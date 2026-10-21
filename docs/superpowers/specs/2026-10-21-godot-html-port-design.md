@@ -2,7 +2,7 @@
 
 Date: 2026-10-21
 
-Status: written design approved by the user on 2026-10-21; implementation plan requires review before execution.
+Status: written design approved by the user on 2026-10-21; implementation authorized 2026-10-21 with the review amendments below.
 
 ## 1. Agreed outcome and authority
 
@@ -106,7 +106,7 @@ docs/
 
 A feature keeps its scripts, scenes and resource classes together when they serve the same feature. Shared presentation components exist only when there is an actual shared use. Do not create a base class or interface for every file.
 
-Use typed GDScript, `RefCounted` runtime state/services where scene access is unnecessary, and custom `Resource` definitions for authored configuration. Treat definitions as immutable: create separate runtime instances for mutable jobs, visitors and sessions. Stable content IDs are used in saves; node paths and live Resource/Node references are not serialized.
+Use typed GDScript, `RefCounted` runtime state/services where scene access is unnecessary, and typed read models loaded from external JSON for authored configuration. Treat definitions as immutable: create separate runtime instances for mutable jobs, visitors and sessions. Stable content IDs are used in saves; node paths and live Resource/Node references are not serialized.
 
 Recipes describe their actual required steps, timings, sugar options and quality parameters. A small explicit step/action vocabulary supports the two current foods; adding an ordinary recipe should be data work, while a genuinely new cooking action adds a focused handler. Avoid a generic scripting language for recipes.
 
@@ -128,7 +128,7 @@ Use Godot-native particles, lights/modulation and shaders only as needed to matc
 
 ## 7. Ink integration
 
-Use Godot Standard 4.6.3, GDScript, Compatibility rendering, official inklecate 1.2.1 and upstream `ephread/inkgd`'s Godot-4 implementation. Start qualification with pinned commit `fea9098ee18d6cdbe9a5e25f8f0296bcdf0fd96a`, identified in the reference project's compatibility report; verify it in this project. Record exact versions and verify downloaded compiler archives against an authoritative checksum. The upstream Godot-4 branch lacks a formal stable release, so native and browser qualification is an early gate, not an assumed result.
+Use Godot Standard 4.7.2, GDScript, Compatibility rendering, official inklecate 1.2.1 and upstream `ephread/inkgd`'s Godot-4 implementation. Start qualification with pinned commit `fea9098ee18d6cdbe9a5e25f8f0296bcdf0fd96a`, identified in the reference project's compatibility report; verify it in this project. Record exact versions and verify downloaded compiler archives against an authoritative checksum. The upstream Godot-4 branch lacks a formal stable release, so native and browser qualification is an early gate, not an assumed result.
 
 Only the narrative adapter imports plugin types. Other modules see application-owned line, speaker, choice and session records. The Ink compiler runs during setup/build and authoring, never as a player-runtime requirement. Keep reproducible compiled story JSON available to exports, and check that generated content matches the authored sources. Preserve third-party licenses separately from original game code.
 
@@ -197,3 +197,15 @@ Capture the unchanged HTML and Godot at comparable scene/time/viewport states fo
 ## 12. Review and next step
 
 This document defines the whole port, not its detailed task-by-task execution plan. The user approved this written design on 2026-10-21. Write the implementation plan against this parity matrix, obtain its review and execution-method selection, then implement and verify the complete selected scope. No product scaffolding or dependency installation has been performed as part of this design step.
+
+
+## Authorized review amendments — 2026-10-21
+
+These user changes supersede older Resource-authoring paths and the simpler clock above. Execution is authorized; no additional design gate is pending.
+
+1. **Latest stable engine:** Godot 4.7.2, confirmed via the official godotengine/godot-builds latest stable release API. Pin it and matching templates with official asset digests; qualify actual Ink/native/Web behavior before accepting compatibility.
+2. **Data independent of builds:** Store balance, initial state, needs, clock rate, recipes/quality, actors, schedules, location/prop layout, interaction definitions, UI/localization, audio mix and dialogue eligibility as JSON under content/. Replace .tres authoring deliverables with corresponding .json data. ContentStore loads the bundled default or an external --content-dir bundle; Web exports deploy a sidecar content/ directory fetched from the same origin. Validate a complete candidate before activation; reload at the title/session boundary, never halfway through a transaction. Existing behavior handlers stay in typed GDScript; a new behavior may require code. Ink compilation produces replaceable story JSON without rebuilding Godot. Content fingerprints protect saved active stories/jobs from incompatible data.
+3. **Independent shared time and dependency order:** game/time/game_clock.gd publishes one authoritative frame (tick, simulation seconds, day and world minutes). simulation_coordinator.gd validates and topologically orders registered systems using allowlisted IDs and declared dependencies. Reject missing dependencies/cycles before play. world_scheduler.gd stores stable due jobs with explicit clock domains, prerequisites, deadline and status; blocked jobs remain visible/retryable or expire, never freeze world time or execute ahead of prerequisites. Bootstrap also has a readiness barrier. Cooking, visits, needs and narrative use this shared step; presentation time remains noncanonical.
+4. **Knowledge and relationship foundation:** Canonical KnowledgeBook and hidden directional RelationshipStore feed a finite ConditionEvaluator: all/any/not, fact_known, relationship_at_least, visit_count_at_least, day_at_least, time_window, participants_available and distance_at_most. Validate all IDs/operators/thresholds. Narrative context exposes read-only canonical queries/projections to real Ink. Gate encounter starts, optional interjections and offered choices; revalidate at selection and after load. Default content preserves HTML encounters while tests exercise knowledgeable/unknown and familiar/unfamiliar variants. Persist relations, fact provenance and pending conditions; no visible friendship meter or invented progression grind.
+
+Implementation mapping: Task 1 adds ContentStore/JSON reload tests and latest-engine qualification; Task 2 adds game/time coordinator/scheduler with dependency-cycle, prerequisite and deterministic-order tests; Task 8 adds RelationshipStore/ConditionEvaluator plus real conditional Ink tests; Task 9 persists those additions; Task 12 verifies external JSON and compiled Ink changes take effect without an engine rebuild. UI .tscn and reusable code-only visual scenes remain native Godot assets; gameplay definitions and all tuning values live in JSON.
