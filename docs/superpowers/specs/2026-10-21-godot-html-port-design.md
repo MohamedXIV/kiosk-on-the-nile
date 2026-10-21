@@ -2,7 +2,7 @@
 
 Date: 2026-10-21
 
-Status: behavioral scope confirmed in conversation; this written design awaits review before implementation planning.
+Status: written design approved by the user on 2026-10-21; implementation plan requires review before execution.
 
 ## 1. Agreed outcome and authority
 
@@ -196,4 +196,4 @@ Capture the unchanged HTML and Godot at comparable scene/time/viewport states fo
 
 ## 12. Review and next step
 
-This document defines the whole port, not its detailed task-by-task execution plan. Review it for fidelity to the HTML, deliberate cleanups and component ownership. Once the written design is approved, write the implementation plan against this parity matrix, then implement and verify the complete selected scope. No product scaffolding or dependency installation has been performed as part of this design step.
+This document defines the whole port, not its detailed task-by-task execution plan. The user approved this written design on 2026-10-21. Write the implementation plan against this parity matrix, obtain its review and execution-method selection, then implement and verify the complete selected scope. No product scaffolding or dependency installation has been performed as part of this design step.
