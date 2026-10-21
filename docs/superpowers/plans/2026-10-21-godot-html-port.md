@@ -120,7 +120,7 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
 
 **Interfaces:** `LocationDefinition` provides ground bounds, solid footprints, prop definitions, spawn/approach markers and typed interaction definitions. `LocationView.configure(definition: LocationDefinition, session: GameSession)`, `interaction_targets() -> Array[InteractionTarget]`. `KioskNavigation.configure(definition, mapping)`, `path(start: Vector2, goal: Vector2) -> PackedVector2Array`. Visual components receive presentation values rather than invoking services. Kettle/grill/fan expose `present(state: Dictionary)` until feature-specific typed views are wired.
 
-- [ ] **Step 1 — Write failures:** `test_rooftop_and_kiosk_markers` checks source bed `(-1.65,-1.2)`, exit `(0,2.05)`, tea `(-1.3,0.65)`, grill `(0.35,0.65)` and phone `(-1.95,-1.15)`. `test_counter_right_access_and_furniture` tests the passable right opening and solid counter/bed/desk/table. `test_visitor_lanes_are_not_player_bounds` asserts valid routes from X ±14.5 while the player retains X ±9.5 limits.
+- [x] **Step 1 — Write failures:** `test_rooftop_and_kiosk_markers` checks source bed `(-1.65,-1.2)`, exit `(0,2.05)`, tea `(-1.3,0.65)`, grill `(0.35,0.65)` and phone `(-1.95,-1.15)`. `test_counter_right_access_and_furniture` tests the passable right opening and solid counter/bed/desk/table. `test_visitor_lanes_are_not_player_bounds` asserts valid routes from X ±14.5 while the player retains X ±9.5 limits.
 
   ```gdscript
   check.equal(kiosk_definition.marker(&"tea"), Vector2(-1.3, 0.65))
@@ -128,10 +128,10 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.is_true(navigation.path(Vector2(-14.5, 3.6), counter_approach).size() > 1)
   check.is_true(counter_blocked and right_opening_reachable)
   ```
-- [ ] **Step 2 — Record red:** Run `locations`; expect missing definitions/scenes or failed physical routes.
-- [ ] **Step 3 — Implement:** Read the HTML's source layout/draw routines to reproduce both scene compositions with independent prop components, the current rooftop floor from X -3 to 3 and depth -2.2 to 2.25, counter at depth 0.7 and the listed source destinations. `LocationDefinition.marker(id: StringName) -> Vector2` resolves logical anchors. Keep both rooms retained, with kiosk root at canvas origin and rooftop root offset by `(4096,0)` pixels, so hidden NPC physics can continue without colliding with the player in another room; logical coordinates remain room-local. Share footprints between native colliders and AStarGrid2D navigation; provide actor clearance and reachable approach points. Draw the river, boat, railing, streetlamp, shelves, phone, sign, rug, desk, bed, stools and table. Camera follows with the specified offset/smoothing. Fan visibility reads home ownership.
-- [ ] **Step 4 — Verify:** Run `locations` and `spatial`. Capture both locations at a common 1280×720 viewport and inspect relative character scale, prop readability and counter occlusion against the HTML. These scenes must already be recognizable before proceeding to the integrated product.
-- [ ] **Step 5 — Commit:** Stage Task 4 paths; commit `feat: recreate kiosk and rooftop locations with solid navigation`.
+- [x] **Step 2 — Record red:** Run `locations`; expect missing definitions/scenes or failed physical routes.
+- [x] **Step 3 — Implement:** Read the HTML's source layout/draw routines to reproduce both scene compositions with independent prop components, the current rooftop floor from X -3 to 3 and depth -2.2 to 2.25, counter at depth 0.7 and the listed source destinations. `LocationDefinition.marker(id: StringName) -> Vector2` resolves logical anchors. Keep both rooms retained, with kiosk root at canvas origin and rooftop root offset by `(4096,0)` pixels, so hidden NPC physics can continue without colliding with the player in another room; logical coordinates remain room-local. Share footprints between native colliders and AStarGrid2D navigation; provide actor clearance and reachable approach points. Draw the river, boat, railing, streetlamp, shelves, phone, sign, rug, desk, bed, stools and table. Camera follows with the specified offset/smoothing. Fan visibility reads home ownership.
+- [x] **Step 4 — Verify:** Run `locations` and `spatial`. Capture both locations at a common 1280×720 viewport and inspect relative character scale, prop readability and counter occlusion against the HTML. These scenes must already be recognizable before proceeding to the integrated product.
+- [x] **Step 5 — Commit:** Stage Task 4 paths; commit `feat: recreate kiosk and rooftop locations with solid navigation`.
 
 ### Task 5: Implement tactile cooking, held food and deterministic quality
 

@@ -20,6 +20,15 @@ func run(check, _tree) -> void:
  invalid = store.bundle()
  invalid.spatial.x_scale = 0
  check.is_true(not store.validate(invalid).ok)
+ invalid = store.bundle()
+ invalid.locations.kiosk.player_bounds = [2,2,1,1]
+ check.is_true(not store.validate(invalid).ok)
+ invalid = store.bundle()
+ invalid.locations.kiosk.props[0].kind = "arbitrary_script"
+ check.is_true(not store.validate(invalid).ok)
+ invalid = store.bundle()
+ invalid.locations.kiosk.interactions[0].radius = -1
+ check.is_true(not store.validate(invalid).ok)
  var before = store.fingerprint
  check.case("invalid_override_is_atomic")
  check.is_true(not store.load_directory("/tmp/does-not-exist-kiosk-content").ok)

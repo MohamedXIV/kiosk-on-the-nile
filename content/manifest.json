@@ -5,6 +5,7 @@
     "balance": "balance.json",
     "needs": "needs.json",
     "social": "social.json",
-    "spatial": "spatial.json"
+    "spatial": "spatial.json",
+    "locations": "locations.json"
   }
 }

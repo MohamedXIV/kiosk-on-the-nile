@@ -22,7 +22,10 @@ try {
  page.on('console',m=>{if(m.type()==='error')errors.push({message:m.text(),location:m.location()});});
  const response=await page.goto(`http://127.0.0.1:${port}/index.html?qa=${scenario}`);
  assert.equal(response.status(),200,"exported qualification must exist");
- if(scenario==='spatial') {
+ if(['kiosk','rooftop'].includes(scenario)) {
+  await page.waitForFunction(()=>window.locationStatus?.ready || window.inkStatus?.phase==='ready',{},{timeout:45000});
+  assert.equal(await page.evaluate(()=>window.locationStatus?.id),scenario,'requested room must boot');
+ } else if(scenario==='spatial') {
   await page.waitForFunction(()=>window.spatialStatus?.ready || window.inkStatus?.phase==='ready',{},{timeout:45000});
   assert.equal(await page.evaluate(()=>window.spatialStatus?.ready),true,'spatial scene must boot');
  } else {
@@ -41,5 +44,5 @@ try {
  assert.deepEqual(errors,[]);
  await mkdir('/tmp/kiosk-port-evidence',{recursive:true});
  await page.screenshot({path:`/tmp/kiosk-port-evidence/${scenario}-arabic.png`});
- console.log(scenario==='spatial'?'SPATIAL_BROWSER_PASS: native character and counter depth': 'INK_BROWSER_PASS: real Ink, Arabic choice, persistent hard reload');
+ console.log(['kiosk','rooftop'].includes(scenario)?`LOCATION_BROWSER_PASS: ${scenario}`:scenario==='spatial'?'SPATIAL_BROWSER_PASS: native character and counter depth': 'INK_BROWSER_PASS: real Ink, Arabic choice, persistent hard reload');
 } finally {await writeFile(`${build}/content/time.json`,originalClock);await browser?.close();server.kill();}

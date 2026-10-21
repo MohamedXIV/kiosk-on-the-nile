@@ -6,6 +6,9 @@ var start: Button
 var restored := false
 var content: ContentStore
 func _ready() -> void:
+ if OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('qa')") in ["kiosk","rooftop"]:
+  add_child(load("res://tests/qualification/locations_boot.tscn").instantiate())
+  return
  if OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('qa')") == "spatial":
   add_child(load("res://tests/fixtures/spatial_room.tscn").instantiate())
   return

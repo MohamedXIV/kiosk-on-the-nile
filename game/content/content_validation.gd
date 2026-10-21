@@ -44,7 +44,46 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not spatial.get("initial_ground") is Array or spatial.initial_ground.size()!=2: return fail("spatial.initial_ground")
   for value in spatial.initial_ground:
    if not number(value): return fail("spatial.initial_ground")
+ if bundle.has("locations"):
+  if not bundle.locations is Dictionary: return fail("locations")
+  for id in bundle.locations:
+   var data: Variant = bundle.locations[id]
+   if not data is Dictionary: return fail("locations."+id)
+   for key in ["player_bounds","navigation_bounds"]:
+    if not rectangle(data.get(key)): return fail("locations."+id+"."+key)
+   for key in ["canvas_origin","spawn"]:
+    if not vector(data.get(key),2): return fail("locations."+id+"."+key)
+   if not data.get("solids") is Array or not data.get("props") is Array or not data.get("interactions") is Array or not data.get("markers") is Dictionary or not data.get("floor") is Dictionary: return fail("locations."+id)
+   if not number(data.get("navigation_cell")) or float(data.navigation_cell)<=0 or not bounded(data.get("navigation_clearance"),0,2): return fail("locations."+id+".navigation")
+   if not props(data.props): return fail("locations."+id+".props")
+   for marker in data.markers.values():
+    if not vector(marker,2): return fail("locations."+id+".markers")
+   for solid in data.solids:
+    if not solid is Dictionary: return fail("locations."+id+".solids")
+    if solid.get("kind") == "rect":
+     if not rectangle(solid.get("rect")): return fail("locations."+id+".solids")
+    elif solid.get("kind") == "circle":
+     if not vector(solid.get("center"),2) or not number(solid.get("radius")) or float(solid.radius)<=0: return fail("locations."+id+".solids")
+    else: return fail("locations."+id+".solids.kind")
+   for target in data.interactions:
+    if not target is Dictionary or not target.get("id") is String or not target.get("primary") is String or not vector(target.get("ground"),2) or not number(target.get("radius")) or float(target.radius)<=0: return fail("locations."+id+".interactions")
  return ActionResult.success()
+static func vector(value: Variant, count: int) -> bool:
+ if not value is Array or value.size()!=count: return false
+ for component in value:
+  if not number(component): return false
+ return true
+static func rectangle(value: Variant) -> bool:
+ return vector(value,4) and value[0]<value[2] and value[1]<value[3]
+static func props(values: Array) -> bool:
+ for prop in values:
+  if not prop is Dictionary or not prop.get("kind") in ["box","counter","stool","table","lamp","railing","kettle","grill","fan","sign"] or not vector(prop.get("ground"),2): return false
+  if prop.kind in ["box","counter"]:
+   if not vector(prop.get("size"),3): return false
+   for dimension in prop.size:
+    if float(dimension)<=0: return false
+  if prop.has("children") and (not prop.children is Array or not props(prop.children)): return false
+ return true
 static func number(value: Variant) -> bool:
  return typeof(value) in [TYPE_FLOAT,TYPE_INT] and is_finite(float(value))
 static func integer(value: Variant) -> bool:
