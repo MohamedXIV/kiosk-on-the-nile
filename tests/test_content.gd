@@ -7,6 +7,16 @@ func run(check, _tree) -> void:
  var store = load(path).new()
  check.is_true(store.load_directory("res://content").ok)
  check.equal(store.section("time").minutes_per_second, 2.5)
+ check.case("typed_data_rejects_bad_tuning_before_activation")
+ var invalid: Dictionary = store.bundle()
+ invalid.needs.hunger_decay = -1
+ check.is_true(not store.validate(invalid).ok)
+ invalid = store.bundle()
+ invalid.balance.starting_money = -2
+ check.is_true(not store.validate(invalid).ok)
+ invalid = store.bundle()
+ invalid.social.initial_facts.append("UNDEFINED_FACT")
+ check.is_true(not store.validate(invalid).ok)
  var before = store.fingerprint
  check.case("invalid_override_is_atomic")
  check.is_true(not store.load_directory("/tmp/does-not-exist-kiosk-content").ok)

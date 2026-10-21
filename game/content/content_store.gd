@@ -42,11 +42,7 @@ func load_http(base_url: String) -> ActionResult:
  source_root = base_url
  return ActionResult.success()
 func validate(candidate: Dictionary) -> ActionResult:
- var clock: Dictionary = candidate.get("time", {})
- var rate: Variant = clock.get("minutes_per_second")
- if not typeof(rate) in [TYPE_FLOAT, TYPE_INT] or not is_finite(float(rate)) or float(rate) <= 0:
-  return ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"invalid_clock_rate")
- return ActionResult.success()
+ return ContentValidation.validate(candidate)
 func _valid_manifest(value: Variant) -> bool:
  return value is Dictionary and value.get("schema_version") == 1 and value.get("sections") is Dictionary and value.sections.has("time")
 func _safe_path(path: String) -> bool:

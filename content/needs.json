@@ -1,0 +1,40 @@
+{
+  "initial": {
+    "hunger": 80,
+    "rest": 90,
+    "mood": 75,
+    "baseline": 70
+  },
+  "hunger_decay": 0.28,
+  "work_rest_decay": 0.32,
+  "rest_decay": 0.15,
+  "low_rest": 25,
+  "low_hunger": 20,
+  "low_needs_mood_decay": 0.2,
+  "sleep": {
+    "fan_baseline": 82,
+    "fan_rest": 100,
+    "fan_mood_floor": 88,
+    "normal_rest": 88,
+    "normal_mood_floor": 65,
+    "hunger_floor": 45,
+    "hunger_cost": 22
+  },
+  "snack": {
+    "hunger": 32,
+    "mood": 5
+  },
+  "tea": {
+    "hunger": 5,
+    "base_mood": 12,
+    "quality_mood": 2
+  },
+  "kebda": {
+    "hunger": 35,
+    "base_mood": 10,
+    "quality_mood": 2
+  },
+  "river_mood": 9,
+  "fan_on_mood": 10,
+  "good_service_mood": 4
+}

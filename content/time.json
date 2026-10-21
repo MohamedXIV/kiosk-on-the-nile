@@ -1,1 +1,16 @@
-{"minutes_per_second":2.5,"start_day":1,"start_minutes":930,"wake_minutes":900,"fixed_step":0.016666666666666666,"system_dependencies":{"clock":[],"needs":["clock"],"cooking":["clock"],"actors":["cooking"],"narrative":["actors"],"scheduler":["narrative"]}}
+{
+  "minutes_per_second": 2.5,
+  "start_day": 1,
+  "start_minutes": 930,
+  "wake_minutes": 900,
+  "fixed_step": 0.016666666666666666,
+  "system_dependencies": {
+    "clock": [],
+    "needs": [
+      "clock"
+    ],
+    "scheduler": [
+      "needs"
+    ]
+  }
+}

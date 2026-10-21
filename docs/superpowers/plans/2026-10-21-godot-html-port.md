@@ -81,7 +81,7 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
 
 **Interfaces:** `GameClock`: `day: int`, `minutes: float`, `advance(delta: float)`, `next_day()`. `WalletService`: `balance: int`, `try_spend(amount: int) -> ActionResult`, `credit(amount: int) -> ActionResult`. `NeedsService`: `hunger/rest/mood/baseline: float`, `tick(delta: float, kiosk_open: bool)`, `apply_delta(hunger: float, rest: float, mood: float)`, `after_sleep(fan_running: bool)`. `HomeService`: `has_fan/fan_on: bool`, `toggle_fan() -> ActionResult`, `install_fan() -> ActionResult`. `KnowledgeBook`: `has(fact: StringName) -> bool`, `learn(fact: StringName, note: String) -> bool`, `notes() -> PackedStringArray`. `GameSession`: `configure(config)`, `start_new()`, `tick(delta: float)`, `running: bool`, `location_id: StringName`, `kiosk_open: bool`, `player_ground: Vector2`, and owned `clock: GameClock`, `wallet: WalletService`, `needs: NeedsService`, `home: HomeService`, `knowledge: KnowledgeBook`. Later tasks add typed `cooking`, `service`, `supply`, `life_actions`, `visitors` and `narrative` fields as their classes are introduced. IDs are `rooftop` and `kiosk`.
 
-- [ ] **Step 1 — Write failures:** `test_initial_day_and_inactive_title` asserts day 1, minutes 930, balance 4500, needs 80/90/75 and no advancement before start; after one active second assert minutes 932.5, hunger 79.72 and rest 89.85 while closed. `test_rent_and_fan_sleep` asserts next day 900 minutes, a 1500-piastre rent debit, baseline 82/rest 100 with a running installed fan; an insufficient balance is retained without invented debt. `test_money_rejects_negative_and_failed_spend_is_atomic` asserts rejection leaves balance unchanged. `test_unique_knowledge` asserts one fact/note per learned ID.
+- [x] **Step 1 — Write failures:** `test_initial_day_and_inactive_title` asserts day 1, minutes 930, balance 4500, needs 80/90/75 and no advancement before start; after one active second assert minutes 932.5, hunger 79.72 and rest 89.85 while closed. `test_rent_and_fan_sleep` asserts next day 900 minutes, a 1500-piastre rent debit, baseline 82/rest 100 with a running installed fan; an insufficient balance is retained without invented debt. `test_money_rejects_negative_and_failed_spend_is_atomic` asserts rejection leaves balance unchanged. `test_unique_knowledge` asserts one fact/note per learned ID.
 
   ```gdscript
   check.equal(session.clock.day, 1)
@@ -90,10 +90,10 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.near(session.needs.hunger, 79.72)
   check.near(session.needs.rest, 89.85)
   ```
-- [ ] **Step 2 — Record red:** Run the `daily_life` suite; expect assertions/classes missing, preserving the earlier Ink result.
-- [ ] **Step 3 — Implement:** Create immutable balance defaults and separate runtime services using the HTML formulas, including hunger/rest clamps, low-needs mood decay, EGP 3 snack effects and existing sleep formulas. `GameSession.tick` calls only the composed services when running; it does not own their calculations. UI/focus loss will use fixed steps rather than wall-clock catch-up. Add snapshot/restore with rejection of nonfinite/negative invalid state.
-- [ ] **Step 4 — Verify:** Run `daily_life` and `ink_runtime`. Add a ten-minute simulated routine with a seeded time source and assert the sum of executed fixed steps, not elapsed wall time; title idle remains unchanged. All actual executed cases must pass.
-- [ ] **Step 5 — Commit:** Stage Task 2 files; commit `feat: add authoritative daily life and wallet services`.
+- [x] **Step 2 — Record red:** Run the `daily_life` suite; expect assertions/classes missing, preserving the earlier Ink result.
+- [x] **Step 3 — Implement:** Create immutable balance defaults and separate runtime services using the HTML formulas, including hunger/rest clamps, low-needs mood decay, EGP 3 snack effects and existing sleep formulas. `GameSession.tick` calls only the composed services when running; it does not own their calculations. UI/focus loss will use fixed steps rather than wall-clock catch-up. Add snapshot/restore with rejection of nonfinite/negative invalid state.
+- [x] **Step 4 — Verify:** Run `daily_life` and `ink_runtime`. Add a ten-minute simulated routine with a seeded time source and assert the sum of executed fixed steps, not elapsed wall time; title idle remains unchanged. All actual executed cases must pass.
+- [x] **Step 5 — Commit:** Stage Task 2 files; commit `feat: add authoritative daily life and wallet services`.
 
 ### Task 3: Establish ground mapping, physical movement and character presentation
 
