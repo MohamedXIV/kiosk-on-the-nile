@@ -11,9 +11,14 @@ var routine: DailyRoutine
 var coordinator := SimulationCoordinator.new()
 var scheduler := WorldScheduler.new()
 var running: bool = false
-var location_id: StringName = &"rooftop"
+var player_pose := ActorPose.new()
+var location_id: StringName:
+ get: return player_pose.location_id
+ set(value): player_pose.location_id = value
 var kiosk_open: bool = false
-var player_ground := Vector2(0,0.5)
+var player_ground: Vector2:
+ get: return player_pose.ground
+ set(value): player_pose.ground = value
 var last_result := ActionResult.success()
 func configure(source: SessionConfig) -> ActionResult:
  for key in ["time","balance","needs","social"]:
@@ -21,6 +26,10 @@ func configure(source: SessionConfig) -> ActionResult:
  var validation := ContentValidation.validate(source.data)
  if not validation.ok: return validation
  config = source
+ var spatial: Dictionary = source.section("spatial")
+ location_id = StringName(spatial.get("initial_location","rooftop"))
+ var initial_ground: Array = spatial.get("initial_ground",[0,0.5])
+ player_ground = Vector2(initial_ground[0],initial_ground[1])
  var balance: Dictionary = source.section("balance")
  if not typeof(balance.get("starting_money")) in [TYPE_INT,TYPE_FLOAT] or balance.starting_money < 0:
   return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_starting_money")

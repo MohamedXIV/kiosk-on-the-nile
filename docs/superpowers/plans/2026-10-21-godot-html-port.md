@@ -101,7 +101,7 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
 
 **Interfaces:** `SpatialMapping.to_canvas(ground: Vector2, height: float = 0.0) -> Vector2`, `to_ground(canvas: Vector2) -> Vector2`; fixed scales 68/54/48. `ActorPose`: `location_id: StringName`, logical `ground: Vector2`, `facing: Vector2` and `walk_phase: float`. `GameSession.player_pose` becomes the player pose owner; its existing location/ground properties delegate to that pose rather than duplicating storage. `ActorMotor extends CharacterBody2D`: `configure(mapping: SpatialMapping, speed: float)`, `step_input(direction: Vector2, delta: float)`, `step_path(path: PackedVector2Array, delta: float)`, signal `pose_changed(pose: ActorPose)`. `InteractionTarget` is a runtime value with stable ID, logical anchor, radius and computed primary/secondary availability. `InteractionSelector.nearest(ground: Vector2, targets: Array[InteractionTarget]) -> InteractionTarget`. `CharacterView.present(pose: ActorPose, color: Color, is_player: bool)`; `HeldItemView.present(item: Variant)` accepts a presentation record initially and is narrowed to `PreparedItem` in Task 5, with null hiding it.
 
-- [ ] **Step 1 — Write failures:** `test_projection_round_trip` asserts `(1,2), height 1` maps to `(68,60)` and ground mapping round-trips at zero height. `test_normalized_speed_and_collision` moves cardinally/diagonally at 4.5 logical units/sec and asserts a body cannot cross a solid test counter. `test_nearest_available_target` checks source-style nearest selection and out-of-range rejection. `test_caption_pose_uses_physics_result` compares the committed pose to the actual body position converted through the mapping after sliding.
+- [x] **Step 1 — Write failures:** `test_projection_round_trip` asserts `(1,2), height 1` maps to `(68,60)` and ground mapping round-trips at zero height. `test_normalized_speed_and_collision` moves cardinally/diagonally at 4.5 logical units/sec and asserts a body cannot cross a solid test counter. `test_nearest_available_target` checks source-style nearest selection and out-of-range rejection. `test_caption_pose_uses_physics_result` compares the committed pose to the actual body position converted through the mapping after sliding.
 
   ```gdscript
   check.equal(mapping.to_canvas(Vector2(1, 2), 1.0), Vector2(68, 60))
@@ -109,10 +109,10 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.near(diagonal_ground_distance, 4.5) # one unobstructed second
   check.equal(committed_pose.ground, mapping.to_ground(motor.position))
   ```
-- [ ] **Step 2 — Record red:** Run the `spatial` suite on an actual SceneTree with physics frames; a geometric mock alone is insufficient.
-- [ ] **Step 3 — Implement:** Use native bodies and unscaled collision hierarchies in the projected plane, with actor visuals offset above the foot anchor. Define the ground pose update once after physics and use it everywhere. Recreate the source's torso/head/legs, apron, directional eyes and shadow as a small component; future art replacement preserves its foot anchor. Use Y sorting, not hand-maintained per-frame global z indices.
-- [ ] **Step 4 — Verify:** Run `spatial` and earlier native suites. Capture the fixture with a character both behind and in front of the counter; assert unchanged collision placement and correct Y-sort ordering, then inspect the image.
-- [ ] **Step 5 — Commit:** Stage Task 3 paths; commit `feat: add grounded movement and reusable character presentation`.
+- [x] **Step 2 — Record red:** Run the `spatial` suite on an actual SceneTree with physics frames; a geometric mock alone is insufficient.
+- [x] **Step 3 — Implement:** Use native bodies and unscaled collision hierarchies in the projected plane, with actor visuals offset above the foot anchor. Define the ground pose update once after physics and use it everywhere. Recreate the source's torso/head/legs, apron, directional eyes and shadow as a small component; future art replacement preserves its foot anchor. Use Y sorting, not hand-maintained per-frame global z indices.
+- [x] **Step 4 — Verify:** Run `spatial` and earlier native suites. Capture the fixture with a character both behind and in front of the counter; assert unchanged collision placement and correct Y-sort ordering, then inspect the image.
+- [x] **Step 5 — Commit:** Stage Task 3 paths; commit `feat: add grounded movement and reusable character presentation`.
 
 ### Task 4: Build both recognizable locations and contextual interaction points
 

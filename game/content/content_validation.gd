@@ -36,6 +36,14 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not social.get("relationship_defaults") is Dictionary: return fail("social.relationship_defaults")
   for axis in ["familiarity","trust"]:
    if not bounded(social.relationship_defaults.get(axis),social.relationship_bounds[0],social.relationship_bounds[1]): return fail("social.relationship_defaults."+axis)
+ if bundle.has("spatial"):
+  var spatial: Dictionary = bundle.spatial
+  for key in ["x_scale","depth_scale","height_scale","player_speed","npc_speed","foot_radius","camera_smoothing"]:
+   if not number(spatial.get(key)) or float(spatial[key]) <= 0: return fail("spatial."+key)
+  if not bounded(spatial.get("camera_vertical_anchor"),0,1): return fail("spatial.camera_vertical_anchor")
+  if not spatial.get("initial_ground") is Array or spatial.initial_ground.size()!=2: return fail("spatial.initial_ground")
+  for value in spatial.initial_ground:
+   if not number(value): return fail("spatial.initial_ground")
  return ActionResult.success()
 static func number(value: Variant) -> bool:
  return typeof(value) in [TYPE_FLOAT,TYPE_INT] and is_finite(float(value))
