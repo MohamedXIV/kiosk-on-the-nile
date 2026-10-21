@@ -1,0 +1,2656 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk on the Nile — كشك ع النيل (2D Three-Quarter Vertical Slice)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: rgba(18, 16, 14, 0.88);
+            --border-warm: rgba(212, 163, 89, 0.42);
+            --accent-amber: #e6a145;
+            --accent-nile: #4a8bad;
+            --text-main: #f3ece1;
+            --text-muted: #b8afa3;
+            --good-green: #68a357;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0d0c0b;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            color: var(--text-main);
+        }
+
+        #canvas-container {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        /* Top HUD */
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .hud-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-warm);
+            border-radius: 8px;
+            padding: 12px 18px;
+            backdrop-filter: blur(6px);
+            pointer-events: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+        }
+
+        .time-money-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+        }
+
+        .needs-box {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .need-item {
+            display: flex;
+            flex-direction: column;
+            width: 90px;
+            gap: 4px;
+        }
+
+        .need-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+        }
+
+        .need-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .need-bar-fill {
+            height: 100%;
+            background: var(--accent-amber);
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .utility-btns {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge-2d {
+            background: rgba(74, 139, 173, 0.22);
+            border: 1px solid var(--accent-nile);
+            color: #9cd3f0;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .btn-ui {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-warm);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.2s;
+        }
+
+        .btn-ui:hover {
+            background: var(--accent-amber);
+            color: #111;
+        }
+
+        /* World Labels & Spatial Speech Bubbles */
+        #world-overlays {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .spatial-bubble {
+            position: absolute;
+            transform: translate(-50%, -100%);
+            background: rgba(22, 19, 16, 0.94);
+            border: 1px solid var(--accent-amber);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            max-width: 260px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.55);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            line-height: 1.4;
+        }
+
+        .spatial-bubble .speaker-name {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-amber);
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .spatial-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: var(--accent-amber) transparent;
+        }
+
+        .station-gauge {
+            position: absolute;
+            transform: translate(-50%, -100%);
+            background: rgba(16, 14, 12, 0.92);
+            border: 1px solid rgba(230, 161, 69, 0.55);
+            color: #f5ebd6;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.45);
+        }
+
+        /* Bottom Contextual Area */
+        .hud-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #dialogue-choices-panel {
+            display: none;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-amber);
+            border-radius: 10px;
+            padding: 14px 20px;
+            max-width: 560px;
+            width: 100%;
+            pointer-events: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+        }
+
+        .choice-prompt-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .choices-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .choice-btn {
+            background: rgba(230, 161, 69, 0.14);
+            border: 1px solid var(--accent-amber);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .choice-btn:hover {
+            background: var(--accent-amber);
+            color: #12100e;
+            font-weight: 600;
+        }
+
+        #interaction-prompt {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-warm);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        .key-badge {
+            background: var(--accent-amber);
+            color: #12100e;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+        }
+
+        #player-tray-indicator {
+            background: rgba(32, 28, 24, 0.92);
+            border: 1px solid var(--accent-amber);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            color: var(--accent-amber);
+            display: none;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: absolute;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 25;
+            pointer-events: none;
+            align-items: center;
+        }
+
+        .toast-msg {
+            background: rgba(20, 18, 15, 0.94);
+            border-right: 4px solid var(--accent-amber);
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+            animation: fadeInOut 3.8s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            12% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* Notebook / Modal */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 7, 6, 0.78);
+            z-index: 40;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-box {
+            background: #1c1916;
+            border: 1px solid var(--accent-amber);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 580px;
+            padding: 24px;
+            max-height: 82vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            color: var(--accent-amber);
+            font-weight: 700;
+        }
+
+        .note-entry {
+            background: rgba(255,255,255,0.04);
+            border-right: 3px solid var(--accent-amber);
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        /* Start & Transition Overlay */
+        #title-screen {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(25, 21, 18, 0.88) 0%, rgba(10, 9, 8, 0.98) 100%);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            pointer-events: auto;
+        }
+
+        #title-screen h1 {
+            font-size: 2.8rem;
+            color: var(--accent-amber);
+            margin-bottom: 6px;
+        }
+
+        #title-screen h2 {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 24px;
+        }
+
+        .philosophy-quote {
+            max-width: 480px;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #dfd7cb;
+            margin-bottom: 30px;
+            padding: 16px;
+            border-top: 1px solid var(--border-warm);
+            border-bottom: 1px solid var(--border-warm);
+        }
+
+        .start-btn {
+            background: var(--accent-amber);
+            color: #12100e;
+            border: none;
+            padding: 12px 34px;
+            font-size: 1.15rem;
+            font-family: inherit;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.04);
+            background: #f3b35c;
+        }
+
+        #fade-overlay {
+            position: absolute;
+            inset: 0;
+            background: #090807;
+            z-index: 45;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.65s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: var(--accent-amber);
+        }
+
+        .controls-hint-bar {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.55);
+            padding: 4px 14px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="game-canvas"></canvas>
+    </div>
+    <div id="world-overlays">
+        <div id="gauge-tea" class="station-gauge" style="display:none;"></div>
+        <div id="gauge-kebda" class="station-gauge" style="display:none;"></div>
+    </div>
+
+    <!-- Title Screen -->
+    <div id="title-screen">
+        <h1>كشك ع النيل</h1>
+        <h2>Kiosk on the Nile — 2D Three-Quarter Top-Down Slice</h2>
+        <div class="philosophy-quote">
+            «اشتغل شوية. قابل الناس. اعمل حاجة حلوة. اتفرج ع النيل. روّح بيتك. عيش.»<br>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">نسخة المقارنة العادلة 2D (منظور علوي ٣/٤ دافئ مع فرز عمق كامل وإضاءة ليلية)</span>
+        </div>
+        <button class="start-btn" id="btn-start-game">ابدأ يومك (Start 2D Experience)</button>
+    </div>
+
+    <!-- Scene / Day Transition Curtain -->
+    <div id="fade-overlay"><span id="fade-text"></span></div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <!-- Main HUD -->
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div class="hud-card time-money-box">
+                <div class="stat-group">
+                    <span class="stat-label" id="location-label">أوضة السطح - شبرا</span>
+                    <span class="stat-value" id="day-time-label">اليوم ١ — ٠٣:٣٠ م</span>
+                </div>
+                <div style="width:1px; height:32px; background:var(--border-warm);"></div>
+                <div class="stat-group">
+                    <span class="stat-label">الفلوس (ج.م)</span>
+                    <span class="stat-value" id="money-label">45 ج.م</span>
+                </div>
+                <div style="width:1px; height:32px; background:var(--border-warm);"></div>
+                <div class="stat-group">
+                    <span class="stat-label">خامات الكشك</span>
+                    <span style="font-size:0.85rem;" id="stock-label">شاي: 6 | كبدة: 5</span>
+                </div>
+            </div>
+
+            <div class="hud-card needs-box">
+                <div class="need-item">
+                    <div class="need-header"><span>شبع</span><span id="val-hunger">80%</span></div>
+                    <div class="need-bar-bg"><div class="need-bar-fill" id="bar-hunger" style="width:80%"></div></div>
+                </div>
+                <div class="need-item">
+                    <div class="need-header"><span>راحة</span><span id="val-rest">90%</span></div>
+                    <div class="need-bar-bg"><div class="need-bar-fill" id="bar-rest" style="width:90%"></div></div>
+                </div>
+                <div class="need-item">
+                    <div class="need-header"><span>روقان</span><span id="val-mood">75%</span></div>
+                    <div class="need-bar-bg"><div class="need-bar-fill" id="bar-mood" style="width:75%"></div></div>
+                </div>
+            </div>
+
+            <div class="hud-card utility-btns">
+                <span class="badge-2d">2D 3/4 Top-Down</span>
+                <button class="btn-ui" id="btn-notebook">دفتر الملاحظات (N)</button>
+                <button class="btn-ui" id="btn-save">حفظ (Save)</button>
+                <button class="btn-ui" id="btn-tests">فحص الأنظمة (Tests)</button>
+            </div>
+        </div>
+
+        <div class="hud-bottom">
+            <div id="dialogue-choices-panel">
+                <div class="choice-prompt-title" id="choice-context-title">شارك في الكلام:</div>
+                <div class="choices-list" id="choices-container"></div>
+            </div>
+
+            <div id="player-tray-indicator">في إيدك: فاضي</div>
+
+            <div id="interaction-prompt">
+                <span class="key-badge">E</span>
+                <span id="prompt-text">تفاعل</span>
+                <span id="prompt-secondary" style="display:none;"><span class="key-badge">F</span> <span id="prompt-sec-text"></span></span>
+            </div>
+
+            <div class="controls-hint-bar">
+                الحركة: WASD أو الأسهم | تفاعل أساسي: E | تفاعل إضافي / أكل شخصي: F | الملاحظات: N
+            </div>
+        </div>
+    </div>
+
+    <!-- Notebook & System Test Modal -->
+    <div class="modal-overlay" id="modal-notebook">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title">دفتر الملاحظات والمعارف</span>
+                <button class="btn-ui" id="btn-close-modal">إغلاق</button>
+            </div>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+<script>
+/**
+ * KIOSK ON THE NILE — 2D THREE-QUARTER TOP-DOWN VERTICAL SLICE
+ * 1-to-1 Functional Parity with the 3D Prototype:
+ * - Identical SoundscapeEngine (Web Audio API procedural synthesizer)
+ * - Identical CanonicalGameState, Economy, Needs, and Save/Load
+ * - Identical TeaStation & KebdaStation cooking state machines
+ * - Identical NPCEntity schedules, Uncle Amgad memory/fan referral, Mahmoud & Samir football debate
+ * - Dedicated 2D Three-Quarter Oblique Top-Down Renderer with true Y-Depth Sorting,
+ *   solid furniture/counter collision boxes, particle steam/smoke, and atmospheric warm night lighting.
+ */
+
+// ============================================================================
+// 1. PROCEDURAL AUDIO ENGINE (100% Identical to 3D Prototype)
+// ============================================================================
+class SoundscapeEngine {
+    constructor() {
+        this.ctx = null;
+        this.nileGain = null;
+        this.sizzleGain = null;
+        this.kettleGain = null;
+        this.fanGain = null;
+        this.initialized = false;
+    }
+
+    init() {
+        if (this.initialized) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+
+        const bufferSize = this.ctx.sampleRate * 3;
+        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= 3.5;
+        }
+
+        // Nile Water Flowing Loop
+        const nileSource = this.ctx.createBufferSource();
+        nileSource.buffer = noiseBuffer;
+        nileSource.loop = true;
+        const nileFilter = this.ctx.createBiquadFilter();
+        nileFilter.type = 'lowpass';
+        nileFilter.frequency.value = 340;
+        this.nileGain = this.ctx.createGain();
+        this.nileGain.gain.value = 0.0;
+        nileSource.connect(nileFilter).connect(this.nileGain).connect(this.ctx.destination);
+        nileSource.start();
+
+        // Kebda Sizzle Loop
+        const sizzleBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const sizzleData = sizzleBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            sizzleData[i] = (Math.random() * 2 - 1) * (Math.random() > 0.15 ? 0.3 : 1.0);
+        }
+        const sizzleSource = this.ctx.createBufferSource();
+        sizzleSource.buffer = sizzleBuffer;
+        sizzleSource.loop = true;
+        const sizzleFilter = this.ctx.createBiquadFilter();
+        sizzleFilter.type = 'bandpass';
+        sizzleFilter.frequency.value = 3200;
+        this.sizzleGain = this.ctx.createGain();
+        this.sizzleGain.gain.value = 0.0;
+        sizzleSource.connect(sizzleFilter).connect(this.sizzleGain).connect(this.ctx.destination);
+        sizzleSource.start();
+
+        // Kettle Boil Loop
+        const kettleSource = this.ctx.createBufferSource();
+        kettleSource.buffer = noiseBuffer;
+        kettleSource.loop = true;
+        const kettleFilter = this.ctx.createBiquadFilter();
+        kettleFilter.type = 'bandpass';
+        kettleFilter.frequency.value = 950;
+        this.kettleGain = this.ctx.createGain();
+        this.kettleGain.gain.value = 0.0;
+        kettleSource.connect(kettleFilter).connect(this.kettleGain).connect(this.ctx.destination);
+        kettleSource.start();
+
+        // Rooftop Electric Fan Hum
+        const fanOsc = this.ctx.createOscillator();
+        fanOsc.type = 'sine';
+        fanOsc.frequency.value = 68;
+        this.fanGain = this.ctx.createGain();
+        this.fanGain.gain.value = 0.0;
+        fanOsc.connect(this.fanGain).connect(this.ctx.destination);
+        fanOsc.start();
+
+        this.initialized = true;
+    }
+
+    updateAmbience(location, isSizzling, isBoiling, isFanRunning) {
+        if (!this.initialized) return;
+        const now = this.ctx.currentTime;
+        this.nileGain.gain.setTargetAtTime(location === 'KIOSK' ? 0.12 : 0.02, now, 0.4);
+        this.sizzleGain.gain.setTargetAtTime(location === 'KIOSK' && isSizzling ? 0.16 : 0.0, now, 0.15);
+        this.kettleGain.gain.setTargetAtTime(location === 'KIOSK' && isBoiling ? 0.10 : 0.0, now, 0.2);
+        this.fanGain.gain.setTargetAtTime(location === 'ROOFTOP' && isFanRunning ? 0.11 : 0.0, now, 0.3);
+    }
+
+    playChime(freq = 520, duration = 0.15, type = 'sine') {
+        if (!this.initialized) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+        osc.connect(gain).connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    }
+
+    playCoin() {
+        this.playChime(880, 0.12, 'triangle');
+        setTimeout(() => this.playChime(1174, 0.2, 'triangle'), 70);
+    }
+
+    playPour() {
+        this.playChime(420, 0.25, 'sine');
+    }
+}
+
+// ============================================================================
+// 2. CANONICAL GAME STATE & ECONOMY (100% Identical to 3D Prototype)
+// ============================================================================
+class CanonicalGameState {
+    constructor() {
+        this.resetToDefault();
+    }
+
+    resetToDefault() {
+        this.day = 1;
+        this.timeMinutes = 15 * 60 + 30; // Starts 3:30 PM on Day 1
+        this.location = 'ROOFTOP'; // 'ROOFTOP' or 'KIOSK'
+        this.kioskOpen = false;
+
+        this.money = 45; // EGP
+        this.dailyRent = 15; // EGP per day
+
+        this.needs = {
+            hunger: 80,
+            rest: 90,
+            mood: 75
+        };
+        this.wellbeingBaseline = 70;
+
+        this.inventory = {
+            teaPortions: 6,
+            kebdaPortions: 5
+        };
+
+        this.knowledge = new Set(['START_ROUTINE']);
+        this.notes = [
+            'اليوم الأول: فتحت الكشك ع النيل. الإيجار اليومي ١٥ جنيه، والأهم إن الواحد يعيشها بروقان.'
+        ];
+
+        this.home = {
+            hasFan: false,
+            fanOn: false
+        };
+
+        this.npcMemory = {
+            amgadVisits: 0,
+            lastServedQuality: null,
+            mahmoudSamirDebateHeard: false,
+            fanReferralUnlocked: false
+        };
+
+        this.heldItem = null; // { type: 'TEA' | 'KEBDA', name: string, quality: string, score: number }
+    }
+
+    addKnowledge(factId, noteText) {
+        if (!this.knowledge.has(factId)) {
+            this.knowledge.add(factId);
+            if (noteText) {
+                this.notes.unshift(noteText);
+                showToast(`معلومة جديدة في الدفتر: ${noteText}`);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    modifyMoney(amount, reason) {
+        this.money = Math.max(0, this.money + amount);
+        const sign = amount >= 0 ? '+' : '';
+        showToast(`${sign}${amount} ج.م (${reason})`);
+    }
+
+    modifyNeed(need, delta) {
+        if (this.needs[need] !== undefined) {
+            this.needs[need] = Math.max(0, Math.min(100, this.needs[need] + delta));
+        }
+    }
+
+    advanceDay() {
+        this.day += 1;
+        this.timeMinutes = 15 * 60; // 3:00 PM
+        this.kioskOpen = false;
+        this.heldItem = null;
+
+        if (this.money >= this.dailyRent) {
+            this.money -= this.dailyRent;
+            showToast(`تم دفع إيجار اليوم (${this.dailyRent} ج.م)`);
+        } else {
+            showToast(`الفلوس مقصرة شوية في الإيجار.. ربنا يفرجها النهاردة.`);
+        }
+
+        if (this.home.hasFan && this.home.fanOn) {
+            this.wellbeingBaseline = 82;
+            this.needs.rest = 100;
+            this.needs.mood = Math.max(this.needs.mood, 88);
+            showToast(`نومة هادية مع هوا المروحة.. صحيت فايق ومزاجك رايق.`);
+        } else {
+            this.needs.rest = 88;
+            this.needs.mood = Math.max(65, (this.needs.mood + this.wellbeingBaseline) / 2);
+        }
+        this.needs.hunger = Math.max(45, this.needs.hunger - 22);
+    }
+
+    formatTime() {
+        const totalHours = Math.floor(this.timeMinutes / 60) % 24;
+        const mins = Math.floor(this.timeMinutes % 60);
+        const period = totalHours >= 12 ? 'م' : 'ص';
+        const hour12 = totalHours % 12 === 0 ? 12 : totalHours % 12;
+        const mStr = mins < 10 ? `0${mins}` : `${mins}`;
+        return `اليوم ${this.day} — ${hour12}:${mStr} ${period}`;
+    }
+
+    saveToStorage() {
+        const data = {
+            day: this.day,
+            timeMinutes: this.timeMinutes,
+            location: this.location,
+            kioskOpen: this.kioskOpen,
+            money: this.money,
+            needs: this.needs,
+            wellbeingBaseline: this.wellbeingBaseline,
+            inventory: this.inventory,
+            knowledge: Array.from(this.knowledge),
+            notes: this.notes,
+            home: this.home,
+            npcMemory: this.npcMemory
+        };
+        localStorage.setItem('KIOSK_ON_THE_NILE_SAVE', JSON.stringify(data));
+    }
+
+    loadFromStorage() {
+        const raw = localStorage.getItem('KIOSK_ON_THE_NILE_SAVE');
+        if (!raw) return false;
+        try {
+            const data = JSON.parse(raw);
+            Object.assign(this, data);
+            this.knowledge = new Set(data.knowledge || []);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+}
+
+// ============================================================================
+// 3. HANDS-ON COOKING SYSTEM (100% Identical to 3D Prototype)
+// ============================================================================
+class TeaStation {
+    constructor() {
+        this.reset();
+    }
+
+    reset() {
+        this.state = 'EMPTY';
+        this.heatTimer = 0;
+        this.brewTimer = 0;
+        this.sugarLevel = 'مظبوط';
+    }
+
+    cycleSugar() {
+        const order = ['مظبوط', 'زيادة', 'سادة'];
+        const idx = (order.indexOf(this.sugarLevel) + 1) % order.length;
+        this.sugarLevel = order[idx];
+        return this.sugarLevel;
+    }
+
+    update(dt) {
+        if (this.state === 'HEATING') {
+            this.heatTimer += dt;
+            if (this.heatTimer >= 3.2) {
+                this.state = 'BOILED';
+            }
+        } else if (this.state === 'BREWING') {
+            this.brewTimer += dt;
+            if (this.brewTimer >= 2.5) {
+                this.state = 'READY';
+            }
+        } else if (this.state === 'READY') {
+            this.brewTimer += dt;
+        }
+    }
+
+    interact(gameState, audio) {
+        if (this.state === 'EMPTY') {
+            if (gameState.inventory.teaPortions <= 0) {
+                showToast('الشاي خلص! اطلب بضاعة من التليفون.');
+                return;
+            }
+            this.state = 'HEATING';
+            this.heatTimer = 0;
+            audio.playPour();
+            return;
+        }
+        if (this.state === 'BOILED') {
+            gameState.inventory.teaPortions -= 1;
+            this.state = 'BREWING';
+            this.brewTimer = 0;
+            audio.playChime(600, 0.1);
+            return;
+        }
+        if (this.state === 'READY') {
+            if (gameState.heldItem) {
+                showToast('إيدك مش فاضية!');
+                return;
+            }
+            let quality = 'ممتاز';
+            let score = 3;
+            if (this.brewTimer > 12) {
+                quality = 'مقبول (تقل زيادة)';
+                score = 1;
+            } else if (this.brewTimer > 8.5) {
+                quality = 'حلو';
+                score = 2;
+            }
+            gameState.heldItem = {
+                type: 'TEA',
+                name: `كوباية شاي (${this.sugarLevel})`,
+                quality,
+                score
+            };
+            audio.playPour();
+            this.reset();
+        }
+    }
+
+    getStatusLabel() {
+        switch (this.state) {
+            case 'EMPTY': return `البراد فاضي (سكر: ${this.sugarLevel})`;
+            case 'HEATING': return `المية بتغلي... (${Math.min(100, Math.floor((this.heatTimer / 3.2) * 100))}%)`;
+            case 'BOILED': return `المية غليت! [E] حط الشاي والسكر (${this.sugarLevel})`;
+            case 'BREWING': return `الشاي بيتخدّر ع الهادي...`;
+            case 'READY': return this.brewTimer > 9 ? `الشاي تقل! [E] صب في الكوباية` : `الشاي جاهز ومظبوط! [E] صب الكوباية`;
+        }
+    }
+
+    getCompactBadge() {
+        if (this.state === 'EMPTY') return null;
+        if (this.state === 'HEATING') return `غليان ${Math.min(100, Math.floor((this.heatTimer / 3.2) * 100))}%`;
+        if (this.state === 'BOILED') return `المية غليت! [E]`;
+        if (this.state === 'BREWING') return `تخدير الشاي...`;
+        if (this.state === 'READY') return this.brewTimer > 9 ? `الشاي تقل [E]` : `شاي جاهز! [E]`;
+    }
+}
+
+class KebdaStation {
+    constructor() {
+        this.reset();
+    }
+
+    reset() {
+        this.state = 'EMPTY';
+        this.cookTimerA = 0;
+        this.cookTimerB = 0;
+        this.seasoned = false;
+    }
+
+    update(dt) {
+        if (this.state === 'SIDE_A') {
+            this.cookTimerA += dt;
+        } else if (this.state === 'SIDE_B' || this.state === 'SEASONED') {
+            this.cookTimerB += dt;
+        }
+    }
+
+    interact(gameState, audio) {
+        if (this.state === 'EMPTY') {
+            if (gameState.inventory.kebdaPortions <= 0) {
+                showToast('الكبدة خلصت! اطلب خامات من التليفون.');
+                return;
+            }
+            gameState.inventory.kebdaPortions -= 1;
+            this.state = 'SIDE_A';
+            this.cookTimerA = 0;
+            this.cookTimerB = 0;
+            this.seasoned = false;
+            audio.playChime(320, 0.12, 'sawtooth');
+            return;
+        }
+        if (this.state === 'SIDE_A') {
+            if (this.cookTimerA < 1.8) {
+                showToast('لسه نية شوية، استنى تاخد لون!');
+                return;
+            }
+            this.state = 'SIDE_B';
+            audio.playChime(440, 0.1);
+            return;
+        }
+        if (this.state === 'SIDE_B') {
+            this.state = 'SEASONED';
+            this.seasoned = true;
+            audio.playChime(680, 0.12);
+            return;
+        }
+        if (this.state === 'SEASONED') {
+            if (gameState.heldItem) {
+                showToast('إيدك مش فاضية!');
+                return;
+            }
+            const qualityObj = this.evaluateQuality();
+            gameState.heldItem = {
+                type: 'KEBDA',
+                name: 'سندوتش كبدة إسكندراني',
+                quality: qualityObj.label,
+                score: qualityObj.score
+            };
+            audio.playChime(760, 0.18);
+            this.reset();
+        }
+    }
+
+    evaluateQuality() {
+        const total = this.cookTimerA + this.cookTimerB;
+        if (total > 15) return { label: 'محروقة شوية', score: 0 };
+        if (this.cookTimerA >= 2.2 && this.cookTimerA <= 7.0 && this.cookTimerB >= 1.8 && this.cookTimerB <= 7.0 && this.seasoned) {
+            return { label: 'ممتاز (ريحة تجيب آخر الشارع)', score: 3 };
+        }
+        if (total >= 3.5 && total <= 12.5) {
+            return { label: 'حلو', score: 2 };
+        }
+        return { label: 'مقبول', score: 1 };
+    }
+
+    getStatusLabel() {
+        switch (this.state) {
+            case 'EMPTY': return 'الجريل جاهز';
+            case 'SIDE_A': {
+                const status = this.cookTimerA < 2.2 ? 'بتتشوح...' : (this.cookTimerA <= 7.0 ? 'وش ١ استوى! [E] قلّب الكبدة' : 'هتتلسع! [E] قلّب بسرعة');
+                return `كبدة ع النار: ${status}`;
+            }
+            case 'SIDE_B': return `وش ٢ ع النار [E] ضيف التوم والكمون والفلفل`;
+            case 'SEASONED': {
+                const warn = this.cookTimerB > 7.5 ? ' (شيلها قبل ما تنشف!)' : '';
+                return `متبلة بالخلطة! [E] عبّي في الفينو${warn}`;
+            }
+        }
+    }
+
+    getCompactBadge() {
+        if (this.state === 'EMPTY') return null;
+        if (this.state === 'SIDE_A') return this.cookTimerA < 2.2 ? `تشويح وش ١...` : `قلّب الكبدة! [E]`;
+        if (this.state === 'SIDE_B') return `تبّل بالتوم والكمون [E]`;
+        if (this.state === 'SEASONED') return `جاهزة للفينو! [E]`;
+    }
+}
+
+// ============================================================================
+// 4. NPC SOCIAL SIMULATION & SPATIAL DIALOGUE (Identical Coordinates & Logic)
+// ============================================================================
+const SPOTS = {
+    SPAWN_WEST: { x: -14.5, z: 3.6 },
+    SPAWN_EAST: { x: 14.5, z: 3.6 },
+    COUNTER_1: { x: -1.3, z: 1.75, facing: { x: 0, z: -1 } },
+    COUNTER_2: { x: 1.1, z: 1.75, facing: { x: 0, z: -1 } },
+    TABLE_A: { x: 5.1, z: 1.6, facing: { x: 1, z: 0 } },
+    TABLE_B: { x: 7.4, z: 1.6, facing: { x: -1, z: 0 } },
+    RAILING_1: { x: -4.8, z: -2.85, facing: { x: 0, z: -1 } },
+    RAILING_2: { x: 3.5, z: -2.85, facing: { x: 0, z: -1 } },
+    WAIT_TAKEAWAY: { x: 0.0, z: 2.35, facing: { x: 0, z: -1 } }
+};
+
+class NPCEntity {
+    constructor(config) {
+        this.id = config.id;
+        this.name = config.name;
+        this.color = config.color || '#9b6b43';
+        this.spotKey = config.spotKey;
+        this.orderType = config.orderType;
+        this.orderLabel = config.orderType === 'TEA' ? 'كوباية شاي' : (config.orderType === 'KEBDA' ? 'سندوتش كبدة' : null);
+
+        const spawn = Math.random() > 0.5 ? SPOTS.SPAWN_WEST : SPOTS.SPAWN_EAST;
+        this.x = spawn.x;
+        this.z = spawn.z;
+        this.facing = { x: 0, z: 1 };
+        this.walkCycle = 0;
+
+        this.targetSpot = SPOTS[this.spotKey];
+        this.state = 'ARRIVING';
+        this.stateTimer = 0;
+        this.stayDuration = config.stayDuration || 22;
+
+        this.currentSpeech = null;
+        this.speechTimer = 0;
+        this.onArrivedCallback = config.onArrivedCallback || null;
+        this.customServeDialog = config.customServeDialog || null;
+        this.ambientLines = config.ambientLines || [];
+    }
+
+    say(text, duration = 5.5) {
+        this.currentSpeech = text;
+        this.speechTimer = duration;
+    }
+
+    update(dt) {
+        if (this.speechTimer > 0) {
+            this.speechTimer -= dt;
+            if (this.speechTimer <= 0) this.currentSpeech = null;
+        }
+
+        const speed = 2.6;
+        if (this.state === 'ARRIVING') {
+            const dx = this.targetSpot.x - this.x;
+            const dz = this.targetSpot.z - this.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist > 0.12) {
+                this.x += (dx / dist) * speed * dt;
+                this.z += (dz / dist) * speed * dt;
+                this.facing = { x: dx / dist, z: dz / dist };
+                this.walkCycle += dt * 10;
+            } else {
+                this.x = this.targetSpot.x;
+                this.z = this.targetSpot.z;
+                if (this.targetSpot.facing) this.facing = { ...this.targetSpot.facing };
+                this.walkCycle = 0;
+                this.state = this.orderType ? 'WAITING_ORDER' : 'EATING_CHILLING';
+                this.stateTimer = 0;
+                if (this.onArrivedCallback) this.onArrivedCallback(this);
+            }
+        } else if (this.state === 'WAITING_ORDER') {
+            this.stateTimer += dt;
+            if (Math.floor(this.stateTimer) % 11 === 0 && !this.currentSpeech && this.orderLabel) {
+                this.say(`واحد ${this.orderLabel} من إيدك يا معلم.`, 4.0);
+            }
+        } else if (this.state === 'EATING_CHILLING') {
+            this.stateTimer += dt;
+            if (this.ambientLines.length > 0 && !this.currentSpeech && Math.random() < 0.005) {
+                const line = this.ambientLines[Math.floor(Math.random() * this.ambientLines.length)];
+                this.say(line, 5.0);
+            }
+            if (this.stateTimer >= this.stayDuration) {
+                this.state = 'LEAVING';
+                this.leaveTarget = Math.random() > 0.5 ? SPOTS.SPAWN_WEST : SPOTS.SPAWN_EAST;
+            }
+        } else if (this.state === 'LEAVING') {
+            const dx = this.leaveTarget.x - this.x;
+            const dz = this.leaveTarget.z - this.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist > 0.25) {
+                this.x += (dx / dist) * speed * dt;
+                this.z += (dz / dist) * speed * dt;
+                this.facing = { x: dx / dist, z: dz / dist };
+                this.walkCycle += dt * 10;
+            } else {
+                this.state = 'GONE';
+            }
+        }
+    }
+}
+
+// ============================================================================
+// 5. 2D THREE-QUARTER TOP-DOWN RENDERER & GAME ORCHESTRATOR
+// ============================================================================
+// Scale constants: 1 meter in X = 68px, 1 meter in Z = 54px (True 3/4 Oblique Ratio)
+const SCALE_X = 68;
+const SCALE_Z = 54;
+
+class Kiosk2DGameApp {
+    constructor() {
+        this.audio = new SoundscapeEngine();
+        this.state = new CanonicalGameState();
+        this.teaStation = new TeaStation();
+        this.kebdaStation = new KebdaStation();
+
+        this.canvas = document.getElementById('game-canvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        // Player spatial state (mirrors 3D world coordinates)
+        this.player = {
+            x: 0,
+            z: 0.5,
+            facing: { x: 0, z: 1 },
+            walkCycle: 0,
+            color: '#3d7a8a'
+        };
+
+        // Smooth 2D camera in world coordinates
+        this.cam = { x: 0, z: 0 };
+
+        // Ambient visual particles (steam, sizzle smoke, dust motes)
+        this.particles = [];
+        this.feluccaX = -11;
+        this.fanAngle = 0;
+
+        this.npcs = [];
+        this.bubbleElements = new Map();
+        this.spawnCooldown = 2.0;
+        this.dayScriptFlags = {};
+
+        this.keys = {};
+        this.handleResize();
+        this.initInput();
+        this.bindUIEvents();
+        this.syncSceneToLocation();
+
+        this.lastFrameTime = performance.now();
+        requestAnimationFrame((t) => this.loop(t));
+    }
+
+    handleResize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.canvas.width = window.innerWidth * dpr;
+        this.canvas.height = window.innerHeight * dpr;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.viewW = window.innerWidth;
+        this.viewH = window.innerHeight;
+    }
+
+    initInput() {
+        window.addEventListener('keydown', (e) => {
+            this.keys[e.code] = true;
+            if (e.code === 'KeyE') this.handlePrimaryInteract();
+            if (e.code === 'KeyF') this.handleSecondaryInteract();
+            if (e.code === 'KeyN') this.toggleNotebookModal();
+        });
+        window.addEventListener('keyup', (e) => {
+            this.keys[e.code] = false;
+        });
+        window.addEventListener('resize', () => this.handleResize());
+    }
+
+    // Convert world (x, z, heightMeters) to 2D screen pixel coordinates
+    worldToScreen(wx, wz, wy = 0) {
+        const sx = this.viewW * 0.5 + (wx - this.cam.x) * SCALE_X;
+        const sy = this.viewH * 0.54 + (wz - this.cam.z) * SCALE_Z - wy * 48;
+        return { x: sx, y: sy };
+    }
+
+    syncSceneToLocation() {
+        const isKiosk = this.state.location === 'KIOSK';
+        if (isKiosk) {
+            this.player.x = -0.2;
+            this.player.z = -0.2;
+            this.player.facing = { x: 0, z: 1 };
+            document.getElementById('location-label').textContent = 'كورنيش النيل — الكشك';
+        } else {
+            this.player.x = 0.0;
+            this.player.z = 0.5;
+            this.player.facing = { x: 0, z: 1 };
+            document.getElementById('location-label').textContent = 'أوضة السطح — البيت';
+        }
+        this.cam.x = this.player.x;
+        this.cam.z = this.player.z;
+    }
+
+    transitionLocation(targetLoc, fadeMessage, callback) {
+        const overlay = document.getElementById('fade-overlay');
+        const textEl = document.getElementById('fade-text');
+        textEl.textContent = fadeMessage || '';
+        overlay.style.opacity = '1';
+        setTimeout(() => {
+            this.state.location = targetLoc;
+            if (callback) callback();
+            this.syncSceneToLocation();
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+            }, 350);
+        }, 650);
+    }
+
+    // ------------------------------------------------------------------------
+    // COLLISION & EMBODIED MOVEMENT IN 2D THREE-QUARTER SPACE
+    // ------------------------------------------------------------------------
+    isPointBlocked(nx, nz) {
+        if (this.state.location === 'KIOSK') {
+            // Outer promenade boundaries
+            if (nx < -9.5 || nx > 9.5 || nz < -2.95 || nz > 3.6) return true;
+
+            // Kiosk left side wall
+            if (nx > -2.45 && nx < -1.95 && nz > -1.85 && nz < 0.85) return true;
+
+            // Kiosk front counter solid block (player walks around the right opening at x > 1.25)
+            if (nx > -2.3 && nx < 1.22 && nz > 0.32 && nz < 1.12) return true;
+
+            // Outdoor plastic table collision
+            if (Math.hypot(nx - 6.25, nz - 1.6) < 0.72) return true;
+
+            return false;
+        } else {
+            // Rooftop Room boundaries
+            if (nx < -2.55 || nx > 2.55 || nz < -1.85 || nz > 2.25) return true;
+
+            // Bed collision (top-left)
+            if (nx < -0.55 && nz < -0.55) return true;
+
+            // Desk collision (top-right)
+            if (nx > 0.9 && nz < -1.05) return true;
+
+            return false;
+        }
+    }
+
+    updatePlayerMovement(dt) {
+        let dx = 0, dz = 0;
+        if (this.keys['KeyW'] || this.keys['ArrowUp']) dz -= 1;
+        if (this.keys['KeyS'] || this.keys['ArrowDown']) dz += 1;
+        if (this.keys['KeyA'] || this.keys['ArrowLeft']) dx -= 1;
+        if (this.keys['KeyD'] || this.keys['ArrowRight']) dx += 1;
+
+        if (dx !== 0 || dz !== 0) {
+            const len = Math.hypot(dx, dz);
+            dx /= len;
+            dz /= len;
+            const speed = 4.5;
+
+            const tryX = this.player.x + dx * speed * dt;
+            const tryZ = this.player.z + dz * speed * dt;
+
+            // Sliding AABB collision resolution
+            if (!this.isPointBlocked(tryX, this.player.z)) {
+                this.player.x = tryX;
+            }
+            if (!this.isPointBlocked(this.player.x, tryZ)) {
+                this.player.z = tryZ;
+            }
+
+            this.player.facing = { x: dx, z: dz };
+            this.player.walkCycle += dt * 12;
+        } else {
+            this.player.walkCycle = 0;
+        }
+
+        // Smooth camera tracking
+        this.cam.x += (this.player.x - this.cam.x) * Math.min(1, dt * 6);
+        this.cam.z += (this.player.z - this.cam.z) * Math.min(1, dt * 6);
+    }
+
+    // ------------------------------------------------------------------------
+    // CONTEXTUAL INTERACTION SYSTEM (Identical Targets & Radii)
+    // ------------------------------------------------------------------------
+    getAvailableInteractions() {
+        const px = this.player.x;
+        const pz = this.player.z;
+        const list = [];
+
+        if (this.state.location === 'ROOFTOP') {
+            list.push({
+                id: 'BED',
+                pos: { x: -1.65, z: -1.2 },
+                radius: 1.65,
+                prompt: 'نام للصبح وابدأ يوم جديد',
+                secPrompt: null
+            });
+            list.push({
+                id: 'DESK_SNACK',
+                pos: { x: 1.6, z: -1.45 },
+                radius: 1.55,
+                prompt: 'لقمة خفيفة بـ ٣ ج.م (يسد الجوع)',
+                secPrompt: null
+            });
+            if (this.state.home.hasFan) {
+                list.push({
+                    id: 'FAN',
+                    pos: { x: 0.25, z: -1.35 },
+                    radius: 1.5,
+                    prompt: this.state.home.fanOn ? 'اطفي المروحة' : 'شغّل المروحة (تلطيف الجو والراحة)',
+                    secPrompt: null
+                });
+            }
+            list.push({
+                id: 'LEAVE_ROOFTOP',
+                pos: { x: 0, z: 2.05 },
+                radius: 1.6,
+                prompt: 'انزل روح الكشك ع النيل',
+                secPrompt: null
+            });
+        } else {
+            list.push({
+                id: 'TEA_STATION',
+                pos: { x: -1.3, z: 0.65 },
+                radius: 1.6,
+                prompt: `البراد: ${this.teaStation.getStatusLabel()}`,
+                secPrompt: this.teaStation.state === 'EMPTY' ? `تغيير السكر (${this.teaStation.sugarLevel})` : null
+            });
+            list.push({
+                id: 'KEBDA_STATION',
+                pos: { x: 0.35, z: 0.65 },
+                radius: 1.6,
+                prompt: `الجريل: ${this.kebdaStation.getStatusLabel()}`,
+                secPrompt: null
+            });
+            list.push({
+                id: 'KIOSK_SIGN',
+                pos: { x: 1.75, z: -1.35 },
+                radius: 1.6,
+                prompt: this.state.kioskOpen ? 'اقفل الكشك بدري' : 'افتح الكشك واستقبل الزباين',
+                secPrompt: 'روّح أوضة السطح'
+            });
+            list.push({
+                id: 'SUPPLIER_PHONE',
+                pos: { x: -1.95, z: -1.15 },
+                radius: 1.6,
+                prompt: 'اطلب خامات للكشك (٤ شاي + ٤ كبدة بـ ١٥ ج.م)',
+                secPrompt: this.state.knowledge.has('KNOWN_CHEAP_FAN') && !this.state.home.hasFan
+                    ? 'اشتري مروحة ستاند مستعملة من عم سعيد (٣٥ ج.م)'
+                    : null
+            });
+            list.push({
+                id: 'NILE_RAILING_VIEW',
+                pos: { x: -2.2, z: -2.85 },
+                radius: 1.7,
+                prompt: 'اقف ع السور اتأمل النيل شوية (يروق المزاج)',
+                secPrompt: null
+            });
+
+            this.npcs.forEach(npc => {
+                if (npc.state === 'WAITING_ORDER' || npc.state === 'EATING_CHILLING') {
+                    const canServe = npc.state === 'WAITING_ORDER' && this.state.heldItem && this.state.heldItem.type === npc.orderType;
+                    list.push({
+                        id: 'NPC_' + npc.id,
+                        npcRef: npc,
+                        pos: { x: npc.x, z: npc.z },
+                        radius: 2.15,
+                        prompt: canServe
+                            ? `قدّم ${this.state.heldItem.name} لـ ${npc.name}`
+                            : `كلّم ${npc.name}`,
+                        secPrompt: null
+                    });
+                }
+            });
+        }
+
+        let closest = null;
+        let minDist = Infinity;
+        for (const item of list) {
+            const d = Math.hypot(px - item.pos.x, pz - item.pos.z);
+            if (d <= item.radius && d < minDist) {
+                minDist = d;
+                closest = item;
+            }
+        }
+        return closest;
+    }
+
+    handlePrimaryInteract() {
+        const target = this.getAvailableInteractions();
+        if (!target) return;
+
+        switch (target.id) {
+            case 'BED':
+                this.transitionLocation('ROOFTOP', `نوم هادي... بداية اليوم ${this.state.day + 1}`, () => {
+                    this.state.advanceDay();
+                    this.dayScriptFlags = {};
+                    this.clearAllNPCs();
+                });
+                break;
+
+            case 'DESK_SNACK':
+                if (this.state.money >= 3) {
+                    this.state.modifyMoney(-3, 'عشا خفيف');
+                    this.state.modifyNeed('hunger', 32);
+                    this.state.modifyNeed('mood', 5);
+                    this.audio.playChime(500, 0.15);
+                } else {
+                    showToast('مفيش فكة كفاية حالياً.');
+                }
+                break;
+
+            case 'FAN':
+                this.state.home.fanOn = !this.state.home.fanOn;
+                this.audio.playChime(this.state.home.fanOn ? 640 : 380, 0.12);
+                if (this.state.home.fanOn) {
+                    this.state.modifyNeed('mood', 10);
+                    showToast('المروحة اشتغلت.. الهوا لطّف حر الأوضة.');
+                }
+                break;
+
+            case 'LEAVE_ROOFTOP':
+                this.transitionLocation('KIOSK', 'في الطريق لكورنيش النيل...', () => {
+                    this.state.kioskOpen = true;
+                    showToast('فتحت الكشك ع النيل. يومك سعيد!');
+                });
+                break;
+
+            case 'TEA_STATION':
+                this.teaStation.interact(this.state, this.audio);
+                break;
+
+            case 'KEBDA_STATION':
+                this.kebdaStation.interact(this.state, this.audio);
+                break;
+
+            case 'KIOSK_SIGN':
+                this.state.kioskOpen = !this.state.kioskOpen;
+                this.audio.playChime(this.state.kioskOpen ? 700 : 400, 0.15);
+                showToast(this.state.kioskOpen ? 'الكشك مفتوح للزباين' : 'قفلت الكشك بدري.. خد وقتك وارتاح.');
+                break;
+
+            case 'SUPPLIER_PHONE':
+                if (this.state.money >= 15) {
+                    this.state.modifyMoney(-15, 'توريد خامات شاي وكبدة');
+                    this.state.inventory.teaPortions += 4;
+                    this.state.inventory.kebdaPortions += 4;
+                    this.audio.playChime(580, 0.15);
+                } else {
+                    showToast('محتاج ١٥ ج.م عشان تطلب بضاعة.');
+                }
+                break;
+
+            case 'NILE_RAILING_VIEW':
+                this.state.modifyNeed('mood', 9);
+                this.audio.playChime(460, 0.3);
+                showToast('وقفت تتأمل المية والمراكب شوية.. بالك راق.');
+                break;
+
+            default:
+                if (target.id.startsWith('NPC_') && target.npcRef) {
+                    this.interactWithNPC(target.npcRef);
+                }
+                break;
+        }
+    }
+
+    handleSecondaryInteract() {
+        const target = this.getAvailableInteractions();
+
+        if (this.state.heldItem && (!target || !target.secPrompt)) {
+            const item = this.state.heldItem;
+            this.state.heldItem = null;
+            if (item.type === 'TEA') {
+                this.state.modifyNeed('mood', 12 + item.score * 2);
+                this.state.modifyNeed('hunger', 5);
+                showToast(`شربت ${item.name} بمزاج وعينك ع النيل.`);
+            } else {
+                this.state.modifyNeed('hunger', 35);
+                this.state.modifyNeed('mood', 10 + item.score * 2);
+                showToast(`أكلت ${item.name} سخن.. يسند القلب.`);
+            }
+            this.audio.playChime(620, 0.2);
+            return;
+        }
+
+        if (!target) return;
+
+        if (target.id === 'TEA_STATION' && this.teaStation.state === 'EMPTY') {
+            const s = this.teaStation.cycleSugar();
+            this.audio.playChime(540, 0.08);
+            showToast(`سكر الشاي دلوقتي: ${s}`);
+        } else if (target.id === 'KIOSK_SIGN') {
+            this.transitionLocation('ROOFTOP', 'روّحت أوضة السطح...', () => {
+                this.state.kioskOpen = false;
+            });
+        } else if (target.id === 'SUPPLIER_PHONE' && this.state.knowledge.has('KNOWN_CHEAP_FAN') && !this.state.home.hasFan) {
+            if (this.state.money >= 35) {
+                this.state.modifyMoney(-35, 'شراء مروحة ستاند مستعملة');
+                this.state.home.hasFan = true;
+                this.state.home.fanOn = true;
+                this.state.addKnowledge('BOUGHT_FAN', 'اشتريت المروحة من عم سعيد بـ ٣٥ جنيه وبعتها ع السطح.');
+                this.audio.playCoin();
+            } else {
+                showToast('محتاج ٣٥ ج.م عشان تشتري المروحة المستعملة.');
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // NPC SERVING & DIALOGUE ORCHESTRATION
+    // ------------------------------------------------------------------------
+    interactWithNPC(npc) {
+        if (npc.state === 'WAITING_ORDER' && this.state.heldItem && this.state.heldItem.type === npc.orderType) {
+            const item = this.state.heldItem;
+            this.state.heldItem = null;
+
+            const basePrice = item.type === 'TEA' ? 5 : 12;
+            const tip = item.score === 3 ? 3 : (item.score === 2 ? 1 : 0);
+            const totalPay = basePrice + tip;
+
+            this.state.modifyMoney(totalPay, `حساب ${item.name} (${item.quality})`);
+            this.state.modifyNeed('mood', item.score >= 2 ? 4 : 0);
+            this.audio.playCoin();
+
+            npc.state = 'EATING_CHILLING';
+            npc.stateTimer = 0;
+
+            if (npc.customServeDialog) {
+                npc.customServeDialog(npc, item);
+            } else {
+                const reaction = item.score === 3
+                    ? 'الله ينور يا معلم! تسلم إيدك والله.'
+                    : 'تسلم يا غالي، تعيش.';
+                npc.say(reaction, 5.0);
+            }
+            return;
+        }
+
+        if (npc.id === 'amgad') {
+            if (this.state.day === 1) {
+                npc.say('الجو ع النيل النهاردة يرد الروح.. الواحد بيهرب من زحمة المكتب هنا.', 5.5);
+                this.showDialogueChoices('العم أمجد (زبون دايم):', [
+                    { text: 'نورت الكشك يا عم أمجد', reply: 'ده منور بأصحابه يا ابني والله.', mood: 4 },
+                    { text: 'ربنا يعينك ع الشغل', reply: 'يارب يا حبيبي، لقمة العيش عايزة صبر.', mood: 3 },
+                    { text: '(ابتسم واسمعه بهدوء)', reply: 'أحلى حاجة هنا الهدوء ده.', mood: 3 }
+                ], npc);
+            } else {
+                npc.say('بقولك إيه.. عم سعيد الكهربائي اللي ورا المحطة عنده مروحة ستاند نضيفة بـ ٣٥ جنيه بدل ٧٠ لو قولتله من طرفي!', 7.5);
+                const learned = this.state.addKnowledge(
+                    'KNOWN_CHEAP_FAN',
+                    'معرفة من عم أمجد: عم سعيد عنده مروحة ستاند مستعملة بـ ٣٥ جنيه بس (تقدر تطلبها من تليفون الكشك).'
+                );
+                if (learned) {
+                    this.state.npcMemory.fanReferralUnlocked = true;
+                }
+                this.showDialogueChoices('رد على عم أمجد:', [
+                    { text: 'تسلم يا عم أمجد، الأوضة فعلاً حر بالليل!', reply: 'توكل على الله، المروحة هتفرق معاك في نومة السطح.', mood: 6 },
+                    { text: 'ربنا يسهل لما أجمع تمنها', reply: 'براحتك يا بطل، أنا قولت أبلغك عشان لقطة.', mood: 3 }
+                ], npc);
+            }
+        } else {
+            npc.say(npc.state === 'WAITING_ORDER' ? `مستني ${npc.orderLabel} على مهلك يا ريس.` : 'قعدة النيل دي بالدنيا.', 4.5);
+        }
+    }
+
+    showDialogueChoices(title, options, targetNpc) {
+        const panel = document.getElementById('dialogue-choices-panel');
+        const titleEl = document.getElementById('choice-context-title');
+        const container = document.getElementById('choices-container');
+
+        titleEl.textContent = title;
+        container.innerHTML = '';
+        panel.style.display = 'block';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = opt.text;
+            btn.onclick = () => {
+                panel.style.display = 'none';
+                if (targetNpc && opt.reply) {
+                    targetNpc.say(opt.reply, 5.5);
+                }
+                if (opt.onSelect) opt.onSelect();
+                if (opt.mood) this.state.modifyNeed('mood', opt.mood);
+                this.audio.playChime(520, 0.1);
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    spawnNPC(config) {
+        const npc = new NPCEntity(config);
+        this.npcs.push(npc);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'spatial-bubble';
+        bubble.style.opacity = '0';
+        document.getElementById('world-overlays').appendChild(bubble);
+        this.bubbleElements.set(npc.id, bubble);
+        return npc;
+    }
+
+    clearAllNPCs() {
+        this.npcs.forEach(n => {
+            const b = this.bubbleElements.get(n.id);
+            if (b) b.remove();
+        });
+        this.npcs = [];
+        this.bubbleElements.clear();
+    }
+
+    updateSocialDirector(dt) {
+        for (let i = this.npcs.length - 1; i >= 0; i--) {
+            const npc = this.npcs[i];
+            npc.update(dt);
+            if (npc.state === 'GONE') {
+                const b = this.bubbleElements.get(npc.id);
+                if (b) b.remove();
+                this.bubbleElements.delete(npc.id);
+                this.npcs.splice(i, 1);
+            }
+        }
+
+        if (this.state.location !== 'KIOSK' || !this.state.kioskOpen) return;
+
+        // 1. Familiar Regular: Uncle Amgad
+        if (!this.dayScriptFlags.amgadSpawned && this.npcs.length < 3) {
+            this.dayScriptFlags.amgadSpawned = true;
+            const isReturning = this.state.npcMemory.amgadVisits > 0;
+            this.spawnNPC({
+                id: 'amgad',
+                name: 'عم أمجد',
+                color: '#5c7a67',
+                spotKey: 'COUNTER_1',
+                orderType: 'TEA',
+                stayDuration: 32,
+                onArrivedCallback: (n) => {
+                    this.state.npcMemory.amgadVisits++;
+                    if (!isReturning) {
+                        n.say('مساء الفل يا ابني.. اعملنا كوباية شاي من إيدك نفتح بيها القعدة.', 6.0);
+                    } else {
+                        const prevQuality = this.state.npcMemory.lastServedQuality || 'مظبوط';
+                        n.say(`مساء الجمال! الشاي بتاع المرة اللي فاتت كان ${prevQuality}.. صبّلي واحد زيه وتعالى أقولك على مصلحة.`, 7.0);
+                    }
+                },
+                customServeDialog: (n, item) => {
+                    this.state.npcMemory.lastServedQuality = item.quality;
+                    if (this.state.day >= 2 && !this.state.knowledge.has('KNOWN_CHEAP_FAN')) {
+                        n.say('تسلم إيدك! قرّب كلمني [E] عايز أقولك على مروحة لقطة لأوضة السطح.', 7.0);
+                    } else {
+                        n.say('أحلى كوباية شاي ع النيل.. تسلم إيدك يا معلم.', 5.5);
+                    }
+                }
+            });
+            return;
+        }
+
+        // 2. Authored Two-NPC Football Conversation (Mahmoud & Samir)
+        if (!this.dayScriptFlags.debateSpawned && this.state.timeMinutes >= 17 * 60 && this.npcs.length <= 2) {
+            this.dayScriptFlags.debateSpawned = true;
+            const mahmoud = this.spawnNPC({
+                id: 'mahmoud',
+                name: 'محمود',
+                color: '#8c3b3b',
+                spotKey: 'TABLE_A',
+                orderType: 'TEA',
+                stayDuration: 36
+            });
+            const samir = this.spawnNPC({
+                id: 'samir',
+                name: 'سمير',
+                color: '#3b598c',
+                spotKey: 'TABLE_B',
+                orderType: 'KEBDA',
+                stayDuration: 36,
+                onArrivedCallback: () => {
+                    mahmoud.say('الحكم بوّظ الماتش امبارح يا سمير!', 6.0);
+                    setTimeout(() => {
+                        samir.say('يا عم فريقك كان نايم أصلًا طول الشوط التاني!', 6.0);
+                        const d = Math.hypot(this.player.x - 6.0, this.player.z - 1.6);
+                        if (d < 8.5) {
+                            this.showDialogueChoices('محمود وسمير بيتناقشوا في ماتش امبارح:', [
+                                {
+                                    text: '"آه والله الحكم ظلمهم فعلاً"',
+                                    onSelect: () => {
+                                        mahmoud.say('شوفت؟ أهو المعلم بيفهم كورة!', 5.0);
+                                        setTimeout(() => samir.say('ماشي يا سيدي، العبرة بالجايات.', 4.5), 2500);
+                                    },
+                                    mood: 5
+                                },
+                                {
+                                    text: '"إنت بتقول إيه بس؟ الدفاع كان شوارع"',
+                                    onSelect: () => {
+                                        samir.say('قوله والنبي يا معلم!', 5.0);
+                                        setTimeout(() => mahmoud.say('طيب هاتلنا الشاي والكبدة نبلع بيهم الهزيمة.', 5.0), 2500);
+                                    },
+                                    mood: 5
+                                },
+                                {
+                                    text: '(اسمعهم وابتسم من غير ما تتدخل)',
+                                    onSelect: () => {
+                                        mahmoud.say('المهم الجو ع النيل يهدي الأعصاب.', 4.5);
+                                    },
+                                    mood: 3
+                                }
+                            ]);
+                        }
+                    }, 3400);
+                }
+            });
+            return;
+        }
+
+        // 3. Quiet Period on Day 2 Evening
+        const isQuietWindow = (this.state.day === 2 && this.state.timeMinutes >= 19 * 60 && this.state.timeMinutes <= 20 * 60 + 15);
+        if (isQuietWindow) return;
+
+        // 4. Ambient Passersby
+        this.spawnCooldown -= dt;
+        if (this.spawnCooldown <= 0 && this.npcs.length < 3) {
+            this.spawnCooldown = 14 + Math.random() * 10;
+            const templates = [
+                {
+                    name: 'أستاذ حسن',
+                    color: '#705d4e',
+                    spotKey: 'RAILING_1',
+                    orderType: 'TEA',
+                    stayDuration: 20,
+                    ambientLines: ['النيل بالليل ليه هيبة تانية.', 'ربنا يديم الستر والهدوء.']
+                },
+                {
+                    name: 'مدام نادية',
+                    color: '#7c4d6b',
+                    spotKey: 'WAIT_TAKEAWAY',
+                    orderType: 'KEBDA',
+                    stayDuration: 8,
+                    ambientLines: ['ريحة الكبدة الإسكندراني ما شاء الله مفحفحة!']
+                },
+                {
+                    name: 'شاب ع الكورنيش',
+                    color: '#4b6e75',
+                    spotKey: 'RAILING_2',
+                    orderType: null,
+                    stayDuration: 15,
+                    ambientLines: ['هوا النيل يرد الروح بعد يوم طويل.']
+                }
+            ];
+            const pick = templates[Math.floor(Math.random() * templates.length)];
+            this.spawnNPC({
+                id: 'passer_' + Math.floor(Math.random() * 99999),
+                ...pick
+            });
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // PARTICLES (Steam for Kettle, Smoke for Kebda Grill)
+    // ------------------------------------------------------------------------
+    updateParticles(dt) {
+        if (this.state.location === 'KIOSK') {
+            if (this.teaStation.state === 'HEATING' || this.teaStation.state === 'BOILED' || this.teaStation.state === 'BREWING') {
+                if (Math.random() < 0.35) {
+                    this.particles.push({
+                        wx: -1.3 + (Math.random() - 0.5) * 0.15,
+                        wz: 0.7,
+                        wy: 1.25,
+                        vy: 0.55 + Math.random() * 0.25,
+                        life: 1.0,
+                        radius: 4 + Math.random() * 5,
+                        color: 'rgba(240, 245, 255,'
+                    });
+                }
+            }
+            if (this.kebdaStation.state !== 'EMPTY') {
+                if (Math.random() < 0.45) {
+                    this.particles.push({
+                        wx: 0.4 + (Math.random() - 0.5) * 0.35,
+                        wz: 0.7,
+                        wy: 1.15,
+                        vy: 0.65 + Math.random() * 0.3,
+                        life: 1.0,
+                        radius: 5 + Math.random() * 6,
+                        color: 'rgba(215, 195, 175,'
+                    });
+                }
+            }
+        }
+
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.wy += p.vy * dt;
+            p.wx += Math.sin(performance.now() * 0.004 + i) * 0.15 * dt;
+            p.life -= dt * 0.75;
+            if (p.life <= 0) this.particles.splice(i, 1);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // 2D THREE-QUARTER TOP-DOWN RENDERER (Painter's Algorithm + Y-Sorting)
+    // ------------------------------------------------------------------------
+    render2DWorld(now) {
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.viewW, this.viewH);
+
+        // Calculate time-of-day darkness (0 = warm afternoon, 1 = deep night)
+        const hour = (this.state.timeMinutes / 60) % 24;
+        let nightFactor = 0.25;
+        if (hour >= 18 && hour < 20) {
+            nightFactor = 0.25 + ((hour - 18) / 2) * 0.65;
+        } else if (hour >= 20 || hour < 5) {
+            nightFactor = 0.9;
+        }
+
+        if (this.state.location === 'KIOSK') {
+            this.renderKioskScene(ctx, now, nightFactor);
+        } else {
+            this.renderRooftopScene(ctx, now, nightFactor);
+        }
+    }
+
+    // Helper: Draw a 3/4 Oblique 2.5D Box (Top face + Front elevation face)
+    drawObliqueBox(ctx, wx, wz, widthM, depthM, heightM, topColor, frontColor, borderColor = 'rgba(0,0,0,0.35)') {
+        const pTopLeft = this.worldToScreen(wx - widthM / 2, wz - depthM / 2, heightM);
+        const pBottomRight = this.worldToScreen(wx + widthM / 2, wz + depthM / 2, heightM);
+        const pGroundRight = this.worldToScreen(wx + widthM / 2, wz + depthM / 2, 0);
+
+        const wPx = pBottomRight.x - pTopLeft.x;
+        const dPx = pBottomRight.y - pTopLeft.y;
+        const hPx = pGroundRight.y - pBottomRight.y;
+
+        // Ground Drop Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+        ctx.fillRect(pTopLeft.x + 6, pTopLeft.y + hPx + 4, wPx, dPx);
+
+        // Front Vertical Face
+        if (hPx > 0) {
+            ctx.fillStyle = frontColor;
+            ctx.fillRect(pTopLeft.x, pBottomRight.y, wPx, hPx);
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(pTopLeft.x, pBottomRight.y, wPx, hPx);
+        }
+
+        // Top Horizontal Face
+        ctx.fillStyle = topColor;
+        ctx.fillRect(pTopLeft.x, pTopLeft.y, wPx, dPx);
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(pTopLeft.x, pTopLeft.y, wPx, dPx);
+    }
+
+    // Helper: Draw Articulated 2D Three-Quarter Character
+    drawCharacter2D(ctx, charObj, isPlayer = false) {
+        const bob = Math.abs(Math.sin(charObj.walkCycle)) * 0.08;
+        const base = this.worldToScreen(charObj.x, charObj.z, 0);
+        const bodyPos = this.worldToScreen(charObj.x, charObj.z, bob);
+
+        // Ground oval shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
+        ctx.beginPath();
+        ctx.ellipse(base.x, base.y, 16, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Legs
+        const legSwing = Math.sin(charObj.walkCycle) * 5;
+        ctx.fillStyle = '#262320';
+        ctx.fillRect(bodyPos.x - 8, bodyPos.y - 16 + legSwing, 6, 14);
+        ctx.fillRect(bodyPos.x + 2, bodyPos.y - 16 - legSwing, 6, 14);
+
+        // Torso / Galabeya or Shirt
+        ctx.fillStyle = charObj.color;
+        ctx.beginPath();
+        ctx.roundRect(bodyPos.x - 14, bodyPos.y - 46, 28, 32, 8);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Apron for Player
+        if (isPlayer) {
+            ctx.fillStyle = '#dfd5c6';
+            ctx.fillRect(bodyPos.x - 9, bodyPos.y - 36, 18, 20);
+        }
+
+        // Head
+        ctx.fillStyle = '#d9a17c';
+        ctx.beginPath();
+        ctx.arc(bodyPos.x, bodyPos.y - 56, 12.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Hair / Cap
+        ctx.fillStyle = '#2b241f';
+        ctx.beginPath();
+        ctx.arc(bodyPos.x, bodyPos.y - 59, 12.5, Math.PI, Math.PI * 2);
+        ctx.fill();
+
+        // Directional Eyes (unless facing strictly away/north)
+        if (charObj.facing.z >= -0.3) {
+            const eyeOffsetX = charObj.facing.x * 4;
+            ctx.fillStyle = '#1a1614';
+            ctx.beginPath();
+            ctx.arc(bodyPos.x - 4 + eyeOffsetX, bodyPos.y - 55, 1.8, 0, Math.PI * 2);
+            ctx.arc(bodyPos.x + 4 + eyeOffsetX, bodyPos.y - 55, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Held Tray & Food Item for Player
+        if (isPlayer && this.state.heldItem) {
+            const trayX = bodyPos.x + charObj.facing.x * 16;
+            const trayY = bodyPos.y - 34 + charObj.facing.z * 6;
+            ctx.fillStyle = '#c8d0d8';
+            ctx.beginPath();
+            ctx.ellipse(trayX, trayY, 13, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#444';
+            ctx.stroke();
+
+            if (this.state.heldItem.type === 'TEA') {
+                ctx.fillStyle = '#b8371b';
+                ctx.fillRect(trayX - 4, trayY - 10, 8, 9);
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(trayX - 4, trayY - 10, 8, 9);
+            } else {
+                ctx.fillStyle = '#d8a657';
+                ctx.beginPath();
+                ctx.ellipse(trayX, trayY - 4, 9, 4.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#5c2516';
+                ctx.fillRect(trayX - 6, trayY - 5, 12, 3);
+            }
+        }
+    }
+
+    renderKioskScene(ctx, now, nightFactor) {
+        // 1. Deep Nile Water Background
+        const waterHorizon = this.worldToScreen(0, -3.3, 0).y;
+        const waterGrad = ctx.createLinearGradient(0, 0, 0, waterHorizon);
+        waterGrad.addColorStop(0, '#091824');
+        waterGrad.addColorStop(1, '#153a50');
+        ctx.fillStyle = waterGrad;
+        ctx.fillRect(0, 0, this.viewW, waterHorizon + 20);
+
+        // Animated Nile Shimmer Lines
+        ctx.strokeStyle = 'rgba(255, 198, 115, 0.16)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 28; i++) {
+            const wy = -12 + (i * 0.3);
+            const wx = Math.sin(now * 0.001 + i * 1.7) * 10;
+            const scr = this.worldToScreen(wx, wy, 0);
+            if (scr.y < waterHorizon - 8) {
+                const len = 28 + Math.sin(now * 0.003 + i) * 14;
+                ctx.beginPath();
+                ctx.moveTo(scr.x - len / 2, scr.y);
+                ctx.lineTo(scr.x + len / 2, scr.y);
+                ctx.stroke();
+            }
+        }
+
+        // Drifting Felucca Boat on the Nile
+        const felPos = this.worldToScreen(this.feluccaX, -7.2, 0);
+        // Water reflection under boat
+        ctx.fillStyle = 'rgba(255, 175, 75, 0.22)';
+        ctx.beginPath();
+        ctx.ellipse(felPos.x, felPos.y + 12, 26, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Hull
+        ctx.fillStyle = '#4e301b';
+        ctx.beginPath();
+        ctx.moveTo(felPos.x - 42, felPos.y);
+        ctx.lineTo(felPos.x + 42, felPos.y);
+        ctx.lineTo(felPos.x + 28, felPos.y + 12);
+        ctx.lineTo(felPos.x - 28, felPos.y + 12);
+        ctx.closePath();
+        ctx.fill();
+        // White Lateen Sail
+        ctx.fillStyle = '#ebe4d8';
+        ctx.beginPath();
+        ctx.moveTo(felPos.x - 6, felPos.y - 2);
+        ctx.lineTo(felPos.x + 26, felPos.y - 68);
+        ctx.lineTo(felPos.x - 28, felPos.y - 10);
+        ctx.closePath();
+        ctx.fill();
+        // Warm boat lantern
+        ctx.fillStyle = '#ffae42';
+        ctx.beginPath();
+        ctx.arc(felPos.x + 10, felPos.y - 6, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Promenade Stone Pavement & Tiles
+        const pNW = this.worldToScreen(-17, -3.3, 0);
+        const pSE = this.worldToScreen(17, 4.5, 0);
+        ctx.fillStyle = '#38332e';
+        ctx.fillRect(pNW.x, pNW.y, pSE.x - pNW.x, pSE.y - pNW.y);
+
+        // Subtle Cairo Promenade Tile Grid
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.lineWidth = 1;
+        for (let x = -16; x <= 16; x += 1.0) {
+            const a = this.worldToScreen(x, -3.3, 0);
+            const b = this.worldToScreen(x, 4.5, 0);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+        for (let z = -3; z <= 4; z += 1.0) {
+            const a = this.worldToScreen(-16, z, 0);
+            const b = this.worldToScreen(16, z, 0);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+
+        // Kiosk Wooden Interior Floorboard
+        const kNW = this.worldToScreen(-2.2, -1.7, 0);
+        const kSE = this.worldToScreen(2.1, 0.8, 0);
+        ctx.fillStyle = '#4e3b2b';
+        ctx.fillRect(kNW.x, kNW.y, kSE.x - kNW.x, kSE.y - kNW.y);
+
+        // 3. Y-Sorted Renderables Queue (Depth = worldZ)
+        const renderQueue = [];
+
+        // Corniche Railing (z = -3.3)
+        renderQueue.push({
+            z: -3.3,
+            draw: () => {
+                const rL = this.worldToScreen(-17, -3.3, 0.85);
+                const rR = this.worldToScreen(17, -3.3, 0.85);
+                const rG = this.worldToScreen(-17, -3.3, 0);
+                ctx.fillStyle = '#1f2328';
+                ctx.fillRect(rL.x, rL.y, rR.x - rL.x, 7);
+                for (let x = -16; x <= 16; x += 1.5) {
+                    const post = this.worldToScreen(x, -3.3, 0.85);
+                    ctx.fillRect(post.x - 3, post.y, 6, rG.y - post.y);
+                }
+            }
+        });
+
+        // Streetlamp on Corniche (x = -7.5, z = -2.8)
+        renderQueue.push({
+            z: -2.8,
+            draw: () => {
+                const base = this.worldToScreen(-7.5, -2.8, 0);
+                const top = this.worldToScreen(-7.5, -2.8, 3.6);
+                ctx.fillStyle = '#25282c';
+                ctx.fillRect(base.x - 4, top.y, 8, base.y - top.y);
+                ctx.fillStyle = '#ffbe66';
+                ctx.beginPath();
+                ctx.arc(top.x + 8, top.y, 9, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+
+        // Kiosk Back Wall & Left Wall (z = -1.7)
+        renderQueue.push({
+            z: -1.7,
+            draw: () => {
+                // Back Wall
+                this.drawObliqueBox(ctx, 0, -1.7, 4.6, 0.25, 2.35, '#3b6156', '#28453c');
+                // Shelves on Back Wall
+                const sh1 = this.worldToScreen(-0.5, -1.58, 1.45);
+                ctx.fillStyle = '#6b4728';
+                ctx.fillRect(sh1.x - 95, sh1.y, 190, 8);
+                // Tea boxes & jars on shelf
+                ctx.fillStyle = '#c83e2b';
+                ctx.fillRect(sh1.x - 80, sh1.y - 16, 18, 16);
+                ctx.fillRect(sh1.x - 56, sh1.y - 16, 18, 16);
+                ctx.fillStyle = '#d4a359';
+                ctx.fillRect(sh1.x + 15, sh1.y - 18, 22, 18);
+
+                // Open/Close Sign on Right of Back Wall (x = 1.8)
+                const signPos = this.worldToScreen(1.75, -1.55, 1.35);
+                ctx.fillStyle = this.state.kioskOpen ? '#4a7c44' : '#7c3838';
+                ctx.fillRect(signPos.x - 22, signPos.y - 14, 44, 26);
+                ctx.strokeStyle = '#e6a145';
+                ctx.strokeRect(signPos.x - 22, signPos.y - 14, 44, 26);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px Cairo';
+                ctx.textAlign = 'center';
+                ctx.fillText(this.state.kioskOpen ? 'مفتوح' : 'مغلق', signPos.x, signPos.y + 3);
+
+                // Left Wall & Supplier Telephone (x = -2.2)
+                this.drawObliqueBox(ctx, -2.2, -0.5, 0.25, 2.5, 2.35, '#3b6156', '#223b34');
+                const phonePos = this.worldToScreen(-1.98, -1.1, 1.15);
+                ctx.fillStyle = '#d4a359';
+                ctx.fillRect(phonePos.x - 8, phonePos.y - 12, 16, 20);
+                ctx.fillStyle = '#1c1916';
+                ctx.fillRect(phonePos.x - 5, phonePos.y - 8, 10, 8);
+            }
+        });
+
+        // Kiosk Front Counter + Tea Kettle + Kebda Grill (z = 0.7)
+        // Because z = 0.7, when the player stands inside the kiosk (z = 0.1), the counter renders AFTER the player, naturally occluding their lower body!
+        renderQueue.push({
+            z: 0.7,
+            draw: () => {
+                // Main wooden counter
+                this.drawObliqueBox(ctx, -0.55, 0.7, 3.45, 0.72, 0.96, '#9c6e42', '#6e4b2a');
+
+                // Tea Kettle on Left Counter (x = -1.3, z = 0.7)
+                const kPos = this.worldToScreen(-1.3, 0.7, 1.02);
+                ctx.fillStyle = '#b87333';
+                ctx.beginPath();
+                ctx.arc(kPos.x, kPos.y - 10, 13, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#3d230d';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                // Kettle lid
+                ctx.fillStyle = '#d99658';
+                ctx.beginPath();
+                ctx.arc(kPos.x, kPos.y - 18, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Kebda Grill on Right Counter (x = 0.4, z = 0.7)
+                const gPos = this.worldToScreen(0.4, 0.7, 1.02);
+                ctx.fillStyle = '#1f2024';
+                ctx.fillRect(gPos.x - 28, gPos.y - 16, 56, 24);
+                ctx.strokeStyle = '#555';
+                ctx.strokeRect(gPos.x - 28, gPos.y - 16, 56, 24);
+
+                if (this.kebdaStation.state !== 'EMPTY') {
+                    ctx.fillStyle = (this.kebdaStation.state === 'SIDE_B' || this.kebdaStation.state === 'SEASONED') ? '#4f2412' : '#8b322c';
+                    ctx.beginPath();
+                    ctx.roundRect(gPos.x - 18, gPos.y - 11, 36, 14, 4);
+                    ctx.fill();
+                    if (this.kebdaStation.state === 'SEASONED') {
+                        ctx.fillStyle = '#7bb354';
+                        ctx.fillRect(gPos.x - 10, gPos.y - 7, 5, 4);
+                        ctx.fillRect(gPos.x + 4, gPos.y - 5, 5, 4);
+                    }
+                }
+            }
+        });
+
+        // Counter Stools (z = 1.7)
+        [-1.3, 1.1].forEach(sx => {
+            renderQueue.push({
+                z: 1.68,
+                draw: () => {
+                    const sPos = this.worldToScreen(sx, 1.68, 0.45);
+                    const sGnd = this.worldToScreen(sx, 1.68, 0);
+                    ctx.fillStyle = '#3d2816';
+                    ctx.fillRect(sPos.x - 4, sPos.y, 8, sGnd.y - sPos.y);
+                    ctx.fillStyle = '#7c5330';
+                    ctx.beginPath();
+                    ctx.ellipse(sPos.x, sPos.y, 14, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#291a0d';
+                    ctx.stroke();
+                }
+            });
+        });
+
+        // Outdoor Plastic Table & Chairs (x = 6.25, z = 1.6)
+        renderQueue.push({
+            z: 1.6,
+            draw: () => {
+                const tPos = this.worldToScreen(6.25, 1.6, 0.72);
+                const tGnd = this.worldToScreen(6.25, 1.6, 0);
+                // Table shadow
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(tGnd.x, tGnd.y, 38, 18, 0, 0, Math.PI * 2);
+                ctx.fill();
+                // Legs
+                ctx.fillStyle = '#1f425c';
+                ctx.fillRect(tPos.x - 24, tPos.y, 5, tGnd.y - tPos.y);
+                ctx.fillRect(tPos.x + 19, tPos.y, 5, tGnd.y - tPos.y);
+                // Table top
+                ctx.fillStyle = '#2d5a7b';
+                ctx.beginPath();
+                ctx.ellipse(tPos.x, tPos.y, 40, 20, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#19374d';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        });
+
+        // Player Character
+        renderQueue.push({
+            z: this.player.z,
+            draw: () => this.drawCharacter2D(ctx, this.player, true)
+        });
+
+        // All Active NPCs
+        this.npcs.forEach(npc => {
+            renderQueue.push({
+                z: npc.z,
+                draw: () => this.drawCharacter2D(ctx, npc, false)
+            });
+        });
+
+        // Sort by Z ascending (back to front) and execute draws
+        renderQueue.sort((a, b) => a.z - b.z);
+        renderQueue.forEach(item => item.draw());
+
+        // 4. Steam & Grill Smoke Particles
+        this.particles.forEach(p => {
+            const sp = this.worldToScreen(p.wx, p.wz, p.wy);
+            ctx.fillStyle = `${p.color}${Math.max(0, p.life * 0.45)})`;
+            ctx.beginPath();
+            ctx.arc(sp.x, sp.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 5. Atmospheric Evening/Night Lighting & Warm Incandescent Pools
+        ctx.fillStyle = `rgba(10, 13, 24, ${nightFactor * 0.55})`;
+        ctx.fillRect(0, 0, this.viewW, this.viewH);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+
+        // Warm Kiosk Overhead Bulb Glow
+        const kioskGlowPos = this.worldToScreen(-0.3, 0.3, 1.1);
+        const kGrad = ctx.createRadialGradient(kioskGlowPos.x, kioskGlowPos.y, 15, kioskGlowPos.x, kioskGlowPos.y, 290);
+        kGrad.addColorStop(0, 'rgba(255, 185, 90, 0.42)');
+        kGrad.addColorStop(0.5, 'rgba(230, 145, 55, 0.16)');
+        kGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = kGrad;
+        ctx.fillRect(0, 0, this.viewW, this.viewH);
+
+        // Streetlamp Glow
+        const lampGlowPos = this.worldToScreen(-7.5, -2.8, 1.8);
+        const lGrad = ctx.createRadialGradient(lampGlowPos.x, lampGlowPos.y, 10, lampGlowPos.x, lampGlowPos.y, 240);
+        lGrad.addColorStop(0, 'rgba(255, 165, 70, 0.36)');
+        lGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = lGrad;
+        ctx.fillRect(0, 0, this.viewW, this.viewH);
+
+        ctx.restore();
+    }
+
+    renderRooftopScene(ctx, now, nightFactor) {
+        // 1. Cairo Night Sky & Rooftop Concrete Surroundings
+        ctx.fillStyle = '#121016';
+        ctx.fillRect(0, 0, this.viewW, this.viewH);
+
+        const outerNW = this.worldToScreen(-9, -6, 0);
+        const outerSE = this.worldToScreen(9, 6, 0);
+        ctx.fillStyle = '#38332e';
+        ctx.fillRect(outerNW.x, outerNW.y, outerSE.x - outerNW.x, outerSE.y - outerNW.y);
+
+        // Rooftop Room Floor (6m x 4.5m)
+        const rNW = this.worldToScreen(-3.0, -2.2, 0);
+        const rSE = this.worldToScreen(3.0, 2.25, 0);
+        ctx.fillStyle = '#6b5744';
+        ctx.fillRect(rNW.x, rNW.y, rSE.x - rNW.x, rSE.y - rNW.y);
+
+        // Warm Egyptian Kelim Rug in Center
+        const rugNW = this.worldToScreen(-1.2, -0.7, 0);
+        const rugSE = this.worldToScreen(1.2, 1.2, 0);
+        ctx.fillStyle = '#7c352b';
+        ctx.fillRect(rugNW.x, rugNW.y, rugSE.x - rugNW.x, rugSE.y - rugNW.y);
+        ctx.strokeStyle = '#d4a359';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(rugNW.x + 6, rugNW.y + 6, (rugSE.x - rugNW.x) - 12, (rugSE.y - rugNW.y) - 12);
+
+        // Exit Door Mat at Bottom Center (z = 2.15)
+        const doorPos = this.worldToScreen(0, 2.15, 0);
+        ctx.fillStyle = '#8c6239';
+        ctx.fillRect(doorPos.x - 42, doorPos.y - 12, 84, 22);
+        ctx.fillStyle = '#f3ece1';
+        ctx.font = '11px Cairo';
+        ctx.textAlign = 'center';
+        ctx.fillText('باب النزول للكشك', doorPos.x, doorPos.y + 3);
+
+        // 2. Y-Sorted Rooftop Room Objects
+        const renderQueue = [];
+
+        // Back & Left Cutaway Walls
+        renderQueue.push({
+            z: -2.2,
+            draw: () => {
+                this.drawObliqueBox(ctx, 0, -2.2, 6.0, 0.22, 2.2, '#9c8c79', '#736555');
+                this.drawObliqueBox(ctx, -2.9, 0, 0.22, 4.45, 2.2, '#9c8c79', '#635648');
+            }
+        });
+
+        // Simple Bed (x = -1.7, z = -1.3)
+        renderQueue.push({
+            z: -1.3,
+            draw: () => {
+                this.drawObliqueBox(ctx, -1.7, -1.3, 2.05, 1.25, 0.42, '#c8b8a6', '#4e3620');
+                // Pillow & Blanket
+                const pPos = this.worldToScreen(-2.35, -1.3, 0.45);
+                ctx.fillStyle = '#e8dfd5';
+                ctx.fillRect(pPos.x - 14, pPos.y - 18, 28, 36);
+            }
+        });
+
+        // Small Desk (x = 1.6, z = -1.6)
+        renderQueue.push({
+            z: -1.6,
+            draw: () => {
+                this.drawObliqueBox(ctx, 1.6, -1.6, 1.2, 0.7, 0.72, '#8c6239', '#5c3e22');
+                // Plate & Tea cup on desk
+                const dPos = this.worldToScreen(1.6, -1.6, 0.75);
+                ctx.fillStyle = '#dedede';
+                ctx.beginPath();
+                ctx.arc(dPos.x - 12, dPos.y, 9, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+
+        // Purchasable Stand Electric Fan (x = 0.3, z = -1.4)
+        if (this.state.home.hasFan) {
+            renderQueue.push({
+                z: -1.4,
+                draw: () => {
+                    const fBase = this.worldToScreen(0.3, -1.4, 0);
+                    const fHead = this.worldToScreen(0.3, -1.4, 1.15);
+
+                    // Base
+                    ctx.fillStyle = '#2b3a42';
+                    ctx.beginPath();
+                    ctx.ellipse(fBase.x, fBase.y, 16, 9, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Stand Pole
+                    ctx.fillStyle = '#d0d5d9';
+                    ctx.fillRect(fBase.x - 3, fHead.y, 6, fBase.y - fHead.y);
+
+                    // Oscillating Head & Spinning Blades
+                    const oscOffset = this.state.home.fanOn ? Math.sin(now * 0.0022) * 7 : 0;
+                    const hx = fHead.x + oscOffset;
+                    const hy = fHead.y;
+
+                    ctx.save();
+                    ctx.translate(hx, hy);
+                    if (this.state.home.fanOn) {
+                        this.fanAngle += 0.35;
+                    }
+                    ctx.rotate(this.fanAngle);
+                    ctx.fillStyle = '#88b4cc';
+                    ctx.fillRect(-16, -4, 32, 8);
+                    ctx.fillRect(-4, -16, 8, 32);
+                    ctx.restore();
+
+                    // Wire Cage
+                    ctx.strokeStyle = '#3d5a6c';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(hx, hy, 18, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Cool air breeze lines when ON
+                    if (this.state.home.fanOn) {
+                        ctx.strokeStyle = 'rgba(160, 220, 255, 0.28)';
+                        ctx.lineWidth = 1.5;
+                        const breezeY = hy + 18 + ((now * 0.06) % 28);
+                        ctx.beginPath();
+                        ctx.moveTo(hx - 14, breezeY);
+                        ctx.lineTo(hx + 14, breezeY + 10);
+                        ctx.stroke();
+                    }
+                }
+            });
+        }
+
+        // Player Character
+        renderQueue.push({
+            z: this.player.z,
+            draw: () => this.drawCharacter2D(ctx, this.player, true)
+        });
+
+        renderQueue.sort((a, b) => a.z - b.z);
+        renderQueue.forEach(item => item.draw());
+
+        // Warm Rooftop Room Bulb Glow
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const rLight = this.worldToScreen(0, -0.2, 1.2);
+        const rGrad = ctx.createRadialGradient(rLight.x, rLight.y, 12, rLight.x, rLight.y, 260);
+        rGrad.addColorStop(0, 'rgba(255, 180, 85, 0.38)');
+        rGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = rGrad;
+        ctx.fillRect(0, 0, this.viewW, this.viewH);
+        ctx.restore();
+    }
+
+    // ------------------------------------------------------------------------
+    // MAIN GAME LOOP & HUD PROJECTIONS
+    // ------------------------------------------------------------------------
+    loop(now) {
+        const dt = Math.min(0.1, (now - this.lastFrameTime) / 1000);
+        this.lastFrameTime = now;
+
+        this.updateClockAndNeeds(dt);
+        this.updatePlayerMovement(dt);
+        this.teaStation.update(dt);
+        this.kebdaStation.update(dt);
+        this.updateSocialDirector(dt);
+        this.updateParticles(dt);
+
+        if (this.state.location === 'KIOSK') {
+            this.feluccaX += dt * 0.45;
+            if (this.feluccaX > 16) this.feluccaX = -16;
+        }
+
+        this.render2DWorld(now);
+        this.updateHUDAndProjections();
+
+        const isSizzling = this.kebdaStation.state !== 'EMPTY';
+        const isBoiling = this.teaStation.state === 'HEATING' || this.teaStation.state === 'BREWING';
+        this.audio.updateAmbience(this.state.location, isSizzling, isBoiling, this.state.home.hasFan && this.state.home.fanOn);
+
+        requestAnimationFrame((t) => this.loop(t));
+    }
+
+    updateClockAndNeeds(dt) {
+        this.state.timeMinutes += dt * 2.5;
+        this.state.modifyNeed('hunger', -dt * 0.28);
+        this.state.modifyNeed('rest', -dt * (this.state.kioskOpen ? 0.32 : 0.15));
+
+        if (this.state.needs.rest < 25 || this.state.needs.hunger < 20) {
+            this.state.modifyNeed('mood', -dt * 0.2);
+        }
+    }
+
+    updateHUDAndProjections() {
+        document.getElementById('day-time-label').textContent = this.state.formatTime();
+        document.getElementById('money-label').textContent = `${this.state.money} ج.م`;
+        document.getElementById('stock-label').textContent = `شاي: ${this.state.inventory.teaPortions} | كبدة: ${this.state.inventory.kebdaPortions}`;
+
+        ['hunger', 'rest', 'mood'].forEach(k => {
+            const val = Math.round(this.state.needs[k]);
+            document.getElementById(`val-${k}`).textContent = `${val}%`;
+            const bar = document.getElementById(`bar-${k}`);
+            bar.style.width = `${val}%`;
+            bar.style.backgroundColor = val > 60 ? '#68a357' : (val > 30 ? '#e6a145' : '#c94a4a');
+        });
+
+        const trayEl = document.getElementById('player-tray-indicator');
+        if (this.state.heldItem) {
+            trayEl.style.display = 'block';
+            trayEl.textContent = `في إيدك: ${this.state.heldItem.name} [${this.state.heldItem.quality}] — (اضغط F عشان تشربه/تاكله لنفسك)`;
+        } else {
+            trayEl.style.display = 'none';
+        }
+
+        const inter = this.getAvailableInteractions();
+        const promptBox = document.getElementById('interaction-prompt');
+        if (inter) {
+            promptBox.style.display = 'flex';
+            document.getElementById('prompt-text').textContent = inter.prompt;
+            const secSpan = document.getElementById('prompt-secondary');
+            if (inter.secPrompt) {
+                secSpan.style.display = 'inline';
+                document.getElementById('prompt-sec-text').textContent = inter.secPrompt;
+            } else {
+                secSpan.style.display = 'none';
+            }
+        } else {
+            promptBox.style.display = 'none';
+        }
+
+        // Spatial Station Gauges in Kiosk
+        const teaGauge = document.getElementById('gauge-tea');
+        const kebdaGauge = document.getElementById('gauge-kebda');
+        if (this.state.location === 'KIOSK') {
+            const teaBadge = this.teaStation.getCompactBadge();
+            if (teaBadge) {
+                const p = this.worldToScreen(-1.3, 0.7, 1.55);
+                teaGauge.style.display = 'block';
+                teaGauge.style.left = `${p.x}px`;
+                teaGauge.style.top = `${p.y}px`;
+                teaGauge.textContent = teaBadge;
+            } else {
+                teaGauge.style.display = 'none';
+            }
+
+            const kebdaBadge = this.kebdaStation.getCompactBadge();
+            if (kebdaBadge) {
+                const p = this.worldToScreen(0.4, 0.7, 1.55);
+                kebdaGauge.style.display = 'block';
+                kebdaGauge.style.left = `${p.x}px`;
+                kebdaGauge.style.top = `${p.y}px`;
+                kebdaGauge.textContent = kebdaBadge;
+            } else {
+                kebdaGauge.style.display = 'none';
+            }
+        } else {
+            teaGauge.style.display = 'none';
+            kebdaGauge.style.display = 'none';
+        }
+
+        // Spatial NPC Speech Bubbles
+        this.npcs.forEach(npc => {
+            const bubble = this.bubbleElements.get(npc.id);
+            if (!bubble) return;
+            if (this.state.location === 'KIOSK' && npc.currentSpeech) {
+                const scr = this.worldToScreen(npc.x, npc.z, 1.65);
+                bubble.style.left = `${scr.x}px`;
+                bubble.style.top = `${scr.y}px`;
+                bubble.style.opacity = '1';
+                bubble.innerHTML = `<span class="speaker-name">${npc.name}</span>${npc.currentSpeech}`;
+            } else {
+                bubble.style.opacity = '0';
+            }
+        });
+    }
+
+    // ------------------------------------------------------------------------
+    // UI MODALS & DETERMINISTIC ACCEPTANCE TESTS
+    // ------------------------------------------------------------------------
+    bindUIEvents() {
+        document.getElementById('btn-start-game').onclick = () => {
+            this.audio.init();
+            document.getElementById('title-screen').style.display = 'none';
+            showToast('أهلاً بيك في أوضة السطح (نسخة 2D).. قدامك الباب لما تحب تنزل تفتح الكشك ع النيل.');
+        };
+
+        document.getElementById('btn-notebook').onclick = () => this.toggleNotebookModal();
+        document.getElementById('btn-close-modal').onclick = () => {
+            document.getElementById('modal-notebook').style.display = 'none';
+        };
+
+        document.getElementById('btn-save').onclick = () => {
+            this.state.saveToStorage();
+            showToast('تم حفظ اللعبة بنجاح (Offline LocalStorage).');
+        };
+
+        document.getElementById('btn-tests').onclick = () => this.runAcceptanceTestsModal();
+    }
+
+    toggleNotebookModal() {
+        const modal = document.getElementById('modal-notebook');
+        const title = document.getElementById('modal-title');
+        const content = document.getElementById('modal-content');
+
+        if (modal.style.display === 'flex') {
+            modal.style.display = 'none';
+            return;
+        }
+
+        title.textContent = 'دفتر الملاحظات والمعارف اليومية';
+        content.innerHTML = this.state.notes
+            .map(n => `<div class="note-entry">${n}</div>`)
+            .join('');
+        modal.style.display = 'flex';
+    }
+
+    runAcceptanceTestsModal() {
+        const results = [];
+
+        // Test 1: Economy Transactions
+        const testState = new CanonicalGameState();
+        const startCash = testState.money;
+        testState.modifyMoney(12, 'Test Kebda Sale');
+        testState.modifyMoney(-15, 'Test Supply');
+        const econPass = (testState.money === startCash - 3);
+        results.push({ name: '1. Economy Transactions & Balance Integrity', pass: econPass });
+
+        // Test 2: Hands-On Cooking Outcomes (Tea & Kebda Quality)
+        const testTea = new TeaStation();
+        testTea.interact(testState, { playPour:()=>{}, playChime:()=>{} });
+        testTea.update(3.5);
+        testTea.interact(testState, { playPour:()=>{}, playChime:()=>{} });
+        testTea.update(3.0);
+        testTea.interact(testState, { playPour:()=>{}, playChime:()=>{} });
+        const teaPass = testState.heldItem && testState.heldItem.type === 'TEA' && testState.heldItem.score === 3;
+        testState.heldItem = null;
+
+        const testKebda = new KebdaStation();
+        testKebda.interact(testState, { playChime:()=>{} });
+        testKebda.update(3.0);
+        testKebda.interact(testState, { playChime:()=>{} });
+        testKebda.update(3.0);
+        testKebda.interact(testState, { playChime:()=>{} });
+        testKebda.interact(testState, { playChime:()=>{} });
+        const kebdaPass = testState.heldItem && testState.heldItem.type === 'KEBDA' && testState.heldItem.score === 3;
+        results.push({ name: '2. Tactile Tea & Kebda Cooking Quality State Machines', pass: teaPass && kebdaPass });
+
+        // Test 3: Social Knowledge Chain -> Fan Purchase -> Wellbeing Consequence
+        const addedFact = testState.addKnowledge('KNOWN_CHEAP_FAN', 'Fan referral test');
+        testState.money = 50;
+        if (testState.knowledge.has('KNOWN_CHEAP_FAN')) {
+            testState.modifyMoney(-35, 'Buy Fan');
+            testState.home.hasFan = true;
+            testState.home.fanOn = true;
+        }
+        testState.advanceDay();
+        const fanPass = addedFact && testState.home.hasFan && testState.wellbeingBaseline === 82 && testState.needs.rest === 100;
+        results.push({ name: '3. Social Knowledge -> Electric Fan Purchase -> Rest/Mood Consequence', pass: fanPass });
+
+        // Test 4: Save / Load Persistence
+        this.state.saveToStorage();
+        const loadedState = new CanonicalGameState();
+        const savePass = loadedState.loadFromStorage() && loadedState.money === this.state.money;
+        results.push({ name: '4. Canonical State Save/Load Offline Persistence', pass: savePass });
+
+        const modal = document.getElementById('modal-notebook');
+        document.getElementById('modal-title').textContent = 'تقرير فحص الأنظمة (Deterministic Acceptance Tests)';
+        document.getElementById('modal-content').innerHTML = results.map(r => `
+            <div class="note-entry" style="border-right-color: ${r.pass ? '#68a357' : '#c94a4a'}">
+                <strong>${r.pass ? '✔ PASS' : '✘ FAIL'}</strong> — ${r.name}
+            </div>
+        `).join('');
+        modal.style.display = 'flex';
+    }
+}
+
+function showToast(msg) {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = 'toast-msg';
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3800);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    window.kiosk2DApp = new Kiosk2DGameApp();
+});
+</script>
+</body>
+</html>
