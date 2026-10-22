@@ -14,10 +14,10 @@ func _draw() -> void:
   ground_rect(_config.pavement,Color(_config.pavement_color))
   for x in range(-16,17): draw_line(_mapping.to_canvas(Vector2(x,-3.3)),_mapping.to_canvas(Vector2(x,4.5)),Color(0,0,0,0.22),1)
   for y in range(-3,5): draw_line(_mapping.to_canvas(Vector2(-16,y)),_mapping.to_canvas(Vector2(16,y)),Color(0,0,0,0.22),1)
-  ground_rect(_config.boards,Color(_config.boards_color))
+  for tile in _config.get("building_tiles",[_config.boards]):ground_rect(tile,Color(_config.boards_color))
  else:
   ground_rect(_config.surroundings,Color(_config.surroundings_color))
-  ground_rect(_config.room,Color(_config.room_color))
+  for tile in _config.get("building_tiles",[_config.room]):ground_rect(tile,Color(_config.room_color))
   ground_rect(_config.rug,Color(_config.rug_color))
   var start := _mapping.to_canvas(Vector2(_config.rug[0],_config.rug[1]))+Vector2(6,6)
   var end := _mapping.to_canvas(Vector2(_config.rug[2],_config.rug[3]))-Vector2(6,6)

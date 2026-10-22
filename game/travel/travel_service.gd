@@ -17,6 +17,10 @@ func configure(routes: Dictionary, clock: GameClock, pose: ActorPose, inventory:
   if not route is Dictionary or not route.get("kind") in ["physical","shop"] or not route.get("from_locations") is Array or route.from_locations.is_empty() or not locations.kind(StringName(str(route.get("destination","")))) in [&"physical",&"shop"]:return ContentValidation.fail("travel.route")
   for value in ["outbound_minutes","return_minutes"]:
    if not ContentValidation.bounded(route.get(value),0.01,1440):return ContentValidation.fail("travel.duration")
+  if route.has("arrival_ground"):
+   if route.kind!="physical" or not ContentValidation.vector(route.arrival_ground,2):return ContentValidation.fail("travel.arrival")
+   var bounds: Array=routes.physical_spawns[str(route.destination)].player_bounds
+   if not Rect2(Vector2(bounds[0],bounds[1]),Vector2(bounds[2]-bounds[0],bounds[3]-bounds[1])).has_point(Vector2(route.arrival_ground[0],route.arrival_ground[1])):return ContentValidation.fail("travel.arrival_bounds")
  _config=routes.duplicate(true)
  _clock=clock
  _pose=pose
@@ -63,7 +67,8 @@ func tick(_frame: Dictionary) -> void:
  else:
   _pose.location_id=StringName(route.destination)
   var definition: Dictionary=_config.physical_spawns[str(_pose.location_id)]
-  _pose.ground=Vector2(definition.spawn[0],definition.spawn[1])
+  var arrival: Array=route.get("arrival_ground",definition.spawn)
+  _pose.ground=Vector2(arrival[0],arrival[1])
   journey.data.phase="completed"
   _safe_return_pose()
  changed.emit()

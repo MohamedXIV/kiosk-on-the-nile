@@ -23,7 +23,7 @@ func apply_structure(edit: Dictionary) -> ActionResult:
  if bundle.is_empty(): return _fail("no_document")
  var location_id := str(edit.get("location_id",""))
  var kind := str(edit.get("kind",""))
- if not bundle.spaces.locations.has(location_id) or not kind in ["walls","doors","rooms"]: return _fail("invalid_structure_edit")
+ if not bundle.spaces.locations.has(location_id) or not kind in ["walls","doors","rooms","buildings"]: return _fail("invalid_structure_edit")
  var value: Variant = edit.get("value")
  if not value is Dictionary or not value.get("id") is String: return _fail("invalid_structure_edit")
  var candidate := bundle.duplicate(true)

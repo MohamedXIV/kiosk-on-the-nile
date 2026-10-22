@@ -81,7 +81,10 @@
     "storage_out_of_reach": "قرّب من الثلاجة المناسبة",
     "not_cleanable": "القطعة دي مفيش تنظيف متاح ليها",
     "already_clean": "نظيف بالفعل",
-    "cleaning_out_of_reach": "قرّب من القطعة في نفس المكان الأول"
+    "cleaning_out_of_reach": "قرّب من القطعة في نفس المكان الأول",
+    "placement_crosses_building": "القطعة لازم تكون بالكامل داخل المبنى أو بالكامل برّه.",
+    "placement_inside_only": "القطعة دي مكانها داخل المبنى فقط.",
+    "placement_outside_only": "القطعة دي مكانها في المساحة الخارجية فقط."
   },
   "theme": {
     "font_size": 19,
@@ -229,5 +232,8 @@
   "venue_reputation": "سمعة الكشك: {label}",
   "station_options": "السكر والعناية",
   "change_sugar": "غيّر كمية السكر",
-  "inventory_furniture": "الأثاث المخزن · انقله بالحقيبة ثم فرغه في المكان الآخر"
+  "inventory_furniture": "الأثاث المخزن · انقله بالحقيبة ثم فرغه في المكان الآخر",
+  "arrange_inside": "داخل المبنى فقط",
+  "arrange_outside": "خارج المبنى فقط",
+  "arrange_either": "مسموح داخل وخارج المبنى"
 }

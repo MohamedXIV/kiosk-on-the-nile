@@ -44,7 +44,11 @@
         "kiosk"
       ],
       "outbound_minutes": 10,
-      "return_minutes": 10
+      "return_minutes": 10,
+      "arrival_ground": [
+        0,
+        4
+      ]
     },
     "to_kiosk": {
       "kind": "physical",

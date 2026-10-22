@@ -10,6 +10,7 @@ var _busy: Callable
 var _adapter: Callable
 func configure(definitions: Dictionary, layout: Dictionary, items: ItemStore, actors: Callable, busy_provider: Callable) -> ActionResult:
  _definitions = definitions.duplicate(true)
+ for space in _definitions.locations.values():space["_building_cells"]=BuildingGeometry.cell_map(space)
  _layout = layout.duplicate(true)
  _items = items
  _actors = actors
@@ -23,6 +24,9 @@ func placement(id: StringName) -> Dictionary:
  return _layout.placements.get(str(id),{}).duplicate(true)
 func snapshot() -> Dictionary:
  return _layout.duplicate(true)
+func building_at(location_id: StringName, point: Vector2) -> StringName:
+ var space: Dictionary=_definitions.locations.get(str(location_id),{})
+ return BuildingGeometry.building_at(space,point) if not space.is_empty() else &""
 func restore(data: Dictionary) -> ActionResult:
  var result := _validate_layout(data)
  if not result.ok: return result

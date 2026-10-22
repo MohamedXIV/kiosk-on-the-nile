@@ -14,6 +14,7 @@ var _depth := SpinBox.new()
 var _axis := OptionButton.new()
 var _status := Label.new()
 var _preview := Control.new()
+var _building_json := TextEdit.new()
 func _ready() -> void:
  custom_minimum_size.x=300
  var title := Label.new()
@@ -21,7 +22,7 @@ func _ready() -> void:
  add_child(title)
  add_child(_location)
  _location.item_selected.connect(func(_i):_preview.queue_redraw())
- for entry in ["walls","doors","rooms"]: _kind.add_item(entry)
+ for entry in ["walls","doors","rooms","buildings"]: _kind.add_item(entry)
  add_child(_kind)
  _identity.placeholder_text="Stable structure ID"
  add_child(_identity)
@@ -40,6 +41,9 @@ func _ready() -> void:
  _axis.add_item("x")
  _axis.add_item("y")
  add_child(_axis)
+ _building_json.placeholder_text='Building JSON: {"id":"home","room_ids":["home_room"],"roof":{"height":2.2,"color":"#756653"},"service_windows":[]}'
+ _building_json.custom_minimum_size.y=80
+ add_child(_building_json)
  for entry in [["Add / replace",_edit.bind(false)],["Remove selected ID",_edit.bind(true)],["Reload JSON",func():reload_requested.emit()],["Validate and export",func():export_requested.emit()]]:
   var button := Button.new()
   button.text=entry[0]
@@ -64,7 +68,13 @@ func _edit(remove: bool) -> void:
  if _location.item_count==0 or _identity.text.strip_edges().is_empty(): return
  var kind := _kind.get_item_text(_kind.selected)
  var value := {"id":_identity.text.strip_edges()}
- if kind=="rooms":
+ if kind=="buildings":
+  if not remove:
+   var parsed: Variant=JSON.parse_string(_building_json.text)
+   if not parsed is Dictionary:_status.text="Invalid building JSON";return
+   value=parsed
+   value.id=_identity.text.strip_edges()
+ elif kind=="rooms":
   var cells: Array = []
   for x in range(int(_x.value),int(_x.value+_length.value)):
    for y in range(int(_y.value),int(_y.value+_depth.value)): cells.append([x,y])

@@ -28,7 +28,11 @@
       "height": 1.15,
       "rotation_speed": 21
     },
-    "behavior": "toggle_equipment"
+    "behavior": "toggle_equipment",
+    "placement": {
+      "environment": "either",
+      "allowed_locations": []
+    }
   },
   "counter": {
     "label": "سطح تحضير",
@@ -49,7 +53,11 @@
       "front": "#6e4b2a"
     },
     "movable": true,
-    "surface": true
+    "surface": true,
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
+    }
   },
   "kettle": {
     "label": "براد شاي",
@@ -67,7 +75,11 @@
     },
     "movable": true,
     "mountable": true,
-    "station_id": "tea"
+    "station_id": "tea",
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
+    }
   },
   "griddle": {
     "label": "جريل كبدة",
@@ -86,7 +98,11 @@
     },
     "movable": true,
     "mountable": true,
-    "station_id": "kebda"
+    "station_id": "kebda",
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
+    }
   },
   "bed": {
     "label": "سرير",
@@ -125,7 +141,11 @@
     },
     "movable": true,
     "surface": false,
-    "behavior": "sleep"
+    "behavior": "sleep",
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
+    }
   },
   "desk": {
     "label": "مكتب",
@@ -162,7 +182,11 @@
       ]
     },
     "movable": true,
-    "surface": true
+    "surface": true,
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
+    }
   },
   "fridge": {
     "label": "ثلاجة",
@@ -186,6 +210,10 @@
         "ingredient",
         "batch"
       ]
+    },
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
     }
   },
   "chair": {
@@ -202,7 +230,11 @@
       "pole": "#3d2816",
       "top": "#7c5330"
     },
-    "movable": true
+    "movable": true,
+    "placement": {
+      "environment": "exterior",
+      "allowed_locations": []
+    }
   },
   "table": {
     "label": "طاولة",
@@ -218,7 +250,11 @@
       "pole": "#1f425c",
       "top": "#2d5a7b"
     },
-    "movable": true
+    "movable": true,
+    "placement": {
+      "environment": "exterior",
+      "allowed_locations": []
+    }
   },
   "chicken": {
     "kind": "ingredient",
@@ -265,6 +301,10 @@
       "kind": "box",
       "top": "#aa9c83",
       "front": "#574a40"
+    },
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
     }
   },
   "fryer": {
@@ -282,6 +322,10 @@
       "kind": "box",
       "top": "#777d7a",
       "front": "#574a40"
+    },
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
     }
   },
   "oven": {
@@ -299,6 +343,10 @@
       "kind": "box",
       "top": "#9b9d99",
       "front": "#574a40"
+    },
+    "placement": {
+      "environment": "interior",
+      "allowed_locations": []
     }
   },
   "radio": {
@@ -317,7 +365,11 @@
       "top": "#6b4634",
       "front": "#574a40"
     },
-    "behavior": "toggle_equipment"
+    "behavior": "toggle_equipment",
+    "placement": {
+      "environment": "either",
+      "allowed_locations": []
+    }
   },
   "marinating_bowl": {
     "kind": "batch",

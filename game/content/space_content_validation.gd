@@ -51,9 +51,13 @@ static func validate(bundle: Dictionary) -> ActionResult:
    for cell in room.cells:
     if not cell is Array or cell.size()!=2 or not ContentValidation.integer(cell[0]) or not ContentValidation.integer(cell[1]) or cells.has(str(cell)): return ContentValidation.fail("spaces.room_cells")
     cells[str(cell)]=room.id
+  var building_result := BuildingContentValidation.validate(s)
+  if not building_result.ok:return building_result
  for id in bundle.items:
   var value: Dictionary = bundle.items[id]
   if value.kind not in ["equipment","furniture"]: continue
+  for location_id in value.get("placement",{}).get("allowed_locations",[]):
+   if not spaces.locations.has(location_id):return ContentValidation.fail("items.placement_location")
   if not value.get("footprint") is Array or value.footprint.size()!=2: return ContentValidation.fail("items.footprint")
   for size in value.footprint:
    if not ContentValidation.integer(size) or size<1: return ContentValidation.fail("items.footprint")

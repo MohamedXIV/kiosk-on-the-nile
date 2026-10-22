@@ -74,6 +74,8 @@ static func validate(layout: Dictionary, request: PlacementRequest, catalog: Dic
   var box := footprint(record,item_definition,space)
   var bounds: Array = space.build_bounds
   if not Rect2(Vector2(bounds[0],bounds[1]),Vector2(bounds[2]-bounds[0],bounds[3]-bounds[1])).encloses(box): return _fail("outside_build_area")
+  var environment := BuildingGeometry.validate_placement(space,item_definition,box,StringName(record.location_id))
+  if not environment.ok:return environment
   if record.host_id!="":
    if not placements.has(record.host_id) or record.host_id==id: return _fail("missing_surface")
    var host: Dictionary = placements[record.host_id]

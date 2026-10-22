@@ -16,6 +16,10 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
  var mounted: Array[Dictionary] = []
  var definitions: Dictionary = spaces.definitions().locations
  var space: Dictionary = definitions[str(location_id)]
+ result.floor["building_tiles"]=[]
+ for cell in BuildingGeometry.cell_map(space):
+  var corner := Vector2(space.origin[0],space.origin[1])+Vector2(cell)*float(space.cell_size)
+  result.floor.building_tiles.append([corner.x,corner.y,corner.x+float(space.cell_size),corner.y+float(space.cell_size)])
  for id in spaces.snapshot().placements:
   var record := spaces.placement(StringName(id))
   if record.location_id!=str(location_id): continue
@@ -68,6 +72,7 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
  for door in space.doors:
   var opened: bool = spaces.snapshot().door_states.get(door.id,door.open)
   var point := Vector2(door.cell[0],door.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])
+  point+=(Vector2(0,float(door.length)) if door.axis=="y" else Vector2(float(door.length),0))*float(space.cell_size)/2
   if not opened:
    result.props.append({"kind":"box","ground":[point.x,point.y],"size":[0.08 if door.axis=="y" else float(door.length)*space.cell_size,float(door.length)*space.cell_size if door.axis=="y" else 0.08,1.7],"top":"#99764e","front":"#6c5032"})
   result.interactions.append({"id":door.id,"ground":[point.x,point.y],"radius":0.9,"primary":labels.door_close if opened else labels.door_open,"action":"door","door_id":door.id,"opened":opened})
@@ -75,7 +80,11 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   var point := Vector2(wall.cell[0],wall.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])
   var size := Vector2(0.08,float(wall.length)*space.cell_size) if wall.axis=="y" else Vector2(float(wall.length)*space.cell_size,0.08)
   point += size/2
-  result.props.append({"kind":"box","ground":[point.x,point.y],"size":[size.x,size.y,1.5],"top":"#9c8c79","front":"#736555"})
+  var height := 1.7
+  for building in space.buildings:
+   for window in building.get("service_windows",[]):
+    if window.wall_id==wall.id:height=float(window.sill_height)
+  result.props.append({"kind":"box","ground":[point.x,point.y],"size":[size.x,size.y,height],"top":"#9c8c79" if location_id==&"rooftop" else "#405856","front":"#736555" if location_id==&"rooftop" else "#243c3a"})
  # Standing markers follow the actual piece, with the authored local offset.
  for marker_id in space.get("marker_bindings",{}):
   var binding: Dictionary = space.marker_bindings[marker_id]
