@@ -6,6 +6,7 @@ var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
 var items: ItemStore
+var build: BuildController
 var spaces: SpaceService
 var inventory: InventoryService
 var home: HomeService
@@ -80,6 +81,9 @@ func configure(source: SessionConfig) -> ActionResult:
  spaces = SpaceService.new()
  var space_result := spaces.configure(source.section("spaces"),layout,items,_actor_snapshots,func(id):return cooking!=null and cooking.job(id)!=null and cooking.job(id).stage!=&"EMPTY")
  if not space_result.ok: return space_result
+ inventory.player_pose=player_pose
+ inventory.spaces=spaces
+ build=BuildController.new(spaces,items,player_pose)
  kiosk_open = source.section("session").kiosk_open
  var social_data := source.section("social")
  var amounts: Dictionary = {}

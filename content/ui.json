@@ -48,7 +48,23 @@
     "no_target": "قرّب من الحاجة اللي عايز تتفاعل معاها",
     "no_secondary": "مفيش اختيار إضافي هنا",
     "invalid_sleep_duration": "اختار مدة نوم ضمن الحدود المتاحة",
-    "nothing_new_to_say": "مفيش كلام جديد دلوقتي؛ سيب القعدة تاخد راحتها"
+    "nothing_new_to_say": "مفيش كلام جديد دلوقتي؛ سيب القعدة تاخد راحتها",
+    "container_full": "المخزن مفيهوش مساحة كفاية",
+    "person_in_the_way": "في حد واقف في المكان ده",
+    "blocked_exit": "المكان ده هيسد المخرج",
+    "trapped_person": "التغيير ده هيحبس حد",
+    "blocked_interaction": "لازم تسيب مساحة للوصول والاستعمال",
+    "equipment_busy": "الجهاز مشغول دلوقتي",
+    "surface_not_empty": "فضّي السطح الأول",
+    "overlapping_item": "في قطعة تانية هنا",
+    "overlapping_structure": "في حائط أو باب هنا",
+    "outside_build_area": "برّه مساحة الترتيب",
+    "requires_counter": "الجهاز ده لازم يتحط على سطح",
+    "surface_busy": "السطح مشغول",
+    "structure_dev_only": "تعديل الحوائط والغرف للمطور فقط",
+    "incompatible_surface": "الجهاز مش مناسب للسطح ده",
+    "item_wrong_location": "القطعة موجودة في مكان تاني",
+    "empty_surface": "السطح فاضي"
   },
   "theme": {
     "font_size": 19,
@@ -132,5 +148,17 @@
       "mood": "#9aaf7c"
     },
     "dialogue_width_ratio": 0.35
-  }
+  },
+  "arrange": "ترتيب المكان",
+  "arrange_title": "ترتيب الأثاث والأجهزة",
+  "arrange_rotate": "تدوير R",
+  "arrange_confirm": "ثبّت",
+  "arrange_store": "خزّن",
+  "arrange_close": "إنهاء الترتيب",
+  "arrange_floor": "على الأرض",
+  "arrange_stored": "في المخزن",
+  "arrange_help": "اضغط على الشبكة لاختيار المكان؛ الوقت مستمر.",
+  "surface_put": "حط اللي في إيدك",
+  "surface_take": "خد اللي على السطح",
+  "surface_empty": "سطح تحضير فاضي"
 }

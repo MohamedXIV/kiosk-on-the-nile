@@ -61,3 +61,38 @@ func restore_legacy(stock: Dictionary, held: PreparedItem, next_id: int) -> Acti
  result = restock_legacy(stock)
  if not result.ok: return result
  return receive_prepared(held) if held!=null else ActionResult.success()
+
+var player_pose: ActorPose
+var spaces: SpaceService
+func put_down(surface_slot_id: StringName) -> ActionResult:
+ var held := held_id()
+ if held.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
+ var available := _surface_available(surface_slot_id)
+ if not available.ok: return available
+ var result := items.prepare_moves([{"item_id":str(held),"quantity":1,"from_container":"player_hand","to_container":str(surface_slot_id)}])
+ return items.commit(result.details.change) if result.ok else result
+func pick_up(surface_slot_id: StringName) -> ActionResult:
+ if not held_id().is_empty(): return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
+ var reach := _surface_reachable(surface_slot_id)
+ if not reach.ok: return reach
+ var food := items.items_in(surface_slot_id)
+ if food.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_surface")
+ var result := items.prepare_moves([{"item_id":food[0].id,"quantity":1,"from_container":str(surface_slot_id),"to_container":"player_hand"}])
+ return items.commit(result.details.change) if result.ok else result
+func _surface_available(id: StringName) -> ActionResult:
+ var reach := _surface_reachable(id)
+ if not reach.ok: return reach
+ var container := items.get_container(id)
+ if container.get("kind")!="surface" or spaces==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
+ var host := spaces.placement(StringName(container.host_id))
+ if host.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
+ for record in spaces.snapshot().placements.values():
+  if record.host_id==container.host_id: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"surface_busy")
+ return ActionResult.success()
+
+func _surface_reachable(id: StringName) -> ActionResult:
+ var container := items.get_container(id)
+ if container.get("kind")!="surface" or spaces==null or player_pose==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
+ var host := spaces.placement(StringName(container.host_id))
+ if host.is_empty() or host.location_id!=str(player_pose.location_id) or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
+ return ActionResult.success()

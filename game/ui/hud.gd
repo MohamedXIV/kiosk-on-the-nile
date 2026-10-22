@@ -1,5 +1,6 @@
 class_name Hud
 extends Control
+signal arrange_requested
 signal save_requested
 signal notebook_requested
 signal diagnostics_requested
@@ -33,7 +34,7 @@ func configure(text: UiText) -> void:
  add_child(_menu)
  var actions := VBoxContainer.new()
  _menu.add_child(actions)
- for entry in [{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
+ for entry in [{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
  var help := UiText.label(text.text("help"))

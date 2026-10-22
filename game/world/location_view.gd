@@ -8,6 +8,7 @@ var station_views: Dictionary = {}
 var _fan: FanView
 var _sign: SignView
 var _geometry: Array[Node] = []
+var _surface_foods: Dictionary = {}
 func configure(data: LocationDefinition, source: GameSession) -> void:
  session = source
  definition = LocationDefinition.new(data.id,SpaceSceneAdapter.location(data.data,data.id,source.spaces,source.items))
@@ -47,6 +48,13 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
  var bounds: Array = data.data.player_bounds
  for box in [[bounds[0]-1,bounds[1]-1,bounds[0],bounds[3]+1],[bounds[2],bounds[1]-1,bounds[2]+1,bounds[3]+1],[bounds[0],bounds[1]-1,bounds[2],bounds[1]],[bounds[0],bounds[3],bounds[2],bounds[3]+1]]:
   _add_solid({"kind":"rect","rect":box},solids,4)
+ for container in session.items.snapshot().containers.values():
+  if container.kind!="surface" or container.location_id!=str(data.id) or session.spaces.placement(StringName(container.host_id)).is_empty(): continue
+  var view := HeldItemView.new()
+  var ground := session.spaces.ground(StringName(container.host_id))
+  view.position=mapping.to_canvas(ground,0.96)+Vector2(0,34)
+  add_child(view)
+  _surface_foods[container.id]=view
  navigation.configure(data,mapping)
  _geometry.assign(get_children())
 func _add_solid(data: Dictionary, parent: Node, layer: int) -> void:
@@ -84,12 +92,18 @@ func _process(_delta: float) -> void:
   if job: station_views[id].present({"stage":str(job.stage),"heat_elapsed":job.heat_elapsed,"brew_elapsed":job.brew_elapsed})
  if _fan: _fan.present(session.home.snapshot())
  if _sign: _sign.present(session.kiosk_open)
+ for slot in _surface_foods:
+  var contents := session.items.items_in(StringName(slot))
+  _surface_foods[slot].present(PreparedItem.from_dict(contents[0].attributes) if not contents.is_empty() and contents[0].kind=="prepared" else null)
 func interaction_targets() -> Array[InteractionTarget]:
  var targets: Array[InteractionTarget] = []
  for data in definition.data.interactions:
   if not _permitted(data.get("requires",{})): continue
   var target := InteractionTarget.new(StringName(data.id),Vector2(data.ground[0],data.ground[1]),float(data.radius))
   target.primary = data.primary
+  if data.get("action")=="surface":
+   var slots := session.items.items_in(StringName(data.slot_id))
+   target.primary = str(session.config.section("ui").get("surface_put")) if not session.inventory.held_id().is_empty() else str(session.config.section("ui").get("surface_take")) if not slots.is_empty() else str(session.config.section("ui").get("surface_empty"))
   if _permitted(data.get("secondary_requires",{})): target.secondary = data.get("secondary","")
   targets.append(target)
  return targets
@@ -103,6 +117,7 @@ func refresh_layout() -> void:
    child.free()
  _geometry.clear()
  station_views.clear()
+ _surface_foods.clear()
  _fan = null
  _sign = null
  var base := LocationDefinition.new(definition.id,session.config.section("locations")[str(definition.id)])

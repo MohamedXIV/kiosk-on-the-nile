@@ -5,6 +5,8 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _build_panel: BuildPanel
+var _placement_preview: PlacementPreview
 var _physical: PhysicalWorldController
 var _world: Node2D
 var _rooms: Dictionary = {}
@@ -123,7 +125,7 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.motion_step = _step_motion
  var room: LocationView = _rooms[str(_session.location_id)]
@@ -133,6 +135,10 @@ func _install(candidate: GameSession) -> void:
  _ui_layer.add_child(_hud)
  _hud.configure(_text)
  _hud.bind(_session)
+ _build_panel=BuildPanel.new()
+ _hud.add_child(_build_panel)
+ _build_panel.configure(_text,_session.build,_session)
+ _hud.arrange_requested.connect(_begin_arrange)
  _hud.save_requested.connect(_request_save)
  _hud.notebook_requested.connect(_toggle_notebook)
  _hud.diagnostics_requested.connect(_diagnostics)
@@ -165,6 +171,18 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _session.build.active:
+  if event.is_action_pressed("cancel"):
+   _session.build.cancel()
+   _build_panel.hide()
+  elif event is InputEventKey and event.pressed and event.keycode==KEY_R: _build_panel.rotate_selection()
+  elif event is InputEventKey and event.pressed and event.keycode==KEY_ENTER: _session.build.confirm()
+  elif event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
+   var room: LocationView=_rooms[str(_session.location_id)]
+   var ground := room.mapping.to_ground(room.get_local_mouse_position())
+   _build_panel.move_cursor(Vector2i(floori(ground.x/0.25),floori(ground.y/0.25)))
+  get_viewport().set_input_as_handled()
+  return
  if _hud.sleep_panel.visible:
   if event.is_action_pressed("cancel"):
    _hud.sleep_panel.hide()
@@ -255,3 +273,16 @@ func _begin_sleep(hours: int) -> void:
  else: _hud.toast.show_message(_text.outcome(result))
  _sound.play_action(result)
  _busy = false
+
+func _begin_arrange() -> void:
+ if _busy or _transition.active or _hud.sleep_panel.visible: return
+ var result := _session.build.begin(_session.location_id)
+ if not result.ok:
+  _hud.toast.show_message(_text.outcome(result))
+  return
+ if _placement_preview: _placement_preview.queue_free()
+ var room: LocationView=_rooms[str(_session.location_id)]
+ _placement_preview=PlacementPreview.new()
+ room.add_child(_placement_preview)
+ _placement_preview.configure(_session.build,_session.spaces,_session.items,room.mapping)
+ _build_panel.open()
