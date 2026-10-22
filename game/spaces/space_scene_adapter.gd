@@ -74,13 +74,13 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   var point := Vector2(door.cell[0],door.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])
   point+=(Vector2(0,float(door.length)) if door.axis=="y" else Vector2(float(door.length),0))*float(space.cell_size)/2
   if not opened:
-   result.props.append({"kind":"box","ground":[point.x,point.y],"size":[0.08 if door.axis=="y" else float(door.length)*space.cell_size,float(door.length)*space.cell_size if door.axis=="y" else 0.08,1.7],"top":"#99764e","front":"#6c5032"})
+   result.props.append({"kind":"box","ground":[point.x,point.y],"size":[0.08 if door.axis=="y" else float(door.length)*space.cell_size,float(door.length)*space.cell_size if door.axis=="y" else 0.08,BuildingGeometry.edge_height(space,door)],"top":"#99764e","front":"#6c5032"})
   result.interactions.append({"id":door.id,"ground":[point.x,point.y],"radius":0.9,"primary":labels.door_close if opened else labels.door_open,"action":"door","door_id":door.id,"opened":opened})
  for wall in space.walls:
   var point := Vector2(wall.cell[0],wall.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])
   var size := Vector2(0.08,float(wall.length)*space.cell_size) if wall.axis=="y" else Vector2(float(wall.length)*space.cell_size,0.08)
   point += size/2
-  var height := 1.7
+  var height := BuildingGeometry.edge_height(space,wall)
   for building in space.buildings:
    for window in building.get("service_windows",[]):
     if window.wall_id==wall.id:height=float(window.sill_height)

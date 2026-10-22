@@ -10,6 +10,7 @@ var _sign: SignView
 var _geometry: Array[Node] = []
 var _surface_foods: Dictionary = {}
 var _item_visuals: Dictionary = {}
+var _buildings: Array[BuildingView]=[]
 func configure(data: LocationDefinition, source: GameSession) -> void:
  session = source
  definition = LocationDefinition.new(data.id,SpaceSceneAdapter.location(data.data,data.id,source.spaces,source.items))
@@ -39,6 +40,12 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
   add_child(boat)
   boat.configure(data.data.water.boat,mapping)
  for prop in data.data.props: _add_visual(prop,self,Vector2.ZERO)
+ var space: Dictionary=session.spaces.definitions().locations[str(data.id)]
+ for building in space.buildings:
+  var roof := BuildingView.new()
+  add_child(roof)
+  roof.configure(space,building,mapping)
+  _buildings.append(roof)
  for prop in data.data.props:
   if prop.kind=="lamp":
    var light := WarmLight.new()
@@ -107,6 +114,7 @@ func _add_visual(data: Dictionary, parent: Node2D, parent_ground: Vector2) -> vo
 func _process(_delta: float) -> void:
  if session == null: return
  visible = session.location_id == definition.id
+ for roof in _buildings:roof.present(session.player_ground,session.location_id==definition.id,session.build.active and session.build.location_id==definition.id)
  for id in station_views:
   var job := session.cooking.job(StringName(id))
   if job:
@@ -142,6 +150,7 @@ func refresh_layout() -> void:
  station_views.clear()
  _surface_foods.clear()
  _item_visuals.clear()
+ _buildings.clear()
  _fan = null
  _sign = null
  var base := LocationDefinition.new(definition.id,session.config.section("locations")[str(definition.id)])

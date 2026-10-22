@@ -37,5 +37,15 @@ static func validate_placement(space: Dictionary, item: Dictionary, footprint: R
  var required := str(policy.get("environment","either"))
  if required!="either" and required!=str(environment):return _fail("placement_inside_only" if required=="interior" else "placement_outside_only")
  return ActionResult.success()
+static func edge_height(space: Dictionary, edge: Dictionary) -> float:
+ var scale := float(space.cell_size)
+ var point := Vector2(space.origin[0],space.origin[1])+Vector2(edge.cell[0],edge.cell[1])*scale
+ point+=(Vector2(float(edge.length)/2,0) if edge.axis=="x" else Vector2(0,float(edge.length)/2))*scale
+ var normal := Vector2(0,scale/2) if edge.axis=="x" else Vector2(scale/2,0)
+ var owner := building_at(space,point-normal)
+ if owner.is_empty():owner=building_at(space,point+normal)
+ for building in space.buildings:
+  if str(building.id)==str(owner):return float(building.roof.height)
+ return 1.7
 static func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
