@@ -186,9 +186,10 @@ Generated audio is original procedural PCM, reproducible with
 needed at runtime.
 
 See [docs/PORT_PARITY.md](docs/PORT_PARITY.md) for implementation mapping and the
-remaining acceptance work. The latest integration has not completed full-day,
-complete-session browser reload or final visual/audio acceptance; successful
-import/export does not establish gameplay parity.
+remaining acceptance work. The living-spaces cycle has browser save/Continue and real purchase, cooking,
+service, cleaning and sleep observations. Full-day default balance, interactive
+editor authoring and final visual/audio acceptance remain open; import/export
+alone does not establish gameplay parity.
 
 
 ## Equip, arrange and maintain the venues

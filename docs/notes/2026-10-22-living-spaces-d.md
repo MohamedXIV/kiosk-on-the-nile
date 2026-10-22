@@ -30,7 +30,7 @@
 - Integration fixes prevent an empty counter interaction from hiding its mounted device; actual host height controls rendering, host selection aligns placement coordinates, and the home desk exposes surface actions.
 - Required final whole-branch static review found two important issues: missing furniture transport and future-step equipment moving to another venue. Stored empty pieces can now be packed one at a time, carried on the existing journey and unpacked into destination storage without changing identity; hosted containers move with them. Workflow actions/transitions revalidate actual placement in the job venue. No other critical/important findings were reported. No automated suites were run.
 
-### Acceptance still open
+### Acceptance still open at the first preview (superseded by the continued cycle below)
 
 Full shawarma vessel→fridge→spit→three slices→assembly→paid service, interrupted cleaning/save/resume, dirty-bed recovery, furniture cross-location transport through the UI, all five adversarial review cases and interactive native editor authoring remain unverified manually. The implementation is a preview, not a fully accepted D4 release. Default multi-day economy and visitor pacing are also not accepted by the externally tuned session.
 
@@ -47,3 +47,15 @@ Full shawarma vessel→fridge→spit→three slices→assembly→paid service, i
 - Packed stored `counter_2`, travelled home and unpacked it into rooftop storage through UI, retaining its identity. `/tmp/furniture-arrived-home.png`.
 - Normal sleep requested1 hour, preview added1 for mood52/rest0, recovered24 rest; crossing midnight assessed rent once. Accelerated manual-only bed dirt remains for the dirty-bed observation.
 - Manual findings: ready food was absent from customer availability once its last raw inputs were used; include actual local prepared instances and the physically present player's carried portion. Sleeping still had the legacy silent held-food deletion; remove that debit so owned food is not consumed without a consumption action. Both corrections remain subject to build/manual continuation below.
+
+- With the correction, actual sleep retained `food_25` unchanged. A second one-hour sleep on the accelerated dirty bed displayed the10% warning and restored10.8 rest (24→34.8), without oversleep at the improved mood. `/tmp/dirty-bed-fixed-preview.png`.
+- On returning/opening the kiosk with no bread/sauce remaining, Nadia selected the real ready shawarma. Delivered `food_25` through E: order3 marked served, hand emptied and money37800→39700 (1800 price +100 tip); `/tmp/shawarma-paid-service.png`.
+- Started floor cleaning, moved away to interrupt, and saved normally with confirmation. Read-only state retained completed1.0416667 minutes and inactive action; new dust added work while interrupted. Actual Continue/resume follows.
+
+- Continue retained the interrupted floor action as inactive and its1.0416667 completed minutes, with cleanliness18.5208333. Resuming completed the remaining work; cleaning state cleared and floor cleanliness was97.8958333 after subsequent accelerated dust. `/tmp/clean-resumed-completed.png`.
+- Nadia's completed visit generated exactly one paid-food summary for `food_25` quality2/order3, with food75, measured wait98.9796296 and observed environment84.65; score84.3628663. No second payment occurred on Continue.
+- Sliced both remaining portions without reheating/reset: one filling went onto a free surface and the final one became `item_27` in hand. Batch job2 completed and stopped exposing slice actions after three total portions; roast elapsed stayed22.625. `/tmp/third-slice-finite-batch.png`.
+
+### Remaining manual coverage
+
+Core shopping→placement→cold batch→partial-save/Continue→surface transfer→assembly→paid service→clean interruption/save/Continue/resume and dirty-bed recovery were observed through ordinary UI. Interactive native editor authoring, all adversarial placement/door race cases, default multi-day balance and comparative audio acceptance remain open. The manual review used the explicitly documented external tuning; release content is the default repository bundle. No automated gameplay suites were added or run.

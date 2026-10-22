@@ -114,5 +114,7 @@ Schema 4/revision 4 migrates earlier saves and retains matching archived Ink.
 Manual evidence includes arrangement/save/Continue, a confirmed market purchase,
 new Farid teaching and a source-backed dirt comment, running cooking/customers
 during a shop journey, and actual schema-3 held food + active tea + pending Ink
-Continue/reply. Complete batch/service/cleaning/sleep/editor acceptance remains
-open. See [the evidence and limits](notes/2026-10-22-living-spaces-d.md).
+Continue/reply. The continued manual cycle also covered real cold preparation, all three slices,
+partial batch Continue, same-ID surface transfers, assembly and paid shawarma
+service, interrupted cleaning Continue/resume and dirty-bed recovery. Interactive
+editor authoring and adversarial geometry/default multi-day acceptance remain open. See [the evidence and limits](notes/2026-10-22-living-spaces-d.md).
