@@ -97,4 +97,4 @@ func present(target: InteractionTarget) -> void:
   if not status.is_empty(): station_labels.append(status)
  _station.text = "  ·  ".join(station_labels)
  var focused := _session.narrative.focused_session()
- dialogue.present(focused,_session.narrative.choices(focused) if focused else [])
+ dialogue.present(focused,_session.narrative.choices(focused))
