@@ -1,0 +1,103 @@
+{
+  "title": "كشك ع النيل",
+  "subtitle": "قعدة هادية، شاي مظبوط، وحكايات ع الكورنيش",
+  "new_game": "يوم جديد",
+  "continue": "كمّل القعدة",
+  "save": "احفظ",
+  "saved": "اتحفظت القعدة",
+  "save_failed": "تعذّر الحفظ؛ القعدة الحالية لسه زي ما هي",
+  "load_failed": "تعذّر استرجاع القعدة المحفوظة",
+  "loading": "بنجهّز القعدة…",
+  "notebook": "كشكول الحكايات",
+  "close": "اقفل",
+  "help": "{move_keys} / الأسهم: الحركة  ·  {primary_key}: تفاعل  ·  {secondary_key}: اختيار إضافي / كل واشرب  ·  {notebook_key}: الكشكول",
+  "money": "{amount} ج.م",
+  "day_time": "اليوم {day}  ·  {hour}:{minute}",
+  "hunger": "الشبع",
+  "rest": "الراحة",
+  "mood": "المزاج",
+  "stock": "شاي {tea}  ·  كبدة {kebda}",
+  "held": "معاك: {item}",
+  "empty_hands": "إيدك فاضية",
+  "open": "الكشك مفتوح",
+  "closed": "الكشك مقفول",
+  "talk": "كلّم {name}",
+  "serve": "قدّم {item} لـ {name}",
+  "consume": "كل / اشرب اللي معاك",
+  "interaction": "[{primary_key}] {primary}",
+  "secondary": "[{secondary_key}] {secondary}",
+  "success": "تمام",
+  "departed": "الزبون مش موجود دلوقتي",
+  "back_home": "راجع أوضة السطح…",
+  "to_kiosk": "في الطريق لكورنيش النيل…",
+  "sleeping": "نوم هادي… بداية اليوم {day}",
+  "errors": {
+    "insufficient_funds": "مفيش فكة كفاية حالياً",
+    "out_of_stock": "الخامات خلصت؛ اطلب من التليفون",
+    "hands_busy": "إيدك مشغولة، قدّم اللي معاك أو استمتع بيه",
+    "too_early": "لسه بدري شوية",
+    "wrong_order": "الزبون مستني حاجة تانية",
+    "empty_hands": "إيدك فاضية",
+    "order_unavailable": "الطلب اتقفل أو الزبون مش موجود",
+    "stale_choice": "الاختيار ده مبقاش متاح",
+    "fan_unknown": "اسأل عم أمجد الأول",
+    "already_owned": "المروحة موجودة عندك",
+    "sugar_unavailable": "غيّر السكر والبراد فاضي",
+    "invalid_save": "ملف الحفظ مش صالح",
+    "wait_cooking": "استنى الطبخة تكمل على مهلك",
+    "no_target": "قرّب من الحاجة اللي عايز تتفاعل معاها",
+    "no_secondary": "مفيش اختيار إضافي هنا"
+  },
+  "theme": {
+    "font_size": 19,
+    "background": "#17130feb",
+    "border": "#9b7648",
+    "text": "#f2e7d4",
+    "accent": "#d8a657"
+  },
+  "input": {
+    "move_left": [
+      "A",
+      "Left"
+    ],
+    "move_right": [
+      "D",
+      "Right"
+    ],
+    "move_up": [
+      "W",
+      "Up"
+    ],
+    "move_down": [
+      "S",
+      "Down"
+    ],
+    "interact_primary": [
+      "E"
+    ],
+    "interact_secondary": [
+      "F"
+    ],
+    "notebook": [
+      "N"
+    ]
+  },
+  "transition": {
+    "fade_out": 0.65,
+    "fade_in": 0.35
+  },
+  "toasts": {
+    "duration": 3
+  },
+  "camera": {
+    "smoothing": 6
+  },
+  "diagnostics": "فحص الأنظمة",
+  "diagnostics_ok": "الأنظمة جاهزة",
+  "diagnostics_failed": "فحص الأنظمة محتاج مراجعة",
+  "narrative_failed": "تعذّر إكمال الحكاية؛ تقدر تكمل يومك",
+  "close_kiosk": "اقفل الكشك وارتاح شوية",
+  "open_kiosk": "افتح الكشك واستقبل الزباين",
+  "saved_web": "القعدة اتسجلت؛ جاري مزامنة حفظ المتصفح",
+  "action_unavailable": "مش متاح دلوقتي"
+}

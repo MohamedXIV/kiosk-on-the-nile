@@ -413,9 +413,9 @@
           -1.15
         ],
         "radius": 1.6,
-        "primary": "اطلب خامات للكشك (٤ شاي + ٤ كبدة بـ ١٥ ج.م)",
+        "primary": "اطلب خامات ({supply_tea} شاي + {supply_kebda} كبدة بـ {supply_price} ج.م)",
         "action": "buy_stock",
-        "secondary": "اشتري مروحة ستاند مستعملة من عم سعيد (٣٥ ج.م)",
+        "secondary": "اشتري مروحة من عم سعيد ({fan_price} ج.م)",
         "secondary_action": "buy_fan",
         "secondary_requires": {
           "all": [
@@ -659,7 +659,7 @@
           -1.45
         ],
         "radius": 1.55,
-        "primary": "لقمة خفيفة بـ ٣ ج.م (يسد الجوع)",
+        "primary": "لقمة خفيفة بـ {snack_price} ج.م (يسد الجوع)",
         "action": "snack"
       },
       {

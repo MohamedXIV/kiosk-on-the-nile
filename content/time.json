@@ -10,7 +10,19 @@
       "clock"
     ],
     "scheduler": [
+      "narrative"
+    ],
+    "cooking": [
       "needs"
+    ],
+    "visitors": [
+      "motion"
+    ],
+    "narrative": [
+      "visitors"
+    ],
+    "motion": [
+      "cooking"
     ]
   }
 }

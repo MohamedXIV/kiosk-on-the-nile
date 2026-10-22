@@ -1,0 +1,52 @@
+class_name LifeActions
+extends RefCounted
+signal day_reset
+signal travelled(destination: StringName)
+var _session: GameSession
+func _init(session: GameSession) -> void:
+ _session = session
+func snack() -> ActionResult:
+ var paid := _session.wallet.try_spend(int(_session.config.section("balance").snack_price))
+ if not paid.ok: return paid
+ var effect: Dictionary = _session.config.section("needs").snack
+ _session.needs.apply_delta(effect.hunger,0,effect.mood)
+ return ActionResult.success({"cue":"coin"})
+func consume_held() -> ActionResult:
+ var item := _session.cooking.held_item()
+ if item == null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
+ var effect: Dictionary = _session.config.section("needs")[str(item.food_id)]
+ _session.cooking.take_held(item.id,false)
+ _session.needs.apply_delta(effect.hunger,0,effect.base_mood+item.quality_score*effect.quality_mood)
+ _session.cooking.held_changed.emit()
+ return ActionResult.success({"cue":"chime"})
+func sleep() -> ActionResult:
+ if _session.location_id != &"rooftop": return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"sleep_at_home")
+ var result := _session.routine.sleep()
+ var item := _session.cooking.held_item()
+ if item: _session.cooking.take_held(item.id)
+ _session.kiosk_open = false
+ var spawn: Array = _session.config.section("locations").rooftop.spawn
+ _session.player_ground = Vector2(spawn[0],spawn[1])
+ day_reset.emit()
+ return result
+func travel(destination: StringName) -> ActionResult:
+ var locations: Dictionary = _session.config.section("locations")
+ if not locations.has(str(destination)) or destination == _session.location_id: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_destination")
+ var spawn: Array = locations[str(destination)].spawn
+ _session.location_id = destination
+ _session.player_ground = Vector2(spawn[0],spawn[1])
+ _session.kiosk_open = destination == &"kiosk"
+ travelled.emit(destination)
+ return ActionResult.success()
+func toggle_kiosk() -> ActionResult:
+ if _session.location_id != &"kiosk": return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"kiosk_unavailable")
+ _session.kiosk_open = not _session.kiosk_open
+ return ActionResult.success({"kiosk_open":_session.kiosk_open,"cue":"chime"})
+func look_at_river() -> ActionResult:
+ _session.needs.apply_delta(0,0,float(_session.config.section("needs").river_mood))
+ return ActionResult.success({"cue":"chime"})
+func toggle_fan() -> ActionResult:
+ var result := _session.home.toggle_fan()
+ if result.ok: result.details["cue"]="chime"
+ if result.ok and _session.home.fan_on: _session.needs.apply_delta(0,0,float(_session.config.section("needs").fan_on_mood))
+ return result

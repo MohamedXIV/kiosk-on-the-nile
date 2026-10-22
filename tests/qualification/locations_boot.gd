@@ -10,7 +10,7 @@ func _ready() -> void:
  var result: ActionResult
  if OS.has_feature("web"):
   selected = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('qa')")
-  result = await store.load_http(str(JavaScriptBridge.eval("window.location.origin"))+"/content")
+  result = await store.load_http(str(JavaScriptBridge.eval("new URL('content/', document.baseURI).href")))
  else:
   result = store.load_directory("res://content")
  if not result.ok:

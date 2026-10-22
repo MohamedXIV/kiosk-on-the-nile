@@ -1,0 +1,82 @@
+{
+  "seed": 1437,
+  "initial_cooldown": 2,
+  "ambient_delay": [
+    14,
+    24
+  ],
+  "ambient_capacity": 3,
+  "regular_capacity": 3,
+  "football_capacity_before_pair": 2,
+  "football_minutes": 1020,
+  "quiet": {
+    "day": 2,
+    "start": 1140,
+    "end": 1215
+  },
+  "arrival_radius": 0.15,
+  "interaction_radius": 2.15,
+  "characters": {
+    "amgad": {
+      "name": "عم أمجد",
+      "color": "#5c7a67",
+      "marker": "counter_1",
+      "food_id": "tea",
+      "stay_seconds": 32,
+      "ambient": false
+    },
+    "mahmoud": {
+      "name": "محمود",
+      "color": "#8c3b3b",
+      "marker": "table_a",
+      "food_id": "tea",
+      "stay_seconds": 36,
+      "ambient": false
+    },
+    "samir": {
+      "name": "سمير",
+      "color": "#3b598c",
+      "marker": "table_b",
+      "food_id": "kebda",
+      "stay_seconds": 36,
+      "ambient": false
+    },
+    "hassan": {
+      "name": "أستاذ حسن",
+      "color": "#705d4e",
+      "marker": "railing_1",
+      "food_id": "tea",
+      "stay_seconds": 20,
+      "ambient": true
+    },
+    "nadia": {
+      "name": "مدام نادية",
+      "color": "#7c4d6b",
+      "marker": "takeaway",
+      "food_id": "kebda",
+      "stay_seconds": 8,
+      "ambient": true
+    },
+    "passer": {
+      "name": "شاب ع الكورنيش",
+      "color": "#4b6e75",
+      "marker": "railing_2",
+      "food_id": "",
+      "stay_seconds": 15,
+      "ambient": true
+    }
+  },
+  "waiting_reminder_seconds": 11,
+  "ambient_remark_delay": [
+    8,
+    18
+  ],
+  "spawn_markers": [
+    "spawn_west",
+    "spawn_east"
+  ],
+  "exit_markers": [
+    "spawn_west",
+    "spawn_east"
+  ]
+}

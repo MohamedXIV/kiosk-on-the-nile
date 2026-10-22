@@ -11,6 +11,11 @@ func present(pose: ActorPose, color: Color, is_player: bool) -> void:
  _pose = pose
  _color = color
  _is_player = is_player
+ var held := get_node_or_null("HeldItem") as HeldItemView
+ if held:
+  held.facing = pose.facing
+  held.position.y = -absf(sin(pose.walk_phase))*float(_style.get("bob_pixels",3.84))
+  held.queue_redraw()
  queue_redraw()
 func _draw() -> void:
  var bob := absf(sin(_pose.walk_phase))*float(_style.get("bob_pixels",3.84))

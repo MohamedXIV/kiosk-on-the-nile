@@ -1,0 +1,99 @@
+class_name FeatureContentValidation
+extends RefCounted
+## Cross-feature authoring references are checked before ContentStore activates a bundle.
+static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("session"):
+  var initial: Variant = bundle.session
+  if not initial is Dictionary or not initial.get("kiosk_open") is bool or not initial.get("home") is Dictionary or not initial.home.get("has_fan") is bool or not initial.home.get("fan_on") is bool or (initial.home.fan_on and not initial.home.has_fan): return ContentValidation.fail("session.initial")
+ if bundle.has("visitors"):
+  var data: Variant = bundle.visitors
+  if not data is Dictionary or not data.get("characters") is Dictionary or data.characters.is_empty(): return ContentValidation.fail("visitors.characters")
+  for field in ["seed","ambient_capacity","regular_capacity","football_capacity_before_pair"]:
+   if not ContentValidation.integer(data.get(field)) or data[field]<0: return ContentValidation.fail("visitors."+field)
+  for field in ["initial_cooldown","football_minutes","arrival_radius","interaction_radius","waiting_reminder_seconds"]:
+   if not ContentValidation.number(data.get(field)) or data[field]<=0: return ContentValidation.fail("visitors."+field)
+  for field in ["ambient_delay","ambient_remark_delay"]:
+   if not ContentValidation.vector(data.get(field),2): return ContentValidation.fail("visitors."+field)
+  if data.ambient_remark_delay[0]<=0 or data.ambient_remark_delay[0]>data.ambient_remark_delay[1]: return ContentValidation.fail("visitors.ambient_remark_delay")
+  if data.ambient_delay[0]<=0 or data.ambient_delay[0]>data.ambient_delay[1]: return ContentValidation.fail("visitors.ambient_delay")
+  if not data.get("quiet") is Dictionary or not ContentValidation.integer(data.quiet.get("day")) or data.quiet.day<1 or not ContentValidation.bounded(data.quiet.get("start"),0,1440) or not ContentValidation.bounded(data.quiet.get("end"),data.quiet.start,1440): return ContentValidation.fail("visitors.quiet")
+  for id in ["amgad","mahmoud","samir"]:
+   if not data.characters.has(id): return ContentValidation.fail("visitors.required_character")
+  var markers: Dictionary = bundle.get("locations",{}).get("kiosk",{}).get("markers",{})
+  for field in ["spawn_markers","exit_markers"]:
+   if not data.get(field) is Array or data[field].is_empty(): return ContentValidation.fail("visitors."+field)
+   for key in data[field]:
+    if not key is String or not ContentValidation.vector(markers.get(key),2): return ContentValidation.fail("visitors.spawn_marker")
+  for id in data.characters:
+   var character: Variant = data.characters[id]
+   if not character is Dictionary or not character.get("name") is String or not character.get("color") is String or not Color.html_is_valid(character.color) or not character.get("marker") is String or not markers.has(character.marker) or not character.get("food_id") in ["tea","kebda",""] or not ContentValidation.number(character.get("stay_seconds")) or character.stay_seconds<=0 or not character.get("ambient") is bool: return ContentValidation.fail("visitors.characters."+id)
+   var anchor: Array = markers[character.marker]
+   var kiosk: Dictionary = bundle.locations.kiosk
+   if FootprintGeometry.blocked(Vector2(anchor[0],anchor[1]),kiosk.solids,float(kiosk.navigation_clearance)): return ContentValidation.fail("visitors.blocked_marker."+id)
+ if bundle.has("ui"):
+  var ui: Variant = bundle.ui
+  if not ui is Dictionary: return ContentValidation.fail("ui")
+  for key in ["title","subtitle","new_game","continue","save","saved","save_failed","load_failed","notebook","close","help","money","day_time","hunger","rest","mood","stock","held","empty_hands","open","closed","talk","serve","consume","interaction","secondary","success"]:
+   if not ui.get(key) is String: return ContentValidation.fail("ui."+key)
+  for key in ["theme","input","errors","transition","toasts"]:
+   if not ui.get(key) is Dictionary: return ContentValidation.fail("ui."+key)
+  for key in ["background","border","text","accent"]:
+   if not ui.theme.get(key) is String or not Color.html_is_valid(ui.theme[key]): return ContentValidation.fail("ui.theme."+key)
+  if not ContentValidation.bounded(ui.theme.get("font_size"),12,48) or not ContentValidation.bounded(ui.toasts.get("duration"),0.1,30): return ContentValidation.fail("ui.theme")
+  for key in ["fade_out","fade_in"]:
+   if not ContentValidation.bounded(ui.transition.get(key),0.01,10): return ContentValidation.fail("ui.transition")
+  for action in ["move_left","move_right","move_up","move_down","interact_primary","interact_secondary","notebook"]:
+   if not ui.input.get(action) is Array or ui.input[action].is_empty(): return ContentValidation.fail("ui.input."+action)
+   for key in ui.input[action]:
+    if not key is String or OS.find_keycode_from_string(key)==KEY_NONE: return ContentValidation.fail("ui.input."+action)
+  for value in ui.errors.values():
+   if not value is String: return ContentValidation.fail("ui.errors")
+ if bundle.has("atmosphere"):
+  var data: Variant = bundle.atmosphere
+  if not data is Dictionary: return ContentValidation.fail("atmosphere")
+  for field in ["audio","night","steam","light"]:
+   if not data.get(field) is Dictionary: return ContentValidation.fail("atmosphere."+field)
+  if not ContentValidation.bounded(data.audio.get("fade_speed"),0.01,100) or not data.audio.get("layers") is Dictionary or not data.audio.get("cues") is Dictionary: return ContentValidation.fail("atmosphere.audio")
+  for layer in data.audio.layers.values():
+   if not layer is Dictionary or not layer.get("path") is String or not ResourceLoader.exists(layer.path,"AudioStream"): return ContentValidation.fail("atmosphere.audio.path")
+   for location in ["kiosk_gain","rooftop_gain"]:
+    if not ContentValidation.bounded(layer.get(location),0,1): return ContentValidation.fail("atmosphere.audio.gain")
+  for path in data.audio.cues.values():
+   if not path is String or not ResourceLoader.exists(path,"AudioStream"): return ContentValidation.fail("atmosphere.audio.cue")
+  if not ContentValidation.bounded(data.night.get("start"),0,1440) or not ContentValidation.bounded(data.night.get("end"),0,1440) or data.night.start>=data.night.end: return ContentValidation.fail("atmosphere.night")
+  if not ContentValidation.bounded(data.night.get("morning_end"),0,data.night.start) or not data.night.get("color") is String or not Color.html_is_valid(data.night.color): return ContentValidation.fail("atmosphere.night.color")
+  for field in ["afternoon_factor","night_factor","opacity"]:
+   if not ContentValidation.bounded(data.night.get(field),0,1): return ContentValidation.fail("atmosphere.night."+field)
+  for field in ["interval","rise_speed","lifetime","radius"]:
+   if not ContentValidation.bounded(data.steam.get(field),0.01,200): return ContentValidation.fail("atmosphere.steam."+field)
+  if not data.light.get("color") is String or not Color.html_is_valid(data.light.color) or not ContentValidation.bounded(data.light.get("radius"),1,1000) or not ContentValidation.bounded(data.light.get("energy"),0,5): return ContentValidation.fail("atmosphere.light")
+ if bundle.has("encounters"):
+  if not bundle.encounters is Dictionary or not bundle.has("social") or not bundle.has("visitors"): return ContentValidation.fail("encounters")
+  var actors: Array = bundle.visitors.characters.keys()
+  actors.append("player")
+  var relationship_validation := RelationshipStore.new(bundle.social,actors).restore({"values":bundle.social.get("initial_relationships",{})})
+  if not relationship_validation.ok: return ContentValidation.fail("social.initial_relationships")
+  var evaluator := ConditionEvaluator.new(KnowledgeBook.new(bundle.social),RelationshipStore.new(bundle.social,actors),GameClock.new(bundle.time),VisitorService.new(),HomeService.new(),ActorPose.new(),bundle.social.facts,actors,bundle.get("locations",{}).keys())
+  for id in bundle.encounters:
+   var definition: Variant = bundle.encounters[id]
+   if not definition is Dictionary or not definition.get("story") is String or not bundle.get("story_"+str(definition.story)) is Dictionary: return ContentValidation.fail("encounters."+id)
+   var story: Dictionary = bundle["story_"+definition.story]
+   if not ContentValidation.integer(story.get("inkVersion")) or not story.get("root") is Array: return ContentValidation.fail("story_"+definition.story)
+   for field in ["requires","offer_requires"]:
+    if not evaluator.validate(definition.get(field,{})): return ContentValidation.fail("encounters."+id+"."+field)
+   if not definition.get("choice_conditions",{}) is Dictionary: return ContentValidation.fail("encounters.choice_conditions")
+   if not definition.get("context_conditions",{}) is Dictionary: return ContentValidation.fail("encounters.context_conditions")
+   for rule in definition.get("choice_conditions",{}).values()+definition.get("context_conditions",{}).values():
+    if not evaluator.validate(rule): return ContentValidation.fail("encounters.choice_conditions")
+   if definition.get("optional",false):
+    if not ContentValidation.bounded(definition.get("choice_expiry"),0.1,120) or not ContentValidation.integer(definition.get("listen_choice")) or definition.listen_choice<0: return ContentValidation.fail("encounters.optional")
+  for location in bundle.get("locations",{}).values():
+   for interaction in location.interactions:
+    for action in [interaction.get("action",""),interaction.get("secondary_action","")]:
+     if not action in ["","cook","sugar","toggle_kiosk","travel","buy_stock","buy_fan","snack","toggle_fan","river","sleep"]: return ContentValidation.fail("locations.interaction_action")
+    if interaction.get("action")=="travel" or interaction.get("secondary_action")=="travel":
+     if not bundle.locations.has(interaction.get("destination")): return ContentValidation.fail("locations.interaction_destination")
+    for field in ["requires","secondary_requires"]:
+     if not evaluator.validate(interaction.get(field,{})): return ContentValidation.fail("locations.interaction_condition")
+    if interaction.get("action")=="cook" and not bundle.get("recipes",{}).get("stations",{}).has(interaction.get("station_id")): return ContentValidation.fail("locations.station_id")
+ return ActionResult.success()

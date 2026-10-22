@@ -1,0 +1,15 @@
+class_name VisitState
+extends RefCounted
+var id: StringName
+var character_id: StringName
+var pose := ActorPose.new()
+var destination := Vector2.ZERO
+var phase: StringName = &"arriving"
+var elapsed: float = 0
+var food_id: StringName
+var stay_seconds: float = 0
+var served: bool = false
+var remark_remaining: float = 0
+var order_id: StringName
+func snapshot() -> Dictionary:
+ return {"id":str(id),"character_id":str(character_id),"pose":pose.snapshot(),"destination":[destination.x,destination.y],"phase":str(phase),"elapsed":elapsed,"food_id":str(food_id),"stay_seconds":stay_seconds,"remark_remaining":remark_remaining,"served":served,"order_id":str(order_id)}

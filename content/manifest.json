@@ -6,6 +6,15 @@
     "needs": "needs.json",
     "social": "social.json",
     "spatial": "spatial.json",
-    "locations": "locations.json"
+    "locations": "locations.json",
+    "recipes": "recipes.json",
+    "visitors": "visitors.json",
+    "encounters": "encounters.json",
+    "story_amgad": "stories/amgad.ink.json",
+    "story_football": "stories/football.ink.json",
+    "story_visitors": "stories/visitors.ink.json",
+    "ui": "ui.json",
+    "atmosphere": "atmosphere.json",
+    "session": "session.json"
   }
 }

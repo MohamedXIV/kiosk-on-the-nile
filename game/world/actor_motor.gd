@@ -8,6 +8,7 @@ var _path := PackedVector2Array()
 var _path_index: int = 0
 func configure(mapping: SpatialMapping, speed: float, foot_radius: float = 8.0) -> void:
  _mapping = mapping
+ position = _mapping.to_canvas(pose.ground)
  _speed = speed
  collision_layer = 2
  collision_mask = 1 | 4

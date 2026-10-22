@@ -1,8 +1,8 @@
 class_name HeldItemView
 extends Node2D
-var _item: Variant
+var _item: PreparedItem
 var facing := Vector2.DOWN
-func present(item: Variant) -> void:
+func present(item: PreparedItem) -> void:
  _item = item
  queue_redraw()
 func _draw() -> void:

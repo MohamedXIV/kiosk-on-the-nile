@@ -1,0 +1,72 @@
+{
+  "amgad": {
+    "story": "amgad",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {},
+    "choice_conditions": {},
+    "context_conditions": {
+      "familiar": {
+        "relationship_at_least": {
+          "from": "player",
+          "to": "amgad",
+          "axis": "familiarity",
+          "value": 30
+        }
+      }
+    }
+  },
+  "amgad_arrival": {
+    "story": "amgad",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {},
+    "choice_conditions": {}
+  },
+  "amgad_served": {
+    "story": "amgad",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {},
+    "choice_conditions": {}
+  },
+  "football": {
+    "story": "football",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {
+      "distance_at_most": {
+        "location_id": "kiosk",
+        "ground": [
+          6,
+          1.6
+        ],
+        "value": 8.5
+      }
+    },
+    "choice_conditions": {},
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2
+  },
+  "visitors": {
+    "story": "visitors",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {},
+    "choice_conditions": {}
+  },
+  "visitors_served": {
+    "story": "visitors",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {},
+    "choice_conditions": {}
+  }
+}

@@ -32,6 +32,12 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
   add_child(boat)
   boat.configure(data.data.water.boat,mapping)
  for prop in data.data.props: _add_visual(prop,self,Vector2.ZERO)
+ for prop in data.data.props:
+  if prop.kind=="lamp":
+   var light := WarmLight.new()
+   light.position = mapping.to_canvas(Vector2(prop.ground[0],prop.ground[1]))
+   light.configure(source.config.section("atmosphere").light)
+   add_child(light)
  var solids := Node2D.new()
  solids.name = "Solids"
  add_child(solids)
@@ -59,11 +65,20 @@ func _add_visual(data: Dictionary, parent: Node2D, parent_ground: Vector2) -> vo
  visual.position = mapping.to_canvas(ground-parent_ground,float(data.get("height_offset",0)))
  parent.add_child(visual)
  visual.configure(data,mapping)
- if data.has("station_id"): station_views[data.station_id] = visual
+ if data.has("station_id"):
+  station_views[data.station_id] = visual
+  var vapour := StationVapour.new()
+  vapour.position.y = -30
+  vapour.job = session.cooking.job(StringName(data.station_id))
+  vapour.data = session.config.section("atmosphere").steam
+  visual.add_child(vapour)
  for child in data.get("children",[]): _add_visual(child,visual,ground)
 func _process(_delta: float) -> void:
  if session == null: return
  visible = session.location_id == definition.id
+ for id in station_views:
+  var job := session.cooking.job(StringName(id))
+  if job: station_views[id].present({"stage":str(job.stage),"heat_elapsed":job.heat_elapsed,"brew_elapsed":job.brew_elapsed})
  if _fan: _fan.present(session.home.snapshot())
  if _sign: _sign.present(session.kiosk_open)
 func interaction_targets() -> Array[InteractionTarget]:
@@ -76,12 +91,4 @@ func interaction_targets() -> Array[InteractionTarget]:
   targets.append(target)
  return targets
 func _permitted(rule: Dictionary) -> bool:
- if rule.is_empty(): return true
- if rule.has("all"):
-  for part in rule.all:
-   if not _permitted(part): return false
-  return true
- if rule.has("not"): return not _permitted(rule["not"])
- if rule.has("fact_known"): return session.knowledge.has(StringName(rule.fact_known))
- if rule.has("home_item_owned"): return rule.home_item_owned == "fan" and session.home.has_fan
- return false
+ return session.conditions.permits(rule)

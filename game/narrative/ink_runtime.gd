@@ -83,11 +83,32 @@ func choose(index: int) -> ActionResult:
  return ActionResult.success()
 func snapshot() -> Dictionary:
  if _player == null: return {}
- return {"story_id":str(_definition.id),"story_hash":_definition.sha256,"ink":_player.get_state(),"frame":_frame.to_dict()}
+ var state: String = _player.get_state()
+ var displayed := _frame.to_dict()
+ return {"story_id":str(_definition.id),"story_hash":_definition.sha256,"ink":state,"frame":displayed,"state_hash":(state+JSON.stringify(displayed,"",true)).sha256_text()}
 func restore(data: Dictionary) -> ActionResult:
- if _player == null or data.get("story_hash") != _definition.sha256 or data.get("story_id") != str(_definition.id) or not JSON.parse_string(data.get("ink", "")) is Dictionary or not data.get("frame") is Dictionary:
+ if _player == null or data.get("story_hash") != _definition.sha256 or data.get("story_id") != str(_definition.id) or not data.get("ink") is String or not JSON.parse_string(data.ink) is Dictionary or not data.get("frame") is Dictionary:
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE, &"incompatible_story")
+ if not data.get("ink") is String or data.get("state_hash")!=(data.ink+JSON.stringify(data.frame,"",true)).sha256_text(): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_story_state")
+ var state: Dictionary = JSON.parse_string(data.ink)
+ if not ContentValidation.integer(state.get("inkSaveVersion")) or not state.get("flows") is Dictionary or state.flows.size()!=1 or not state.get("variablesState") is Dictionary or not state.get("evalStack") is Array or not state.get("visitCounts") is Dictionary or not state.get("turnIndices") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_state")
+ for flow in state.flows.values():
+  if not flow is Dictionary or not flow.get("callstack") is Dictionary or not flow.get("outputStream") is Array or not flow.get("currentChoices") is Array: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_flow")
+ var displayed: Dictionary = data.frame
+ if not displayed.get("text") is String or not displayed.get("speaker_id") is String or not ContentValidation.number(displayed.get("duration")) or displayed.duration<=0 or not displayed.get("choices") is Array or not displayed.get("effects") is Array or not displayed.get("ended") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_frame")
+ for choice in displayed.choices:
+  if not choice is Dictionary or not choice.get("id") is String or not choice.get("text") is String or not ContentValidation.integer(choice.get("index")): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_choice")
+ for effect in displayed.effects:
+  if not effect is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_effect")
+ var previous: String = _player.get_state()
  _player.set_state(data.ink)
+ if not _error.is_empty() or _player.current_choices.size()!=displayed.choices.size():
+  _player.set_state(previous)
+  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_state")
+ for i in range(_player.current_choices.size()):
+  if _player.current_choices[i].text.strip_edges()!=displayed.choices[i].text or _player.current_choices[i].index!=int(displayed.choices[i].index):
+   _player.set_state(previous)
+   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_choices")
  _frame = NarrativeTypes.Frame.from_dict(data.frame)
  return ActionResult.success()
 func close() -> void:

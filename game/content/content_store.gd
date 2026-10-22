@@ -2,6 +2,7 @@ class_name ContentStore
 extends Node
 ## Plain external JSON is validated before replacing the active immutable bundle.
 var _sections: Dictionary = {}
+var required_sections: Array = []
 var fingerprint: String = ""
 var source_root: String = "res://content"
 func section(id: String) -> Dictionary:
@@ -42,6 +43,8 @@ func load_http(base_url: String) -> ActionResult:
  source_root = base_url
  return ActionResult.success()
 func validate(candidate: Dictionary) -> ActionResult:
+ for id in required_sections:
+  if not candidate.get(id) is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"missing_section",{"section":id})
  return ContentValidation.validate(candidate)
 func _valid_manifest(value: Variant) -> bool:
  return value is Dictionary and value.get("schema_version") == 1 and value.get("sections") is Dictionary and value.sections.has("time")

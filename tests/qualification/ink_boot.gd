@@ -17,7 +17,7 @@ func _ready() -> void:
  var content_outcome: ActionResult
  if OS.has_feature("web"):
   var origin: String = JavaScriptBridge.eval("window.location.origin")
-  content_outcome = await content.load_http(origin + "/content")
+  content_outcome = await content.load_http(str(JavaScriptBridge.eval("new URL('content/', document.baseURI).href")))
  else:
   content_outcome = content.load_directory("res://content")
  if not content_outcome.ok:

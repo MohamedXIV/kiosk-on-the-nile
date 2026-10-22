@@ -36,7 +36,7 @@ func restore(data: Dictionary) -> ActionResult:
  for key in ["day","minutes","world_minutes","simulation_seconds","tick"]:
   if not typeof(data.get(key)) in [TYPE_FLOAT,TYPE_INT] or not is_finite(float(data[key])) or float(data[key]) < 0:
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_clock")
- if int(data.day) < 1: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_day")
+ if not ContentValidation.integer(data.day) or not ContentValidation.integer(data.tick) or int(data.day) < 1: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_day")
  day = int(data.day)
  minutes = float(data.minutes)
  world_minutes = float(data.world_minutes)

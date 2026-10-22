@@ -23,7 +23,9 @@ func path(start: Vector2, goal: Vector2) -> PackedVector2Array:
  var first := _nearest_cell(start)
  var last := _nearest_cell(goal)
  if not _grid.region.has_point(first) or not _grid.region.has_point(last): return PackedVector2Array()
- return _grid.get_point_path(first,last)
+ var points := _grid.get_point_path(first,last)
+ if not points.is_empty() and not blocked(goal) and points[points.size()-1].distance_to(goal)>0.001: points.append(goal)
+ return points
 func _nearest_cell(point: Vector2) -> Vector2i:
  var center := Vector2i(roundi(point.x/_cell),roundi(point.y/_cell))
  for radius in range(6):
