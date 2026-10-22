@@ -33,9 +33,13 @@ func configure(text: UiText, session: GameSession) -> void:
  _cards.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  scroll.add_child(_cards)
  var detail_column := VBoxContainer.new()
- detail_column.custom_minimum_size.x=260
  detail_column.size_flags_horizontal=Control.SIZE_EXPAND_FILL
- body.add_child(detail_column)
+ var detail_scroll := ScrollContainer.new()
+ detail_scroll.custom_minimum_size=Vector2(260,200)
+ detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+ body.add_child(detail_scroll)
+ detail_scroll.add_child(detail_column)
  _details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  _details.size_flags_vertical=Control.SIZE_EXPAND_FILL
  detail_column.add_child(_details)

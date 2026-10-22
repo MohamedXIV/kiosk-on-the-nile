@@ -98,3 +98,21 @@ previous compiled Ink for already-open matching sessions. Design sources,
 external content knobs, manual observations and limits are recorded in
 [the social follow-up notes](notes/2026-10-22-social-visitors-and-hud.md).
 Full multi-day pacing and complete-game acceptance remain separate.
+
+
+## Living spaces extension — 2026-10-22
+
+The approved extension is implemented with canonical item identities, venue storage,
+shared player/editor grid rules, developer-only structure authoring, world-running
+shopping journeys and confirmed catalogue purchases. Equipment capabilities feed
+world-minute workflows: real cold-marinated shawarma batches and finite slicing,
+assembly and alternative fried/baked potatoes. Farid's Ink reads actual learning
+evidence. Hygiene captures food contact at preparation; customer summaries use
+observed surroundings, actual food and service wait to derive reputation.
+Schema 4/revision 4 migrates earlier saves and retains matching archived Ink.
+
+Manual evidence includes arrangement/save/Continue, a confirmed market purchase,
+new Farid teaching and a source-backed dirt comment, running cooking/customers
+during a shop journey, and actual schema-3 held food + active tea + pending Ink
+Continue/reply. Complete batch/service/cleaning/sleep/editor acceptance remains
+open. See [the evidence and limits](notes/2026-10-22-living-spaces-d.md).
