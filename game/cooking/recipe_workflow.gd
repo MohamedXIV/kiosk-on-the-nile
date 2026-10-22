@@ -95,6 +95,7 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
  else:
   candidate.step_index=int(candidate.step_index)+1
   var next: Dictionary=candidate.definition.steps[int(candidate.step_index)]
+  if not _equipment.is_usable(StringName(candidate.devices[next.capability]),StringName(candidate.location_id),StringName(next.capability)):return _fail("equipment_out_of_reach")
   if not next.get("inherit_elapsed",false):candidate.elapsed=0.0
   candidate.last_world_minutes=_clock.world_minutes
   candidate["current_hygiene_evidence"]=_hygiene_evidence(candidate,next)
@@ -205,7 +206,7 @@ func _cancel(job: Dictionary) -> ActionResult:
  job.status="cancelled"
  return _commit(change,equipment.details.state,job)
 func _near(id: StringName, location_id: StringName) -> bool:
- return _inventory.player_pose!=null and _inventory.player_pose.location_id==location_id and _inventory.spaces.ground(id).distance_to(_inventory.player_pose.ground)<=1.6
+ return _inventory.player_pose!=null and _inventory.player_pose.location_id==location_id and _inventory.spaces.placement(id).get("location_id")==str(location_id) and _inventory.spaces.ground(id).distance_to(_inventory.player_pose.ground)<=1.6
 func snapshot() -> Dictionary:
  return {"jobs":_jobs.duplicate(true),"next_id":_next_id}
 func restore(data: Dictionary) -> ActionResult:
