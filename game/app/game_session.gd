@@ -6,6 +6,7 @@ var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
 var items: ItemStore
+var equipment: EquipmentService
 var build: BuildController
 var spaces: SpaceService
 var inventory: InventoryService
@@ -83,6 +84,10 @@ func configure(source: SessionConfig) -> ActionResult:
  if not space_result.ok: return space_result
  inventory.player_pose=player_pose
  inventory.spaces=spaces
+ equipment=EquipmentService.new()
+ var equipment_result := equipment.configure(source.section("equipment"),items,spaces)
+ if not equipment_result.ok:return equipment_result
+ inventory.equipment=equipment
  build=BuildController.new(spaces,items,player_pose)
  kiosk_open = source.section("session").kiosk_open
  var social_data := source.section("social")

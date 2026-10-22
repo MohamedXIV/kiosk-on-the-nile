@@ -63,5 +63,16 @@
       "equipment"
     ],
     "host_id": ""
+  },
+  "player_bag": {
+    "id": "player_bag",
+    "location_id": "player",
+    "kind": "purchase_bag",
+    "capacity": 48,
+    "allowed_tags": [
+      "ingredient",
+      "batch"
+    ],
+    "host_id": ""
   }
 }

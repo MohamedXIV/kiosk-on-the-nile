@@ -23,6 +23,7 @@
     "items": "items.json",
     "containers": "containers.json",
     "spaces": "spaces.json",
-    "initial_layout": "initial_layout.json"
+    "initial_layout": "initial_layout.json",
+    "equipment": "equipment.json"
   }
 }

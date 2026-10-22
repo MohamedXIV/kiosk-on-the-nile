@@ -36,6 +36,12 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
     var moved: Dictionary = target.duplicate(true)
     moved.ground = [ground.x,ground.y]
     result.interactions.append(moved)
+  if item.definition_id in ["radio","fan"]:
+   result.interactions.append({"id":"equipment:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":str(definition.label),"action":"toggle_equipment"})
+  if definition.has("container"):
+   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"افتح مخزون المكان","action":"inventory"})
+  if item.definition_id=="bed" and id!="bed":
+   result.interactions.append({"id":"bed:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"اختيار مدة النوم والراحة","action":"sleep"})
   if definition.get("surface",false):
    result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":"سطح التحضير","secondary":"","action":"surface","instance_id":id,"slot_id":id+":top"})
  for child in mounted:

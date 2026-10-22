@@ -5,6 +5,7 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _inventory_panel: InventoryPanel
 var _build_panel: BuildPanel
 var _placement_preview: PlacementPreview
 var _physical: PhysicalWorldController
@@ -125,7 +126,7 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.motion_step = _step_motion
  var room: LocationView = _rooms[str(_session.location_id)]
@@ -138,6 +139,10 @@ func _install(candidate: GameSession) -> void:
  _build_panel=BuildPanel.new()
  _hud.add_child(_build_panel)
  _build_panel.configure(_text,_session.build,_session)
+ _inventory_panel=InventoryPanel.new()
+ _hud.add_child(_inventory_panel)
+ _inventory_panel.configure(_text,_session)
+ _hud.inventory_requested.connect(func():_inventory_panel.open())
  _hud.arrange_requested.connect(_begin_arrange)
  _hud.save_requested.connect(_request_save)
  _hud.notebook_requested.connect(_toggle_notebook)
@@ -157,7 +162,7 @@ func _install(candidate: GameSession) -> void:
 func _physics_process(delta: float) -> void:
  if _session==null or not _focused: return
  _session.tick(delta)
- _sound.present(_session.location_id,_session.cooking,_session.home)
+ _sound.present(_session.location_id,_session.cooking,_session.home,_session.items,_session.spaces)
  _atmosphere.present(_session.clock.minutes,_session.location_id)
  _character.present(_session.player_pose,Color(_config.section("spatial").character.player_color),true)
  _character.get_node("HeldItem").present(_session.cooking.held_item())
@@ -171,6 +176,9 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _inventory_panel.visible:
+  if event.is_action_pressed("cancel"):_inventory_panel.hide()
+  return
  if _session.build.active:
   if event.is_action_pressed("cancel"):
    _session.build.cancel()
@@ -197,6 +205,10 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   _busy = true
   var result := await _router.execute(event.is_action_pressed("interact_secondary"))
+  if result.ok and result.details.get("show_inventory",false):
+   _inventory_panel.open()
+   _busy=false
+   return
   if result.ok and result.details.get("choose_sleep",false):
    _hud.sleep_panel.present(_session.routine)
    _busy = false

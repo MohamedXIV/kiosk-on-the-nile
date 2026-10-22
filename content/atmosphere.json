@@ -21,6 +21,11 @@
         "path": "res://assets/audio/fan.wav",
         "kiosk_gain": 0,
         "rooftop_gain": 0.11
+      },
+      "radio": {
+        "path": "res://assets/audio/radio.wav",
+        "rooftop_gain": 0.045,
+        "kiosk_gain": 0.035
       }
     },
     "cues": {

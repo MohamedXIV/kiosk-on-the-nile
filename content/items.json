@@ -1,11 +1,13 @@
 {
   "tea_portion": {
     "kind": "ingredient",
-    "label": "وحدة شاي"
+    "label": "وحدة شاي",
+    "required_storage": "dry"
   },
   "kebda_portion": {
     "kind": "ingredient",
-    "label": "وحدة كبدة"
+    "label": "وحدة كبدة",
+    "required_storage": "dry"
   },
   "prepared_food": {
     "kind": "prepared",
@@ -174,7 +176,15 @@
       "front": "#92988d"
     },
     "movable": true,
-    "storage": "cold"
+    "storage": "cold",
+    "container": {
+      "kind": "cold",
+      "capacity": 48,
+      "allowed_tags": [
+        "ingredient",
+        "batch"
+      ]
+    }
   },
   "chair": {
     "label": "كرسي",
@@ -207,5 +217,103 @@
       "top": "#2d5a7b"
     },
     "movable": true
+  },
+  "chicken": {
+    "kind": "ingredient",
+    "label": "فراخ",
+    "required_storage": "cold"
+  },
+  "marinade": {
+    "kind": "ingredient",
+    "label": "تتبيلة",
+    "required_storage": "cold"
+  },
+  "oil": {
+    "kind": "ingredient",
+    "label": "زيت",
+    "required_storage": "dry"
+  },
+  "bread": {
+    "kind": "ingredient",
+    "label": "عيش",
+    "required_storage": "dry"
+  },
+  "garlic_sauce": {
+    "kind": "ingredient",
+    "label": "ثومية",
+    "required_storage": "cold"
+  },
+  "potato": {
+    "kind": "ingredient",
+    "label": "بطاطس",
+    "required_storage": "dry"
+  },
+  "rotisserie": {
+    "kind": "equipment",
+    "label": "سيخ شاورما",
+    "footprint": [
+      3,
+      3
+    ],
+    "height": 1.25,
+    "movable": true,
+    "mountable": true,
+    "color": "#aa9c83",
+    "visual": {
+      "kind": "box",
+      "top": "#aa9c83",
+      "front": "#574a40"
+    }
+  },
+  "fryer": {
+    "kind": "equipment",
+    "label": "قلاية",
+    "footprint": [
+      3,
+      3
+    ],
+    "height": 0.55,
+    "movable": true,
+    "mountable": true,
+    "color": "#777d7a",
+    "visual": {
+      "kind": "box",
+      "top": "#777d7a",
+      "front": "#574a40"
+    }
+  },
+  "oven": {
+    "kind": "equipment",
+    "label": "فرن",
+    "footprint": [
+      4,
+      3
+    ],
+    "height": 1.1,
+    "movable": true,
+    "mountable": false,
+    "color": "#9b9d99",
+    "visual": {
+      "kind": "box",
+      "top": "#9b9d99",
+      "front": "#574a40"
+    }
+  },
+  "radio": {
+    "kind": "furniture",
+    "label": "راديو",
+    "footprint": [
+      2,
+      1
+    ],
+    "height": 0.45,
+    "movable": true,
+    "mountable": true,
+    "color": "#6b4634",
+    "visual": {
+      "kind": "box",
+      "top": "#6b4634",
+      "front": "#574a40"
+    }
   }
 }

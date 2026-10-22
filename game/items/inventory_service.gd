@@ -11,6 +11,11 @@ func stock_count(location_id: StringName, ingredient_id: StringName) -> int:
  for item in items.instances(StringName(definition_id)):
   var container := items.get_container(StringName(item.container_id))
   if container.get("location_id")==str(location_id) and container.get("kind") in ["dry","cold"]: total += int(item.quantity)
+ for lines in items.snapshot().reservations.values():
+  for line in lines:
+   var item := items.get_item(StringName(line.item_id))
+   var container := items.get_container(StringName(item.container_id))
+   if item.definition_id==definition_id and container.location_id==str(location_id):total-=int(line.quantity)
  return total
 func held_id() -> StringName:
  var held := items.items_in(&"player_hand")
@@ -98,3 +103,112 @@ func _surface_reachable(id: StringName) -> ActionResult:
  var host := spaces.placement(StringName(container.host_id))
  if host.is_empty() or host.location_id!=str(player_pose.location_id) or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
  return ActionResult.success()
+
+var equipment: EquipmentService
+func available(location_id: StringName, requirements: Array[Dictionary]) -> ActionResult:
+ var remaining: Dictionary={}
+ var sources: Array[Dictionary]=[]
+ var state := items.snapshot()
+ var reserved: Dictionary={}
+ for lines in state.reservations.values():
+  for line in lines:reserved[line.item_id]=int(reserved.get(line.item_id,0))+int(line.quantity)
+ for requirement in requirements:
+  var definition_id := str(requirement.get("definition_id",""))
+  if not ContentValidation.integer(requirement.get("quantity")) or requirement.quantity<1 or items.definition(StringName(definition_id)).is_empty():return ContentValidation.fail("inventory.requirement")
+  var needed := int(requirement.quantity)
+  for item in items.instances(StringName(definition_id)):
+   if requirement.has("item_id") and requirement.item_id!=item.id:continue
+   var container := items.get_container(StringName(item.container_id))
+   if not _usable_storage(container,location_id,str(requirement.get("required_storage",items.definition(StringName(definition_id)).get("required_storage","dry")))):continue
+   var used := int(reserved.get(item.id,0))+int(remaining.get(item.id,0))
+   var quantity := mini(needed,maxi(0,int(item.quantity)-used))
+   if quantity<=0:continue
+   sources.append({"item_id":item.id,"definition_id":definition_id,"quantity":quantity})
+   remaining[item.id]=int(remaining.get(item.id,0))+quantity
+   needed-=quantity
+   if needed==0:break
+  if needed>0:return ActionResult.failure(ActionResult.Code.OUT_OF_STOCK,&"out_of_stock",{"definition_id":definition_id,"missing":needed,"location_id":str(location_id)})
+ return ActionResult.success({"sources":sources})
+func reserve(job_id: StringName, location_id: StringName, requirements: Array[Dictionary]) -> ActionResult:
+ if items.snapshot().reservations.has(str(job_id)):return ContentValidation.fail("inventory.duplicate_reservation")
+ var result := available(location_id,requirements)
+ if not result.ok:return result
+ var change := items.candidate()
+ change.state.reservations[str(job_id)]=result.details.sources
+ return items.commit(change)
+func consume_reservation(job_id: StringName, amounts: Array[Dictionary]) -> ActionResult:
+ var change := items.candidate()
+ if not change.state.reservations.has(str(job_id)):return ContentValidation.fail("inventory.missing_reservation")
+ var lines: Array=change.state.reservations[str(job_id)]
+ for amount in amounts:
+  if not ContentValidation.integer(amount.get("quantity")) or amount.quantity<1:return ContentValidation.fail("inventory.consume")
+  var needed := int(amount.quantity)
+  for line in lines:
+   if line.definition_id!=str(amount.get("definition_id","")):continue
+   var taken := mini(needed,int(line.quantity))
+   line.quantity-=taken
+   change.state.items[line.item_id].quantity-=taken
+   if change.state.items[line.item_id].quantity==0:change.state.items.erase(line.item_id)
+   needed-=taken
+   if needed==0:break
+  if needed>0:return ContentValidation.fail("inventory.consume_over_reservation")
+ var remaining: Array=[]
+ for line in lines:
+  if line.quantity>0:remaining.append(line)
+ change.state.reservations[str(job_id)]=remaining
+ return items.commit(change)
+func release_reservation(job_id: StringName) -> ActionResult:
+ var change := items.candidate()
+ change.state.reservations.erase(str(job_id))
+ return items.commit(change)
+func unpack_purchase_bag(bag_id: StringName, location_id: StringName) -> ActionResult:
+ if player_pose==null or player_pose.location_id!=location_id:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_destination")
+ var bag := items.get_container(bag_id)
+ if bag.get("kind")!="purchase_bag":return ContentValidation.fail("inventory.not_bag")
+ var change := items.candidate()
+ var moved: Array=[]
+ var remaining: Array=[]
+ var containers: Array=change.state.containers.keys()
+ containers.sort()
+ for item in items.items_in(bag_id):
+  var quantity := int(item.quantity)
+  var storage := str(items.definition(StringName(item.definition_id)).get("required_storage","dry"))
+  for id in containers:
+   var container: Dictionary=change.state.containers[id]
+   if not _usable_storage(container,location_id,storage):continue
+   var used := 0
+   for owned in change.state.items.values():
+    if owned.container_id==id:used+=int(owned.quantity)
+   var fitted := mini(quantity,maxi(0,int(container.capacity)-used))
+   if fitted==0:continue
+   if fitted==quantity and quantity==int(item.quantity):change.state.items[item.id].container_id=id
+   else:
+    var copy: Dictionary=item.duplicate(true)
+    var new_id := "item_%d" % int(change.state.next_id)
+    change.state.next_id=int(change.state.next_id)+1
+    copy.id=new_id
+    copy.quantity=fitted
+    copy.container_id=id
+    change.state.items[new_id]=copy
+    change.state.items[item.id].quantity-=fitted
+    if change.state.items[item.id].quantity==0:change.state.items.erase(item.id)
+   quantity-=fitted
+   moved.append({"definition_id":item.definition_id,"quantity":fitted})
+   if quantity==0:break
+  if quantity>0:remaining.append({"definition_id":item.definition_id,"quantity":quantity})
+ var result := items.commit(change)
+ return ActionResult.success({"moved":moved,"remaining":remaining}) if result.ok else result
+func pack(item_id: StringName) -> ActionResult:
+ var item := items.get_item(item_id)
+ if item.is_empty() or player_pose==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_item")
+ var container := items.get_container(StringName(item.container_id))
+ if container.location_id!=str(player_pose.location_id) or not container.kind in ["dry","cold"]:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"item_wrong_location")
+ for lines in items.snapshot().reservations.values():
+  for line in lines:
+   if line.item_id==str(item_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"ingredient_reserved")
+ var result := items.prepare_moves([{"item_id":str(item_id),"quantity":int(item.quantity),"from_container":item.container_id,"to_container":"player_bag"}])
+ return items.commit(result.details.change) if result.ok else result
+func _usable_storage(container: Dictionary, location_id: StringName, storage: String) -> bool:
+ if container.get("location_id")!=str(location_id) or container.get("kind")!=storage:return false
+ if storage=="cold":return equipment!=null and equipment.is_usable(StringName(container.host_id),location_id,&"cold_storage")
+ return storage=="dry"

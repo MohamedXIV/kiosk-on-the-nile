@@ -23,7 +23,7 @@ func configure(data: Dictionary) -> void:
   player.stream = load(data.cues[id])
   add_child(player)
   _cues[id] = player
-func present(location: StringName, cooking: CookingService, home: HomeService) -> void:
+func present(location: StringName, cooking: CookingService, home: HomeService, items: ItemStore = null, spaces: SpaceService = null) -> void:
  var active_grill := false
  var active_tea := false
  for station_id in cooking.station_ids():
@@ -35,6 +35,12 @@ func present(location: StringName, cooking: CookingService, home: HomeService) -
   if id=="sizzle": gain= gain if active_grill else 0
   if id=="kettle": gain= gain if active_tea else 0
   if id=="fan": gain= gain if home.has_fan and home.fan_on else 0
+  if id=="radio":
+   gain=0.0
+   if items!=null and spaces!=null:
+    for radio in items.instances(&"radio"):
+     var placement := spaces.placement(StringName(radio.id))
+     if not placement.is_empty() and placement.location_id==str(location) and radio.attributes.get("enabled",false):gain=float(_data.layers[id].get(str(location)+"_gain",0))
   _targets[id] = 0.0 if _muted else gain
 func play_action(result: ActionResult) -> void:
  if result.ok and not _muted and _cues.has(result.details.get("cue","")): _cues[result.details.cue].play()

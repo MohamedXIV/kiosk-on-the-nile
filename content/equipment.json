@@ -1,0 +1,78 @@
+{
+  "counter": {
+    "capabilities": [
+      "prep_surface"
+    ],
+    "resource_group": "workspace",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "desk": {
+    "capabilities": [
+      "prep_surface"
+    ],
+    "resource_group": "workspace",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "fridge": {
+    "capabilities": [
+      "cold_storage"
+    ],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "kettle": {
+    "capabilities": [
+      "heat_water"
+    ],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "griddle": {
+    "capabilities": [
+      "griddle"
+    ],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "rotisserie": {
+    "capabilities": [
+      "roast_rotisserie"
+    ],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "fryer": {
+    "capabilities": [
+      "fry"
+    ],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "oven": {
+    "capabilities": [
+      "bake"
+    ],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": true
+  },
+  "fan": {
+    "capabilities": [],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": false
+  },
+  "radio": {
+    "capabilities": [],
+    "resource_group": "heat_zone",
+    "capacity": 1,
+    "enabled_by_default": false
+  }
+}

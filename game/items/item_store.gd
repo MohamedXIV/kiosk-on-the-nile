@@ -50,6 +50,11 @@ func prepare_grants(grants: Array[Dictionary]) -> ActionResult:
   if change.state.items.has(id): return _fail("duplicate_item")
   change.state.next_id = int(change.state.next_id)+1
   change.state.items[id] = {"id":id,"definition_id":definition_id,"kind":_definitions[definition_id].kind,"quantity":grant.get("quantity",0),"container_id":str(grant.get("container_id","")),"attributes":grant.get("attributes",{}).duplicate(true)}
+  var container_spec: Dictionary=_definitions[definition_id].get("container",{})
+  if not container_spec.is_empty():
+   var owner: Dictionary=change.state.containers.get(str(grant.get("container_id","")),{})
+   var container_id := id+":"+str(container_spec.kind)
+   change.state.containers[container_id]={"id":container_id,"location_id":owner.get("location_id",""),"kind":container_spec.kind,"capacity":container_spec.capacity,"allowed_tags":container_spec.allowed_tags.duplicate(),"host_id":id}
  return _prepared(change)
 func commit(change: ItemChangeSet, notify: bool = true) -> ActionResult:
  if change==null or change.revision!=revision: return _fail("stale_item_change")

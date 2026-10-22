@@ -64,7 +64,8 @@
     "structure_dev_only": "تعديل الحوائط والغرف للمطور فقط",
     "incompatible_surface": "الجهاز مش مناسب للسطح ده",
     "item_wrong_location": "القطعة موجودة في مكان تاني",
-    "empty_surface": "السطح فاضي"
+    "empty_surface": "السطح فاضي",
+    "ingredient_reserved": "الخامات دي محجوزة لطبخة شغالة"
   },
   "theme": {
     "font_size": 19,
@@ -160,5 +161,13 @@
   "arrange_help": "اضغط على الشبكة لاختيار المكان؛ الوقت مستمر.",
   "surface_put": "حط اللي في إيدك",
   "surface_take": "خد اللي على السطح",
-  "surface_empty": "سطح تحضير فاضي"
+  "surface_empty": "سطح تحضير فاضي",
+  "inventory": "المخزون والحقيبة",
+  "inventory_title": "مخزون المكان — الوقت مستمر",
+  "inventory_bag": "حقيبة المشتريات",
+  "inventory_cold": "الثلاجة",
+  "inventory_dry": "الخامات الجافة",
+  "inventory_unpack": "فرّغ اللي له مكان",
+  "inventory_pack": "في الحقيبة",
+  "inventory_partial": "اتنقل اللي له مساحة؛ الباقي موجود في الحقيبة"
 }
