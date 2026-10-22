@@ -12,6 +12,8 @@ static func validate_recipes(recipes: Dictionary, items: ItemStore) -> ActionRes
  for id in recipes:
   var recipe: Variant=recipes[id]
   if not recipe is Dictionary or not ContentValidation.integer(recipe.get("version")) or recipe.version<1 or not recipe.get("label") is String or not recipe.get("inputs") is Array or not recipe.get("steps") is Array or recipe.steps.is_empty() or not recipe.get("quality_keys") is Array or recipe.quality_keys.size()!=4:return ContentValidation.fail("recipe_workflows."+id)
+  if recipe.has("vessel_definition"):
+   if items.definition(StringName(str(recipe.vessel_definition))).get("kind")!="batch" or items.definition(StringName(str(recipe.get("filling_definition","")))).get("kind")!="ingredient" or not ContentValidation.integer(recipe.get("portions")) or recipe.portions<1 or not ContentValidation.bounded(recipe.get("slice_minutes"),0.01,1440):return ContentValidation.fail("recipe_workflows.batch")
   if not recipe.get("output") is Dictionary or not recipe.output.get("food_id") is String:return ContentValidation.fail("recipe_workflows.output")
   if recipe.get("quality",{}).get("kind")=="two_sides":
    for field in ["burnt_after","excellent_a_min","excellent_a_max","excellent_b_min","excellent_b_max","good_total_min","good_total_max"]:

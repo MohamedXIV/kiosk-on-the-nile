@@ -80,7 +80,14 @@ func _add_visual(data: Dictionary, parent: Node2D, parent_ground: Vector2) -> vo
  visual.position = mapping.to_canvas(ground-parent_ground,float(data.get("height_offset",0)))
  parent.add_child(visual)
  visual.configure(data,mapping)
- if data.has("instance_id"):_item_visuals[data.instance_id]=visual
+ if data.has("instance_id"):
+  _item_visuals[data.instance_id]=visual
+  var item := session.items.get_item(StringName(data.instance_id))
+  if item.get("kind")=="equipment" and not data.has("station_id"):
+   var state_view := EquipmentView.new()
+   visual.add_child(state_view)
+   state_view.position.y=-float(data.get("size",[0,0,1])[2])*mapping.height_scale-12
+   state_view.configure(StringName(data.instance_id),session)
  if data.has("station_id"):
   station_views[data.station_id] = visual
   var vapour := StationVapour.new()
@@ -102,7 +109,7 @@ func _process(_delta: float) -> void:
  if _sign: _sign.present(session.kiosk_open)
  for slot in _surface_foods:
   var contents := session.items.items_in(StringName(slot))
-  _surface_foods[slot].present(PreparedItem.from_dict(contents[0].attributes) if not contents.is_empty() and contents[0].kind=="prepared" else null)
+  _surface_foods[slot].present_record(contents[0] if not contents.is_empty() else {})
 func interaction_targets() -> Array[InteractionTarget]:
  var targets: Array[InteractionTarget] = []
  for data in definition.data.interactions:

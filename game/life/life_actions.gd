@@ -14,7 +14,8 @@ func snack() -> ActionResult:
 func consume_held() -> ActionResult:
  var item := _session.cooking.held_item()
  if item == null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
- var effect: Dictionary = _session.config.section("needs")[str(item.food_id)]
+ var effect: Dictionary = _session.foods.definition(item.food_id).get("nourishment",{})
+ if effect.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"unknown_food")
  _session.cooking.take_held(item.id,false)
  _session.needs.apply_delta(effect.hunger,0,effect.base_mood+item.quality_score*effect.quality_mood)
  _session.cooking.held_changed.emit()

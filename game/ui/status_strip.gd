@@ -74,6 +74,7 @@ func present(session: GameSession) -> void:
  var stock := session.cooking.inventory_snapshot()
  _inventory.text = _text.text("stock_short",{"tea":int(stock.tea),"kebda":int(stock.kebda)})
  _held.text = _text.text("held",{"item":session.cooking.item_label(session.cooking.held_item())}) if session.cooking.held_item() else _text.text("empty_hands")
+ if not session.inventory.held_id().is_empty() and session.cooking.held_item()==null:_held.text=_text.text("held",{"item":session.items.definition(StringName(session.items.get_item(session.inventory.held_id()).definition_id)).label})
  _held.tooltip_text = _held.text
  for key in _bars:
   _bars[key].value = session.needs.get(key)

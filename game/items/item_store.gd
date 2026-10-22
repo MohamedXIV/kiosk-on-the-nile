@@ -53,7 +53,7 @@ func prepare_grants(grants: Array[Dictionary]) -> ActionResult:
   if _definitions[definition_id].get("surface",false):
    var owner: Dictionary=change.state.containers.get(str(grant.get("container_id","")),{})
    var slot_id := id+":top"
-   change.state.containers[slot_id]={"id":slot_id,"location_id":owner.get("location_id",""),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch"],"host_id":id}
+   change.state.containers[slot_id]={"id":slot_id,"location_id":owner.get("location_id",""),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch","ingredient"],"host_id":id}
   var container_spec: Dictionary=_definitions[definition_id].get("container",{})
   if not container_spec.is_empty():
    var owner: Dictionary=change.state.containers.get(str(grant.get("container_id","")),{})

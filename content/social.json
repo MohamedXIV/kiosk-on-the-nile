@@ -8,7 +8,8 @@
   "facts": [
     "START_ROUTINE",
     "KNOWN_CHEAP_FAN",
-    "BOUGHT_FAN"
+    "BOUGHT_FAN",
+    "KNOWN_SHAWARMA_BASICS"
   ],
   "relationship_defaults": {
     "familiarity": 0,

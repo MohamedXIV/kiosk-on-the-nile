@@ -64,10 +64,21 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
  var candidate: Dictionary=_jobs[str(job_id)].duplicate(true)
  if action_id==&"cancel":return _cancel(candidate)
  var step: Dictionary=candidate.definition.steps[int(candidate.step_index)]
- if not _near(StringName(candidate.devices[step.capability]),StringName(candidate.location_id)):return _fail("equipment_out_of_reach")
+ if step.kind=="batch_heat":return _batch_action(candidate,action_id)
+ var action_device := str(candidate.devices[step.capability])
+ if step.kind=="cold_wait":
+  var next_step: Dictionary=candidate.definition.steps[int(candidate.step_index)+1]
+  action_device=str(candidate.devices[next_step.capability])
+ if not _near(StringName(action_device),StringName(candidate.location_id)):return _fail("equipment_out_of_reach")
  var result := RecipeStepHandlers.apply(step,candidate,action_id,{})
  if not result.ok:return result
  var change := _inventory.items.candidate()
+ if step.kind=="prepare" and candidate.definition.get("vessel_definition","")!="":
+  var vessel := BatchPreparation.create_vessel(candidate,change)
+  if not vessel.ok:return vessel
+ if step.kind=="cold_wait":
+  var loaded := BatchPreparation.load_vessel(candidate,change,action_device)
+  if not loaded.ok:return loaded
  if step.get("consume_inputs",false):_consume_all(change,candidate)
  candidate.step_results.append({"step_id":step.id,"grade":int(result.details.grade),"elapsed":candidate.elapsed,"assess":step.get("assess",true),"hygiene_evidence":_hygiene_evidence(candidate,step)})
  var output: PreparedItem
@@ -100,12 +111,20 @@ func tick(frame: Dictionary) -> void:
   var delta := maxf(0,float(frame.world_minutes)-float(job.last_world_minutes))
   job.last_world_minutes=float(frame.world_minutes)
   var step: Dictionary=job.definition.steps[int(job.step_index)]
-  if step.kind in ["heat","brew","wait"] or _near(StringName(job.devices[step.capability]),StringName(job.location_id)):job.elapsed=float(job.elapsed)+delta
+  if step.kind=="cold_wait":
+   var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
+   if not bowl.is_empty():
+    var container := _inventory.items.get_container(StringName(bowl.container_id))
+    if _inventory._usable_storage(container,StringName(job.location_id),"cold"):job.elapsed=float(job.elapsed)+delta
+  elif step.kind=="batch_heat":
+   if job.get("heat_on",true):job.elapsed=float(job.elapsed)+delta
+   _progress_slice(job,delta)
+  elif step.kind in ["heat","brew","wait"] or _near(StringName(job.devices[step.capability]),StringName(job.location_id)):job.elapsed=float(job.elapsed)+delta
 func job(id: StringName) -> Dictionary:
  return _jobs.get(str(id),{}).duplicate(true)
 func active_at(instance_id: StringName) -> Dictionary:
  for record in _jobs.values():
-  if record.status=="active" and str(instance_id) in record.devices.values():return record.duplicate(true)
+  if record.status=="active" and str(record.devices[record.definition.steps[int(record.step_index)].capability])==str(instance_id):return record.duplicate(true)
  return {}
 func recipes() -> Dictionary:
  return _recipes.duplicate(true)
@@ -145,6 +164,9 @@ func _prepared_output(job: Dictionary, change: ItemChangeSet) -> PreparedItem:
  item.food_id=StringName(job.definition.output.food_id)
  item.sugar_id=StringName(job.sugar_id)
  var technique := RecipeStepHandlers.technique(job)
+ for input in job.input_evidence:
+  if input.attributes.has("technique_grade"):technique=mini(technique,int(input.attributes.technique_grade))
+  job.quality_penalty=maxi(int(job.quality_penalty),int(input.attributes.get("mood_penalty",0)))
  item.quality_score=maxi(1,technique-int(job.quality_penalty)) if technique>0 else 0
  item.quality_key=StringName(job.definition.quality_keys[item.quality_score])
  var attributes := item.snapshot()
@@ -167,6 +189,7 @@ func _commit(change: ItemChangeSet, equipment_state: Dictionary, job: Dictionary
 func _cancel(job: Dictionary) -> ActionResult:
  var change := _inventory.items.candidate()
  change.state.reservations.erase(job.id)
+ if job.has("bowl_id"):change.state.items.erase(str(job.bowl_id))
  var equipment := _equipment.prepare_reservations(StringName(job.id),[],true)
  if not equipment.ok:return equipment
  job.status="cancelled"
@@ -183,10 +206,72 @@ func restore(data: Dictionary) -> ActionResult:
   var result := CookingWorkflowValidation.validate_recipes({str(job.recipe_id):job.definition},_inventory.items)
   if not result.ok or job.step_index<0 or job.step_index>=job.definition.steps.size():return _fail("invalid_workflow_definition")
   if not ContentValidation.integer(job.get("quality_penalty")) or job.quality_penalty<0 or job.quality_penalty>2 or not job.get("sugar_id") is String:return _fail("invalid_workflow_quality")
+  if job.status=="active" and job.definition.has("vessel_definition") and job.step_index>=1:
+   var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
+   if bowl.get("kind")!="batch" or bowl.attributes.get("source_job_id")!=id or not ContentValidation.integer(bowl.attributes.get("portions_remaining")) or bowl.attributes.portions_remaining<1 or bowl.attributes.portions_remaining>int(job.definition.portions):return _fail("invalid_batch")
+   if job.definition.steps[int(job.step_index)].kind=="batch_heat" and bowl.container_id!=str(job.devices[job.definition.steps[int(job.step_index)].capability])+":batch":return _fail("batch_device")
+  if job.has("pending_slice"):
+   if not job.pending_slice is Dictionary or not ContentValidation.number(job.pending_slice.get("elapsed")) or job.pending_slice.elapsed<0 or job.pending_slice.get("duration")!=job.definition.get("slice_minutes"):return _fail("invalid_slice")
   for instance_id in job.devices.values():
-   if job.status=="active" and _inventory.spaces.placement(StringName(instance_id)).get("location_id")!=job.get("location_id"):return _fail("orphan_workflow_device")
+   if _inventory.items.get_item(StringName(instance_id)).is_empty():return _fail("orphan_workflow_device")
+   var step: Dictionary=job.definition.steps[int(job.step_index)]
+   if job.status=="active" and str(job.devices[step.capability])==str(instance_id) and _inventory.spaces.placement(StringName(instance_id)).get("location_id")!=job.get("location_id"):return _fail("orphan_workflow_device")
  _jobs=data.jobs.duplicate(true)
  _next_id=int(data.next_id)
  return ActionResult.success()
 func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
+
+func jobs_at(instance_id: StringName) -> Array[Dictionary]:
+ var result: Array[Dictionary]=[]
+ for job in _jobs.values():
+  if job.status!="active":continue
+  var step: Dictionary=job.definition.steps[int(job.step_index)]
+  if str(job.devices[step.capability])==str(instance_id):result.append(job.duplicate(true));continue
+  if step.kind=="cold_wait" and job.get("bowl_id","")==str(_inventory.held_id()):
+   var next: Dictionary=job.definition.steps[int(job.step_index)+1]
+   if str(job.devices[next.capability])==str(instance_id):result.append(job.duplicate(true))
+ return result
+func _batch_action(job: Dictionary, action_id: StringName) -> ActionResult:
+ var step: Dictionary=job.definition.steps[int(job.step_index)]
+ if not _near(StringName(job.devices[step.capability]),StringName(job.location_id)):return _fail("equipment_out_of_reach")
+ if action_id==&"stop_heat":
+  job["heat_on"]=false
+  _jobs[job.id]=job
+  changed.emit()
+  return ActionResult.success()
+ if action_id!=&"slice":return _fail("invalid_cooking_stage")
+ if float(job.elapsed)<float(step.duration):return ActionResult.failure(ActionResult.Code.TOO_EARLY,&"too_early")
+ if job.has("pending_slice"):return _fail("slice_in_progress")
+ if not _inventory.held_id().is_empty():return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
+ job["pending_slice"]={"elapsed":0.0,"duration":float(job.definition.slice_minutes)}
+ _jobs[job.id]=job
+ changed.emit()
+ return ActionResult.success()
+func _progress_slice(job: Dictionary, delta: float) -> void:
+ if not job.has("pending_slice"):return
+ var step: Dictionary=job.definition.steps[int(job.step_index)]
+ if not _near(StringName(job.devices[step.capability]),StringName(job.location_id)):
+  job.erase("pending_slice")
+  changed.emit()
+  return
+ job.pending_slice.elapsed=float(job.pending_slice.elapsed)+delta
+ if job.pending_slice.elapsed<float(job.pending_slice.duration) or not _inventory.held_id().is_empty():return
+ var candidate := job.duplicate(true)
+ var evidence := RecipeStepHandlers.apply(step,candidate,&"slice",{})
+ if not evidence.ok:return
+ var technique := int(evidence.details.grade)
+ for result in candidate.step_results:
+  if result.get("assess",true):technique=mini(technique,int(result.grade))
+ var change := _inventory.items.candidate()
+ var sliced := BatchPreparation.slice_portion(candidate,change,technique)
+ if not sliced.ok:return
+ candidate.erase("pending_slice")
+ var lines: Array[Dictionary]=[]
+ if sliced.details.empty:
+  candidate.status="completed"
+  change.state.reservations.erase(candidate.id)
+ else:lines.append({"instance_id":candidate.devices[step.capability],"capability":step.capability,"units":1})
+ var resources := _equipment.prepare_reservations(StringName(candidate.id),lines,true)
+ if not resources.ok:return
+ _commit(change,resources.details.state,candidate)

@@ -28,6 +28,7 @@
     "travel": "travel.json",
     "shops": "shops.json",
     "recipe_workflows": "recipe_workflows.json",
-    "learning": "learning.json"
+    "learning": "learning.json",
+    "foods": "foods.json"
   }
 }

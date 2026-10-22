@@ -64,7 +64,7 @@ func present() -> void:
   _revision=revision
   _refresh()
 func _refresh() -> void:
- for child in _cards.get_children():child.free()
+ for child in _cards.get_children():_cards.remove_child(child);child.queue_free()
  _quote=null
  _confirm.disabled=true
  var offers := _session.shops.offers(_shop_id)

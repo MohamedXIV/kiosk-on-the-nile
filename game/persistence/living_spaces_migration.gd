@@ -20,6 +20,8 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   candidate.schema_revision=2
  if candidate.schema_revision==2 and target_revision>=3:
   if not candidate.state.items.containers.has("rooftop_dry"):candidate.state.items.containers.rooftop_dry=config.section("containers").rooftop_dry
+  for container in candidate.state.items.containers.values():
+   if container.kind in ["surface","hand"] and not "ingredient" in container.allowed_tags:container.allowed_tags.append("ingredient")
   candidate.state["workflow"]={"jobs":{},"next_id":1}
   candidate.state["learning"]={"attempts":{},"results":{}}
   if candidate.state.get("equipment")=={}:candidate.state.equipment={"reservations":{},"revision":0}
@@ -64,7 +66,7 @@ static func _convert(envelope: Dictionary, config: SessionConfig) -> ActionResul
  for grant in initial.instances:
   if config.section("items")[grant.definition_id].get("surface",false):
    var slot_id := str(grant.id)+":top"
-   containers[slot_id]={"id":slot_id,"location_id":str(grant.container_id).trim_suffix("_world"),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch"],"host_id":grant.id}
+   containers[slot_id]={"id":slot_id,"location_id":str(grant.container_id).trim_suffix("_world"),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch","ingredient"],"host_id":grant.id}
  var result := items.configure(config.section("items"),containers)
  if not result.ok: return result
  var grants: Array[Dictionary] = []

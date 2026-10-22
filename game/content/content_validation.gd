@@ -20,6 +20,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not recipe_store_result.ok:return recipe_store_result
   var workflow_result := CookingWorkflowValidation.validate_recipes(bundle.recipe_workflows,recipe_items)
   if not workflow_result.ok:return workflow_result
+ if bundle.has("foods"):
+  var foods_result := FoodRegistry.validate(bundle.foods)
+  if not foods_result.ok:return foods_result
  var time: Dictionary = bundle.get("time",{})
  if not number(time.get("minutes_per_second")) or float(time.minutes_per_second) <= 0: return fail("time.minutes_per_second")
  if bundle.has("visitors"):

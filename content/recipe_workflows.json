@@ -117,5 +117,202 @@
       "good",
       "excellent"
     ]
+  },
+  "shawarma_batch": {
+    "version": 1,
+    "label": "تجهيز دفعة شاورما",
+    "learning_fact": "KNOWN_SHAWARMA_BASICS",
+    "consume_on_start": true,
+    "inputs": [
+      {
+        "definition_id": "chicken",
+        "quantity": 3,
+        "required_storage": "cold"
+      },
+      {
+        "definition_id": "marinade",
+        "quantity": 1,
+        "required_storage": "cold"
+      },
+      {
+        "definition_id": "oil",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "prep",
+        "kind": "prepare",
+        "capability": "prep_surface",
+        "duration": 3,
+        "action": "refrigerate",
+        "label": "خد الوعاء وحطه في الثلاجة",
+        "after": []
+      },
+      {
+        "id": "marinate",
+        "kind": "cold_wait",
+        "capability": "cold_storage",
+        "duration": 15,
+        "action": "load_spit",
+        "label": "بعد التتبيل خد الوعاء وروح حمّله على السيخ",
+        "after": [
+          "prep"
+        ]
+      },
+      {
+        "id": "roast",
+        "kind": "batch_heat",
+        "capability": "roast_rotisserie",
+        "duration": 20,
+        "good_until": 45,
+        "okay_until": 45,
+        "burnt_after": 60,
+        "action": "slice",
+        "label": "قطّع حصة جاهزة",
+        "after": [
+          "marinate"
+        ]
+      }
+    ],
+    "vessel_definition": "marinating_bowl",
+    "filling_definition": "shawarma_filling",
+    "portions": 3,
+    "slice_minutes": 1,
+    "output": {
+      "food_id": "shawarma_filling"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ]
+  },
+  "shawarma_assemble": {
+    "version": 1,
+    "label": "تجميع سندوتش شاورما",
+    "learning_fact": "KNOWN_SHAWARMA_BASICS",
+    "consume_on_start": true,
+    "inputs": [
+      {
+        "definition_id": "shawarma_filling",
+        "quantity": 1,
+        "required_storage": "hand"
+      },
+      {
+        "definition_id": "bread",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "garlic_sauce",
+        "quantity": 1,
+        "required_storage": "cold"
+      }
+    ],
+    "steps": [
+      {
+        "id": "assemble",
+        "kind": "assemble",
+        "capability": "prep_surface",
+        "duration": 2,
+        "action": "take",
+        "label": "خد سندوتش الشاورما",
+        "after": []
+      }
+    ],
+    "output": {
+      "food_id": "shawarma"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ]
+  },
+  "potato_fried": {
+    "version": 1,
+    "label": "بطاطس مقلية",
+    "learning_fact": "",
+    "consume_on_start": true,
+    "inputs": [
+      {
+        "definition_id": "potato",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "oil",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "cook",
+        "kind": "heat",
+        "capability": "fry",
+        "duration": 8,
+        "good_until": 16,
+        "okay_until": 16,
+        "burnt_after": 24,
+        "action": "take",
+        "label": "خد البطاطس",
+        "after": []
+      }
+    ],
+    "output": {
+      "food_id": "potato_fried"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ]
+  },
+  "potato_baked": {
+    "version": 1,
+    "label": "بطاطس في الفرن",
+    "learning_fact": "",
+    "consume_on_start": true,
+    "inputs": [
+      {
+        "definition_id": "potato",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "oil",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "cook",
+        "kind": "heat",
+        "capability": "bake",
+        "duration": 12,
+        "good_until": 24,
+        "okay_until": 24,
+        "burnt_after": 36,
+        "action": "take",
+        "label": "خد البطاطس",
+        "after": []
+      }
+    ],
+    "output": {
+      "food_id": "potato_baked"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ]
   }
 }

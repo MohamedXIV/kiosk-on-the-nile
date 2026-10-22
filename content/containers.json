@@ -6,7 +6,8 @@
     "capacity": 1,
     "allowed_tags": [
       "prepared",
-      "batch"
+      "batch",
+      "ingredient"
     ],
     "host_id": ""
   },

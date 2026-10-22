@@ -315,5 +315,14 @@
       "top": "#6b4634",
       "front": "#574a40"
     }
+  },
+  "marinating_bowl": {
+    "kind": "batch",
+    "label": "وعاء فراخ متبلة"
+  },
+  "shawarma_filling": {
+    "kind": "ingredient",
+    "label": "حصة حشو شاورما",
+    "required_storage": "hand"
   }
 }

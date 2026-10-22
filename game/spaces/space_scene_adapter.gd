@@ -39,11 +39,13 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   if item.definition_id in ["radio","fan"]:
    result.interactions.append({"id":"equipment:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":str(definition.label),"action":"toggle_equipment"})
   if definition.has("container"):
-   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"افتح مخزون المكان","action":"inventory"})
+   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"افتح مخزون المكان","action":"inventory","container_id":id+":"+str(definition.container.kind)})
   if item.definition_id=="bed" and id!="bed":
    result.interactions.append({"id":"bed:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"اختيار مدة النوم والراحة","action":"sleep"})
+  if item.kind=="equipment" and not definition.has("station_id") and not definition.has("container"):
+   result.interactions.append({"id":"recipe:"+id,"ground":[ground.x,ground.y],"radius":1.3,"primary":str(definition.label),"action":"recipes","instance_id":id})
   if definition.get("surface",false):
-   result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":"سطح التحضير","secondary":"","action":"surface","instance_id":id,"slot_id":id+":top"})
+   result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":"سطح التحضير","secondary":str(spaces.definitions().get("recipe_label","الوصفات")),"secondary_action":"recipes","action":"surface","instance_id":id,"slot_id":id+":top"})
  for child in mounted:
   if prop_by_id.has(child.host_id):
    var host: Dictionary=prop_by_id[child.host_id]

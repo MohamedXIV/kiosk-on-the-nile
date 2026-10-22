@@ -10,16 +10,14 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
   if container.kind=="placed" and not placements.has(id):return _fail("unplaced_world_item")
   if item.kind=="prepared":
    var raw: Dictionary=item.attributes
-   var recipes: Dictionary=session.config.section("recipes").recipes
-   if raw.get("id")!=id or not recipes.has(str(raw.get("recipe_id",""))) or not ContentValidation.integer(raw.get("quality_score")) or not raw.quality_score in [0,1,2,3] or not raw.get("sugar_id") is String:return _fail("food")
-   var recipe: Dictionary=recipes[raw.recipe_id]
-   if raw.get("food_id")!=recipe.food_id or raw.get("quality_key")!=recipe.quality_keys[int(raw.quality_score)]:return _fail("food")
-   if recipe.get("rules_id")=="tea":
-    var known:=false
-    for sugar in recipe.sugars:
-     if sugar.id==raw.sugar_id:known=true
-    if not known:return _fail("food_sugar")
+   var food := session.foods.definition(StringName(str(raw.get("food_id",""))))
+   if raw.get("id")!=id or food.is_empty() or not ContentValidation.integer(raw.get("quality_score")) or not raw.quality_score in [0,1,2,3] or not raw.get("sugar_id") is String or raw.get("quality_key")!=food.quality_keys[int(raw.quality_score)]:return _fail("food")
+   if food.has("sugars"):
+    if not food.sugars.has(raw.sugar_id):return _fail("food_sugar")
    elif raw.sugar_id!="":return _fail("food_sugar")
+   if raw.has("source_job_id"):
+    var job := session.workflow.job(StringName(raw.source_job_id))
+    if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("food_source")
  for container in items.containers.values():
   if container.host_id!="" and not items.items.has(container.host_id):return _fail("container_host")
   if container.kind=="surface" and not session.items.items_in(StringName(container.id)).is_empty():
@@ -29,6 +27,13 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
  var workflows: Dictionary=session.workflow.snapshot().jobs
  for id in items.reservations:
   if not workflows.has(id) or workflows[id].status!="active":return _fail("orphan_ingredient_reservation")
+ for id in workflows:
+  var job: Dictionary=workflows[id]
+  if job.status!="active":continue
+  var step: Dictionary=job.definition.steps[int(job.step_index)]
+  var resource_lines: Array=session.equipment.snapshot().reservations.get(id,[])
+  if resource_lines.size()!=1 or resource_lines[0].instance_id!=job.devices[step.capability] or resource_lines[0].capability!=step.capability:return _fail("missing_workflow_resource")
+  if not job.inputs_consumed and items.reservations.get(id,[]).is_empty():return _fail("missing_workflow_ingredients")
  for id in session.equipment.snapshot().reservations:
   if not workflows.has(id) or workflows[id].status!="active":return _fail("orphan_equipment_reservation")
  if session.home.snapshot()!=envelope.state.home:return _fail("home_projection")

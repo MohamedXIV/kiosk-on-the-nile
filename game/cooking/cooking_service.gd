@@ -2,6 +2,7 @@ class_name CookingService
 extends RefCounted
 signal changed(station_id: StringName)
 signal held_changed
+var foods: FoodRegistry
 var _legacy := LegacyCookingAdapter.new()
 var _workflow: RecipeWorkflow
 var _inventory: InventoryService
@@ -68,9 +69,9 @@ func inventory_snapshot() -> Dictionary:
 func restock(tea: int, kebda: int) -> ActionResult:
  return _legacy.restock(tea,kebda)
 func item_label(item: PreparedItem) -> String:
- return _legacy.item_label(item)
+ return foods.label(item) if foods!=null else _legacy.item_label(item)
 func quality_label(item: PreparedItem) -> String:
- return _legacy.quality_label(item)
+ return foods.quality_label(item) if foods!=null else _legacy.quality_label(item)
 func station_ids() -> Array:
  return _legacy.station_ids()
 func set_quality_provider(provider: Callable) -> void:

@@ -18,6 +18,10 @@ func is_usable(id: StringName, location_id: StringName, capability: StringName) 
  var item := _items.get_item(id)
  var placement := _spaces.placement(id)
  if item.is_empty() or placement.is_empty() or placement.location_id!=str(location_id):return false
+ if capability==&"prep_surface":
+  for p in _spaces.snapshot().placements.values():
+   if p.host_id==str(id):return false
+  if not _items.items_in(StringName(str(id)+":top")).is_empty():return false
  var definition: Dictionary=_definitions.get(item.definition_id,{})
  return not definition.is_empty() and item.attributes.get("enabled",definition.get("enabled_by_default",true)) and str(capability) in definition.capabilities
 func set_enabled(id: StringName, enabled: bool) -> ActionResult:

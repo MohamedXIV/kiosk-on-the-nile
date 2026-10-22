@@ -5,6 +5,7 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _recipe_panel: RecipePanel
 var _shop_panel: ShopPanel
 var _journey_panel: JourneyPanel
 var _inventory_panel: InventoryPanel
@@ -128,7 +129,7 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible)
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.motion_step = _step_motion
  var room: LocationView = _rooms.get(str(_session.location_id))
@@ -144,6 +145,9 @@ func _install(candidate: GameSession) -> void:
  _inventory_panel=InventoryPanel.new()
  _hud.add_child(_inventory_panel)
  _inventory_panel.configure(_text,_session)
+ _recipe_panel=RecipePanel.new()
+ _hud.add_child(_recipe_panel)
+ _recipe_panel.configure(_text,_session)
  _hud.inventory_requested.connect(func():_inventory_panel.open())
  _journey_panel=JourneyPanel.new()
  _hud.add_child(_journey_panel)
@@ -175,10 +179,10 @@ func _install(candidate: GameSession) -> void:
 func _physics_process(delta: float) -> void:
  if _session==null or not _focused: return
  _session.tick(delta)
- _sound.present(_session.location_id,_session.cooking,_session.home,_session.items,_session.spaces)
+ _sound.present(_session.location_id,_session.cooking,_session.home,_session.items,_session.spaces,_session.workflow)
  _atmosphere.present(_session.clock.minutes,_session.location_id)
  _character.present(_session.player_pose,Color(_config.section("spatial").character.player_color),true)
- _character.get_node("HeldItem").present(_session.cooking.held_item())
+ _character.get_node("HeldItem").present_record(_session.items.get_item(_session.inventory.held_id()))
  _camera.global_position = _motor.global_position
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
  _hud.present(_router.nearest())
@@ -193,6 +197,9 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _recipe_panel.visible:
+  if event.is_action_pressed("cancel"):_recipe_panel.hide()
+  return
  if _inventory_panel.visible:
   if event.is_action_pressed("cancel"):_inventory_panel.hide()
   return
@@ -222,6 +229,10 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   _busy = true
   var result := await _router.execute(event.is_action_pressed("interact_secondary"))
+  if result.ok and result.details.has("show_recipes"):
+   _recipe_panel.present(StringName(result.details.show_recipes))
+   _busy=false
+   return
   if result.ok and result.details.get("show_inventory",false):
    _inventory_panel.open()
    _busy=false
@@ -321,3 +332,4 @@ func _travel_changed() -> void:
   _session.build.cancel()
   _build_panel.hide()
  _inventory_panel.hide()
+ _recipe_panel.hide()

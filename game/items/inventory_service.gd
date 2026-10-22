@@ -92,6 +92,7 @@ func _surface_available(id: StringName) -> ActionResult:
  var container := items.get_container(id)
  if container.get("kind")!="surface" or spaces==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
  var host := spaces.placement(StringName(container.host_id))
+ if equipment!=null and equipment.is_busy(StringName(container.host_id)):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"equipment_busy")
  if host.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_surface")
  for record in spaces.snapshot().placements.values():
   if record.host_id==container.host_id: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"surface_busy")
@@ -209,6 +210,23 @@ func pack(item_id: StringName) -> ActionResult:
  var result := items.prepare_moves([{"item_id":str(item_id),"quantity":int(item.quantity),"from_container":item.container_id,"to_container":"player_bag"}])
  return items.commit(result.details.change) if result.ok else result
 func _usable_storage(container: Dictionary, location_id: StringName, storage: String) -> bool:
+ if storage=="hand":return container.get("id")=="player_hand" and player_pose!=null and player_pose.location_id==location_id
  if container.get("location_id")!=str(location_id) or container.get("kind")!=storage:return false
  if storage=="cold":return equipment!=null and equipment.is_usable(StringName(container.host_id),location_id,&"cold_storage")
  return storage=="dry"
+
+func store_held(container_id: StringName) -> ActionResult:
+ var id := held_id()
+ var item := items.get_item(id)
+ var container := items.get_container(container_id)
+ if item.get("kind")!="batch" or player_pose==null or not _usable_storage(container,player_pose.location_id,"cold") or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
+ var result := items.prepare_moves([{"item_id":str(id),"quantity":1,"from_container":"player_hand","to_container":str(container_id)}])
+ return items.commit(result.details.change) if result.ok else result
+func pick_up_storage(item_id: StringName) -> ActionResult:
+ if not held_id().is_empty():return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
+ var item := items.get_item(item_id)
+ if item.get("kind")!="batch" or player_pose==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_item")
+ var container := items.get_container(StringName(item.container_id))
+ if not _usable_storage(container,player_pose.location_id,"cold") or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
+ var result := items.prepare_moves([{"item_id":str(item_id),"quantity":1,"from_container":item.container_id,"to_container":"player_hand"}])
+ return items.commit(result.details.change) if result.ok else result

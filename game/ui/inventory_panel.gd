@@ -29,7 +29,7 @@ func open() -> void:
  refresh()
  show()
 func refresh() -> void:
- for row in _rows.get_children():row.free()
+ for row in _rows.get_children():_rows.remove_child(row);row.queue_free()
  var state := _session.items.snapshot()
  for container in state.containers.values():
   if container.location_id!=str(_session.location_id) and container.kind!="purchase_bag":continue
@@ -39,6 +39,9 @@ func refresh() -> void:
   for item in entries:count+=int(item.quantity)
   var title := _text.text("inventory_bag") if container.kind=="purchase_bag" else _text.text("inventory_cold") if container.kind=="cold" else _text.text("inventory_dry")
   _rows.add_child(UiText.label(title+" · %d/%d" % [count,int(container.capacity)]))
+  if container.kind=="cold" and _session.items.get_item(_session.inventory.held_id()).get("kind")=="batch":
+   var storage_id := StringName(container.id)
+   _rows.add_child(UiText.button(_text.text("recipe_store_bowl"),func():_apply(_session.inventory.store_held(storage_id))))
   if container.kind=="purchase_bag":
    var id := StringName(container.id)
    _rows.add_child(UiText.button(_text.text("inventory_unpack"),func():_apply(_session.inventory.unpack_purchase_bag(id,_session.location_id))))
@@ -47,7 +50,10 @@ func refresh() -> void:
    var label := UiText.label(str(_session.items.definition(StringName(item.definition_id)).label)+" × "+str(item.quantity))
    label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
    row.add_child(label)
-   if container.kind!="purchase_bag":
+   if item.kind=="batch":
+    var batch_id := StringName(item.id)
+    row.add_child(UiText.button(_text.text("recipe_take_bowl"),func():_apply(_session.inventory.pick_up_storage(batch_id))))
+   elif container.kind!="purchase_bag":
     var item_id := StringName(item.id)
     row.add_child(UiText.button(_text.text("inventory_pack"),func():_apply(_session.inventory.pack(item_id))))
    _rows.add_child(row)

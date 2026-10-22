@@ -49,7 +49,10 @@ func execute(secondary: bool) -> ActionResult:
   if data.id==str(target.id): record=data;break
  var action: String = record.get("secondary_action","") if secondary and not target.secondary.is_empty() else record.get("action","") if not secondary else ""
  match action:
-  "inventory":return ActionResult.success({"show_inventory":true})
+  "recipes":return ActionResult.success({"show_recipes":str(record.instance_id)})
+  "inventory":
+   if _session.items.get_item(_session.inventory.held_id()).get("kind")=="batch":return _session.inventory.store_held(StringName(record.container_id))
+   return ActionResult.success({"show_inventory":true})
   "toggle_equipment":
    var id := StringName(record.instance_id)
    return _session.equipment.set_enabled(id,not _session.equipment.enabled(id))

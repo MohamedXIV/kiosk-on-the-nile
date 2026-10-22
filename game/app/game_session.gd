@@ -17,6 +17,7 @@ var home: HomeService
 var knowledge: KnowledgeBook
 var routine: DailyRoutine
 var mood_policy: MoodPolicy
+var foods: FoodRegistry
 var learning: RecipeLearning
 var workflow: RecipeWorkflow
 var cooking: CookingService
@@ -72,7 +73,7 @@ func configure(source: SessionConfig) -> ActionResult:
   if definition.get("surface",false):
    var container_change := items.candidate()
    var slot_id := str(grant.id)+":top"
-   container_change.state.containers[slot_id] = {"id":slot_id,"location_id":str(grant.container_id).trim_suffix("_world"),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch"],"host_id":grant.id}
+   container_change.state.containers[slot_id] = {"id":slot_id,"location_id":str(grant.container_id).trim_suffix("_world"),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch","ingredient"],"host_id":grant.id}
    var slot_result := items.commit(container_change,false)
    if not slot_result.ok: return slot_result
  var furniture_result := items.prepare_grants(initial_grants)
@@ -115,6 +116,9 @@ func configure(source: SessionConfig) -> ActionResult:
  if not shops_result.ok:return shops_result
  mood_policy = MoodPolicy.new(source.section("wellbeing"))
  routine = DailyRoutine.new(clock,wallet,needs,home,int(balance.daily_rent),mood_policy)
+ foods=FoodRegistry.new()
+ var food_result := foods.configure(source.section("foods"))
+ if not food_result.ok:return food_result
  cooking = CookingService.new()
  var kitchen := cooking.configure(source.section("recipes"),inventory)
  if not kitchen.ok: return kitchen
@@ -123,6 +127,7 @@ func configure(source: SessionConfig) -> ActionResult:
  var workflow_result := workflow.configure(source.section("recipe_workflows"),inventory,equipment,clock,knowledge)
  if not workflow_result.ok:return workflow_result
  workflow.quality_provider=func():return mood_policy.quality_penalty(needs.mood)
+ cooking.foods=foods
  cooking.set_workflow(workflow)
  learning=RecipeLearning.new()
  learning.configure(workflow,items,source.section("learning").families)

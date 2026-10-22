@@ -26,6 +26,11 @@
         "path": "res://assets/audio/radio.wav",
         "rooftop_gain": 0.045,
         "kiosk_gain": 0.035
+      },
+      "oven": {
+        "path": "res://assets/audio/fan.wav",
+        "kiosk_gain": 0.02,
+        "rooftop_gain": 0.01
       }
     },
     "cues": {
@@ -53,5 +58,11 @@
     "color": "#ffc46b",
     "energy": 0.7,
     "radius": 240
+  },
+  "equipment": {
+    "working": "#d9a24a",
+    "ready": "#83bf7a",
+    "burnt": "#ca5141",
+    "ready_cue": "chime"
   }
 }

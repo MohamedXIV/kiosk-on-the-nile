@@ -23,16 +23,25 @@ func configure(data: Dictionary) -> void:
   player.stream = load(data.cues[id])
   add_child(player)
   _cues[id] = player
-func present(location: StringName, cooking: CookingService, home: HomeService, items: ItemStore = null, spaces: SpaceService = null) -> void:
+func present(location: StringName, cooking: CookingService, home: HomeService, items: ItemStore = null, spaces: SpaceService = null, workflow: RecipeWorkflow = null) -> void:
  var active_grill := false
  var active_tea := false
  for station_id in cooking.station_ids():
   var job := cooking.job(StringName(station_id))
   if job.recipe.rules_id==&"kebda" and job.stage!=&"EMPTY": active_grill=true
   if job.recipe.rules_id==&"tea" and job.stage in [&"HEATING",&"BREWING"]: active_tea=true
+ var active_oven := false
+ if workflow!=null:
+  for job in workflow.snapshot().jobs.values():
+   if job.status!="active" or job.location_id!=str(location):continue
+   var step: Dictionary=job.definition.steps[int(job.step_index)]
+   if step.kind in ["heat","batch_heat"] and job.get("heat_on",true):
+    if step.capability in ["fry","griddle","roast_rotisserie"]:active_grill=true
+    if step.capability=="bake":active_oven=true
  for id in _players:
   var gain := float(_data.layers[id].get(str(location)+"_gain",0))
   if id=="sizzle": gain= gain if active_grill else 0
+  if id=="oven":gain=gain if active_oven else 0
   if id=="kettle": gain= gain if active_tea else 0
   if id=="fan": gain= gain if home.has_fan and home.fan_on else 0
   if id=="radio":

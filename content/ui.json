@@ -71,7 +71,14 @@
     "stale_shop_quote": "العرض اتغير؛ راجع السعر والكمية تاني",
     "shop_unavailable": "المتجر أو العرض مش متاح دلوقتي",
     "invalid_shop_quantity": "اختار كمية متاحة",
-    "reused_purchase_id": "العملية دي اتأكدت قبل كده"
+    "reused_purchase_id": "العملية دي اتأكدت قبل كده",
+    "recipe_unknown": "اسمع الفكرة الأساسية للوصفة الأول",
+    "missing_equipment": "في جهاز مطلوب مش موضوع أو مش متاح",
+    "equipment_out_of_reach": "روح للجهاز المطلوب الأول",
+    "carry_marinated_bowl": "خد وعاء التتبيل في إيدك وروح للسيخ",
+    "slice_in_progress": "التقطيع شغال؛ خليك عند السيخ",
+    "batch_empty": "الدفعة خلصت",
+    "storage_out_of_reach": "قرّب من الثلاجة المناسبة"
   },
   "theme": {
     "font_size": 19,
@@ -199,5 +206,16 @@
     "roast_rotisserie": "شوي على السيخ",
     "cold_storage": "حفظ بارد",
     "prep_surface": "سطح تجهيز"
-  }
+  },
+  "recipes_title": "وصفات الجهاز",
+  "recipes": "الوصفات",
+  "recipe_start": "ابدأ التحضير",
+  "recipe_cancel": "الغِ الطبخة",
+  "recipe_stop_heat": "اقفل الحرارة",
+  "recipe_progress": "{elapsed} / {duration} دقيقة",
+  "recipe_missing": "المطلوب: {reason}",
+  "recipe_store_bowl": "حط الوعاء في الثلاجة",
+  "recipe_take_bowl": "خد الوعاء",
+  "recipe_choose": "اختار وصفة مناسبة",
+  "recipe_portions": "حصص باقية: {count}"
 }
