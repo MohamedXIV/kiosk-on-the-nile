@@ -3,6 +3,7 @@ extends RefCounted
 signal encounter_requested(kind: StringName, visit_ids: PackedStringArray, context: Dictionary)
 signal departed(visit_id: StringName)
 var visits: Dictionary = {}
+var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
 var _data: Dictionary
 var _markers: Dictionary
@@ -26,7 +27,8 @@ func character(id: StringName) -> Dictionary:
  return _data.characters.get(str(id),{}).duplicate(true)
 func spawn(character_id: StringName) -> VisitState:
  var definition := character(character_id)
- if definition.is_empty(): return null
+ if definition.is_empty() or _has_character(character_id): return null
+ history.reserve(str(character_id),_clock)
  var visit := VisitState.new()
  visit.id = StringName("visit_%d" % _next)
  _next += 1
@@ -47,7 +49,7 @@ func tick(delta: float) -> void:
   elif visit.phase == &"staying":
    visit.elapsed += delta
    _remarks(visit,delta)
-   if visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&""):
+   if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=float(_data.max_wait_seconds):
     visit.phase = &"leaving"
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
     visit.destination = Vector2(exit_position[0],exit_position[1])
@@ -55,11 +57,11 @@ func tick(delta: float) -> void:
     departed.emit(visit.id)
   elif visit.phase == &"leaving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): visits.erase(id)
  if not _open.call(): return
- if not _flags.get("amgad",false) and visits.size()<int(_data.regular_capacity) and not _has_character(&"amgad"):
+ if not _flags.get("amgad",false) and visits.size()<int(_data.regular_capacity) and _eligible("amgad"):
   _flags.amgad = true
   spawn(&"amgad")
   return
- if not _flags.get("football",false) and _clock.minutes>=float(_data.football_minutes) and visits.size()<=int(_data.football_capacity_before_pair) and not _has_character(&"mahmoud") and not _has_character(&"samir"):
+ if not _flags.get("football",false) and _clock.minutes>=float(_data.football_minutes) and visits.size()<=int(_data.football_capacity_before_pair) and _eligible("mahmoud") and _eligible("samir"):
   _flags.football = true
   spawn(&"mahmoud")
   spawn(&"samir")
@@ -71,8 +73,12 @@ func tick(delta: float) -> void:
   _cooldown = _rng.randf_range(float(_data.ambient_delay[0]),float(_data.ambient_delay[1]))
   var pool: Array = []
   for id in _data.characters:
-   if _data.characters[id].ambient: pool.append(id)
-  if not pool.is_empty(): spawn(StringName(pool[_rng.randi_range(0,pool.size()-1)]))
+   if _data.characters[id].ambient and _eligible(id): pool.append(id)
+  if not pool.is_empty():
+   var oldest := INF
+   for id in pool: oldest=minf(oldest,history.last_visit(id))
+   var candidates: Array = pool.filter(func(id):return history.last_visit(id)==oldest)
+   spawn(StringName(candidates[_rng.randi_range(0,candidates.size()-1)]))
 func _arrived(visit: VisitState) -> void:
  visit.phase = &"staying"
  visit.elapsed = 0
@@ -98,6 +104,7 @@ func commit_pose(visit_id: StringName, pose: ActorPose) -> void:
 func record_service(_order_id: StringName, visit_id: StringName, item: PreparedItem, _payment: int) -> void:
  if not visits.has(str(visit_id)): return
  var visit: VisitState = visits[str(visit_id)]
+ history.served(str(visit.character_id),_order_id,visit_id,item)
  visit.served = true
  visit.elapsed = 0
  visit.remark_remaining = _rng.randf_range(float(_data.ambient_remark_delay[0]),float(_data.ambient_remark_delay[1]))
@@ -114,13 +121,17 @@ func begin_day() -> void:
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in visits: records[id] = visits[id].snapshot()
- return {"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
+ return {"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("visit_counts") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_counts")
  for id in data.visit_counts:
   if id=="amgad" or not _data.characters.has(id) or not ContentValidation.integer(data.visit_counts[id]) or data.visit_counts[id]<0: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_counts")
  if not data.get("visits") is Dictionary or not data.get("memory") is Dictionary or not data.get("flags") is Dictionary or not ContentValidation.number(data.get("cooldown")) or not ContentValidation.integer(data.get("next_id")) or data.next_id<1 or not data.get("rng_state") is String or not data.rng_state.is_valid_int(): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visitors")
  if not ContentValidation.integer(data.memory.get("amgad_visits")) or data.memory.amgad_visits<0 or not data.memory.get("last_served_quality") is String: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_memory")
+ var restored_history := VisitorHistory.new()
+ if not data.get("history") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visitor_history")
+ var history_result := restored_history.restore(data.history,_data.characters,_clock)
+ if not history_result.ok: return history_result
  var candidate: Dictionary = {}
  for id in data.visits:
   var record: Variant = data.visits[id]
@@ -144,6 +155,7 @@ func restore(data: Dictionary) -> ActionResult:
   candidate[id] = visit
  for flag in data.flags:
   if not flag in ["amgad","football","football_started"] or not data.flags[flag] is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_daily_flags")
+ history = restored_history
  _other_visit_counts = data.visit_counts.duplicate()
  visits = candidate
  memory = data.memory.duplicate(true)
@@ -169,3 +181,12 @@ func _has_character(character_id: StringName) -> bool:
  for visit in visits.values():
   if visit.character_id==character_id: return true
  return false
+
+func _eligible(id: String) -> bool:
+ var definition: Dictionary = _data.characters[id]
+ if _has_character(StringName(id)) or not history.eligible(id,definition.visit_policy,_clock): return false
+ var window: Array = definition.visit_policy.time_window
+ if _clock.minutes<float(window[0]) or _clock.minutes>=float(window[1]): return false
+ for visit: VisitState in visits.values():
+  if character(visit.character_id).marker==definition.marker: return false
+ return true

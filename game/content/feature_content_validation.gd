@@ -25,7 +25,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not data is Dictionary or not data.get("characters") is Dictionary or data.characters.is_empty(): return ContentValidation.fail("visitors.characters")
   for field in ["seed","ambient_capacity","regular_capacity","football_capacity_before_pair"]:
    if not ContentValidation.integer(data.get(field)) or data[field]<0: return ContentValidation.fail("visitors."+field)
-  for field in ["initial_cooldown","football_minutes","arrival_radius","interaction_radius","waiting_reminder_seconds"]:
+  for field in ["initial_cooldown","football_minutes","arrival_radius","interaction_radius","waiting_reminder_seconds","max_wait_seconds"]:
    if not ContentValidation.number(data.get(field)) or data[field]<=0: return ContentValidation.fail("visitors."+field)
   for field in ["ambient_delay","ambient_remark_delay"]:
    if not ContentValidation.vector(data.get(field),2): return ContentValidation.fail("visitors."+field)
@@ -42,6 +42,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
   for id in data.characters:
    var character: Variant = data.characters[id]
    if not character is Dictionary or not character.get("name") is String or not character.get("color") is String or not Color.html_is_valid(character.color) or not character.get("marker") is String or not markers.has(character.marker) or not character.get("food_id") in ["tea","kebda",""] or not ContentValidation.number(character.get("stay_seconds")) or character.stay_seconds<=0 or not character.get("ambient") is bool: return ContentValidation.fail("visitors.characters."+id)
+   if not character.get("visit_policy") is Dictionary: return ContentValidation.fail("visitors.visit_policy."+id)
+   var policy: Dictionary = character.visit_policy
+   if not ContentValidation.integer(policy.get("daily_limit")) or not ContentValidation.bounded(policy.daily_limit,1,20) or not ContentValidation.bounded(policy.get("return_after_minutes"),0,10080) or not ContentValidation.vector(policy.get("time_window"),2) or policy.time_window[0]<0 or policy.time_window[0]>=policy.time_window[1] or policy.time_window[1]>1440: return ContentValidation.fail("visitors.visit_policy."+id)
    var anchor: Array = markers[character.marker]
    var kiosk: Dictionary = bundle.locations.kiosk
    if FootprintGeometry.blocked(Vector2(anchor[0],anchor[1]),kiosk.solids,float(kiosk.navigation_clearance)): return ContentValidation.fail("visitors.blocked_marker."+id)
@@ -50,6 +53,16 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not ui is Dictionary: return ContentValidation.fail("ui")
   for key in ["title","subtitle","new_game","continue","save","saved","save_failed","load_failed","notebook","close","help","money","day_time","hunger","rest","mood","stock","held","empty_hands","open","closed","talk","serve","consume","interaction","secondary","success","sleep_title","sleep_hours_suffix","sleep_confirm","sleep_cancel","sleep_preview","sleep_oversleep","sleep_on_time","sleep_recovery","sleeping","sleep_completed","craft_mood_penalty","work_mood_hint"]:
    if not ui.get(key) is String: return ContentValidation.fail("ui."+key)
+  for key in ["menu","stock_short"]:
+   if not ui.get(key) is String: return ContentValidation.fail("ui."+key)
+  if not ui.get("hud") is Dictionary: return ContentValidation.fail("ui.hud")
+  for field in ["margin","font_size","meter_width","dialogue_font_size"]:
+   if not ContentValidation.bounded(ui.hud.get(field),4,100): return ContentValidation.fail("ui.hud."+field)
+  for field in ["dialogue_width_ratio","dialogue_max_height_ratio","prompt_width_ratio"]:
+   if not ContentValidation.bounded(ui.hud.get(field),0.2,0.95): return ContentValidation.fail("ui.hud."+field)
+  if not ui.hud.get("meter_colors") is Dictionary: return ContentValidation.fail("ui.hud.meter_colors")
+  for key in ["hunger","rest","mood"]:
+   if not ui.hud.meter_colors.get(key) is String or not Color.html_is_valid(ui.hud.meter_colors[key]): return ContentValidation.fail("ui.hud.meter_colors."+key)
   if not ui.get("sleep_dim_color") is String or not Color.html_is_valid(ui.sleep_dim_color): return ContentValidation.fail("ui.sleep_dim_color")
   for key in ["theme","input","errors","transition","toasts"]:
    if not ui.get(key) is Dictionary: return ContentValidation.fail("ui."+key)
@@ -101,6 +114,20 @@ static func validate(bundle: Dictionary) -> ActionResult:
    if not definition.get("context_conditions",{}) is Dictionary: return ContentValidation.fail("encounters.context_conditions")
    for rule in definition.get("choice_conditions",{}).values()+definition.get("context_conditions",{}).values():
     if not evaluator.validate(rule): return ContentValidation.fail("encounters.choice_conditions")
+   if definition.has("topics"):
+    if not definition.topics is Array or definition.topics.is_empty(): return ContentValidation.fail("encounters.topics")
+    var topics: Dictionary = {}
+    for topic in definition.topics:
+     if not topic is Dictionary or not topic.get("id") is String or not topic.id.is_valid_identifier() or topics.has(topic.id) or not topic.get("scope") in ["once","day","visit"] or not ContentValidation.integer(topic.get("variants")) or not ContentValidation.bounded(topic.variants,1,16) or not topic.get("modes") is Array or topic.modes.is_empty() or not evaluator.validate(topic.get("requires",{})): return ContentValidation.fail("encounters.topics."+id)
+     topics[topic.id] = true
+     for mode in topic.modes:
+      if not ContentValidation.integer(mode) or not ContentValidation.bounded(mode,0,4): return ContentValidation.fail("encounters.topics.mode")
+     if topic.has("minimum_visits") and (not ContentValidation.integer(topic.minimum_visits) or topic.minimum_visits<0): return ContentValidation.fail("encounters.topics.minimum_visits")
+     if topic.has("requires_previous_service") and not topic.requires_previous_service is bool: return ContentValidation.fail("encounters.topics.service_memory")
+     if topic.has("characters"):
+      if not topic.characters is Array or topic.characters.is_empty(): return ContentValidation.fail("encounters.topics.characters")
+      for actor in topic.characters:
+       if not actor in bundle.visitors.characters: return ContentValidation.fail("encounters.topics.characters")
    if definition.get("optional",false):
     if not ContentValidation.bounded(definition.get("choice_expiry"),0.1,120) or not ContentValidation.integer(definition.get("listen_choice")) or definition.listen_choice<0: return ContentValidation.fail("encounters.optional")
   for location in bundle.get("locations",{}).values():

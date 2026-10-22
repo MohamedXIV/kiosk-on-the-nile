@@ -18,5 +18,7 @@
     0,
     100
   ],
-  "initial_relationships": {}
+  "initial_relationships": {},
+  "conversation_familiarity_threshold": 30,
+  "hearing_radius": 7
 }

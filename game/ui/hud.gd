@@ -9,47 +9,46 @@ var notebook: Notebook
 var toast: ToastStack
 var _session: GameSession
 var _text: UiText
-var _heading: Label
-var _inventory: Label
+var _strip: StatusStrip
+var _menu: PopupPanel
+var _prompt_panel: PanelContainer
 var _prompt: Label
 var _station: Label
-var _bars: Dictionary = {}
 func configure(text: UiText) -> void:
  _text = text
  theme = text.make_theme()
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter = Control.MOUSE_FILTER_IGNORE
- var panel := PanelContainer.new()
- panel.position = Vector2(18,18)
- panel.custom_minimum_size.x = 280
- add_child(panel)
- var box := VBoxContainer.new()
- panel.add_child(box)
- _heading = UiText.label()
- box.add_child(_heading)
- _inventory = UiText.label()
- box.add_child(_inventory)
- for key in ["hunger","rest","mood"]:
-  var row := HBoxContainer.new()
-  box.add_child(row)
-  var bar := ProgressBar.new()
-  bar.custom_minimum_size = Vector2(180,16)
-  bar.show_percentage = false
-  row.add_child(bar)
-  row.add_child(UiText.label(text.text(key)))
-  _bars[key] = bar
- var buttons := HBoxContainer.new()
- box.add_child(buttons)
- buttons.add_child(UiText.button(text.text("save"),func():save_requested.emit()))
- buttons.add_child(UiText.button(text.text("notebook"),func():notebook_requested.emit()))
- buttons.add_child(UiText.button(text.text("diagnostics"),func():diagnostics_requested.emit()))
+ var margin := float(text.data.hud.margin)
+ _strip = StatusStrip.new()
+ _strip.anchor_right = 1
+ _strip.offset_left = margin
+ _strip.offset_right = -margin
+ _strip.offset_top = margin
+ add_child(_strip)
+ _strip.configure(text)
+ _strip.menu_requested.connect(_open_menu)
+ _menu = PopupPanel.new()
+ _menu.theme = theme
+ add_child(_menu)
+ var actions := VBoxContainer.new()
+ _menu.add_child(actions)
+ for entry in [{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
+  var callback: Callable = entry.action
+  actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
+ var help := UiText.label(text.text("help"))
+ help.custom_minimum_size.x = 280
+ help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ help.add_theme_font_size_override("font_size",15)
+ actions.add_child(help)
  var prompt_panel := PanelContainer.new()
+ _prompt_panel = prompt_panel
  prompt_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
- prompt_panel.anchor_left = 0.3
+ prompt_panel.anchor_left = 1.0-float(text.data.hud.prompt_width_ratio)
  prompt_panel.anchor_right = 0.98
  prompt_panel.anchor_top = 1
  prompt_panel.anchor_bottom = 1
- prompt_panel.offset_top = -152
+ prompt_panel.offset_top = -18
  prompt_panel.offset_bottom = -18
  add_child(prompt_panel)
  var prompts := VBoxContainer.new()
@@ -60,16 +59,13 @@ func configure(text: UiText) -> void:
  _station = UiText.label()
  _station.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  prompts.add_child(_station)
- var help := UiText.label(text.text("help"))
- help.add_theme_font_size_override("font_size",14)
- help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
- prompts.add_child(help)
  dialogue = DialoguePanel.new()
- dialogue.anchor_left = 0.53
+ dialogue.anchor_left = 1.0-float(text.data.hud.dialogue_width_ratio)
  dialogue.anchor_right = 0.98
- dialogue.anchor_top = 0.05
- dialogue.anchor_bottom = 0.5
+ dialogue.anchor_top = 0
+ dialogue.anchor_bottom = 0
  add_child(dialogue)
+ dialogue.configure(text)
  notebook = Notebook.new()
  add_child(notebook)
  notebook.configure(text)
@@ -96,10 +92,8 @@ func bind(session: GameSession) -> void:
  _session = session
 func present(target: InteractionTarget) -> void:
  if _session==null: return
- var minute := int(_session.clock.minutes)%1440
- _heading.text = _text.text("day_time",{"day":_session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})+"\n"+_text.text("money",{"amount":"%.2f" % (_session.wallet.balance/100.0)})
- _inventory.text = _text.text("stock",_session.cooking.inventory_snapshot())+"\n"+(_text.text("open") if _session.kiosk_open else _text.text("closed"))+"\n"+(_text.text("held",{"item":_session.cooking.item_label(_session.cooking.held_item())}) if _session.cooking.held_item() else _text.text("empty_hands"))
- for key in _bars: _bars[key].value = _session.needs.get(key)
+ _strip.present(_session)
+ dialogue.position.y = _strip.position.y+_strip.size.y+float(_text.data.hud.margin)
  _prompt.text = _text.text("interaction",{"primary":target.primary}) if target else ""
  var secondary: String = target.secondary if target else ""
  if secondary.is_empty() and _session.cooking.held_item(): secondary = _text.text("consume")
@@ -110,6 +104,17 @@ func present(target: InteractionTarget) -> void:
   if not status.is_empty(): station_labels.append(status)
  _station.text = "  ·  ".join(station_labels)
  var penalty := _session.mood_policy.quality_penalty(_session.needs.mood)
- if penalty>0: _station.text += "\n"+_text.text("work_mood_hint",{"penalty":penalty})
+ if penalty>0 and not station_labels.is_empty(): _station.text += "\n"+_text.text("work_mood_hint",{"penalty":penalty})
+ _prompt.visible = not _prompt.text.is_empty()
+ _station.visible = not _station.text.is_empty()
+ _prompt_panel.visible = _prompt.visible or _station.visible
+ _prompt_panel.offset_top = _prompt_panel.offset_bottom-_prompt_panel.get_combined_minimum_size().y
  var focused := _session.narrative.focused_session()
  dialogue.present(focused,_session.narrative.choices(focused))
+
+func _open_menu() -> void:
+ _menu.popup()
+ _menu.position = Vector2i(int(_strip.position.x),int(_strip.position.y+_strip.size.y+8))
+
+func top_occupied_height() -> float:
+ return _strip.position.y+_strip.size.y+float(_text.data.hud.margin)

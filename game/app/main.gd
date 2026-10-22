@@ -100,7 +100,6 @@ func continue_game() -> void:
  var result := await _save.load_candidate(_config)
  if result.ok:
   var candidate: GameSession = result.details.session
-  candidate.reparent(self)
   _install(candidate)
  else:
   push_warning("Save load rejected: %s (%s)" % [result.message_key,result.details])
@@ -172,6 +171,7 @@ func _physics_process(delta: float) -> void:
  _camera.global_position = _motor.global_position
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
  _hud.present(_router.nearest())
+ _captions.top_inset = _hud.top_occupied_height()
  _captions.present(_session,_rooms[str(_session.location_id)],_camera)
  _save.transition_active = _transition.active
  _save.boundary(_session)

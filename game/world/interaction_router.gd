@@ -29,6 +29,7 @@ func nearest() -> InteractionTarget:
    var character := _session.visitors.character(visit.character_id)
    var item := _session.cooking.held_item()
    var order := _session.service.pending_for(visit.id)
+   if not (item and order and order.food_id==item.food_id) and not _session.narrative.can_talk(visit.id): continue
    target.primary = _text.text("serve",{"item":_session.cooking.item_label(item),"name":character.name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":character.name})
    targets.append(target)
  return InteractionSelector.nearest(_session.player_ground,targets)

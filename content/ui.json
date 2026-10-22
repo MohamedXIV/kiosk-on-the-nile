@@ -47,7 +47,8 @@
     "wait_cooking": "استنى الطبخة تكمل على مهلك",
     "no_target": "قرّب من الحاجة اللي عايز تتفاعل معاها",
     "no_secondary": "مفيش اختيار إضافي هنا",
-    "invalid_sleep_duration": "اختار مدة نوم ضمن الحدود المتاحة"
+    "invalid_sleep_duration": "اختار مدة نوم ضمن الحدود المتاحة",
+    "nothing_new_to_say": "مفيش كلام جديد دلوقتي؛ سيب القعدة تاخد راحتها"
   },
   "theme": {
     "font_size": 19,
@@ -115,5 +116,21 @@
   "sleep_completed": "صحيت في اليوم {day} الساعة {hour}:{minute}",
   "craft_mood_penalty": "المزاج مأثر على التحضير؛ الجودة: {quality}",
   "work_mood_hint": "مزاجك الحالي يقلّل جودة الدفعة الجديدة حتى {penalty} درجة",
-  "sleep_dim_color": "#00000099"
+  "sleep_dim_color": "#00000099",
+  "menu": "القائمة",
+  "stock_short": "شاي {tea} · كبدة {kebda}",
+  "hud": {
+    "margin": 12,
+    "font_size": 16,
+    "meter_width": 66,
+    "dialogue_font_size": 17,
+    "dialogue_max_height_ratio": 0.42,
+    "prompt_width_ratio": 0.72,
+    "meter_colors": {
+      "hunger": "#c5a76b",
+      "rest": "#7aa9af",
+      "mood": "#9aaf7c"
+    },
+    "dialogue_width_ratio": 0.35
+  }
 }

@@ -2,7 +2,14 @@
   "amgad": {
     "story": "amgad",
     "requires": {
-      "participants_available": true
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
     },
     "offer_requires": {},
     "choice_conditions": {},
@@ -15,7 +22,73 @@
           "value": 30
         }
       }
-    }
+    },
+    "topics": [
+      {
+        "id": "fan_bought",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "requires": {
+          "home_item_owned": "fan"
+        }
+      },
+      {
+        "id": "fan_referral",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "requires": {
+          "all": [
+            {
+              "day_at_least": 2
+            },
+            {
+              "not": {
+                "fact_known": "KNOWN_CHEAP_FAN"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "introduction",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "requires": {
+          "not": {
+            "day_at_least": 2
+          }
+        }
+      },
+      {
+        "id": "memory",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "requires": {},
+        "requires_previous_service": true,
+        "minimum_visits": 2
+      },
+      {
+        "id": "smalltalk",
+        "scope": "day",
+        "modes": [
+          0
+        ],
+        "variants": 3,
+        "requires": {}
+      }
+    ]
   },
   "amgad_arrival": {
     "story": "amgad",
@@ -23,7 +96,18 @@
       "participants_available": true
     },
     "offer_requires": {},
-    "choice_conditions": {}
+    "choice_conditions": {},
+    "topics": [
+      {
+        "id": "arrival",
+        "scope": "visit",
+        "modes": [
+          1
+        ],
+        "variants": 3,
+        "requires": {}
+      }
+    ]
   },
   "amgad_served": {
     "story": "amgad",
@@ -31,7 +115,18 @@
       "participants_available": true
     },
     "offer_requires": {},
-    "choice_conditions": {}
+    "choice_conditions": {},
+    "topics": [
+      {
+        "id": "served",
+        "scope": "visit",
+        "modes": [
+          2
+        ],
+        "variants": 3,
+        "requires": {}
+      }
+    ]
   },
   "football": {
     "story": "football",
@@ -51,15 +146,89 @@
     "choice_conditions": {},
     "optional": true,
     "choice_expiry": 8,
-    "listen_choice": 2
+    "listen_choice": 2,
+    "topics": [
+      {
+        "id": "football",
+        "scope": "day",
+        "modes": [
+          0
+        ],
+        "variants": 3,
+        "requires": {}
+      }
+    ]
   },
   "visitors": {
     "story": "visitors",
     "requires": {
       "participants_available": true
     },
-    "offer_requires": {},
-    "choice_conditions": {}
+    "offer_requires": {
+      "distance_at_most": 3.4
+    },
+    "choice_conditions": {},
+    "topics": [
+      {
+        "id": "arrival",
+        "scope": "visit",
+        "modes": [
+          1
+        ],
+        "variants": 3,
+        "requires": {},
+        "characters": [
+          "nadia",
+          "farid",
+          "salma",
+          "youssef"
+        ]
+      },
+      {
+        "id": "waiting",
+        "scope": "visit",
+        "modes": [
+          3
+        ],
+        "variants": 3,
+        "requires": {}
+      },
+      {
+        "id": "ambient",
+        "scope": "day",
+        "modes": [
+          4
+        ],
+        "variants": 3,
+        "requires": {},
+        "characters": [
+          "hassan",
+          "mona",
+          "passer",
+          "youssef"
+        ]
+      },
+      {
+        "id": "memory",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "requires": {},
+        "requires_previous_service": true,
+        "minimum_visits": 2
+      },
+      {
+        "id": "smalltalk",
+        "scope": "day",
+        "modes": [
+          0
+        ],
+        "variants": 3,
+        "requires": {}
+      }
+    ]
   },
   "visitors_served": {
     "story": "visitors",
@@ -67,6 +236,17 @@
       "participants_available": true
     },
     "offer_requires": {},
-    "choice_conditions": {}
+    "choice_conditions": {},
+    "topics": [
+      {
+        "id": "served",
+        "scope": "visit",
+        "modes": [
+          2
+        ],
+        "variants": 3,
+        "requires": {}
+      }
+    ]
   }
 }

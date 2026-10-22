@@ -21,12 +21,13 @@ func boundary(session: GameSession) -> void:
 func load_candidate(config: SessionConfig) -> ActionResult:
  var result := store.read()
  if not result.ok: return result
- var candidate := await codec.create_candidate(result.details.data,config)
+ var candidate := await codec.create_candidate(result.details.data,config,get_parent())
  if candidate.ok:
   store.protect_previous = bool(result.details.get("backup",false))
   return candidate
+ push_warning("Save candidate rejected: %s (%s); retaining previous save" % [candidate.message_key,candidate.details])
  store.protect_previous = true
  if not result.details.get("backup",false):
   var previous := store.read_previous()
-  if previous.ok: return await codec.create_candidate(previous.details.data,config)
+  if previous.ok: return await codec.create_candidate(previous.details.data,config,get_parent())
  return candidate

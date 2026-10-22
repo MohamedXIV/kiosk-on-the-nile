@@ -113,9 +113,9 @@ func tick(delta: float) -> void:
  changed.emit()
 
 func _encounter_requested(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
- if kind in [&"reminder",&"ambient"]:
+ if kind in [&"reminder",&"ambient",&"served"]:
   for conversation: ConversationSession in narrative.sessions.values():
-   if conversation.elapsed>=conversation.current.duration: continue
+   if conversation.elapsed>=conversation.current.duration and conversation.current.choices.is_empty(): continue
    for participant in participants:
     if participant in conversation.participants: return
  var id: StringName = &"visitors"

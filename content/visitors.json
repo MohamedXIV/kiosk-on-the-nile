@@ -2,8 +2,8 @@
   "seed": 1437,
   "initial_cooldown": 2,
   "ambient_delay": [
-    14,
-    24
+    22,
+    42
   ],
   "ambient_capacity": 3,
   "regular_capacity": 3,
@@ -23,7 +23,15 @@
       "marker": "counter_1",
       "food_id": "tea",
       "stay_seconds": 32,
-      "ambient": false
+      "ambient": false,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          900,
+          1440
+        ]
+      }
     },
     "mahmoud": {
       "name": "محمود",
@@ -31,7 +39,15 @@
       "marker": "table_a",
       "food_id": "tea",
       "stay_seconds": 36,
-      "ambient": false
+      "ambient": false,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          900,
+          1440
+        ]
+      }
     },
     "samir": {
       "name": "سمير",
@@ -39,7 +55,15 @@
       "marker": "table_b",
       "food_id": "kebda",
       "stay_seconds": 36,
-      "ambient": false
+      "ambient": false,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          900,
+          1440
+        ]
+      }
     },
     "hassan": {
       "name": "أستاذ حسن",
@@ -47,7 +71,15 @@
       "marker": "railing_1",
       "food_id": "tea",
       "stay_seconds": 20,
-      "ambient": true
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          930,
+          1320
+        ]
+      }
     },
     "nadia": {
       "name": "مدام نادية",
@@ -55,7 +87,15 @@
       "marker": "takeaway",
       "food_id": "kebda",
       "stay_seconds": 8,
-      "ambient": true
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          990,
+          1200
+        ]
+      }
     },
     "passer": {
       "name": "شاب ع الكورنيش",
@@ -63,13 +103,85 @@
       "marker": "railing_2",
       "food_id": "",
       "stay_seconds": 15,
-      "ambient": true
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          960,
+          1440
+        ]
+      }
+    },
+    "salma": {
+      "name": "أبلة سلمى",
+      "color": "#a16c47",
+      "marker": "counter_2",
+      "food_id": "tea",
+      "stay_seconds": 38,
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          900,
+          1080
+        ]
+      }
+    },
+    "mona": {
+      "name": "منى",
+      "color": "#687e96",
+      "marker": "railing_2",
+      "food_id": "",
+      "stay_seconds": 42,
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          1020,
+          1320
+        ]
+      }
+    },
+    "farid": {
+      "name": "عم فريد",
+      "color": "#847549",
+      "marker": "takeaway",
+      "food_id": "kebda",
+      "stay_seconds": 10,
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          960,
+          1170
+        ]
+      }
+    },
+    "youssef": {
+      "name": "يوسف",
+      "color": "#507976",
+      "marker": "counter_2",
+      "food_id": "tea",
+      "stay_seconds": 30,
+      "ambient": true,
+      "visit_policy": {
+        "daily_limit": 1,
+        "return_after_minutes": 480,
+        "time_window": [
+          1080,
+          1440
+        ]
+      }
     }
   },
-  "waiting_reminder_seconds": 11,
+  "waiting_reminder_seconds": 24,
   "ambient_remark_delay": [
-    8,
-    18
+    22,
+    40
   ],
   "spawn_markers": [
     "spawn_west",
@@ -78,5 +190,6 @@
   "exit_markers": [
     "spawn_west",
     "spawn_east"
-  ]
+  ],
+  "max_wait_seconds": 95
 }

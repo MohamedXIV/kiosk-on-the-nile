@@ -57,7 +57,7 @@ qualification results.
    replacement, station/visitor variants and a repeatable CI acceptance gate. The existing
    GitHub workflow currently covers compilation/import/release export only.
 
-The prototype remains untouched. No build has been published or deployed.
+The prototype remains untouched. Experimental Web ZIPs are published as GitHub prereleases; this is not a main-branch merge or a hosted deployment.
 
 ## Approved sleep/mood update — 2026-10-22
 
@@ -86,3 +86,15 @@ Existing daily-life assertions were adapted to the approved sleep signature and
 calendar result. No automated suites were added or run in this update. Current
 manual browser observations and any remaining acceptance limits are recorded in
 `docs/notes/2026-10-22-playtest-feedback.md`.
+
+## Approved social/HUD follow-up — 2026-10-22
+
+Tracked daily visit quotas and time windows, four additional named visitors,
+actual paid-service memories, persistent Ink topic consumption and rotating
+authored lines intentionally replace the prototype's repeated random visitors
+and endlessly restartable topics. A compact top status strip and contextual
+footer replace the tall left HUD. Schema 3 migrates older saves and retains
+previous compiled Ink for already-open matching sessions. Design sources,
+external content knobs, manual observations and limits are recorded in
+[the social follow-up notes](notes/2026-10-22-social-visitors-and-hud.md).
+Full multi-day pacing and complete-game acceptance remain separate.

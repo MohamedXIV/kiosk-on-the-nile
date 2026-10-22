@@ -1,6 +1,6 @@
 class_name SaveCodec
 extends Node
-const SCHEMA_VERSION := 2
+const SCHEMA_VERSION := 3
 const COMPONENTS := ["clock","routine","wallet","needs","home","knowledge","relationships","effects","cooking","service","visitors","scheduler"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
@@ -18,14 +18,17 @@ func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
   if not data.state.get(id) is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_saved_component",{"component":id})
  if not data.state.get("kiosk_open") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kiosk_state")
  return ActionResult.success()
-func create_candidate(data: Dictionary, config: SessionConfig) -> ActionResult:
+func create_candidate(data: Dictionary, config: SessionConfig, destination: Node = null) -> ActionResult:
  var migration := SaveMigrations.upgrade(data)
  if not migration.ok: return migration
  var restored_data: Dictionary = migration.details.data
  var result := validate(restored_data,config)
  if not result.ok: return result
  var candidate := GameSession.new()
- add_child(candidate)
+ # Inkgd tears down runtime nodes on tree exit. Restore under the final owner
+ # so installing a validated candidate never reparents a live Ink player.
+ var owner_node: Node = destination if destination!=null else self
+ owner_node.add_child(candidate)
  result = candidate.configure(config)
  if not result.ok:
   candidate.queue_free()
@@ -56,6 +59,12 @@ func create_candidate(data: Dictionary, config: SessionConfig) -> ActionResult:
    if order==null or order.visit_id!=visit.id:
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_order")
+ for memories in candidate.visitors.history.snapshot().services.values():
+  for memory in memories:
+   var order := candidate.service.order(StringName(memory.order_id))
+   if order==null or order.status!=&"delivered" or str(order.visit_id)!=memory.visit_id or str(order.food_id)!=memory.food_id:
+    candidate.queue_free()
+    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_service_memory")
  result = await candidate.narrative.restore(restored_data.state.narrative)
  if not result.ok:
   candidate.queue_free()
@@ -72,9 +81,10 @@ static func decode_text(raw: String) -> ActionResult:
  var parsed: Variant = JSON.parse_string(raw)
  if not parsed is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"save_unreadable")
  if valid_digest(parsed): return ActionResult.success({"data":parsed})
- # Version 1 wrote this exact sorted, compact JSON. Verify its original bytes
- # before normalizing a legacy checksum; never repair a damaged payload.
- if parsed.get("schema_version")==1 and parsed.get("checksum") is String:
+ # Verify the exact compact bytes first. Godot's JSON parser can round a
+ # nonintegral value by one ULP, even when stringify used full_precision.
+ # Only an authenticated original payload may be resealed in memory.
+ if ContentValidation.integer(parsed.get("schema_version")) and int(parsed.schema_version) in [1,2,SCHEMA_VERSION] and parsed.get("checksum") is String:
   var prefix := '{"checksum":"%s",' % parsed.checksum
   if raw.begins_with(prefix):
    var original_payload := "{"+raw.substr(prefix.length())

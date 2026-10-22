@@ -34,6 +34,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
     if not bounded(needs[group].get(key),0,100): return fail("needs."+group+"."+key)
  if bundle.has("social"):
   var social: Dictionary = bundle.social
+  if not bounded(social.get("conversation_familiarity_threshold"),0,100) or not bounded(social.get("hearing_radius"),0.1,100): return fail("social.conversation")
   for field in ["facts","initial_facts","initial_notes"]:
    if not social.get(field) is Array: return fail("social."+field)
    for value in social[field]:

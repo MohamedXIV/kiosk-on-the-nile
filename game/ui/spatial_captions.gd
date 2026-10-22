@@ -1,14 +1,18 @@
 class_name SpatialCaptions
 extends Control
 var _labels: Dictionary = {}
+var top_inset: float = 12
 func present(session: GameSession, room: LocationView, camera: Camera2D) -> void:
  var active: Dictionary = {}
+ var focused := session.narrative.focused_session()
  if session.location_id==&"kiosk":
   for conversation: ConversationSession in session.narrative.sessions.values():
+   if conversation==focused and not session.narrative.choices(conversation).is_empty(): continue
    if conversation.finished or conversation.elapsed>=conversation.current.duration or conversation.current.text.is_empty(): continue
    for visit_id in conversation.participants:
     var visit: VisitState = session.visitors.visits.get(visit_id)
     if visit==null or visit.character_id!=conversation.current.speaker_id: continue
+    if visit.pose.ground.distance_to(session.player_ground)>float(session.config.section("social").hearing_radius): continue
     var id := str(conversation.id)
     active[id] = true
     if not _labels.has(id):
@@ -27,7 +31,7 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
     label.size.x = 300
     var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,92)
     var screen: Vector2 = camera.get_canvas_transform()*canvas
-    label.position = Vector2(clampf(screen.x-150,8,get_viewport_rect().size.x-308),clampf(screen.y-label.size.y,12,get_viewport_rect().size.y-180))
+    label.position = Vector2(clampf(screen.x-150,8,get_viewport_rect().size.x-308),clampf(screen.y-label.size.y,top_inset,get_viewport_rect().size.y-180))
  for id in _labels.keys():
   if not active.has(id):
    _labels[id].queue_free()
