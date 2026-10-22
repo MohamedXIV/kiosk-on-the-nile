@@ -1,7 +1,14 @@
 # كشك ع النيل · Kiosk on the Nile
 
-An Arabic Godot port of the included three-quarter HTML prototype. The original
-`kiosk_on_the_nile_2d_three_quarter_top_down.html` remains the reference, unchanged.
+An Egyptian slice-of-life game set on the Nile corniche in the 2000s: quiet
+days, familiar people, conversation, memory and mutual help. The kiosk and its
+cooking are part of that life. People have reasons to visit the corniche beyond
+buying anything; relationships also connect characters to one another.
+
+Read [the game vision](docs/GAME_VISION.md) before designing features or tuning
+the pace. It records the owner's clarification and the gaps in the current
+preview. The unchanged three-quarter HTML prototype is a historical porting
+reference; its visitor and service behavior does not override that vision.
 
 ## Open and run
 

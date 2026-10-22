@@ -1,5 +1,10 @@
 # Kiosk on the Nile: modular Godot port
 
+> Vision clarification, 2026-10-23: [GAME_VISION](../../GAME_VISION.md) governs
+> experience and pacing. This document records the historical port scope. HTML
+> behavior does not override independent corniche life, quiet companionship,
+> character relationships, knowledge or mutual help.
+
 Date: 2026-10-21
 
 Status: written design approved by the user on 2026-10-21; implementation authorized 2026-10-21 with the review amendments below.
@@ -10,7 +15,7 @@ Rebuild the current HTML experience as a maintainable Godot game. Preserve its t
 
 The behavioral and visual reference is `kiosk_on_the_nile_2d_three_quarter_top_down.html` at repository commit `705de5ace833b47361ce76b43bf4aad410153df5`. Keep that file intact as a comparison reference.
 
-The vision and experience documents in `MohamedXIV/nile-kiosk` explain the broader intent: a quiet Egyptian life, familiar people, satisfying work and modest comfort. Its application code, module structure, event-sourcing architecture, implementation milestones and previously deferred localization decisions are not templates for this port. The current HTML takes precedence where its scope, perspective, dimensions or balance differ.
+The vision and experience documents in `MohamedXIV/nile-kiosk` explain the broader intent: a quiet Egyptian life, familiar people, satisfying work and modest comfort. Its application code, module structure, event-sourcing architecture, implementation milestones and previously deferred localization decisions are not templates for this port. HTML supplies the historical presentation and spatial reference for this milestone; its balance and social behavior are subordinate to the owner's latest game vision.
 
 Success means a player can recognize and play the HTML experience in Godot, including its small atmospheric details. A runnable set of abstract systems or a room containing placeholder circles does not satisfy the port.
 

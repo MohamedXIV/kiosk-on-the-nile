@@ -1,5 +1,10 @@
 # Living Spaces Implementation Plan — خطة التنفيذ الجامعة
 
+> مرجعية أحدث، 2026-10-23: اقرأ [فلسفة اللعبة](../../GAME_VISION.md).
+> هذه خطة نطاق تقني سابق، وليست خطة مكتملة لحياة الكورنيش الاجتماعية.
+> لا تعتمد كثافة الخدمة أو حصر المعرفة في الوصفات أو ربط حضور الناس بفتح
+> الكشك قواعد نهائية؛ الفجوات الاجتماعية تحتاج تصميمًا قبل أي توسع برمجي تالٍ.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans for Native execution or superpowers:subagent-driven-development if the user chooses that method. Steps use checkbox (`- [ ]`) syntax. This plan is awaiting user review and execution-method confirmation; product implementation has not started.
 
 **Goal:** إتاحة تجهيز البيت والكشك، والتسوق أثناء استمرار العالم، والطبخ بمعدات ومكونات فعلية، والنظافة والسمعة المرتبطتين بتجارب الزباين.

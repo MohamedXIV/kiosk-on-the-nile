@@ -1,5 +1,11 @@
 # HTML → Godot parity and evidence
 
+> Port parity is historical evidence, not acceptance of the intended experience.
+> [The game vision](GAME_VISION.md), clarified on 2026-10-23, takes priority over
+> inherited visitor/service behavior. Independent corniche life, quiet company,
+> sustained personal stories, hospitality and social connections remain explicit
+> design gaps; the current cooking/shopping cycle does not establish those goals.
+
 Reference: unchanged `kiosk_on_the_nile_2d_three_quarter_top_down.html` at
 `705de5ace833b47361ce76b43bf4aad410153df5`. Intended design and execution details:
 [spec](superpowers/specs/2026-10-21-godot-html-port-design.md),
