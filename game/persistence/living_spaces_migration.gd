@@ -30,6 +30,12 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   var result := _add_hygiene(candidate,config)
   if not result.ok:return result
   candidate.schema_revision=4
+ if candidate.schema_revision==4 and target_revision>=5:
+  var result := BuildingLayoutMigration.upgrade(candidate.state,config)
+  if not result.ok:return result
+  candidate.state=result.details.state
+  candidate.schema_revision=5
+  candidate["building_migration_report"]=result.details.report
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

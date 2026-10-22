@@ -25,7 +25,7 @@ static func structure_solids(space: Dictionary, door_states: Dictionary, potenti
   var size := Vector2(float(door.length)*scale,0.08) if door.axis=="x" else Vector2(0.08,float(door.length)*scale)
   result.append(solid(Rect2(start-Vector2(0.04,0.04),size),str(door.id)))
  return result
-static func validate(layout: Dictionary, request: PlacementRequest, catalog: Dictionary, actors: Array[Dictionary], structural_authoring: bool = false) -> ActionResult:
+static func validate(layout: Dictionary, request: PlacementRequest, catalog: Dictionary, actors: Array[Dictionary], structural_authoring: bool = false, check_access: bool = true) -> ActionResult:
  if request==null or not catalog.spaces.has(str(request.location_id)): return _fail("invalid_destination")
  var instances: Dictionary = layout.get("instances",{})
  if not instances.has(str(request.instance_id)): return _fail("unknown_item")
@@ -103,6 +103,7 @@ static func validate(layout: Dictionary, request: PlacementRequest, catalog: Dic
   # Only prevent collisions introduced by this request, including its children.
   for id in footprints:
    if (id==str(request.instance_id) or placements[id].host_id==str(request.instance_id)) and footprints[id].grow(0.18).has_point(point): return _fail("person_in_the_way")
+ if not check_access:return ActionResult.success({"placements":placements})
  var connectivity := _reachable(space,potential_solids,actors,placements,catalog,instances,str(request.location_id))
  if not connectivity.ok: return connectivity
  return ActionResult.success({"placements":placements})

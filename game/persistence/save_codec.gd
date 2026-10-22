@@ -1,7 +1,7 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 4
+const SCHEMA_REVISION := 5
 const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","hygiene","customer_experience","scheduler"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
@@ -41,6 +41,7 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
   candidate.queue_free()
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_pose")
  for id in COMPONENTS:
+  if id=="equipment" and restored_data.state.workflow.get("jobs") is Dictionary:candidate.equipment.restore_frozen_contracts(restored_data.state.workflow.jobs)
   result = candidate.get(id).restore(restored_data.state[id])
   if not result.ok:
    candidate.queue_free()
@@ -77,7 +78,7 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
  if not result.ok:
   candidate.queue_free()
   return result
- return ActionResult.success({"session":candidate})
+ return ActionResult.success({"session":candidate,"migration_report":restored_data.get("building_migration_report",{}) if data.get("schema_revision")!=SCHEMA_REVISION else {}})
 
 static func valid_digest(data: Dictionary) -> bool:
  var candidate := data.duplicate(true)

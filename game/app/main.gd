@@ -108,6 +108,9 @@ func continue_game() -> void:
  if result.ok:
   var candidate: GameSession = result.details.session
   _install(candidate)
+  var report: Dictionary=result.details.get("migration_report",{})
+  if not report.is_empty() and (not report.moved.is_empty() or not report.stored.is_empty()):
+   _hud.toast.show_message(_text.text("building_migration",{"moved":report.moved.size(),"stored":report.stored.size()}))
  else:
   push_warning("Save load rejected: %s (%s)" % [result.message_key,result.details])
   var error := UiText.label(_text.text("load_failed"))
