@@ -83,13 +83,14 @@ func configure(source: SessionConfig) -> ActionResult:
  for fan in items.instances(&"fan"):
   if fan.container_id=="rooftop_world": layout.placements[fan.id]={"instance_id":fan.id,"location_id":"rooftop","cell":[2,-3],"rotation":0,"host_id":"","slot_id":""}
  spaces = SpaceService.new()
- var space_result := spaces.configure(source.section("spaces"),layout,items,_actor_snapshots,func(id):return cooking!=null and cooking.job(id)!=null and cooking.job(id).stage!=&"EMPTY")
+ var space_result := spaces.configure(source.section("spaces"),layout,items,_actor_snapshots,_equipment_busy)
  if not space_result.ok: return space_result
  inventory.player_pose=player_pose
  inventory.spaces=spaces
  equipment=EquipmentService.new()
  var equipment_result := equipment.configure(source.section("equipment"),items,spaces)
  if not equipment_result.ok:return equipment_result
+ equipment.external_busy=func(id):return cooking!=null and cooking.legacy_busy(id)
  inventory.equipment=equipment
  locations=LocationRegistry.new()
  var travel_config := source.section("travel")
@@ -197,3 +198,6 @@ func _actor_snapshots() -> Array[Dictionary]:
  if visitors!=null:
   for visit in visitors.visits.values(): result.append(visit.pose.snapshot())
  return result
+
+func _equipment_busy(id: StringName) -> bool:
+ return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id))

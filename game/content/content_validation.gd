@@ -11,6 +11,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if bundle.has("shops"):
   var commerce_result := CommerceContentValidation.validate(bundle)
   if not commerce_result.ok:return commerce_result
+ if bundle.has("equipment"):
+  var equipment_result := CookingWorkflowValidation.validate_equipment(bundle.equipment,bundle.get("items",{}))
+  if not equipment_result.ok:return equipment_result
  var time: Dictionary = bundle.get("time",{})
  if not number(time.get("minutes_per_second")) or float(time.minutes_per_second) <= 0: return fail("time.minutes_per_second")
  if bundle.has("visitors"):

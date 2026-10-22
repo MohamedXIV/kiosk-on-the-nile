@@ -127,3 +127,7 @@ func station_ids() -> Array:
 
 func set_quality_provider(provider: Callable) -> void:
  _quality_provider = provider
+
+func legacy_busy(id: StringName) -> bool:
+ var current := job(id)
+ return current!=null and current.stage!=&"EMPTY"
