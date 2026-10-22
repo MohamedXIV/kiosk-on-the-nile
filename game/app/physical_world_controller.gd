@@ -14,13 +14,14 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
   parent.add_child(room)
   room.configure(LocationDefinition.new(StringName(id),session.config.section("locations")[id]),session)
   rooms[id]=room
- var room: LocationView = rooms[str(session.location_id)]
+ var room_id := session.location_id if session.locations.is_physical(session.location_id) else StringName(session.travel.snapshot().journey.origin_pose.location_id)
+ var room: LocationView = rooms[str(room_id)]
  motor = ActorMotor.new()
  room.add_child(motor)
  motor.pose = session.player_pose
  var spatial := session.config.section("spatial")
  motor.configure(room.mapping,float(spatial.player_speed),float(spatial.foot_radius))
- motor.teleport(session.location_id,session.player_ground)
+ if session.locations.is_physical(session.location_id):motor.teleport(session.location_id,session.player_ground)
  character = preload("res://game/presentation/character_view.tscn").instantiate()
  motor.add_child(character)
  character.configure(spatial.character)
@@ -40,9 +41,10 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
 func step(delta: float) -> void:
  var direction := Vector2.ZERO
  if input_provider.is_valid(): direction = input_provider.call()
- motor.step_input(direction,delta)
+ if _session.locations.is_physical(_session.location_id):motor.step_input(direction,delta)
  visitors.step(delta)
 func set_active_location(id: StringName) -> void:
+ if not _session.locations.is_physical(id):return
  var room: LocationView = rooms[str(id)]
  if motor.get_parent()!=room: motor.reparent(room,false)
  motor.teleport(id,_session.player_ground)

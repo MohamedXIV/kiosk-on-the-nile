@@ -24,6 +24,7 @@
     "containers": "containers.json",
     "spaces": "spaces.json",
     "initial_layout": "initial_layout.json",
-    "equipment": "equipment.json"
+    "equipment": "equipment.json",
+    "travel": "travel.json"
   }
 }

@@ -6,6 +6,8 @@ var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
 var items: ItemStore
+var locations: LocationRegistry
+var travel: TravelService
 var equipment: EquipmentService
 var build: BuildController
 var spaces: SpaceService
@@ -88,6 +90,13 @@ func configure(source: SessionConfig) -> ActionResult:
  var equipment_result := equipment.configure(source.section("equipment"),items,spaces)
  if not equipment_result.ok:return equipment_result
  inventory.equipment=equipment
+ locations=LocationRegistry.new()
+ var travel_config := source.section("travel")
+ locations.configure(source.section("locations"),travel_config.routes)
+ travel_config["physical_spawns"]=source.section("locations")
+ travel=TravelService.new()
+ var travel_result := travel.configure(travel_config,clock,player_pose,inventory,locations)
+ if not travel_result.ok:return travel_result
  build=BuildController.new(spaces,items,player_pose)
  kiosk_open = source.section("session").kiosk_open
  var social_data := source.section("social")
@@ -107,7 +116,7 @@ func configure(source: SessionConfig) -> ActionResult:
  service = ServiceSystem.new()
  visitors = VisitorService.new()
  service.configure(wallet,cooking,visitors.is_available,balance)
- visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open and location_id==&"kiosk")
+ visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open)
  service.settled.connect(visitors.record_service)
  service.settled.connect(func(_order,_visit,item,_payment):
   if item.quality_score>=2: needs.apply_delta(0,0,float(config.section("needs").good_service_mood)))
@@ -118,7 +127,7 @@ func configure(source: SessionConfig) -> ActionResult:
  relationships = RelationshipStore.new(source.section("social"),actors)
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships
- conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,source.section("locations").keys())
+ conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,locations.ids())
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
  narrative = NarrativeDirector.new()
  add_child(narrative)
@@ -143,6 +152,7 @@ func configure(source: SessionConfig) -> ActionResult:
 func rebuild_order() -> ActionResult:
  var handlers := {"needs":func(frame):needs.tick(frame.delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):cooking.tick(frame.delta),"visitors":func(frame):visitors.tick(frame.delta),"narrative":func(frame):narrative.tick(frame.delta),"motion":func(frame):
   if motion_step.is_valid(): motion_step.call(frame.delta)}
+ handlers["travel"]=func(frame):travel.tick(frame)
  return coordinator.prepare(clock,handlers,config.section("time").system_dependencies)
 func start_new() -> void:
  running = true

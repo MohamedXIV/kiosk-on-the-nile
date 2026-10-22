@@ -8,6 +8,7 @@ func _init(session: GameSession, room: LocationView, text: UiText) -> void:
  _room = room
  _text = text
 func nearest() -> InteractionTarget:
+ if _room==null or not _session.locations.is_physical(_session.location_id):return null
  var targets := _room.interaction_targets()
  var balance: Dictionary = _session.config.section("balance")
  var format: Dictionary = {}

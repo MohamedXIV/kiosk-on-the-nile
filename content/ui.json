@@ -65,7 +65,9 @@
     "incompatible_surface": "الجهاز مش مناسب للسطح ده",
     "item_wrong_location": "القطعة موجودة في مكان تاني",
     "empty_surface": "السطح فاضي",
-    "ingredient_reserved": "الخامات دي محجوزة لطبخة شغالة"
+    "ingredient_reserved": "الخامات دي محجوزة لطبخة شغالة",
+    "journey_busy": "كمّل الرحلة الحالية الأول",
+    "invalid_journey": "حالة الرحلة مش صالحة"
   },
   "theme": {
     "font_size": 19,
@@ -169,5 +171,12 @@
   "inventory_dry": "الخامات الجافة",
   "inventory_unpack": "فرّغ اللي له مكان",
   "inventory_pack": "في الحقيبة",
-  "inventory_partial": "اتنقل اللي له مساحة؛ الباقي موجود في الحقيبة"
+  "inventory_partial": "اتنقل اللي له مساحة؛ الباقي موجود في الحقيبة",
+  "journey_return": "ارجع لمكانك",
+  "journey_outbound": "في الطريق إلى {place}… باقي {minutes} دقيقة\nالطبخ والزباين والوقت مستمرين.",
+  "journey_returning": "في طريق الرجوع… باقي {minutes} دقيقة",
+  "journey_browsing": "{place} — اتفرج واشتري براحتك. الوقت مستمر.",
+  "shop_market": "روح السوق",
+  "shop_appliances": "روح محل الأجهزة",
+  "shop_homewares": "روح مستلزمات البيت"
 }

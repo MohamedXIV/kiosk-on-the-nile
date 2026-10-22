@@ -17,6 +17,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not time.get("system_dependencies") is Dictionary: return fail("time.system_dependencies")
   var handlers: Dictionary = {}
   for id in ["needs","cooking","motion","visitors","narrative","scheduler"]: handlers[id]=func(_frame):return ActionResult.success()
+  if bundle.has("travel"):handlers["travel"]=func(_frame):return ActionResult.success()
   var ordering := SimulationCoordinator.new().prepare(GameClock.new(time),handlers,time.system_dependencies)
   if not ordering.ok: return ordering
  if bundle.has("balance"):

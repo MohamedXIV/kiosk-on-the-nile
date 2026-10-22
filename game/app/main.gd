@@ -5,6 +5,7 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _journey_panel: JourneyPanel
 var _inventory_panel: InventoryPanel
 var _build_panel: BuildPanel
 var _placement_preview: PlacementPreview
@@ -129,7 +130,7 @@ func _install(candidate: GameSession) -> void:
   var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.motion_step = _step_motion
- var room: LocationView = _rooms[str(_session.location_id)]
+ var room: LocationView = _rooms.get(str(_session.location_id))
  _router = InteractionRouter.new(_session,room,_text)
  if _hud: _hud.free()
  _hud = Hud.new()
@@ -143,6 +144,14 @@ func _install(candidate: GameSession) -> void:
  _hud.add_child(_inventory_panel)
  _inventory_panel.configure(_text,_session)
  _hud.inventory_requested.connect(func():_inventory_panel.open())
+ _journey_panel=JourneyPanel.new()
+ _hud.add_child(_journey_panel)
+ _journey_panel.configure(_text,_session)
+ _session.travel.changed.connect(_travel_changed)
+ _hud.travel_requested.connect(func(route_id):
+  if _session.build.active or _hud.sleep_panel.visible:return
+  var result := _session.travel.depart(route_id)
+  if not result.ok:_hud.toast.show_message(_text.outcome(result)))
  _hud.arrange_requested.connect(_begin_arrange)
  _hud.save_requested.connect(_request_save)
  _hud.notebook_requested.connect(_toggle_notebook)
@@ -170,7 +179,9 @@ func _physics_process(delta: float) -> void:
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
  _hud.present(_router.nearest())
  _captions.top_inset = _hud.top_occupied_height()
- _captions.present(_session,_rooms[str(_session.location_id)],_camera)
+ _journey_panel.present()
+ _captions.visible=_session.locations.is_physical(_session.location_id)
+ if _captions.visible:_captions.present(_session,_rooms[str(_session.location_id)],_camera)
  _save.transition_active = _transition.active
  _save.boundary(_session)
 func _unhandled_input(event: InputEvent) -> void:
@@ -224,9 +235,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _commit_transition(details: Dictionary) -> ActionResult:
  var result := _session.life.sleep(int(details.sleep_hours)) if details.has("sleep_hours") else _session.life.travel(StringName(details.destination))
  if not result.ok: return result
- var room: LocationView = _rooms[str(_session.location_id)]
- _physical.set_active_location(_session.location_id)
- _router = InteractionRouter.new(_session,room,_text)
+ _travel_changed()
  return result
 func _request_save() -> void:
  if _session==null: return
@@ -298,3 +307,11 @@ func _begin_arrange() -> void:
  room.add_child(_placement_preview)
  _placement_preview.configure(_session.build,_session.spaces,_session.items,room.mapping)
  _build_panel.open()
+
+func _travel_changed() -> void:
+ _physical.set_active_location(_session.location_id)
+ _router=InteractionRouter.new(_session,_rooms.get(str(_session.location_id)),_text)
+ if _session.build.active:
+  _session.build.cancel()
+  _build_panel.hide()
+ _inventory_panel.hide()

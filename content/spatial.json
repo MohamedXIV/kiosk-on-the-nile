@@ -20,5 +20,6 @@
     "skin": "#d9a17c",
     "hair": "#2b241f",
     "player_color": "#3d7a8a"
-  }
+  },
+  "hearing_radius": 3.4
 }

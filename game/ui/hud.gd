@@ -1,5 +1,6 @@
 class_name Hud
 extends Control
+signal travel_requested(route_id: StringName)
 signal inventory_requested
 signal arrange_requested
 signal save_requested
@@ -38,6 +39,9 @@ func configure(text: UiText) -> void:
  for entry in [{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
+ for entry in [{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
+  var route_id := StringName(entry.id)
+  actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();travel_requested.emit(route_id)))
  var help := UiText.label(text.text("help"))
  help.custom_minimum_size.x = 280
  help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

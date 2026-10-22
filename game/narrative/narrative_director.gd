@@ -77,6 +77,9 @@ func tick(delta: float) -> void:
   if not conversation.current.choices.is_empty():
    conversation.choice_elapsed += delta
    if conversation.optional and conversation.choice_elapsed>=float(definition.get("choice_expiry",8)):
+    if not _can_hear(conversation):
+     _finish(conversation)
+     continue
     var listen := str(definition.get("listen_choice",2))
     choose(conversation.id,StringName("%s:%d:%s" % [conversation.id,conversation.beat,listen]),true)
    elif _focus.is_empty() and _can_offer(conversation): _focus = conversation.id; changed.emit()
@@ -110,8 +113,10 @@ func _advance(conversation: ConversationSession) -> void:
    _report_failure(conversation,ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect"))
    _finish(conversation)
    return
- if not conversation.current.text.is_empty(): history.commit(conversation.topic_selection)
- for i in range(conversation.current.effects.size()): _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]))
+ if not conversation.current.text.is_empty() and _can_hear(conversation): history.commit(conversation.topic_selection)
+ for i in range(conversation.current.effects.size()):
+  if not _can_hear(conversation):continue
+  _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]))
  if _focus.is_empty() and not conversation.current.choices.is_empty() and _can_offer(conversation): _focus = conversation.id
  changed.emit()
 func choices(conversation: ConversationSession) -> Array[Dictionary]:
@@ -256,3 +261,11 @@ func _saved_story(record: Dictionary) -> StoryDefinition:
  legacy.raw_json = JSON.stringify(archived,"",true)
  legacy.sha256 = legacy.raw_json.sha256_text()
  return legacy if legacy.sha256==record.runtime.get("story_hash") else null
+
+func _can_hear(conversation: ConversationSession) -> bool:
+ if not _session.locations.is_physical(_session.location_id):return false
+ var radius := float(_session.config.section("spatial").hearing_radius)
+ for participant in conversation.participants:
+  var visit: VisitState=_session.visitors.visits.get(str(participant))
+  if visit!=null and visit.pose.location_id==_session.location_id and visit.pose.ground.distance_to(_session.player_ground)<=radius:return true
+ return false

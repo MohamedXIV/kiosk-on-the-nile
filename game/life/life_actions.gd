@@ -33,14 +33,9 @@ func sleep(hours: int) -> ActionResult:
  _session.player_ground = Vector2(spawn[0],spawn[1])
  return result
 func travel(destination: StringName) -> ActionResult:
- var locations: Dictionary = _session.config.section("locations")
- if not locations.has(str(destination)) or destination == _session.location_id: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_destination")
- var spawn: Array = locations[str(destination)].spawn
- _session.location_id = destination
- _session.player_ground = Vector2(spawn[0],spawn[1])
- _session.kiosk_open = destination == &"kiosk"
- travelled.emit(destination)
- return ActionResult.success()
+ var result := _session.travel.depart(&"to_kiosk" if destination==&"kiosk" else &"to_rooftop")
+ if result.ok:travelled.emit(destination)
+ return result
 func toggle_kiosk() -> ActionResult:
  if _session.location_id != &"kiosk": return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"kiosk_unavailable")
  _session.kiosk_open = not _session.kiosk_open
