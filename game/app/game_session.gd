@@ -1,5 +1,6 @@
 class_name GameSession
 extends Node
+signal _encounter_ready(kind: StringName, participants: PackedStringArray, extra: Dictionary)
 signal changed
 var config: SessionConfig
 var clock: GameClock
@@ -17,6 +18,8 @@ var home: HomeService
 var knowledge: KnowledgeBook
 var routine: DailyRoutine
 var mood_policy: MoodPolicy
+var customer_experience: CustomerExperience
+var _pending_encounters: Array[Dictionary]=[]
 var hygiene: HygieneService
 var foods: FoodRegistry
 var learning: RecipeLearning
@@ -150,7 +153,14 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.food_selector=_choose_food
  service.configure(wallet,cooking,visitors.is_available,balance,foods,clock)
  visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open)
+ customer_experience=CustomerExperience.new()
+ var experience_result := customer_experience.configure(source.section("customer_experience"),hygiene,spaces,clock)
+ if not experience_result.ok:return experience_result
+ customer_experience.visit_provider=func(id):return visitors.visits.get(str(id))
+ visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
+ visitors.departed.connect(_close_experience)
  service.settled.connect(visitors.record_service)
+ service.settled.connect(func(order_id,visit_id,_item,_payment):_sync_experience(visit_id,order_id))
  service.settled.connect(func(_order,_visit,item,_payment):
   if item.quality_score>=2: needs.apply_delta(0,0,float(config.section("needs").good_service_mood)))
  life.sleep_started.connect(hygiene.interrupt_clean)
@@ -162,6 +172,7 @@ func configure(source: SessionConfig) -> ActionResult:
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships
  conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,locations.ids())
+ conditions.customer_experience=customer_experience
  conditions.learning=learning
  conditions.recipe_ids=source.section("recipe_workflows").keys()+source.section("learning").families.values()
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
@@ -179,6 +190,7 @@ func configure(source: SessionConfig) -> ActionResult:
  var narrative_result := narrative.configure(self,source.section("encounters"),stories)
  if not narrative_result.ok: return narrative_result
  visitors.encounter_requested.connect(_encounter_requested)
+ _encounter_ready.connect(_start_encounter)
  life.sleep_started.connect(narrative.cancel_all)
  routine.slept.connect(_sleep_elapsed)
  life.travelled.connect(func(destination):
@@ -188,11 +200,12 @@ func configure(source: SessionConfig) -> ActionResult:
 func rebuild_order() -> ActionResult:
  var handlers := {"needs":func(frame):needs.tick(frame.delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):
   cooking.tick(frame.delta)
-  workflow.tick(frame),"visitors":func(frame):visitors.tick(frame.delta),"narrative":func(frame):narrative.tick(frame.delta),"motion":func(frame):
+  workflow.tick(frame),"visitors":func(frame):visitors.tick(frame.delta),"narrative":_step_narrative,"motion":func(frame):
   if motion_step.is_valid(): motion_step.call(frame.delta)}
  handlers["travel"]=func(frame):travel.tick(frame)
  handlers["shops"]=func(frame):shops.tick(frame)
  handlers["hygiene"]=func(frame):hygiene.tick(frame)
+ handlers["customer_experience"]=_step_experiences
  return coordinator.prepare(clock,handlers,config.section("time").system_dependencies)
 func start_new() -> void:
  running = true
@@ -202,6 +215,13 @@ func tick(delta: float) -> void:
  changed.emit()
 
 func _encounter_requested(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
+ _pending_encounters.append({"kind":kind,"participants":participants.duplicate(),"extra":extra.duplicate(true)})
+func _step_narrative(frame: Dictionary) -> void:
+ var pending := _pending_encounters.duplicate()
+ _pending_encounters.clear()
+ for event in pending:_encounter_ready.emit(event.kind,event.participants,event.extra)
+ narrative.tick(float(frame.delta))
+func _start_encounter(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
  if kind in [&"reminder",&"ambient",&"served"]:
   for conversation: ConversationSession in narrative.sessions.values():
    if conversation.elapsed>=conversation.current.duration and conversation.current.choices.is_empty(): continue
@@ -213,6 +233,7 @@ func _encounter_requested(kind: StringName, participants: PackedStringArray, ext
  elif extra.get("character_id")=="amgad" and kind in [&"arrival",&"served"]: id=&"amgad_arrival" if kind==&"arrival" else &"amgad_served"
  elif kind==&"served": id=&"visitors_served"
  context_data["mode"] = 1 if kind==&"arrival" else 2 if kind==&"served" else 3 if kind==&"reminder" else 4 if kind==&"ambient" else 0
+ if kind in [&"arrival",&"ambient"] and narrative.has_topics(&"venue_comments",participants,context_data):id=&"venue_comments"
  await narrative.start(id,participants,context_data)
 func talk(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
@@ -251,9 +272,36 @@ func _choose_food(character_id: StringName) -> StringName:
   if not id in offered:continue
   for i in range(int(preferences[id])):pool.append(id)
  if pool.is_empty():return &""
+ if not visitors.random_chance(customer_experience.demand_factor(&"kiosk")):return &""
  return StringName(pool[visitors.random_index(pool.size())])
 
 func _record_cooking_use(job_id: StringName, step_index: int, instance_id: StringName, kind: StringName) -> void:
  var use_id: StringName=&"prep" if kind==&"prepare" else &"assembly" if kind==&"assemble" else &"batch"
  var source := str(job_id)+"/step/"+str(step_index) if use_id!=&"batch" else str(job_id)+"/appliance/"+str(instance_id)
  hygiene.record_use(StringName(source),instance_id,use_id)
+
+func _sync_experience(visit_id: StringName, order_id: StringName = &"") -> ActionResult:
+ var visit: VisitState=visitors.visits.get(str(visit_id))
+ if visit==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ var observed := customer_experience.observe(visit_id,visit.pose)
+ if not observed.ok:return observed
+ var order := service.order(order_id)
+ if order==null:return ActionResult.success()
+ var patience := float(config.section("visitors").max_wait_seconds)*float(config.section("time").minutes_per_second)
+ customer_experience.record_order(visit_id,order.id,order.created_at if order.timing_known else -1.0,patience)
+ if order.status==&"delivered" and order.served_quality>=0:
+  return customer_experience.record_service(visit_id,{"order_id":str(order.id),"item_id":str(order.delivered_item_id),"food_id":str(order.food_id),"quality":order.served_quality,"served_at":order.served_at})
+ return ActionResult.success()
+func _close_experience(visit_id: StringName) -> void:
+ var visit: VisitState=visitors.visits.get(str(visit_id))
+ if visit==null:return
+ _sync_experience(visit_id,visit.order_id)
+ var order := service.order(visit.order_id)
+ customer_experience.close_visit(visit_id,&"departed",order.closed_at if order!=null and order.status==&"cancelled" and order.closed_at>=0 else clock.world_minutes)
+
+func _step_experiences(_frame: Dictionary) -> ActionResult:
+ for visit in visitors.visits.values():
+  if visit.phase==&"leaving":continue
+  var result := _sync_experience(visit.id,visit.order_id)
+  if not result.ok:return result
+ return ActionResult.success()

@@ -321,5 +321,68 @@
         }
       }
     ]
+  },
+  "venue_comments": {
+    "story": "venue_comments",
+    "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "choice_conditions": {},
+    "topics": [
+      {
+        "id": "venue_improved",
+        "scope": "evidence",
+        "source_type": "visit",
+        "observation_kind": "improved",
+        "modes": [
+          0,
+          1,
+          4
+        ],
+        "variants": 1,
+        "requires": {
+          "venue_observation": "improved"
+        }
+      },
+      {
+        "id": "venue_dirty",
+        "scope": "evidence",
+        "source_type": "visit",
+        "observation_kind": "dirty",
+        "modes": [
+          0,
+          1,
+          4
+        ],
+        "variants": 1,
+        "requires": {
+          "venue_observation": "dirty"
+        }
+      },
+      {
+        "id": "venue_food_memory",
+        "scope": "evidence",
+        "source_type": "visit",
+        "observation_kind": "food",
+        "modes": [
+          0,
+          1,
+          4
+        ],
+        "variants": 1,
+        "requires": {
+          "venue_observation": "food"
+        }
+      }
+    ]
   }
 }

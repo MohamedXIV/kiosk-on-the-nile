@@ -13,12 +13,19 @@ func select(encounter: StringName, definition: Dictionary, visit: VisitState, se
   var previous: Dictionary = _records.get(key,{})
   var scope := "once" if topic.scope=="once" else "day_%d" % session.clock.day if topic.scope=="day" else str(visit.id)
   var source_id := ""
+  var source_type := str(topic.get("source_type","recipe"))
   if topic.scope=="evidence":
-   source_id=str(session.learning.context(StringName(str(topic.get("recipe_id","")))).last_item_id)
+   if source_type=="visit":
+    var context := session.customer_experience.context(visit.id)
+    var kind := str(topic.get("observation_kind",""))
+    source_id=str(context.get("visit_id","")) if kind=="dirty" else str(context.get("previous_visit_id","")) if kind=="improved" else str(context.get("food_visit_id",""))
+    scope="experience:"+source_id
+   else:
+    source_id=str(session.learning.context(StringName(str(topic.get("recipe_id","")))).last_item_id)
+    scope="result:"+source_id
    if source_id.is_empty():continue
-   scope="result:"+source_id
   if previous.get("scope")==scope: continue
-  return {"topic_id":str(topic.id),"key":key,"scope":scope,"variant":(int(previous.get("variant",-1))+1)%int(topic.variants),"source_id":source_id}
+  return {"topic_id":str(topic.id),"key":key,"scope":scope,"variant":(int(previous.get("variant",-1))+1)%int(topic.variants),"source_id":source_id,"source_type":source_type}
  return {}
 func commit(selection: Dictionary) -> void:
  if not selection.is_empty(): _records[selection.key]=selection.duplicate(true)
@@ -33,7 +40,7 @@ func restore(data: Dictionary, definitions: Dictionary, characters: Dictionary) 
    for topic: Dictionary in definitions[encounter].get("topics",[]):
     for actor in characters:
      if key==_key(encounter,str(topic.id),actor) and record.topic_id==topic.id:
-      found = record.variant>=0 and record.variant<int(topic.variants) and (record.scope=="once" if topic.scope=="once" else _numbered(record.scope,"day_") if topic.scope=="day" else record.scope.begins_with("result:") and _numbered(record.scope.trim_prefix("result:"),"food_") if topic.scope=="evidence" else _numbered(record.scope,"visit_"))
+      found = record.variant>=0 and record.variant<int(topic.variants) and _valid_scope(topic,record.scope)
   if not found: return _invalid()
  _records = data.duplicate(true)
  return ActionResult.success()
@@ -45,3 +52,21 @@ static func _key(encounter: String, topic: String, actor: String) -> String:
  return encounter+"/"+topic+"/"+actor
 func _invalid() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_topic_history")
+
+static func _valid_scope(topic: Dictionary, scope: String) -> bool:
+ match topic.scope:
+  "once":return scope=="once"
+  "day":return _numbered(scope,"day_")
+  "visit":return _numbered(scope,"visit_")
+  "evidence":
+   if topic.get("source_type")=="visit":return scope.begins_with("experience:") and _numbered(scope.trim_prefix("experience:"),"visit_")
+   return scope.begins_with("result:") and _numbered(scope.trim_prefix("result:"),"food_")
+ return false
+
+static func equivalent_selection(a: Dictionary, b: Dictionary) -> bool:
+ var first := a.duplicate(true)
+ var second := b.duplicate(true)
+ for value in [first,second]:
+  if not value.has("source_id"):value["source_id"]=""
+  if not value.has("source_type"):value["source_type"]="recipe"
+ return StableJson.stringify(first)==StableJson.stringify(second)

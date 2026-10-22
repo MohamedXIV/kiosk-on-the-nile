@@ -5,6 +5,7 @@ signal departed(visit_id: StringName)
 var visits: Dictionary = {}
 var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
+var demand_provider: Callable
 var food_selector: Callable
 var foods: FoodRegistry
 var _data: Dictionary
@@ -73,7 +74,7 @@ func tick(delta: float) -> void:
  if _clock.day==int(quiet.day) and _clock.minutes>=float(quiet.start) and _clock.minutes<=float(quiet.end): return
  _cooldown -= delta
  if _cooldown<=0 and visits.size()<int(_data.ambient_capacity):
-  _cooldown = _rng.randf_range(float(_data.ambient_delay[0]),float(_data.ambient_delay[1]))
+  _cooldown = _rng.randf_range(float(_data.ambient_delay[0]),float(_data.ambient_delay[1]))/(maxf(0.01,float(demand_provider.call())) if demand_provider.is_valid() else 1.0)
   var pool: Array = []
   for id in _data.characters:
    if _data.characters[id].ambient and _eligible(id): pool.append(id)
@@ -207,3 +208,6 @@ func update_markers(markers: Dictionary) -> void:
 
 func random_index(size: int) -> int:
  return _rng.randi_range(0,maxi(0,size-1))
+
+func random_chance(probability: float) -> bool:
+ return _rng.randf()<clampf(probability,0,1)

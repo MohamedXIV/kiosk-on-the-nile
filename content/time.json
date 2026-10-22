@@ -18,7 +18,7 @@
       "hygiene"
     ],
     "narrative": [
-      "visitors"
+      "customer_experience"
     ],
     "motion": [
       "cooking"
@@ -31,6 +31,9 @@
     ],
     "hygiene": [
       "motion"
+    ],
+    "customer_experience": [
+      "visitors"
     ]
   }
 }

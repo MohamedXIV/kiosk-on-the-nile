@@ -126,7 +126,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
     var topics: Dictionary = {}
     for topic in definition.topics:
      if not topic is Dictionary or not topic.get("id") is String or not topic.id.is_valid_identifier() or topics.has(topic.id) or not topic.get("scope") in ["once","day","visit","evidence"] or not ContentValidation.integer(topic.get("variants")) or not ContentValidation.bounded(topic.variants,1,16) or not topic.get("modes") is Array or topic.modes.is_empty() or not evaluator.validate(topic.get("requires",{})): return ContentValidation.fail("encounters.topics."+id)
-     if topic.scope=="evidence" and not topic.get("recipe_id") in evaluator.recipe_ids:return ContentValidation.fail("encounters.evidence_recipe")
+     if topic.scope=="evidence" and topic.get("source_type")!="visit" and not topic.get("recipe_id") in evaluator.recipe_ids:return ContentValidation.fail("encounters.evidence_recipe")
      topics[topic.id] = true
      for mode in topic.modes:
       if not ContentValidation.integer(mode) or not ContentValidation.bounded(mode,0,4): return ContentValidation.fail("encounters.topics.mode")

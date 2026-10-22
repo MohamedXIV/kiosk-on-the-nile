@@ -56,6 +56,8 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  conversation.topic_selection = selected
  conversation.context_extra = extra.duplicate(true)
  if not selected.is_empty(): conversation.context_extra.merge({"topic_id":selected.topic_id,"line_variant":selected.variant,"source_item_id":selected.get("source_id","")},true)
+ if selected.get("source_type")=="visit" and not participants.is_empty():
+  conversation.context_extra["experience_context"]=_session.customer_experience.context(StringName(participants[0]))
  conversation.runtime = InkRuntime.new()
  add_child(conversation.runtime)
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation))
@@ -211,7 +213,7 @@ func restore(data: Dictionary) -> ActionResult:
    # consumed the topic yet, but the saved selection must still be eligible.
    if not conversation.current.text.is_empty() or not conversation.current.effects.is_empty() or conversation.participants.is_empty(): return _reject_candidates(candidates)
    var selected_visit: VisitState = _session.visitors.visits[conversation.participants[0]]
-   if StableJson.stringify(restored_history.select(conversation.encounter_id,_definitions[str(conversation.encounter_id)],selected_visit,_session,int(conversation.context_extra.get("mode",0))))!=StableJson.stringify(conversation.topic_selection): return _reject_candidates(candidates)
+   if not ConversationHistory.equivalent_selection(restored_history.select(conversation.encounter_id,_definitions[str(conversation.encounter_id)],selected_visit,_session,int(conversation.context_extra.get("mode",0))),conversation.topic_selection): return _reject_candidates(candidates)
   for effect in conversation.current.effects:
    if not _session.effects.valid(effect): return _reject_candidates(candidates)
   # Loaded choices must still satisfy canonical eligibility. Never replay effects.
@@ -235,6 +237,10 @@ func _report_failure(conversation: ConversationSession, result: ActionResult) ->
 
 func _context_for(conversation: ConversationSession) -> Dictionary:
  var projected := context(conversation.participants,conversation.context_extra)
+ var experience: Dictionary=conversation.context_extra.get("experience_context",{})
+ if not experience.is_empty():
+  var food := _session.foods.definition(StringName(str(experience.get("previous_food_id",""))))
+  projected.merge({"venue_dirty_category":str(experience.get("dirty_category","")),"venue_previous_food":str(food.get("menu_label","الأكل")),"venue_previous_quality":int(experience.get("previous_food_quality",-1))},true)
  var learning_recipe := str(_definitions[str(conversation.encounter_id)].get("learning_recipe",""))
  if not learning_recipe.is_empty():
   var knowledge := _session.learning.context(StringName(learning_recipe))
@@ -288,3 +294,6 @@ func _can_hear(conversation: ConversationSession) -> bool:
   var visit: VisitState=_session.visitors.visits.get(str(participant))
   if visit!=null and visit.pose.location_id==_session.location_id and visit.pose.ground.distance_to(_session.player_ground)<=radius:return true
  return false
+
+func has_topics(encounter: StringName, participants: PackedStringArray, extra: Dictionary) -> bool:
+ return not _select_topic(encounter,participants,extra).is_empty()

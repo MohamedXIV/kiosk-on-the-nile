@@ -139,3 +139,5 @@ func _validate_layout(data: Dictionary) -> ActionResult:
  return ActionResult.success()
 func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
+func item_record(id: StringName) -> Dictionary:
+ return _items.get_item(id)

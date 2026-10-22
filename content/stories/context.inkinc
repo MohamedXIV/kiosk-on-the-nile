@@ -19,3 +19,6 @@ VAR previous_food = ""
 VAR shawarma_attempted = false
 VAR shawarma_completed = false
 VAR shawarma_quality = -1
+VAR venue_dirty_category = ""
+VAR venue_previous_food = ""
+VAR venue_previous_quality = -1

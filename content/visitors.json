@@ -36,7 +36,11 @@
         "tea": 4,
         "shawarma": 2,
         "potato_baked": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "amgad"
+      ]
     },
     "mahmoud": {
       "name": "محمود",
@@ -57,7 +61,11 @@
         "tea": 4,
         "shawarma": 2,
         "potato_baked": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "samir": {
       "name": "سمير",
@@ -78,7 +86,11 @@
         "kebda": 4,
         "shawarma": 2,
         "potato_baked": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "hassan": {
       "name": "أستاذ حسن",
@@ -99,7 +111,11 @@
         "tea": 4,
         "shawarma": 2,
         "potato_fried": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "nadia": {
       "name": "مدام نادية",
@@ -120,7 +136,11 @@
         "kebda": 4,
         "shawarma": 2,
         "potato_fried": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "passer": {
       "name": "شاب ع الكورنيش",
@@ -136,7 +156,11 @@
           960,
           1440
         ]
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "salma": {
       "name": "أبلة سلمى",
@@ -157,7 +181,11 @@
         "tea": 4,
         "shawarma": 2,
         "potato_baked": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "mona": {
       "name": "منى",
@@ -173,7 +201,11 @@
           1020,
           1320
         ]
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     },
     "farid": {
       "name": "عم فريد",
@@ -191,6 +223,7 @@
         ]
       },
       "manual_encounters": [
+        "venue_comments",
         "shawarma_learning",
         "visitors"
       ],
@@ -219,7 +252,11 @@
         "tea": 4,
         "shawarma": 2,
         "potato_baked": 1
-      }
+      },
+      "manual_encounters": [
+        "venue_comments",
+        "visitors"
+      ]
     }
   },
   "waiting_reminder_seconds": 24,

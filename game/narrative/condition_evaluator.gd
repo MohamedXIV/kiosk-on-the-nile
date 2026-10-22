@@ -1,6 +1,7 @@
 class_name ConditionEvaluator
 extends RefCounted
 ## Finite declarative queries; never invokes content-provided methods.
+var customer_experience: CustomerExperience
 var learning: RecipeLearning
 var recipe_ids: Array=[]
 var _knowledge: KnowledgeBook
@@ -36,6 +37,7 @@ func validate(rule: Variant, depth: int = 0) -> bool:
    return true
   "not": return validate(value,depth+1)
   "fact_known": return value is String and value in _facts
+  "venue_observation":return value in ["dirty","improved","food"]
   "recipe_attempted","recipe_completed":return value is String and value in recipe_ids
   "home_item_owned": return value == "fan"
   "relationship_at_least":
@@ -66,6 +68,10 @@ func permits(rule: Dictionary, participants: PackedStringArray = PackedStringArr
    return false
   "not": return not permits(value,participants)
   "fact_known": return _knowledge.has(StringName(value))
+  "venue_observation":
+   if customer_experience==null or participants.is_empty():return false
+   var context := customer_experience.context(StringName(participants[0]))
+   return context.get("dirty_observed",false) if value=="dirty" else context.get("improved_observed",false) if value=="improved" else context.get("food_memory",false)
   "recipe_attempted":return learning!=null and learning.context(StringName(value)).attempted
   "recipe_completed":return learning!=null and learning.context(StringName(value)).completed
   "home_item_owned": return _home.has_fan

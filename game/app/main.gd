@@ -269,7 +269,10 @@ func _toggle_notebook() -> void:
  if _hud.sleep_panel.visible or _transition.active: return
  _session.hygiene.interrupt_clean()
  if _hud.notebook.visible: _hud.notebook.hide()
- else: _hud.notebook.present(_session.knowledge.notes())
+ else:
+  var notes := _session.knowledge.notes()
+  notes.append(_text.text("venue_reputation",{"label":_session.customer_experience.reputation(&"kiosk").label}))
+  _hud.notebook.present(notes)
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   _focused = false
