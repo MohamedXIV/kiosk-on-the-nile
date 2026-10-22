@@ -29,6 +29,7 @@ func available_recipes(location_id: StringName, instance_id: StringName) -> Arra
  if item.is_empty():return result
  for id in _recipes:
   var definition: Dictionary=_recipes[id]
+  if not _station_eligible(definition,location_id,instance_id).ok:continue
   var capability := StringName(definition.steps[0].capability)
   if not _equipment.is_usable(instance_id,location_id,capability):continue
   var eligibility := _requirements(definition,location_id,[str(instance_id)])
@@ -37,9 +38,13 @@ func available_recipes(location_id: StringName, instance_id: StringName) -> Arra
 func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedStringArray) -> ActionResult:
  if not _recipes.has(str(recipe_id)):return _fail("unknown_recipe")
  var definition: Dictionary=_recipes[str(recipe_id)].duplicate(true)
+ if instance_ids.is_empty():return _fail("recipe_station_mismatch")
+ var eligibility := _station_eligible(definition,location_id,StringName(instance_ids[0]))
+ if not eligibility.ok:return eligibility
  var requirements := _requirements(definition,location_id,instance_ids)
  if not requirements.ok:return requirements
  var devices: Dictionary=requirements.details.devices
+ devices[str(definition.steps[0].capability)]=str(instance_ids[0])
  var first: Dictionary=definition.steps[0]
  if not _near(StringName(devices[first.capability]),location_id):return _fail("equipment_out_of_reach")
  var id := "cook_%d" % _next_id
@@ -95,7 +100,7 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
  else:
   candidate.step_index=int(candidate.step_index)+1
   var next: Dictionary=candidate.definition.steps[int(candidate.step_index)]
-  if not _equipment.is_usable(StringName(candidate.devices[next.capability]),StringName(candidate.location_id),StringName(next.capability)):return _fail("equipment_out_of_reach")
+  if not _equipment.is_usable(StringName(candidate.devices[next.capability]),StringName(candidate.location_id),StringName(next.capability),job_id):return _fail("equipment_out_of_reach")
   if not next.get("inherit_elapsed",false):candidate.elapsed=0.0
   candidate.last_world_minutes=_clock.world_minutes
   candidate["current_hygiene_evidence"]=_hygiene_evidence(candidate,next)
@@ -132,6 +137,15 @@ func active_at(instance_id: StringName) -> Dictionary:
  return {}
 func recipes() -> Dictionary:
  return _recipes.duplicate(true)
+func _station_eligible(definition: Dictionary, location_id: StringName, instance_id: StringName) -> ActionResult:
+ var fact := StringName(str(definition.get("learning_fact","")))
+ if not fact.is_empty() and not _knowledge.has(fact):return _fail("recipe_unknown")
+ var locations: Array=definition.get("allowed_locations",[])
+ if not locations.is_empty() and not str(location_id) in locations:return _fail("recipe_wrong_location")
+ if not _equipment.is_usable(instance_id,location_id,StringName(definition.steps[0].capability)):return _fail("recipe_station_mismatch")
+ for step in definition.steps:
+  if _equipment.candidates(location_id,StringName(step.capability)).is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_equipment",{"capability":str(step.capability)})
+ return ActionResult.success()
 func _requirements(definition: Dictionary, location_id: StringName, preferred: PackedStringArray) -> ActionResult:
  var fact := StringName(str(definition.get("learning_fact","")))
  if not fact.is_empty() and not _knowledge.has(fact):return _fail("recipe_unknown")
@@ -307,6 +321,7 @@ func available_foods(location_id: StringName) -> PackedStringArray:
  for recipe_id in _recipes:
   var definition: Dictionary=_recipes[recipe_id]
   if definition.has("vessel_definition"):continue
+  if not definition.get("allowed_locations",[]).is_empty() and not str(location_id) in definition.allowed_locations:continue
   var fact := StringName(str(definition.get("learning_fact","")))
   if not fact.is_empty() and not _knowledge.has(fact):continue
   var usable := true

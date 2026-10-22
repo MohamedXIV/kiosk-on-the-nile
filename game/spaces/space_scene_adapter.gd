@@ -45,7 +45,7 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
     if definition.get("behavior")=="toggle_equipment":
      moved.id="equipment:"+id
      moved.action="toggle_equipment"
-    if definition.get("surface",false):moved.merge({"secondary":labels.recipes,"secondary_action":"recipes"},true)
+    if definition.get("surface",false):moved.merge({"secondary":labels.care,"secondary_action":"recipes"},true)
     elif not moved.has("secondary_action"):moved.merge({"secondary":labels.clean,"secondary_action":"clean"})
     result.interactions.append(moved)
     mapped=true
@@ -63,7 +63,7 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   for placed in spaces.snapshot().placements.values():
    if placed.host_id==id:mounted_device=true;break
   if definition.get("surface",false) and not mounted_device:
-   result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":labels.surface,"secondary":labels.recipes,"secondary_action":"recipes","action":"surface","instance_id":id,"slot_id":id+":top"})
+   result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":labels.surface,"secondary":labels.care,"secondary_action":"recipes","action":"surface","instance_id":id,"slot_id":id+":top"})
  for child in mounted:
   if prop_by_id.has(child.host_id):
    var host: Dictionary=prop_by_id[child.host_id]

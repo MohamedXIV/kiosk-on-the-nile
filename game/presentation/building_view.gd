@@ -9,8 +9,9 @@ func configure(space: Dictionary, building: Dictionary, mapping: SpatialMapping)
  _building=building
  _mapping=mapping
  z_index=50
- for cell in BuildingGeometry.cell_map(space):
-  if BuildingGeometry.cell_map(space)[cell]==building.id:_cells.append(cell)
+ var membership := BuildingGeometry.cell_map(space)
+ for cell in membership:
+  if membership[cell]==building.id:_cells.append(cell)
  queue_redraw()
 func present(player_ground: Vector2, player_in_location: bool, arrangement_active: bool) -> void:
  visible=not arrangement_active and not (player_in_location and BuildingGeometry.building_at(_space,player_ground)==StringName(_building.id))

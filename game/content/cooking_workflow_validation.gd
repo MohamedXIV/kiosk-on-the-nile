@@ -4,7 +4,8 @@ static func validate_equipment(data: Dictionary, items: Dictionary) -> ActionRes
  for id in data:
   var value: Variant=data[id]
   if not items.has(id) or not value is Dictionary or not value.get("capabilities") is Array or not value.get("resource_group") is String or not ContentValidation.integer(value.get("capacity")) or value.capacity<1 or not value.get("enabled_by_default") is bool:return ContentValidation.fail("equipment."+id)
-  for capability in value.capabilities:
+  if not value.get("retired_capabilities",[]) is Array:return ContentValidation.fail("equipment.retired_capabilities")
+  for capability in value.capabilities+value.get("retired_capabilities",[]):
    if not capability in ["heat_water","griddle","fry","bake","roast_rotisserie","cold_storage","prep_surface"]:return ContentValidation.fail("equipment.capability")
  return ActionResult.success()
 static func validate_recipes(recipes: Dictionary, items: ItemStore) -> ActionResult:
@@ -12,6 +13,10 @@ static func validate_recipes(recipes: Dictionary, items: ItemStore) -> ActionRes
  for id in recipes:
   var recipe: Variant=recipes[id]
   if not recipe is Dictionary or not ContentValidation.integer(recipe.get("version")) or recipe.version<1 or not recipe.get("label") is String or not recipe.get("inputs") is Array or not recipe.get("steps") is Array or recipe.steps.is_empty() or not recipe.get("quality_keys") is Array or recipe.quality_keys.size()!=4:return ContentValidation.fail("recipe_workflows."+id)
+  if recipe.has("allowed_locations"):
+   if not recipe.allowed_locations is Array:return ContentValidation.fail("recipe_workflows.allowed_locations")
+   for location in recipe.allowed_locations:
+    if not location is String or location.is_empty():return ContentValidation.fail("recipe_workflows.allowed_location")
   if recipe.has("vessel_definition"):
    if items.definition(StringName(str(recipe.vessel_definition))).get("kind")!="batch" or items.definition(StringName(str(recipe.get("filling_definition","")))).get("kind")!="ingredient" or not ContentValidation.integer(recipe.get("portions")) or recipe.portions<1 or not ContentValidation.bounded(recipe.get("slice_minutes"),0.01,1440):return ContentValidation.fail("recipe_workflows.batch")
   if not recipe.get("output") is Dictionary or not recipe.output.get("food_id") is String:return ContentValidation.fail("recipe_workflows.output")

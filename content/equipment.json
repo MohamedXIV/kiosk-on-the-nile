@@ -8,12 +8,13 @@
     "enabled_by_default": true
   },
   "desk": {
-    "capabilities": [
-      "prep_surface"
-    ],
+    "capabilities": [],
     "resource_group": "workspace",
     "capacity": 1,
-    "enabled_by_default": true
+    "enabled_by_default": true,
+    "retired_capabilities": [
+      "prep_surface"
+    ]
   },
   "fridge": {
     "capabilities": [

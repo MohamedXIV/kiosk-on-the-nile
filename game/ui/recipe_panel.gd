@@ -5,6 +5,7 @@ var _text: UiText
 var _instance_id: StringName
 var _rows := VBoxContainer.new()
 var _feedback := Label.new()
+var _heading := Label.new()
 var _progress: Array[Dictionary]=[]
 func configure(text: UiText, session: GameSession) -> void:
  _session=session
@@ -16,7 +17,7 @@ func configure(text: UiText, session: GameSession) -> void:
  anchor_bottom=0.85
  var column := VBoxContainer.new()
  add_child(column)
- column.add_child(UiText.label(text.text("recipes_title")))
+ column.add_child(_heading)
  var scroll := ScrollContainer.new()
  scroll.custom_minimum_size.y=160
  scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
@@ -36,6 +37,8 @@ func _refresh() -> void:
  for child in _rows.get_children():_rows.remove_child(child);child.queue_free()
  _progress.clear()
  var instance := _session.items.get_item(_instance_id)
+ var item_definition := _session.items.definition(StringName(str(instance.get("definition_id",""))))
+ _heading.text=_text.text("item_actions_title",{"item":item_definition.get("label","")})
  if not instance.is_empty() and _session.items.definition(StringName(instance.definition_id)).get("surface",false):
   var slot := StringName(str(_instance_id)+":top")
   if not _session.inventory.held_id().is_empty():_rows.add_child(UiText.button(_text.text("surface_put"),func():_session.hygiene.interrupt_clean();_apply(_session.inventory.put_down(slot))))

@@ -3,6 +3,7 @@ extends RefCounted
 var external_busy: Callable
 var _reservations: Dictionary={}
 var _revision: int=0
+var _frozen_capabilities: Dictionary={}
 var _definitions: Dictionary
 var _items: ItemStore
 var _spaces: SpaceService
@@ -14,7 +15,7 @@ func configure(definitions: Dictionary, items: ItemStore, spaces: SpaceService) 
  _items=items
  _spaces=spaces
  return ActionResult.success()
-func is_usable(id: StringName, location_id: StringName, capability: StringName) -> bool:
+func is_usable(id: StringName, location_id: StringName, capability: StringName, job_id: StringName = &"") -> bool:
  var item := _items.get_item(id)
  var placement := _spaces.placement(id)
  if item.is_empty() or placement.is_empty() or placement.location_id!=str(location_id):return false
@@ -23,7 +24,7 @@ func is_usable(id: StringName, location_id: StringName, capability: StringName) 
    if p.host_id==str(id):return false
   if not _items.items_in(StringName(str(id)+":top")).is_empty():return false
  var definition: Dictionary=_definitions.get(item.definition_id,{})
- return not definition.is_empty() and item.attributes.get("enabled",definition.get("enabled_by_default",true)) and str(capability) in definition.capabilities
+ return not definition.is_empty() and item.attributes.get("enabled",definition.get("enabled_by_default",true)) and (str(capability) in definition.capabilities or (str(capability) in definition.get("retired_capabilities",[]) and str(capability) in _frozen_capabilities.get(str(job_id),{}).get(str(id),[])))
 func set_enabled(id: StringName, enabled: bool) -> ActionResult:
  var item := _items.get_item(id)
  if item.is_empty() or not _definitions.has(item.definition_id) or _spaces.placement(id).is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"item_not_placed")
@@ -53,7 +54,7 @@ func prepare_reservations(job_id: StringName, requirements: Array[Dictionary], r
   var placement := _spaces.placement(id)
   if placement.is_empty() or not ContentValidation.integer(requirement.get("units",1)) or requirement.get("units",1)<1:return _fail("equipment_unavailable")
   var capability := StringName(str(requirement.get("capability","")))
-  if not is_usable(id,StringName(placement.location_id),capability) or (external_busy.is_valid() and external_busy.call(id)):return _fail("equipment_busy")
+  if not is_usable(id,StringName(placement.location_id),capability,job_id) or (external_busy.is_valid() and external_busy.call(id)):return _fail("equipment_busy")
   var item := _items.get_item(id)
   var definition: Dictionary=_definitions[item.definition_id]
   var group := str(definition.resource_group)
@@ -92,7 +93,7 @@ func restore(data: Dictionary) -> ActionResult:
    var id := StringName(line.instance_id)
    var item := _items.get_item(id)
    var placement := _spaces.placement(id)
-   if item.is_empty() or placement.is_empty() or not _definitions.has(item.definition_id) or not is_usable(id,StringName(placement.location_id),StringName(line.capability)):return _fail("orphan_equipment")
+   if item.is_empty() or placement.is_empty() or not _definitions.has(item.definition_id) or not is_usable(id,StringName(placement.location_id),StringName(line.capability),StringName(job_id)):return _fail("orphan_equipment")
    var definition: Dictionary=_definitions[item.definition_id]
    if line.get("resource_group")!=definition.resource_group:return _fail("invalid_resource_group")
    var key := str(id)+":"+str(line.resource_group)
@@ -103,3 +104,19 @@ func restore(data: Dictionary) -> ActionResult:
  return ActionResult.success()
 func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
+
+func restore_frozen_contracts(jobs: Dictionary) -> void:
+ # Only pre-location-policy jobs may finish with a retired capability.
+ # This grant is job-scoped, derived from its frozen definition, never a new-start candidate.
+ _frozen_capabilities.clear()
+ for id in jobs:
+  var job: Variant=jobs[id]
+  if not job is Dictionary or job.get("status")!="active" or not job.get("definition") is Dictionary or job.definition.has("allowed_locations") or not job.definition.get("steps") is Array or not job.get("devices") is Dictionary:continue
+  var validation := CookingWorkflowValidation.validate_recipes({str(job.get("recipe_id","")):job.definition},_items)
+  if not validation.ok:continue
+  var grants: Dictionary={}
+  for step in job.definition.steps:
+   var device := str(job.devices.get(step.capability,""))
+   if not grants.has(device):grants[device]=[]
+   grants[device].append(step.capability)
+  _frozen_capabilities[str(id)]=grants

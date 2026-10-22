@@ -237,5 +237,9 @@
   "arrange_inside": "داخل المبنى فقط",
   "arrange_outside": "خارج المبنى فقط",
   "arrange_either": "مسموح داخل وخارج المبنى",
-  "arrange_select_piece": "اختار قطعة من المكان أو من القائمة الأول."
+  "arrange_select_piece": "اختار قطعة من المكان أو من القائمة الأول.",
+  "building_migration": "اتظبط المكان: نُقلت {moved} قطعة، واتخزنت {stored} قطعة بأمان",
+  "item_actions_title": "{item} — الاستخدام والعناية",
+  "recipe_wrong_location": "الوصفة دي مش متاحة في المكان ده",
+  "recipe_station_mismatch": "ابدأ من محطة مناسبة للخطوة الأولى"
 }
