@@ -80,3 +80,7 @@ func snapshot() -> Dictionary:
  return _legacy.snapshot()
 func restore(data: Dictionary) -> ActionResult:
  return _legacy.restore(data)
+
+func set_hygiene_provider(provider: Callable, use_provider: Callable) -> void:
+ _legacy.hygiene_provider=provider
+ _legacy.use_provider=use_provider

@@ -161,6 +161,9 @@ func _install(candidate: GameSession) -> void:
   var result := _session.travel.depart(route_id)
   if not result.ok:_hud.toast.show_message(_text.outcome(result)))
  _hud.arrange_requested.connect(_begin_arrange)
+ _hud.clean_floor_requested.connect(func():
+  var result := _session.hygiene.begin_clean(StringName("floor:"+str(_session.location_id)))
+  _hud.toast.show_message(_text.outcome(result)))
  _hud.save_requested.connect(_request_save)
  _hud.notebook_requested.connect(_toggle_notebook)
  _hud.diagnostics_requested.connect(_diagnostics)
@@ -264,6 +267,7 @@ func _choose(session_id: StringName, choice_id: StringName) -> void:
  if not result.ok: _hud.toast.show_message(_text.outcome(result))
 func _toggle_notebook() -> void:
  if _hud.sleep_panel.visible or _transition.active: return
+ _session.hygiene.interrupt_clean()
  if _hud.notebook.visible: _hud.notebook.hide()
  else: _hud.notebook.present(_session.knowledge.notes())
 func _notification(what: int) -> void:
@@ -314,6 +318,7 @@ func _begin_sleep(hours: int) -> void:
 
 func _begin_arrange() -> void:
  if _busy or _transition.active or _hud.sleep_panel.visible: return
+ _session.hygiene.interrupt_clean()
  var result := _session.build.begin(_session.location_id)
  if not result.ok:
   _hud.toast.show_message(_text.outcome(result))

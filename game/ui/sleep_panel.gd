@@ -52,3 +52,4 @@ func _refresh() -> void:
  _preview.text = _text.text("sleep_preview",{"hours":data.requested_hours,"day":data.wake_day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
  _preview.text += "\n"+(_text.text("sleep_oversleep",{"hours":data.extra_hours}) if data.extra_hours>0 else _text.text("sleep_on_time"))
  _preview.text += "\n"+_text.text("sleep_recovery")
+ if float(data.get("rest_multiplier",1))<1:_preview.text+="\n"+_text.text("sleep_dirty_bed")

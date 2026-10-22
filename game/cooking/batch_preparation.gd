@@ -27,6 +27,12 @@ static func slice_portion(job: Dictionary, change: ItemChangeSet, technique: int
  change.state.next_id=int(change.state.next_id)+1
  change.state.items[id]={"id":id,"definition_id":job.definition.filling_definition,"kind":"ingredient","quantity":1,"container_id":"player_hand","attributes":{"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"step_evidence":job.step_results.duplicate(true),"heat_elapsed":job.elapsed}}
  batch.attributes.portions_remaining=int(batch.attributes.portions_remaining)-1
+ var records: Array=change.state.items[id].attributes.step_evidence
+ var step: Dictionary=job.definition.steps[int(job.step_index)]
+ records.append({"step_id":step.id,"grade":technique,"elapsed":job.elapsed,"hygiene_evidence":job.get("current_hygiene_evidence",{}).duplicate(true)})
+ var hygiene_penalty := 0
+ for evidence in records:hygiene_penalty=maxi(hygiene_penalty,int(evidence.get("hygiene_evidence",{}).get("penalty",0)))
+ change.state.items[id].attributes["hygiene_penalty"]=hygiene_penalty
  var empty: bool = batch.attributes.portions_remaining==0
  if empty:change.state.items.erase(bowl_id)
  return ActionResult.success({"item_id":id,"empty":empty})

@@ -17,6 +17,7 @@ var home: HomeService
 var knowledge: KnowledgeBook
 var routine: DailyRoutine
 var mood_policy: MoodPolicy
+var hygiene: HygieneService
 var foods: FoodRegistry
 var learning: RecipeLearning
 var workflow: RecipeWorkflow
@@ -128,6 +129,14 @@ func configure(source: SessionConfig) -> ActionResult:
  if not workflow_result.ok:return workflow_result
  workflow.quality_provider=func():return mood_policy.quality_penalty(needs.mood)
  cooking.foods=foods
+ hygiene=HygieneService.new()
+ var hygiene_result := hygiene.configure(source.section("hygiene"),items,spaces,clock,func():return player_pose,func(id):return cooking.legacy_busy(id) or equipment.is_busy(id))
+ if not hygiene_result.ok:return hygiene_result
+ cooking.set_hygiene_provider(hygiene.food_contact_evidence,func(id):hygiene.record_use(StringName("legacy:"+str(id)),id,&"batch"))
+ workflow.hygiene_provider=hygiene.food_contact_evidence
+ workflow.use_provider=_record_cooking_use
+ routine.sleep_rest_provider=func():return hygiene.sleep_rest_multiplier(routine.bed_id)
+ travel.departed.connect(hygiene.interrupt_clean)
  cooking.set_workflow(workflow)
  learning=RecipeLearning.new()
  learning.configure(workflow,items,source.section("learning").families)
@@ -144,6 +153,7 @@ func configure(source: SessionConfig) -> ActionResult:
  service.settled.connect(visitors.record_service)
  service.settled.connect(func(_order,_visit,item,_payment):
   if item.quality_score>=2: needs.apply_delta(0,0,float(config.section("needs").good_service_mood)))
+ life.sleep_started.connect(hygiene.interrupt_clean)
  life.sleep_started.connect(visitors.clear_visits)
  clock.day_changed.connect(func(_previous,_current):visitors.begin_day())
  var actors: Array = source.section("visitors").characters.keys()
@@ -182,6 +192,7 @@ func rebuild_order() -> ActionResult:
   if motion_step.is_valid(): motion_step.call(frame.delta)}
  handlers["travel"]=func(frame):travel.tick(frame)
  handlers["shops"]=func(frame):shops.tick(frame)
+ handlers["hygiene"]=func(frame):hygiene.tick(frame)
  return coordinator.prepare(clock,handlers,config.section("time").system_dependencies)
 func start_new() -> void:
  running = true
@@ -215,6 +226,9 @@ func _sleep_elapsed(frame: Dictionary) -> void:
  # consume the same elapsed clock frame. Recovery has already been applied.
  cooking.tick(float(frame.delta))
  workflow.tick(frame)
+ hygiene.elapse(float(frame.delta)*float(config.section("time").minutes_per_second))
+ shops.elapse(float(frame.delta)*float(config.section("time").minutes_per_second))
+ hygiene.record_use(StringName("sleep:"+str(clock.tick)),routine.bed_id,&"sleep")
  scheduler.tick(frame)
  changed.emit()
 
@@ -225,7 +239,7 @@ func _actor_snapshots() -> Array[Dictionary]:
  return result
 
 func _equipment_busy(id: StringName) -> bool:
- return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id))
+ return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id))
 
 func _choose_food(character_id: StringName) -> StringName:
  var character := visitors.character(character_id)
@@ -238,3 +252,8 @@ func _choose_food(character_id: StringName) -> StringName:
   for i in range(int(preferences[id])):pool.append(id)
  if pool.is_empty():return &""
  return StringName(pool[visitors.random_index(pool.size())])
+
+func _record_cooking_use(job_id: StringName, step_index: int, instance_id: StringName, kind: StringName) -> void:
+ var use_id: StringName=&"prep" if kind==&"prepare" else &"assembly" if kind==&"assemble" else &"batch"
+ var source := str(job_id)+"/step/"+str(step_index) if use_id!=&"batch" else str(job_id)+"/appliance/"+str(instance_id)
+ hygiene.record_use(StringName(source),instance_id,use_id)

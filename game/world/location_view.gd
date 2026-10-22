@@ -82,6 +82,9 @@ func _add_visual(data: Dictionary, parent: Node2D, parent_ground: Vector2) -> vo
  visual.configure(data,mapping)
  if data.has("instance_id"):
   _item_visuals[data.instance_id]=visual
+  var hygiene_view := HygieneView.new()
+  visual.add_child(hygiene_view)
+  hygiene_view.configure(StringName(data.instance_id),session.hygiene,float(data.get("size",[1,1,1])[0])*mapping.x_scale)
   var item := session.items.get_item(StringName(data.instance_id))
   if item.get("kind")=="equipment" and not data.has("station_id"):
    var state_view := EquipmentView.new()

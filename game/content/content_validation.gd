@@ -23,6 +23,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if bundle.has("foods"):
   var foods_result := FoodRegistry.validate(bundle.foods)
   if not foods_result.ok:return foods_result
+ if bundle.has("hygiene"):
+  var hygiene_result := HygieneContentValidation.validate(bundle.hygiene,bundle.get("items",{}))
+  if not hygiene_result.ok:return hygiene_result
  var time: Dictionary = bundle.get("time",{})
  if not number(time.get("minutes_per_second")) or float(time.minutes_per_second) <= 0: return fail("time.minutes_per_second")
  if bundle.has("visitors"):
@@ -34,6 +37,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   for id in ["needs","cooking","motion","visitors","narrative","scheduler"]: handlers[id]=func(_frame):return ActionResult.success()
   if bundle.has("travel"):handlers["travel"]=func(_frame):return ActionResult.success()
   if bundle.has("shops"):handlers["shops"]=func(_frame):return ActionResult.success()
+  if bundle.has("hygiene"):handlers["hygiene"]=func(_frame):return ActionResult.success()
   var ordering := SimulationCoordinator.new().prepare(GameClock.new(time),handlers,time.system_dependencies)
   if not ordering.ok: return ordering
  if bundle.has("balance"):

@@ -78,7 +78,10 @@
     "carry_marinated_bowl": "خد وعاء التتبيل في إيدك وروح للسيخ",
     "slice_in_progress": "التقطيع شغال؛ خليك عند السيخ",
     "batch_empty": "الدفعة خلصت",
-    "storage_out_of_reach": "قرّب من الثلاجة المناسبة"
+    "storage_out_of_reach": "قرّب من الثلاجة المناسبة",
+    "not_cleanable": "القطعة دي مفيش تنظيف متاح ليها",
+    "already_clean": "نظيف بالفعل",
+    "cleaning_out_of_reach": "قرّب من القطعة في نفس المكان الأول"
   },
   "theme": {
     "font_size": 19,
@@ -217,5 +220,10 @@
   "recipe_store_bowl": "حط الوعاء في الثلاجة",
   "recipe_take_bowl": "خد الوعاء",
   "recipe_choose": "اختار وصفة مناسبة",
-  "recipe_portions": "حصص باقية: {count}"
+  "recipe_portions": "حصص باقية: {count}",
+  "clean_item": "نضّف القطعة",
+  "clean_stop": "وقف التنظيف",
+  "clean_floor": "نضّف أرضية المكان",
+  "clean_progress": "التنظيف شغال… باقي {minutes} دقيقة؛ الحركة بعيدًا توقفه",
+  "sleep_dirty_bed": "السرير متسخ؛ استعادة الراحة أقل ١٠٪"
 }

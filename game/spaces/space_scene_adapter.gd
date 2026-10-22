@@ -35,11 +35,14 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
    if target.get("instance_id")==id or (target.get("instance_id")=="legacy_fan" and item.definition_id=="fan"):
     var moved: Dictionary = target.duplicate(true)
     moved.ground = [ground.x,ground.y]
+    if not moved.has("secondary_action"):moved.merge({"secondary":"تنظيف","secondary_action":"clean"})
     result.interactions.append(moved)
+  if item.kind in ["furniture","equipment"] and not definition.get("surface",false) and not definition.has("container") and not definition.has("station_id"):
+   result.interactions.append({"id":"care:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":"تنظيف "+str(definition.label),"action":"clean"})
   if item.definition_id in ["radio","fan"]:
    result.interactions.append({"id":"equipment:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":str(definition.label),"action":"toggle_equipment"})
   if definition.has("container"):
-   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"افتح مخزون المكان","action":"inventory","container_id":id+":"+str(definition.container.kind)})
+   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"افتح مخزون المكان","action":"inventory","container_id":id+":"+str(definition.container.kind),"secondary":"العناية بالجهاز","secondary_action":"recipes"})
   if item.definition_id=="bed" and id!="bed":
    result.interactions.append({"id":"bed:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"اختيار مدة النوم والراحة","action":"sleep"})
   if item.kind=="equipment" and not definition.has("station_id") and not definition.has("container"):

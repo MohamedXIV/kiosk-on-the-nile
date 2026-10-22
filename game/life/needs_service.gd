@@ -19,11 +19,11 @@ func apply_delta(hunger_delta: float, rest_delta: float, mood_delta: float) -> v
  hunger = clampf(hunger + hunger_delta,0,100)
  rest = clampf(rest + rest_delta,0,100)
  mood = clampf(mood + mood_delta,0,100)
-func recover_sleep(hours: float, fan_running: bool) -> void:
+func recover_sleep(hours: float, fan_running: bool, rest_multiplier: float = 1.0) -> void:
  var config: Dictionary = _config.sleep
  var rest_gain := hours*float(config.rest_per_hour)*(float(config.fan_rest_multiplier) if fan_running else 1.0)
  var mood_gain := hours*float(config.mood_per_hour)*(float(config.fan_mood_multiplier) if fan_running else 1.0)
- apply_delta(-hours*float(config.hunger_per_hour),rest_gain,mood_gain)
+ apply_delta(-hours*float(config.hunger_per_hour),rest_gain*rest_multiplier,mood_gain)
  if fan_running: baseline=float(config.fan_baseline)
 func snapshot() -> Dictionary:
  return {"hunger":hunger,"rest":rest,"mood":mood,"baseline":baseline}

@@ -1,5 +1,6 @@
 class_name Hud
 extends Control
+signal clean_floor_requested
 signal travel_requested(route_id: StringName)
 signal inventory_requested
 signal arrange_requested
@@ -40,7 +41,7 @@ func configure(text: UiText) -> void:
  _menu.add_child(menu_scroll)
  actions.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  menu_scroll.add_child(actions)
- for entry in [{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
+ for entry in [{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
  for entry in [{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
@@ -113,6 +114,8 @@ func present(target: InteractionTarget) -> void:
   var status := StationController.new(_session.cooking,str(_text.data.input.interact_primary[0])).status_label(StringName(id),true)
   if not status.is_empty(): station_labels.append(status)
  _station.text = "  ·  ".join(station_labels)
+ var cleaning := _session.hygiene.active_action()
+ if not cleaning.is_empty():_station.text+="\n"+_text.text("clean_progress",{"minutes":ceili(maxf(0,float(cleaning.required_minutes)-float(cleaning.completed_minutes)))})
  var penalty := _session.mood_policy.quality_penalty(_session.needs.mood)
  if penalty>0 and not station_labels.is_empty(): _station.text += "\n"+_text.text("work_mood_hint",{"penalty":penalty})
  _prompt.visible = not _prompt.text.is_empty()

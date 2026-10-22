@@ -5,6 +5,7 @@ signal attempt_started(job_id: StringName, recipe_id: StringName, evidence: Dict
 signal item_completed(job_id: StringName, item_id: StringName, quality: int)
 var quality_provider: Callable
 var sugar_provider: Callable
+var use_provider: Callable
 var hygiene_provider: Callable
 var _recipes: Dictionary
 var _inventory: InventoryService
@@ -51,6 +52,7 @@ func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedS
  var evidence: Array=[]
  for source in available.details.sources:evidence.append(change.state.items[source.item_id].duplicate(true))
  var job := {"id":id,"recipe_id":str(recipe_id),"recipe_version":int(definition.version),"definition":definition,"time_domain":"world_minutes","location_id":str(location_id),"step_index":0,"elapsed":0.0,"last_world_minutes":_clock.world_minutes,"step_results":[],"devices":devices,"input_evidence":evidence,"quality_penalty":int(quality_provider.call()) if quality_provider.is_valid() else 0,"sugar_id":str(sugar_provider.call(StringName(instance_ids[0]))) if sugar_provider.is_valid() and not instance_ids.is_empty() else "","status":"active","inputs_consumed":false}
+ job["current_hygiene_evidence"]=_hygiene_evidence(job,first)
  if definition.get("consume_on_start",true):_consume_all(change,job)
  var resources: Array[Dictionary]=[{"instance_id":devices[first.capability],"capability":first.capability,"units":1}]
  var equipment := _equipment.prepare_reservations(StringName(id),resources,true)
@@ -80,7 +82,7 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
   var loaded := BatchPreparation.load_vessel(candidate,change,action_device)
   if not loaded.ok:return loaded
  if step.get("consume_inputs",false):_consume_all(change,candidate)
- candidate.step_results.append({"step_id":step.id,"grade":int(result.details.grade),"elapsed":candidate.elapsed,"assess":step.get("assess",true),"hygiene_evidence":_hygiene_evidence(candidate,step)})
+ candidate.step_results.append({"step_id":step.id,"grade":int(result.details.grade),"elapsed":candidate.elapsed,"assess":step.get("assess",true),"hygiene_evidence":candidate.get("current_hygiene_evidence",{})})
  var output: PreparedItem
  var resource_lines: Array[Dictionary]=[]
  if int(candidate.step_index)+1>=candidate.definition.steps.size():
@@ -95,6 +97,7 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
   var next: Dictionary=candidate.definition.steps[int(candidate.step_index)]
   if not next.get("inherit_elapsed",false):candidate.elapsed=0.0
   candidate.last_world_minutes=_clock.world_minutes
+  candidate["current_hygiene_evidence"]=_hygiene_evidence(candidate,next)
   resource_lines.append({"instance_id":candidate.devices[next.capability],"capability":next.capability,"units":1})
  var equipment := _equipment.prepare_reservations(job_id,resource_lines,true)
  if not equipment.ok:return equipment
@@ -167,10 +170,13 @@ func _prepared_output(job: Dictionary, change: ItemChangeSet) -> PreparedItem:
  for input in job.input_evidence:
   if input.attributes.has("technique_grade"):technique=mini(technique,int(input.attributes.technique_grade))
   job.quality_penalty=maxi(int(job.quality_penalty),int(input.attributes.get("mood_penalty",0)))
- item.quality_score=maxi(1,technique-int(job.quality_penalty)) if technique>0 else 0
+ var hygiene_penalty := 0
+ for evidence in job.step_results:hygiene_penalty=maxi(hygiene_penalty,int(evidence.get("hygiene_evidence",{}).get("penalty",0)))
+ for input in job.input_evidence:hygiene_penalty=maxi(hygiene_penalty,int(input.attributes.get("hygiene_penalty",0)))
+ item.quality_score=maxi(1,technique-int(job.quality_penalty)-hygiene_penalty) if technique>0 else 0
  item.quality_key=StringName(job.definition.quality_keys[item.quality_score])
  var attributes := item.snapshot()
- attributes.merge({"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"step_evidence":job.step_results.duplicate(true)})
+ attributes.merge({"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"hygiene_penalty":hygiene_penalty,"step_evidence":job.step_results.duplicate(true)})
  change.state.items[str(item.id)]={"id":str(item.id),"definition_id":"prepared_food","kind":"prepared","quantity":1,"container_id":"player_hand","attributes":attributes}
  return item
 func _hygiene_evidence(job: Dictionary, step: Dictionary) -> Dictionary:
@@ -183,6 +189,10 @@ func _commit(change: ItemChangeSet, equipment_state: Dictionary, job: Dictionary
  _equipment.commit_reservations(equipment_state)
  _jobs[job.id]=job.duplicate(true)
  if str(job.id)=="cook_%d" % _next_id:_next_id+=1
+ if job.status=="active" and use_provider.is_valid() and int(job.get("use_recorded_step",-1))!=int(job.step_index):
+  _jobs[job.id]["use_recorded_step"]=int(job.step_index)
+  var step: Dictionary=job.definition.steps[int(job.step_index)]
+  use_provider.call(StringName(job.id),int(job.step_index),StringName(job.devices[step.capability]),StringName(step.kind))
  _inventory.items.changed.emit(_inventory.items.revision)
  changed.emit()
  return ActionResult.success()

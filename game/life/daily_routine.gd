@@ -1,6 +1,8 @@
 class_name DailyRoutine
 extends RefCounted
 signal slept(frame: Dictionary)
+var sleep_rest_provider: Callable
+var bed_id: StringName=&"bed"
 var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
@@ -22,13 +24,13 @@ func preview(hours: Variant) -> ActionResult:
  var extra := policy.oversleep_hours(needs.mood,needs.rest)
  var duration := int(hours)+extra
  var total := clock.minutes+duration*60.0
- return ActionResult.success({"requested_hours":int(hours),"extra_hours":extra,"actual_hours":duration,"wake_day":clock.day+floori(total/1440.0),"wake_minutes":fposmod(total,1440.0)})
+ return ActionResult.success({"requested_hours":int(hours),"extra_hours":extra,"actual_hours":duration,"wake_day":clock.day+floori(total/1440.0),"wake_minutes":fposmod(total,1440.0),"rest_multiplier":float(sleep_rest_provider.call()) if sleep_rest_provider.is_valid() else 1.0})
 func sleep(hours: int) -> ActionResult:
  var result := preview(hours)
  if not result.ok: return result
  var before := wallet.balance
  var frame := clock.elapse_minutes(float(result.details.actual_hours)*60)
- needs.recover_sleep(float(result.details.actual_hours),home.has_fan and home.fan_on)
+ needs.recover_sleep(float(result.details.actual_hours),home.has_fan and home.fan_on,float(result.details.rest_multiplier))
  result.details["rent_spent"] = before-wallet.balance
  result.details["cue"] = "chime"
  slept.emit(frame)

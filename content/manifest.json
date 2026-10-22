@@ -34,6 +34,7 @@
     "ui": "ui.json",
     "visitors": "visitors.json",
     "wellbeing": "wellbeing.json",
-    "story_shawarma_learning": "stories/shawarma_learning.ink.json"
+    "story_shawarma_learning": "stories/shawarma_learning.ink.json",
+    "hygiene": "hygiene.json"
   }
 }

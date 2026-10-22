@@ -35,6 +35,11 @@ func present(instance_id: StringName, _recipes: Array[Dictionary] = []) -> void:
 func _refresh() -> void:
  for child in _rows.get_children():_rows.remove_child(child);child.queue_free()
  _progress.clear()
+ var hygiene := _session.hygiene.state(_instance_id)
+ if not hygiene.is_empty():
+  _rows.add_child(UiText.label(str(hygiene.label)))
+  _rows.add_child(UiText.button(_text.text("clean_item"),func():_apply(_session.hygiene.begin_clean(_instance_id))))
+  if _session.hygiene.is_cleaning(_instance_id):_rows.add_child(UiText.button(_text.text("clean_stop"),func():_session.hygiene.interrupt_clean();_refresh()))
  for job in _session.workflow.jobs_at(_instance_id):
   var step: Dictionary=job.definition.steps[int(job.step_index)]
   _rows.add_child(UiText.label(str(job.definition.label)+" — "+str(step.label)))

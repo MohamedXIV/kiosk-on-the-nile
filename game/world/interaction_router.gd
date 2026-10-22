@@ -48,7 +48,9 @@ func execute(secondary: bool) -> ActionResult:
  for data in _room.definition.data.interactions:
   if data.id==str(target.id): record=data;break
  var action: String = record.get("secondary_action","") if secondary and not target.secondary.is_empty() else record.get("action","") if not secondary else ""
+ if action!="clean":_session.hygiene.interrupt_clean()
  match action:
+  "clean":return _session.hygiene.begin_clean(StringName(record.instance_id))
   "recipes":return ActionResult.success({"show_recipes":str(record.instance_id)})
   "inventory":
    if _session.items.get_item(_session.inventory.held_id()).get("kind")=="batch":return _session.inventory.store_held(StringName(record.container_id))
@@ -70,5 +72,7 @@ func execute(secondary: bool) -> ActionResult:
   "toggle_kiosk": return _session.life.toggle_kiosk()
   "river": return _session.life.look_at_river()
   "travel": return ActionResult.success({"transition":true,"destination":record.destination})
-  "sleep": return ActionResult.success({"choose_sleep":true})
+  "sleep":
+   _session.routine.bed_id=StringName(str(record.get("instance_id","bed")))
+   return ActionResult.success({"choose_sleep":true})
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_secondary")

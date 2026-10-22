@@ -15,7 +15,7 @@
       "needs"
     ],
     "visitors": [
-      "motion"
+      "hygiene"
     ],
     "narrative": [
       "visitors"
@@ -28,6 +28,9 @@
     ],
     "shops": [
       "travel"
+    ],
+    "hygiene": [
+      "motion"
     ]
   }
 }

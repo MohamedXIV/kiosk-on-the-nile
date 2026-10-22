@@ -7,6 +7,8 @@ var _stations: Dictionary = {}
 var _jobs: Dictionary = {}
 var _inventory: InventoryService
 var _stock_keys: Array = []
+var hygiene_provider: Callable
+var use_provider: Callable
 var _quality_provider: Callable
 var _rules := {"tea":TeaRules.new(),"kebda":KebdaRules.new()}
 func configure(data: Dictionary, inventory: InventoryService) -> ActionResult:
@@ -29,6 +31,9 @@ func act(station_id: StringName) -> ActionResult:
  var current := job(station_id)
  if current == null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"unknown_station")
  if current.stage==&"EMPTY":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"legacy_job_finished")
+ if current.hygiene_evidence.is_empty() and hygiene_provider.is_valid():
+  current.hygiene_evidence=hygiene_provider.call(PackedStringArray([str(station_id)]))
+  if use_provider.is_valid():use_provider.call(station_id)
  var recipe := current.recipe
  var starting := current.stage==&"EMPTY"
  var penalty := 0
@@ -49,7 +54,7 @@ func act(station_id: StringName) -> ActionResult:
   item.food_id = recipe.food_id
   item.sugar_id = current.sugar_id
   var technique_score := int(result.details.score)
-  item.quality_score = maxi(1,technique_score-current.quality_penalty) if technique_score>0 else 0
+  item.quality_score = maxi(1,technique_score-current.quality_penalty-int(current.hygiene_evidence.get("penalty",0))) if technique_score>0 else 0
   result.details["technique_score"] = technique_score
   result.details["mood_penalty"] = current.quality_penalty
   result.details["score"] = item.quality_score
