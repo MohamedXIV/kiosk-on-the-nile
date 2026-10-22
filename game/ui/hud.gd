@@ -44,6 +44,7 @@ func configure(text: UiText) -> void:
  buttons.add_child(UiText.button(text.text("notebook"),func():notebook_requested.emit()))
  buttons.add_child(UiText.button(text.text("diagnostics"),func():diagnostics_requested.emit()))
  var prompt_panel := PanelContainer.new()
+ prompt_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
  prompt_panel.anchor_left = 0.3
  prompt_panel.anchor_right = 0.98
  prompt_panel.anchor_top = 1
@@ -57,6 +58,7 @@ func configure(text: UiText) -> void:
  _prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  prompts.add_child(_prompt)
  _station = UiText.label()
+ _station.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  prompts.add_child(_station)
  var help := UiText.label(text.text("help"))
  help.add_theme_font_size_override("font_size",14)

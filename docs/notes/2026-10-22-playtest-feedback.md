@@ -82,3 +82,9 @@ The low-mood run was also left awake across midnight: the observed clock reached
 calendar day 2 at 03:35, `last_rent_day` was 2 and the balance was 3000, consistent
 with exactly one daily rent assessment. Source initial needs remain mood 75/rest
 90; the low-needs authoring copy existed only in `/tmp/kiosk-sleep-live`.
+
+A small HUD follow-up lets the interaction card grow upward and wraps station/
+mood text, so the new hint does not push help below the viewport. Actual browser
+captures at 1280x720 and 960x540 were inspected with primary/secondary tea prompts
+and the two-grade mood hint: `/tmp/kiosk-sleep-footer-wide.png` and
+`/tmp/kiosk-sleep-footer-compact.png`.
