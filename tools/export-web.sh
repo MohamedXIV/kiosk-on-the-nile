@@ -11,5 +11,9 @@ while [[ $# -gt 0 ]]; do
  esac
 done
 mkdir -p "$OUT"
-bash "$ROOT/tools/godot.sh" --headless --path "$ROOT" --export-"$MODE" Web "$OUT/index.html"
+PRESET=Web
+if [[ "$MODE" == release ]]; then PRESET="Web Release"; fi
+BUILD_STEM="kiosk-$(git -C "$ROOT" rev-parse --short=12 HEAD)"
+bash "$ROOT/tools/godot.sh" --headless --path "$ROOT" --export-"$MODE" "$PRESET" "$OUT/$BUILD_STEM.html"
+mv "$OUT/$BUILD_STEM.html" "$OUT/index.html"
 cp -R "$ROOT/content" "$OUT/"

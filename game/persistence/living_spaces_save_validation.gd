@@ -11,7 +11,7 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
   if item.kind=="prepared":
    var raw: Dictionary=item.attributes
    var food := session.foods.definition(StringName(str(raw.get("food_id",""))))
-   if raw.get("id")!=id or food.is_empty() or not ContentValidation.integer(raw.get("quality_score")) or not raw.quality_score in [0,1,2,3] or not raw.get("sugar_id") is String or raw.get("quality_key")!=food.quality_keys[int(raw.quality_score)]:return _fail("food")
+   if raw.get("id")!=id or food.is_empty() or not ContentValidation.integer(raw.get("quality_score")) or int(raw.quality_score)<0 or int(raw.quality_score)>3 or not raw.get("sugar_id") is String or raw.get("quality_key")!=food.quality_keys[int(raw.quality_score)]:return _fail("food")
    if food.has("sugars"):
     if not food.sugars.has(raw.sugar_id):return _fail("food_sugar")
    elif raw.sugar_id!="":return _fail("food_sugar")

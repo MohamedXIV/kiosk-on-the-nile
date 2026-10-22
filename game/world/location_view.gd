@@ -56,7 +56,9 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
   if container.kind!="surface" or container.location_id!=str(data.id) or session.spaces.placement(StringName(container.host_id)).is_empty(): continue
   var view := HeldItemView.new()
   var ground := session.spaces.ground(StringName(container.host_id))
-  view.position=Vector2(0,-0.96*mapping.height_scale+34)
+  var host := session.items.get_item(StringName(container.host_id))
+  var height := float(session.items.definition(StringName(host.definition_id)).get("height",0.96))
+  view.position=Vector2(0,-height*mapping.height_scale+34)
   if _item_visuals.has(container.host_id):_item_visuals[container.host_id].add_child(view)
   else:
    view.position+=mapping.to_canvas(ground)

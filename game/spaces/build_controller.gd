@@ -70,3 +70,6 @@ func _failure(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
 func definition(id: StringName) -> Dictionary:
  return _items.definition(id)
+
+func host_placement(id: StringName) -> Dictionary:
+ return _spaces.placement(id)

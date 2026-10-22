@@ -35,6 +35,11 @@ func present(instance_id: StringName, _recipes: Array[Dictionary] = []) -> void:
 func _refresh() -> void:
  for child in _rows.get_children():_rows.remove_child(child);child.queue_free()
  _progress.clear()
+ var instance := _session.items.get_item(_instance_id)
+ if not instance.is_empty() and _session.items.definition(StringName(instance.definition_id)).get("surface",false):
+  var slot := StringName(str(_instance_id)+":top")
+  if not _session.inventory.held_id().is_empty():_rows.add_child(UiText.button(_text.text("surface_put"),func():_session.hygiene.interrupt_clean();_apply(_session.inventory.put_down(slot))))
+  elif not _session.items.items_in(slot).is_empty():_rows.add_child(UiText.button(_text.text("surface_take"),func():_session.hygiene.interrupt_clean();_apply(_session.inventory.pick_up(slot))))
  var station := _session.cooking.job(_instance_id)
  if station!=null and station.stage==&"EMPTY" and station.recipe.rules_id==&"tea":_rows.add_child(UiText.button(_text.text("change_sugar"),func():_apply(_session.cooking.cycle_sugar(_instance_id))))
  var hygiene := _session.hygiene.state(_instance_id)

@@ -26,7 +26,7 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   var prop: Dictionary = definition.get("visual",{"kind":"box","top":definition.get("color","#98714b"),"front":"#654b32"}).duplicate(true)
   prop["ground"] = [ground.x,ground.y]
   prop["size"] = [box.size.x,box.size.y,float(definition.get("height",0.8))]
-  prop["height_offset"] = float(definition.get("mount_height",0.96)) if record.host_id!="" else 0.0
+  prop["height_offset"] = float(items.definition(StringName(items.get_item(StringName(record.host_id)).definition_id)).get("height",0.96)) if record.host_id!="" else 0.0
   if definition.has("station_id"): prop["station_id"] = definition.station_id
   prop["instance_id"]=id
   prop_by_id[id]=prop
@@ -41,7 +41,8 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
     if definition.get("behavior")=="toggle_equipment":
      moved.id="equipment:"+id
      moved.action="toggle_equipment"
-    if not moved.has("secondary_action"):moved.merge({"secondary":labels.clean,"secondary_action":"clean"})
+    if definition.get("surface",false):moved.merge({"secondary":labels.recipes,"secondary_action":"recipes"},true)
+    elif not moved.has("secondary_action"):moved.merge({"secondary":labels.clean,"secondary_action":"clean"})
     result.interactions.append(moved)
     mapped=true
   if item.kind=="furniture" and not mapped and not definition.get("surface",false) and definition.get("behavior","")=="":
@@ -54,7 +55,10 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
    result.interactions.append({"id":"bed:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":labels.sleep,"action":"sleep","secondary":labels.clean,"secondary_action":"clean"})
   if item.kind=="equipment" and not definition.has("station_id") and not definition.has("container"):
    result.interactions.append({"id":"recipe:"+id,"ground":[ground.x,ground.y],"radius":1.3,"primary":str(definition.label),"action":"recipes","instance_id":id})
-  if definition.get("surface",false):
+  var mounted_device := false
+  for placed in spaces.snapshot().placements.values():
+   if placed.host_id==id:mounted_device=true;break
+  if definition.get("surface",false) and not mounted_device:
    result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":labels.surface,"secondary":labels.recipes,"secondary_action":"recipes","action":"surface","instance_id":id,"slot_id":id+":top"})
  for child in mounted:
   if prop_by_id.has(child.host_id):

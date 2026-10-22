@@ -12,3 +12,10 @@
 - Integration review corrected functional target precedence: cleaning entries no longer shadow appliance/radio/bed actions; the kettle's F menu includes sugar and care. Owned fan toggles address the actual selected instance. Runtime labels moved into spaces/ui JSON.
 - Corrected cleaning progress so tiny initial dust cannot make the job slower than ongoing dust forever: new dirt adds work at full-clean capacity, and current dirt clears proportionally to remaining work.
 - Full manual integrated cycles are next; build success is not their acceptance evidence.
+
+## D4 manual sessions in progress
+
+- Default content: normal Continue from a previously saved A/B session into final revision 4 displayed the moved bed and preserved 29 EGP; screenshot `/tmp/kiosk-default-d3-continue.png`.
+- A separate manual-only external content copy starts at the kiosk with 500 EGP, controlled Farid/Nadia arrivals and accelerated floor/bed dirt, to reach advanced mechanics without claiming economic balance acceptance. Release content remains unchanged. Inputs are ordinary mouse/keyboard through Chromium; no game command bridge or automated assertion suite.
+- A real previous social debug build produced a schema 3 save with a held kebda sandwich (quality 2), active boiled-water job, and Amgad's pending three-choice Ink introduction. Saved through the normal HUD; `/tmp/kiosk-legacy-saved-active.png`. Same browser origin is now loading the new build for actual Continue/reply.
+- Release import/export succeeded. Pack inspection found no `res://tests/` entries, no QA command bridge markers, and only the harmless project editor-plugin configuration path (no editor plugin source files).

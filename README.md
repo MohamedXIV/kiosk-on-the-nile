@@ -28,14 +28,14 @@ cloud workspace. Desktop users may instead open `project.godot` with Godot 4.7.2
 New Game starts on the rooftop at 15:30. Use WASD/arrows to move, **E** to interact,
 **F** for the nearby secondary action or personal consumption, and **N** for the
 notebook. Conversation choices use the mouse and leave the world running.
-The title screen has New/Continue; the HUD has Save and isolated system checks.
+The title screen has New/Continue. The compact HUD menu contains Save, inventory, arrangement, cleaning, notebook and shopping journeys.
 
 ## Change gameplay without rebuilding the engine project
 
 `content/manifest.json` identifies a complete external JSON bundle. It contains
 initial session/home state, balance, needs, time/dependency order, location geometry/interactions, recipes,
 visitors/schedules, social facts/relationship defaults, dialogue conditions, UI,
-input bindings and atmosphere/audio mix. Edit this data and restart at the title.
+input bindings and atmosphere/audio mix. Edit this data and reload the page/restart the application. New/Continue in an already running application keeps that run’s validated bundle. Web JSON requests use a fresh load identifier so browser caching does not hide edits.
 There is no mid-transaction hot reload.
 
 For a separate native authoring bundle, copy the entire `content/` directory:
@@ -77,7 +77,11 @@ rather than a blanket rejection of compatible numeric changes.
 | `game/app` | Startup and retained session composition |
 | `game/content` | Atomic JSON loading and definition validation |
 | `game/time` | Authoritative clock, dependency order and prerequisite-aware jobs |
-| `game/cooking` | Recipe rules, independent station jobs, stock and held food |
+| `game/items` | Owned instances, containers, ingredient reservations and hand/surface transfers |
+| `game/spaces` | Shared grid rules, placements, structural data and player arrangement |
+| `game/cooking` | Equipment resources, frozen recipe workflows, real learning evidence and legacy active-job adapter |
+| `game/travel`, `game/commerce` | Journey phases/deadlines, shop stock, quotes and confirmed receipts |
+| `game/hygiene`, `game/social` | Cleanliness/cleaning and observed visit experiences/reputation |
 | `game/service`, `game/economy`, `game/life` | Orders/payments, supplies, needs and home actions |
 | `game/actors` | Visitor lifecycle/memory and native physical movement adapters |
 | `game/narrative` | Real Ink sessions, facts, directional relationships and finite conditions |
@@ -88,7 +92,7 @@ The declared default simulation order is:
 
 ```mermaid
 flowchart LR
-  Clock --> Needs --> Cooking --> Motion --> Visitors --> Narrative --> Scheduler
+  Clock --> Travel --> Shops --> Needs --> Cooking --> Motion --> Hygiene --> Visitors --> Experiences --> Narrative --> Scheduler
 ```
 
 Every system sees the same clock frame. Missing dependencies and cycles are
@@ -124,7 +128,7 @@ same-day naps retain daily encounter flags. New calendar days reset those flags.
 ```bash
 bash tools/build.sh --out /tmp/kiosk-web
 # Release:
-bash tools/export-web.sh --release --out /tmp/kiosk-web-release
+bash tools/build.sh --release --out /tmp/kiosk-web-release
 python3 tools/web/serve.py /tmp/kiosk-web
 ```
 
@@ -140,12 +144,12 @@ Godot project again. Asset additions and new behaviors may require a new export.
 
 Debug builds retain the dedicated `?qa=ink`, `?qa=spatial`, `?qa=kiosk` and
 `?qa=rooftop` qualification scenes. A normal debug game exposes a read-only
-`window.gameStatus` snapshot. Release ignores these query routes and does not
+`window.gameStatus` snapshot. Release excludes qualification scene files, ignores these query routes and does not
 create the probe. No browser bridge can grant money, move actors or run actions.
 
 ## Saves
 
-Logical schema version **2** stores all feature snapshots, including stock,
+Logical schema version **4** (revision 4) stores canonical items, placements, bags, journeys, receipts, equipment/workflows, hygiene/cleaning and visit experiences, alongside
 mid-cook timers, quoted orders, visitor RNG/memory, relationships/fact provenance,
 effect occurrence IDs and displayed pending Ink choices. It includes integrity
 checksums and story hashes. Restoration creates a separate validated session;
@@ -185,3 +189,46 @@ See [docs/PORT_PARITY.md](docs/PORT_PARITY.md) for implementation mapping and th
 remaining acceptance work. The latest integration has not completed full-day,
 complete-session browser reload or final visual/audio acceptance; successful
 import/export does not establish gameplay parity.
+
+
+## Equip, arrange and maintain the venues
+
+- **Arrangement:** choose an owned or stored piece from the HUD menu. Click the ground grid, rotate with **R**, confirm with **Enter**, or cancel with **Esc**. Choosing a counter host aligns a mountable appliance to it. Food must be removed before moving its counter; operating/cleaning equipment cannot move. Previewing keeps the committed position intact.
+- **Shopping:** use the market, appliance or homeware journey. Going and returning consume the same world clock; cooking/customers continue throughout browsing. Confirm the quoted quantity/price, then return. Furniture goes to the origin venue’s furniture storage; groceries remain in the purchase bag until unpacked. A full container keeps the remainder in the bag.
+- **Storage and cooking:** ingredients belong to their actual venue. Cold ingredients require a placed, enabled fridge there; a purchase bag cannot feed cooking. Put carried items on free surfaces and pick up the same instance later. Open a device’s recipe/actions panel for its supported methods. The kettle’s secondary panel also changes sugar.
+- **Shawarma:** hear the basics from Farid, obtain the equipment/ingredients, prepare a vessel, physically store it in the fridge, carry it to the spit, slice finite portions, then assemble with bread and sauce on a free surface. Tips do not grant equipment or quality. Potato frying and baking use separate methods on the same ingredient.
+- **Cleaning:** furniture/equipment care is contextual; floor cleaning is in the HUD menu. Time continues, leaving interrupts the task, and actual progress survives. Dirt remains when a piece is stored. Food-contact hygiene affects that batch; floors/seats affect observed venue experience. Very dirty beds reduce rest recovery by 10%, shown before sleep.
+
+The same placement service supports home and kiosk. Structural walls, doors and
+explicit room cells are authored through the **Living Spaces** Godot editor dock;
+player commands reject structural editing. Runtime door use is separate.
+
+| Data | Controls |
+| --- | --- |
+| `items`, `containers`, `spaces`, `initial_layout` | Definitions, real storage, grid/structure and starting layout |
+| `equipment`, `recipe_workflows`, `foods`, `learning` | Shared capabilities/resources, steps/timing, food values and learning families |
+| `travel`, `shops` | Routes, catalogue, stock, prices and restock deadlines |
+| `hygiene`, `customer_experience` | Dirt/cleaning, observations, scoring, sensitivity and recovery demand floor |
+
+Deleting a referenced ID or changing the meaning of an active step requires an
+explicit migration. Active jobs keep their necessary definition/time domain;
+old active tea/kebda jobs finish on their saved seconds-based rules. Existing
+prices, paid receipts, item identities and matching archived Ink cursors survive
+compatible content changes. Schemas 1–3 and private schema-4 revisions upgrade
+without charging money or inventing bad past experiences.
+
+### Downloaded Web build on Windows
+
+Extract the **whole ZIP**, keep `content/` beside `index.html`, then in that folder:
+
+```powershell
+py -m http.server 8765 --bind 127.0.0.1
+```
+
+Open **http://127.0.0.1:8765/**. Each export uses versioned engine filenames;
+keep the generated JS/WASM/PCK/worklet files together. After replacing an older
+build, refresh the page; Ctrl+Shift+R also clears older cached startup files.
+A browser/profile/origin change uses a separate browser save store.
+
+Current implementation and manual evidence/limits are in
+[the living-spaces notes](docs/notes/2026-10-22-living-spaces-d.md).

@@ -42,7 +42,7 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
   coordinates.add_child(field)
   field.value_changed.connect(func(_value):if not _updating:_preview())
  box.add_child(_host)
- _host.item_selected.connect(func(_index):if not _updating:_preview())
+ _host.item_selected.connect(_select_host)
  var actions := HBoxContainer.new()
  box.add_child(actions)
  actions.add_child(UiText.button(text.text("arrange_rotate"),rotate_selection))
@@ -100,3 +100,15 @@ func _preview() -> void:
  _controller.preview(Vector2i(int(_x.value),int(_y.value)),_rotation,host_id,&"top" if not host_id.is_empty() else &"")
 func _present_result() -> void:
  _status.text=_text.text("arrange_help") if _controller.last_result.ok else _text.outcome(_controller.last_result)
+
+func _select_host(index: int) -> void:
+ if _updating:return
+ var id := StringName(str(_host.get_item_metadata(index)))
+ var host := _controller.host_placement(id)
+ if not host.is_empty():
+  _updating=true
+  _x.value=int(host.cell[0])
+  _y.value=int(host.cell[1])
+  _rotation=int(host.rotation)
+  _updating=false
+ _preview()

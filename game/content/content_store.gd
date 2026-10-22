@@ -2,6 +2,7 @@ class_name ContentStore
 extends Node
 ## Plain external JSON is validated before replacing the active immutable bundle.
 var _sections: Dictionary = {}
+var _request_nonce: String
 var required_sections: Array = []
 var fingerprint: String = ""
 var source_root: String = "res://content"
@@ -27,6 +28,7 @@ func load_directory(directory: String) -> ActionResult:
  source_root = directory
  return ActionResult.success()
 func load_http(base_url: String) -> ActionResult:
+ _request_nonce=Crypto.new().generate_random_bytes(8).hex_encode()
  var manifest: Variant = await _fetch_json(base_url.path_join("manifest.json"))
  if not _valid_manifest(manifest): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"invalid_manifest")
  var candidate: Dictionary = {}
@@ -56,7 +58,8 @@ func _read_json(path: String) -> Variant:
 func _fetch_json(url: String) -> Variant:
  var request := HTTPRequest.new()
  add_child(request)
- if request.request(url) != OK:
+ var fresh_url := url+("&" if "?" in url else "?")+"kiosk_content="+_request_nonce
+ if request.request(fresh_url) != OK:
   request.queue_free()
   return null
  var response: Array = await request.request_completed

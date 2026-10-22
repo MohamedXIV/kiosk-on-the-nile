@@ -114,7 +114,7 @@ static func _convert(envelope: Dictionary, config: SessionConfig) -> ActionResul
  if not result.ok: return result
  if kitchen.get("held")!=null:
   var raw: Variant = kitchen.held
-  if not raw is Dictionary or not raw.get("id") is String or not recipes.recipes.has(str(raw.get("recipe_id",""))) or not ContentValidation.integer(raw.get("quality_score")) or not raw.quality_score in [0,1,2,3] or not raw.get("sugar_id") is String: return _fail("held_food")
+  if not raw is Dictionary or not raw.get("id") is String or not recipes.recipes.has(str(raw.get("recipe_id",""))) or not ContentValidation.integer(raw.get("quality_score")) or int(raw.quality_score)<0 or int(raw.quality_score)>3 or not raw.get("sugar_id") is String: return _fail("held_food")
   var recipe: Dictionary = recipes.recipes[raw.recipe_id]
   if raw.get("food_id")!=recipe.food_id or raw.get("quality_key")!=recipe.quality_keys[int(raw.quality_score)]: return _fail("held_food")
   var suffix: String = raw.id.trim_prefix("food_")
