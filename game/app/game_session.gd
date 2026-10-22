@@ -7,6 +7,7 @@ var wallet: WalletService
 var needs: NeedsService
 var items: ItemStore
 var locations: LocationRegistry
+var shops: ShopService
 var travel: TravelService
 var equipment: EquipmentService
 var build: BuildController
@@ -105,13 +106,17 @@ func configure(source: SessionConfig) -> ActionResult:
   if key.ends_with("_price") or key=="daily_rent": amounts[key] = str(float(balance[key])/100.0)
  for i in range(social_data.initial_notes.size()): social_data.initial_notes[i] = str(social_data.initial_notes[i]).format(amounts)
  knowledge = KnowledgeBook.new(social_data)
+ shops=ShopService.new()
+ shops.eligibility_provider=func(fact):return knowledge.has(fact)
+ var shops_result := shops.configure(source.section("shops"),wallet,items,travel,clock)
+ if not shops_result.ok:return shops_result
  mood_policy = MoodPolicy.new(source.section("wellbeing"))
  routine = DailyRoutine.new(clock,wallet,needs,home,int(balance.daily_rent),mood_policy)
  cooking = CookingService.new()
  var kitchen := cooking.configure(source.section("recipes"),inventory)
  if not kitchen.ok: return kitchen
  cooking.set_quality_provider(func():return mood_policy.quality_penalty(needs.mood))
- supplies = SupplyService.new(wallet,cooking,home,knowledge,balance,items)
+ supplies = SupplyService.new(travel,home,knowledge)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
  visitors = VisitorService.new()
@@ -153,6 +158,7 @@ func rebuild_order() -> ActionResult:
  var handlers := {"needs":func(frame):needs.tick(frame.delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):cooking.tick(frame.delta),"visitors":func(frame):visitors.tick(frame.delta),"narrative":func(frame):narrative.tick(frame.delta),"motion":func(frame):
   if motion_step.is_valid(): motion_step.call(frame.delta)}
  handlers["travel"]=func(frame):travel.tick(frame)
+ handlers["shops"]=func(frame):shops.tick(frame)
  return coordinator.prepare(clock,handlers,config.section("time").system_dependencies)
 func start_new() -> void:
  running = true

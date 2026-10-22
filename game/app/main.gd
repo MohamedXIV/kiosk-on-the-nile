@@ -5,6 +5,7 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _shop_panel: ShopPanel
 var _journey_panel: JourneyPanel
 var _inventory_panel: InventoryPanel
 var _build_panel: BuildPanel
@@ -147,6 +148,9 @@ func _install(candidate: GameSession) -> void:
  _journey_panel=JourneyPanel.new()
  _hud.add_child(_journey_panel)
  _journey_panel.configure(_text,_session)
+ _shop_panel=ShopPanel.new()
+ _hud.add_child(_shop_panel)
+ _shop_panel.configure(_text,_session)
  _session.travel.changed.connect(_travel_changed)
  _hud.travel_requested.connect(func(route_id):
   if _session.build.active or _hud.sleep_panel.visible:return
@@ -180,6 +184,8 @@ func _physics_process(delta: float) -> void:
  _hud.present(_router.nearest())
  _captions.top_inset = _hud.top_occupied_height()
  _journey_panel.present()
+ _shop_panel.present()
+ if _shop_panel.visible:_journey_panel.hide()
  _captions.visible=_session.locations.is_physical(_session.location_id)
  if _captions.visible:_captions.present(_session,_rooms[str(_session.location_id)],_camera)
  _save.transition_active = _transition.active

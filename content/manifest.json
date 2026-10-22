@@ -25,6 +25,7 @@
     "spaces": "spaces.json",
     "initial_layout": "initial_layout.json",
     "equipment": "equipment.json",
-    "travel": "travel.json"
+    "travel": "travel.json",
+    "shops": "shops.json"
   }
 }

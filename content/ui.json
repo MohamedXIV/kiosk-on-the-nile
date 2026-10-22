@@ -67,7 +67,11 @@
     "empty_surface": "السطح فاضي",
     "ingredient_reserved": "الخامات دي محجوزة لطبخة شغالة",
     "journey_busy": "كمّل الرحلة الحالية الأول",
-    "invalid_journey": "حالة الرحلة مش صالحة"
+    "invalid_journey": "حالة الرحلة مش صالحة",
+    "stale_shop_quote": "العرض اتغير؛ راجع السعر والكمية تاني",
+    "shop_unavailable": "المتجر أو العرض مش متاح دلوقتي",
+    "invalid_shop_quantity": "اختار كمية متاحة",
+    "reused_purchase_id": "العملية دي اتأكدت قبل كده"
   },
   "theme": {
     "font_size": 19,
@@ -178,5 +182,22 @@
   "journey_browsing": "{place} — اتفرج واشتري براحتك. الوقت مستمر.",
   "shop_market": "روح السوق",
   "shop_appliances": "روح محل الأجهزة",
-  "shop_homewares": "روح مستلزمات البيت"
+  "shop_homewares": "روح مستلزمات البيت",
+  "shop_title": "المتجر — الطبخ والزباين والوقت مستمرين",
+  "shop_price": "{price} ج.م · المتاح {stock}",
+  "shop_size": "المساحة {width} × {depth}",
+  "shop_requires_counter": "يحتاج سطحًا مناسبًا",
+  "shop_review": "راجع السعر والكمية",
+  "shop_confirm": "أكد الشراء",
+  "shop_total": "الإجمالي {price} ج.م — أكد الشراء",
+  "shop_bought": "اتشرت؛ الأثاث يوصل مخزن المكان والخامات في الحقيبة لحد ما تفرّغها.",
+  "capability_labels": {
+    "heat_water": "تسخين مياه",
+    "griddle": "تشويح على الجريل",
+    "fry": "قلي",
+    "bake": "خبز",
+    "roast_rotisserie": "شوي على السيخ",
+    "cold_storage": "حفظ بارد",
+    "prep_surface": "سطح تجهيز"
+  }
 }

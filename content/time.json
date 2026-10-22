@@ -6,7 +6,7 @@
   "system_dependencies": {
     "clock": [],
     "needs": [
-      "travel"
+      "shops"
     ],
     "scheduler": [
       "narrative"
@@ -25,6 +25,9 @@
     ],
     "travel": [
       "clock"
+    ],
+    "shops": [
+      "travel"
     ]
   }
 }

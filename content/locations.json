@@ -419,9 +419,9 @@
           -1.15
         ],
         "radius": 1.6,
-        "primary": "اطلب خامات ({supply_tea} شاي + {supply_kebda} كبدة بـ {supply_price} ج.م)",
+        "primary": "روح السوق تشتري الخامات",
         "action": "buy_stock",
-        "secondary": "اشتري مروحة من عم سعيد ({fan_price} ج.م)",
+        "secondary": "روح تشوف عرض المروحة المستعملة",
         "secondary_action": "buy_fan",
         "secondary_requires": {
           "all": [

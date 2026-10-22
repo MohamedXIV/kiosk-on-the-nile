@@ -50,6 +50,10 @@ func prepare_grants(grants: Array[Dictionary]) -> ActionResult:
   if change.state.items.has(id): return _fail("duplicate_item")
   change.state.next_id = int(change.state.next_id)+1
   change.state.items[id] = {"id":id,"definition_id":definition_id,"kind":_definitions[definition_id].kind,"quantity":grant.get("quantity",0),"container_id":str(grant.get("container_id","")),"attributes":grant.get("attributes",{}).duplicate(true)}
+  if _definitions[definition_id].get("surface",false):
+   var owner: Dictionary=change.state.containers.get(str(grant.get("container_id","")),{})
+   var slot_id := id+":top"
+   change.state.containers[slot_id]={"id":slot_id,"location_id":owner.get("location_id",""),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch"],"host_id":id}
   var container_spec: Dictionary=_definitions[definition_id].get("container",{})
   if not container_spec.is_empty():
    var owner: Dictionary=change.state.containers.get(str(grant.get("container_id","")),{})
