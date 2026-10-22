@@ -96,9 +96,28 @@ rejected before play. Scheduler jobs have explicit clock domains, prerequisites,
 deadlines and visible statuses; blocked jobs do not stop time. Rendering, water,
 boat, fan and vapour animation do not advance canonical state.
 
-The day label follows the prototype's workday: sleep advances the day and wakes
-at 15:00. `world_minutes` is the same clock's monotonic timeline for deadlines;
-it does not move backwards when the displayed day/time changes after sleep.
+The clock now follows calendar days: midnight advances the day whether awake or
+asleep. Rent is assessed once per new calendar day, never per nap, with no arrears.
+`world_minutes` and `simulation_seconds` remain monotonic during sleep.
+
+At the bed, choose 1–12 hours and see the expected wake day/time. Duration-based
+recovery is configured in `needs.sleep`; `wellbeing.json` controls duration limits,
+oversleep and work quality. Default deterministic rules are:
+
+| Condition before sleep/work | Effect |
+| --- | --- |
+| Mood below 35 and rest below 35 | Sleep 2 additional hours |
+| Otherwise mood below 55 and rest below 60 | Sleep 1 additional hour |
+| Other sleep conditions | Wake after the requested duration |
+| Mood below 35 when preparation starts | Reduce technique quality by up to 2 grades |
+| Otherwise mood below 60 when preparation starts | Reduce it by up to 1 grade |
+| Mood at least 60 | Preserve the technique result |
+
+Unburnt food has a minimum final grade of 1; actually burnt food stays burnt.
+The modifier is captured in the active job and saved, so reloading or changing
+mood mid-batch cannot reroll its result. Unattended stations consume the elapsed
+sleep time and can overbrew/burn. Sleep ends current visits/orders/conversations;
+same-day naps retain daily encounter flags. New calendar days reset those flags.
 
 ## Web build
 
@@ -126,11 +145,19 @@ create the probe. No browser bridge can grant money, move actors or run actions.
 
 ## Saves
 
-Logical schema version **1** stores all feature snapshots, including stock,
+Logical schema version **2** stores all feature snapshots, including stock,
 mid-cook timers, quoted orders, visitor RNG/memory, relationships/fact provenance,
 effect occurrence IDs and displayed pending Ink choices. It includes integrity
 checksums and story hashes. Restoration creates a separate validated session;
 the application replaces the live session only after success.
+
+Version 1 saves are verified using their original serialized checksum and
+upgraded in a disposable candidate. Calendar dates are derived from the saved
+monotonic timeline; loading never charges rent. Existing active jobs keep their
+legacy zero mood penalty, and pending Ink stories still require their original
+hash. The original file is not rewritten until the player explicitly saves.
+Version 2 uses a stable numeric JSON representation for integrity checks and
+records the last assessed rent day. Corrupt/future saves remain rejected.
 
 Files live under `user://saves/session.json`, with a recoverable `previous.json`.
 In this cloud workspace `user://` is under `.cache/data/godot/app_userdata/`.

@@ -56,5 +56,5 @@ func execute(secondary: bool) -> ActionResult:
   "toggle_kiosk": return _session.life.toggle_kiosk()
   "river": return _session.life.look_at_river()
   "travel": return ActionResult.success({"transition":true,"destination":record.destination})
-  "sleep": return ActionResult.success({"transition":true,"sleep":true,"destination":"rooftop"})
+  "sleep": return ActionResult.success({"choose_sleep":true})
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_secondary")

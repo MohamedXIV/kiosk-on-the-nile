@@ -1,6 +1,6 @@
 class_name LifeActions
 extends RefCounted
-signal day_reset
+signal sleep_started
 signal travelled(destination: StringName)
 var _session: GameSession
 func _init(session: GameSession) -> void:
@@ -19,15 +19,18 @@ func consume_held() -> ActionResult:
  _session.needs.apply_delta(effect.hunger,0,effect.base_mood+item.quality_score*effect.quality_mood)
  _session.cooking.held_changed.emit()
  return ActionResult.success({"cue":"chime"})
-func sleep() -> ActionResult:
+func sleep(hours: int) -> ActionResult:
  if _session.location_id != &"rooftop": return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"sleep_at_home")
- var result := _session.routine.sleep()
+ var result := _session.routine.preview(hours)
+ if not result.ok: return result
+ sleep_started.emit()
+ _session.kiosk_open = false
+ result = _session.routine.sleep(hours)
  var item := _session.cooking.held_item()
  if item: _session.cooking.take_held(item.id)
  _session.kiosk_open = false
  var spawn: Array = _session.config.section("locations").rooftop.spawn
  _session.player_ground = Vector2(spawn[0],spawn[1])
- day_reset.emit()
  return result
 func travel(destination: StringName) -> ActionResult:
  var locations: Dictionary = _session.config.section("locations")

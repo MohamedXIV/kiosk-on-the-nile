@@ -1,0 +1,30 @@
+{
+  "sleep": {
+    "minimum_hours": 1,
+    "maximum_hours": 12,
+    "step_hours": 1,
+    "default_hours": 8
+  },
+  "oversleep_rules": [
+    {
+      "mood_below": 35,
+      "rest_below": 35,
+      "extra_hours": 2
+    },
+    {
+      "mood_below": 55,
+      "rest_below": 60,
+      "extra_hours": 1
+    }
+  ],
+  "quality_rules": [
+    {
+      "mood_below": 35,
+      "penalty": 2
+    },
+    {
+      "mood_below": 60,
+      "penalty": 1
+    }
+  ]
+}

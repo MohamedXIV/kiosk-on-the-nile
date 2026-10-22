@@ -103,6 +103,7 @@ func continue_game() -> void:
   candidate.reparent(self)
   _install(candidate)
  else:
+  push_warning("Save load rejected: %s (%s)" % [result.message_key,result.details])
   var error := UiText.label(_text.text("load_failed"))
   error.position = Vector2(30,30)
   _title.add_child(error)
@@ -151,6 +152,7 @@ func _install(candidate: GameSession) -> void:
  _hud.diagnostics_requested.connect(_diagnostics)
  _session.narrative.failed.connect(func(_result):_hud.toast.show_message(_text.text("narrative_failed")))
  _hud.dialogue.choice_selected.connect(_choose)
+ _hud.sleep_panel.confirmed.connect(_begin_sleep)
  _captions = SpatialCaptions.new()
  _captions.theme = _text.make_theme()
  _captions.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -176,6 +178,11 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _hud.sleep_panel.visible:
+  if event.is_action_pressed("cancel"):
+   _hud.sleep_panel.hide()
+   get_viewport().set_input_as_handled()
+  return
  if event.is_action_pressed("notebook"):
   _toggle_notebook()
   get_viewport().set_input_as_handled()
@@ -185,16 +192,20 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   _busy = true
   var result := await _router.execute(event.is_action_pressed("interact_secondary"))
+  if result.ok and result.details.get("choose_sleep",false):
+   _hud.sleep_panel.present(_session.routine)
+   _busy = false
+   return
   if result.ok and result.details.get("transition",false):
    _save.transition_active = true
-   var message := _text.text("sleeping",{"day":_session.clock.day+1}) if result.details.get("sleep",false) else _text.text("to_kiosk") if result.details.destination=="kiosk" else _text.text("back_home")
+   var message := _text.text("to_kiosk") if result.details.destination=="kiosk" else _text.text("back_home")
    result = await _transition.run(func():return _commit_transition(result.details),message)
    _save.transition_active = false
   _sound.play_action(result)
-  _hud.toast.show_message(_text.outcome(result))
+  _hud.toast.show_message(_text.text("craft_mood_penalty",{"quality":_session.cooking.quality_label(result.details.item)}) if result.ok and result.details.get("mood_penalty",0)>0 else _text.outcome(result))
   _busy = false
 func _commit_transition(details: Dictionary) -> ActionResult:
- var result := _session.life.sleep() if details.get("sleep",false) else _session.life.travel(StringName(details.destination))
+ var result := _session.life.sleep(int(details.sleep_hours)) if details.has("sleep_hours") else _session.life.travel(StringName(details.destination))
  if not result.ok: return result
  var room: LocationView = _rooms[str(_session.location_id)]
  _motor.reparent(room,false)
@@ -212,6 +223,7 @@ func _choose(session_id: StringName, choice_id: StringName) -> void:
  _sound.play_action(result)
  if not result.ok: _hud.toast.show_message(_text.outcome(result))
 func _toggle_notebook() -> void:
+ if _hud.sleep_panel.visible or _transition.active: return
  if _hud.notebook.visible: _hud.notebook.hide()
  else: _hud.notebook.present(_session.knowledge.notes())
 func _notification(what: int) -> void:
@@ -225,7 +237,7 @@ func _notification(what: int) -> void:
   if _sound and _session: _sound.set_muted(false)
 
 func _step_motion(delta: float) -> void:
- var locked := _transition.active or _hud.notebook.visible
+ var locked := _transition.active or _hud.notebook.visible or _hud.sleep_panel.visible
  var direction := Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _motor.step_input(direction,delta)
  _visitors.step(delta)
@@ -240,3 +252,25 @@ func _diagnostics() -> void:
 func _save_message(result: ActionResult) -> String:
  if not result.ok: return _text.text("save_failed")
  return _text.text("saved_web") if result.details.get("sync_requested",false) else _text.text("saved")
+
+func _begin_sleep(hours: int) -> void:
+ if _busy or _transition.active or not _hud.sleep_panel.visible: return
+ var preview := _session.routine.preview(hours)
+ if not preview.ok:
+  _hud.toast.show_message(_text.outcome(preview))
+  return
+ _busy = true
+ _hud.sleep_panel.hide()
+ # The fade is presentation only; keep the quoted time/condition stable.
+ _session.running = false
+ _save.transition_active = true
+ var details := {"sleep_hours":hours,"destination":"rooftop"}
+ var result := await _transition.run(func():return _commit_transition(details),_text.text("sleeping"))
+ _save.transition_active = false
+ _session.running = true
+ if result.ok:
+  var minute := int(_session.clock.minutes)
+  _hud.toast.show_message(_text.text("sleep_completed",{"day":_session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)}))
+ else: _hud.toast.show_message(_text.outcome(result))
+ _sound.play_action(result)
+ _busy = false

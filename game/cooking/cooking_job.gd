@@ -9,6 +9,7 @@ var side_a_elapsed: float = 0.0
 var side_b_elapsed: float = 0.0
 var seasoned: bool = false
 var sugar_id: StringName
+var quality_penalty: int = 0
 func _init(station: StringName = &"", definition: RecipeDefinition = null) -> void:
  station_id = station
  recipe = definition
@@ -20,12 +21,14 @@ func reset() -> void:
  side_a_elapsed = 0
  side_b_elapsed = 0
  seasoned = false
+ quality_penalty = 0
  sugar_id = StringName(recipe.data.get("default_sugar",""))
 func snapshot() -> Dictionary:
- return {"station_id":str(station_id),"recipe_id":str(recipe.id),"recipe":recipe.data.duplicate(true),"stage":str(stage),"heat_elapsed":heat_elapsed,"brew_elapsed":brew_elapsed,"side_a_elapsed":side_a_elapsed,"side_b_elapsed":side_b_elapsed,"seasoned":seasoned,"sugar_id":str(sugar_id)}
+ return {"station_id":str(station_id),"recipe_id":str(recipe.id),"recipe":recipe.data.duplicate(true),"stage":str(stage),"heat_elapsed":heat_elapsed,"brew_elapsed":brew_elapsed,"side_a_elapsed":side_a_elapsed,"side_b_elapsed":side_b_elapsed,"seasoned":seasoned,"sugar_id":str(sugar_id),"quality_penalty":quality_penalty}
 func restore(data: Dictionary) -> ActionResult:
  if data.get("station_id") != str(station_id) or data.get("recipe_id") != str(recipe.id) or not data.get("recipe") is Dictionary:
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_cooking_job")
+ if not ContentValidation.integer(data.get("quality_penalty")) or not ContentValidation.bounded(data.quality_penalty,0,2) or (data.get("stage")=="EMPTY" and data.quality_penalty!=0): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_work_quality")
  var validation := ContentValidation.validate_recipe(data.recipe)
  if not validation.ok: return validation
  if data.recipe.rules_id != str(recipe.rules_id) or data.recipe.food_id != str(recipe.food_id): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"incompatible_recipe")
@@ -61,4 +64,5 @@ func restore(data: Dictionary) -> ActionResult:
  side_b_elapsed = float(data.side_b_elapsed)
  seasoned = data.seasoned
  sugar_id = StringName(data.sugar_id)
+ quality_penalty = int(data.quality_penalty)
  return ActionResult.success()

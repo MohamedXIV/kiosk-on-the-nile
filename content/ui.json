@@ -30,7 +30,7 @@
   "departed": "الزبون مش موجود دلوقتي",
   "back_home": "راجع أوضة السطح…",
   "to_kiosk": "في الطريق لكورنيش النيل…",
-  "sleeping": "نوم هادي… بداية اليوم {day}",
+  "sleeping": "نوم هادي…",
   "errors": {
     "insufficient_funds": "مفيش فكة كفاية حالياً",
     "out_of_stock": "الخامات خلصت؛ اطلب من التليفون",
@@ -46,7 +46,8 @@
     "invalid_save": "ملف الحفظ مش صالح",
     "wait_cooking": "استنى الطبخة تكمل على مهلك",
     "no_target": "قرّب من الحاجة اللي عايز تتفاعل معاها",
-    "no_secondary": "مفيش اختيار إضافي هنا"
+    "no_secondary": "مفيش اختيار إضافي هنا",
+    "invalid_sleep_duration": "اختار مدة نوم ضمن الحدود المتاحة"
   },
   "theme": {
     "font_size": 19,
@@ -80,6 +81,9 @@
     ],
     "notebook": [
       "N"
+    ],
+    "cancel": [
+      "Escape"
     ]
   },
   "transition": {
@@ -99,5 +103,17 @@
   "close_kiosk": "اقفل الكشك وارتاح شوية",
   "open_kiosk": "افتح الكشك واستقبل الزباين",
   "saved_web": "القعدة اتسجلت؛ جاري مزامنة حفظ المتصفح",
-  "action_unavailable": "مش متاح دلوقتي"
+  "action_unavailable": "مش متاح دلوقتي",
+  "sleep_title": "عايز تنام كام ساعة؟",
+  "sleep_hours_suffix": "ساعة",
+  "sleep_confirm": "نام",
+  "sleep_cancel": "إلغاء",
+  "sleep_preview": "مدة النوم المطلوبة: {hours} ساعة\nالاستيقاظ المتوقع: اليوم {day}، الساعة {hour}:{minute}",
+  "sleep_oversleep": "مزاجك وراحتك قبل النوم ممكن يأخروك {hours} ساعة؛ التأخير محسوب في الموعد المعروض.",
+  "sleep_on_time": "مزاجك وراحتك يسمحوا تصحى في الموعد اللي اخترته.",
+  "sleep_recovery": "الراحة بتزيد مع مدة النوم، والمروحة تساعدك ترتاح. الطبخ المتروك يفضل على النار.",
+  "sleep_completed": "صحيت في اليوم {day} الساعة {hour}:{minute}",
+  "craft_mood_penalty": "المزاج مأثر على التحضير؛ الجودة: {quality}",
+  "work_mood_hint": "مزاجك الحالي يقلّل جودة الدفعة الجديدة حتى {penalty} درجة",
+  "sleep_dim_color": "#00000099"
 }

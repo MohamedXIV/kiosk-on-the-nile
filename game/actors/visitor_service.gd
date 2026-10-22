@@ -55,11 +55,11 @@ func tick(delta: float) -> void:
     departed.emit(visit.id)
   elif visit.phase == &"leaving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): visits.erase(id)
  if not _open.call(): return
- if not _flags.get("amgad",false) and visits.size()<int(_data.regular_capacity):
+ if not _flags.get("amgad",false) and visits.size()<int(_data.regular_capacity) and not _has_character(&"amgad"):
   _flags.amgad = true
   spawn(&"amgad")
   return
- if not _flags.get("football",false) and _clock.minutes>=float(_data.football_minutes) and visits.size()<=int(_data.football_capacity_before_pair):
+ if not _flags.get("football",false) and _clock.minutes>=float(_data.football_minutes) and visits.size()<=int(_data.football_capacity_before_pair) and not _has_character(&"mahmoud") and not _has_character(&"samir"):
   _flags.football = true
   spawn(&"mahmoud")
   spawn(&"samir")
@@ -103,11 +103,12 @@ func record_service(_order_id: StringName, visit_id: StringName, item: PreparedI
  visit.remark_remaining = _rng.randf_range(float(_data.ambient_remark_delay[0]),float(_data.ambient_remark_delay[1]))
  if visit.character_id == &"amgad": memory.last_served_quality = str(item.quality_key)
  encounter_requested.emit(&"served",PackedStringArray([str(visit_id)]),{"quality_score":item.quality_score,"character_id":str(visit.character_id)})
-func reset_day() -> void:
+func clear_visits() -> void:
  for visit in visits.values():
   _orders.cancel_visit(visit.id)
   departed.emit(visit.id)
  visits.clear()
+func begin_day() -> void:
  _flags.clear()
  _cooldown = float(_data.initial_cooldown)
 func snapshot() -> Dictionary:
@@ -163,3 +164,8 @@ func _remarks(visit: VisitState, delta: float) -> void:
 
 func visit_count(character_id: StringName) -> int:
  return int(memory.amgad_visits) if character_id==&"amgad" else int(_other_visit_counts.get(str(character_id),0))
+
+func _has_character(character_id: StringName) -> bool:
+ for visit in visits.values():
+  if visit.character_id==character_id: return true
+ return false

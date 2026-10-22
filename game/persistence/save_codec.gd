@@ -1,7 +1,7 @@
 class_name SaveCodec
 extends Node
-const SCHEMA_VERSION := 1
-const COMPONENTS := ["clock","wallet","needs","home","knowledge","relationships","effects","cooking","service","visitors","scheduler"]
+const SCHEMA_VERSION := 2
+const COMPONENTS := ["clock","routine","wallet","needs","home","knowledge","relationships","effects","cooking","service","visitors","scheduler"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -9,7 +9,7 @@ func encode(session: GameSession) -> Dictionary:
  state["player_pose"] = session.player_pose.snapshot()
  state["kiosk_open"] = session.kiosk_open
  var envelope := {"schema_version":SCHEMA_VERSION,"content_fingerprint":session.config.fingerprint,"state":state}
- envelope["checksum"] = JSON.stringify(envelope,"",true).sha256_text()
+ envelope["checksum"] = StableJson.stringify(envelope).sha256_text()
  return envelope
 func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
  if not valid_digest(data): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_save")
@@ -19,7 +19,10 @@ func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
  if not data.state.get("kiosk_open") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kiosk_state")
  return ActionResult.success()
 func create_candidate(data: Dictionary, config: SessionConfig) -> ActionResult:
- var result := validate(data,config)
+ var migration := SaveMigrations.upgrade(data)
+ if not migration.ok: return migration
+ var restored_data: Dictionary = migration.details.data
+ var result := validate(restored_data,config)
  if not result.ok: return result
  var candidate := GameSession.new()
  add_child(candidate)
@@ -28,11 +31,11 @@ func create_candidate(data: Dictionary, config: SessionConfig) -> ActionResult:
   candidate.queue_free()
   return result
  for id in COMPONENTS:
-  result = candidate.get(id).restore(data.state[id])
+  result = candidate.get(id).restore(restored_data.state[id])
   if not result.ok:
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,result.message_key,{"component":id})
- result = candidate.player_pose.restore(data.state.player_pose)
+ result = candidate.player_pose.restore(restored_data.state.player_pose)
  if not result.ok or not config.section("locations").has(str(candidate.location_id)):
   candidate.queue_free()
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_pose")
@@ -42,7 +45,7 @@ func create_candidate(data: Dictionary, config: SessionConfig) -> ActionResult:
  if ground.x<float(bounds[0]) or ground.x>float(bounds[2]) or ground.y<float(bounds[1]) or ground.y>float(bounds[3]) or FootprintGeometry.blocked(ground,location.solids,0):
   candidate.queue_free()
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_position")
- candidate.kiosk_open = data.state.kiosk_open
+ candidate.kiosk_open = restored_data.state.kiosk_open
  for order in candidate.service.snapshot().orders.values():
   if order.status=="pending" and not candidate.visitors.is_available(StringName(order.visit_id)):
    candidate.queue_free()
@@ -53,7 +56,7 @@ func create_candidate(data: Dictionary, config: SessionConfig) -> ActionResult:
    if order==null or order.visit_id!=visit.id:
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_order")
- result = await candidate.narrative.restore(data.state.narrative)
+ result = await candidate.narrative.restore(restored_data.state.narrative)
  if not result.ok:
   candidate.queue_free()
   return result
@@ -63,4 +66,20 @@ static func valid_digest(data: Dictionary) -> bool:
  var candidate := data.duplicate(true)
  var checksum: Variant = candidate.get("checksum")
  candidate.erase("checksum")
- return checksum is String and checksum==JSON.stringify(candidate,"",true).sha256_text()
+ return checksum is String and (checksum==StableJson.stringify(candidate).sha256_text() or (data.get("schema_version")==1 and checksum==JSON.stringify(candidate,"",true).sha256_text()))
+
+static func decode_text(raw: String) -> ActionResult:
+ var parsed: Variant = JSON.parse_string(raw)
+ if not parsed is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"save_unreadable")
+ if valid_digest(parsed): return ActionResult.success({"data":parsed})
+ # Version 1 wrote this exact sorted, compact JSON. Verify its original bytes
+ # before normalizing a legacy checksum; never repair a damaged payload.
+ if parsed.get("schema_version")==1 and parsed.get("checksum") is String:
+  var prefix := '{"checksum":"%s",' % parsed.checksum
+  if raw.begins_with(prefix):
+   var original_payload := "{"+raw.substr(prefix.length())
+   if original_payload.sha256_text()==parsed.checksum:
+    parsed.erase("checksum")
+    parsed["checksum"] = StableJson.stringify(parsed).sha256_text()
+    return ActionResult.success({"data":parsed})
+ return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_save")

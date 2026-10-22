@@ -13,12 +13,11 @@
   "low_needs_mood_decay": 0.2,
   "sleep": {
     "fan_baseline": 82,
-    "fan_rest": 100,
-    "fan_mood_floor": 88,
-    "normal_rest": 88,
-    "normal_mood_floor": 65,
-    "hunger_floor": 45,
-    "hunger_cost": 22
+    "rest_per_hour": 12,
+    "mood_per_hour": 2,
+    "hunger_per_hour": 2.75,
+    "fan_rest_multiplier": 1.2,
+    "fan_mood_multiplier": 1.4
   },
   "snack": {
     "hunger": 32,

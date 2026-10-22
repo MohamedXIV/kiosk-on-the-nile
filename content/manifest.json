@@ -15,6 +15,7 @@
     "story_visitors": "stories/visitors.ink.json",
     "ui": "ui.json",
     "atmosphere": "atmosphere.json",
-    "session": "session.json"
+    "session": "session.json",
+    "wellbeing": "wellbeing.json"
   }
 }

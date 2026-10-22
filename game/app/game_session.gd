@@ -8,6 +8,7 @@ var needs: NeedsService
 var home: HomeService
 var knowledge: KnowledgeBook
 var routine: DailyRoutine
+var mood_policy: MoodPolicy
 var cooking: CookingService
 var supplies: SupplyService
 var life: LifeActions
@@ -56,10 +57,12 @@ func configure(source: SessionConfig) -> ActionResult:
   if key.ends_with("_price") or key=="daily_rent": amounts[key] = str(float(balance[key])/100.0)
  for i in range(social_data.initial_notes.size()): social_data.initial_notes[i] = str(social_data.initial_notes[i]).format(amounts)
  knowledge = KnowledgeBook.new(social_data)
- routine = DailyRoutine.new(clock,wallet,needs,home,int(balance.daily_rent))
+ mood_policy = MoodPolicy.new(source.section("wellbeing"))
+ routine = DailyRoutine.new(clock,wallet,needs,home,int(balance.daily_rent),mood_policy)
  cooking = CookingService.new()
  var kitchen := cooking.configure(source.section("recipes"))
  if not kitchen.ok: return kitchen
+ cooking.set_quality_provider(func():return mood_policy.quality_penalty(needs.mood))
  supplies = SupplyService.new(wallet,cooking,home,knowledge,balance)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
@@ -69,7 +72,8 @@ func configure(source: SessionConfig) -> ActionResult:
  service.settled.connect(visitors.record_service)
  service.settled.connect(func(_order,_visit,item,_payment):
   if item.quality_score>=2: needs.apply_delta(0,0,float(config.section("needs").good_service_mood)))
- life.day_reset.connect(visitors.reset_day)
+ life.sleep_started.connect(visitors.clear_visits)
+ clock.day_changed.connect(func(_previous,_current):visitors.begin_day())
  var actors: Array = source.section("visitors").characters.keys()
  actors.append("player")
  relationships = RelationshipStore.new(source.section("social"),actors)
@@ -91,7 +95,8 @@ func configure(source: SessionConfig) -> ActionResult:
  var narrative_result := narrative.configure(self,source.section("encounters"),stories)
  if not narrative_result.ok: return narrative_result
  visitors.encounter_requested.connect(_encounter_requested)
- life.day_reset.connect(narrative.cancel_all)
+ life.sleep_started.connect(narrative.cancel_all)
+ routine.slept.connect(_sleep_elapsed)
  life.travelled.connect(func(destination):
   if destination!=&"kiosk": narrative.cancel_all())
  scheduler.configure({})
@@ -124,3 +129,10 @@ func talk(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState = visitors.visits[str(visit_id)]
  return await narrative.start(&"amgad" if visit.character_id==&"amgad" else &"visitors",PackedStringArray([str(visit_id)]))
+
+func _sleep_elapsed(frame: Dictionary) -> void:
+ # Sleep skips travel/social scenes, while unattended stations and due jobs
+ # consume the same elapsed clock frame. Recovery has already been applied.
+ cooking.tick(float(frame.delta))
+ scheduler.tick(frame)
+ changed.emit()

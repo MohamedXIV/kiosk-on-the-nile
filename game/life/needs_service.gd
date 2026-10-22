@@ -19,16 +19,12 @@ func apply_delta(hunger_delta: float, rest_delta: float, mood_delta: float) -> v
  hunger = clampf(hunger + hunger_delta,0,100)
  rest = clampf(rest + rest_delta,0,100)
  mood = clampf(mood + mood_delta,0,100)
-func after_sleep(fan_running: bool) -> void:
+func recover_sleep(hours: float, fan_running: bool) -> void:
  var config: Dictionary = _config.sleep
- if fan_running:
-  baseline = config.fan_baseline
-  rest = config.fan_rest
-  mood = maxf(mood,config.fan_mood_floor)
- else:
-  rest = config.normal_rest
-  mood = maxf(config.normal_mood_floor,(mood + baseline) / 2.0)
- hunger = maxf(config.hunger_floor,hunger - config.hunger_cost)
+ var rest_gain := hours*float(config.rest_per_hour)*(float(config.fan_rest_multiplier) if fan_running else 1.0)
+ var mood_gain := hours*float(config.mood_per_hour)*(float(config.fan_mood_multiplier) if fan_running else 1.0)
+ apply_delta(-hours*float(config.hunger_per_hour),rest_gain,mood_gain)
+ if fan_running: baseline=float(config.fan_baseline)
 func snapshot() -> Dictionary:
  return {"hunger":hunger,"rest":rest,"mood":mood,"baseline":baseline}
 func restore(data: Dictionary) -> ActionResult:

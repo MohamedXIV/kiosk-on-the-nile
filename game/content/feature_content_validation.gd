@@ -2,6 +2,21 @@ class_name FeatureContentValidation
 extends RefCounted
 ## Cross-feature authoring references are checked before ContentStore activates a bundle.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("wellbeing"):
+  var policy: Variant = bundle.wellbeing
+  if not policy is Dictionary or not policy.get("sleep") is Dictionary or not policy.get("oversleep_rules") is Array or not policy.get("quality_rules") is Array: return ContentValidation.fail("wellbeing")
+  for field in ["minimum_hours","maximum_hours","step_hours","default_hours"]:
+   if not ContentValidation.integer(policy.sleep.get(field)): return ContentValidation.fail("wellbeing.sleep."+field)
+  var settings: Dictionary = policy.sleep
+  if settings.minimum_hours<1 or settings.maximum_hours>12 or settings.minimum_hours>settings.maximum_hours or settings.step_hours<1 or settings.default_hours<settings.minimum_hours or settings.default_hours>settings.maximum_hours or (int(settings.default_hours)-int(settings.minimum_hours))%int(settings.step_hours)!=0: return ContentValidation.fail("wellbeing.sleep")
+  var previous_penalty := 3
+  var previous_threshold := -1.0
+  for rule in policy.quality_rules:
+   if not rule is Dictionary or not ContentValidation.bounded(rule.get("mood_below"),0,100) or not ContentValidation.integer(rule.get("penalty")) or not ContentValidation.bounded(rule.penalty,0,2) or rule.mood_below<=previous_threshold or rule.penalty>previous_penalty: return ContentValidation.fail("wellbeing.quality_rules")
+   previous_penalty = int(rule.penalty)
+   previous_threshold = float(rule.mood_below)
+  for rule in policy.oversleep_rules:
+   if not rule is Dictionary or not ContentValidation.bounded(rule.get("mood_below"),0,100) or not ContentValidation.bounded(rule.get("rest_below"),0,100) or not ContentValidation.integer(rule.get("extra_hours")) or not ContentValidation.bounded(rule.extra_hours,0,2): return ContentValidation.fail("wellbeing.oversleep_rules")
  if bundle.has("session"):
   var initial: Variant = bundle.session
   if not initial is Dictionary or not initial.get("kiosk_open") is bool or not initial.get("home") is Dictionary or not initial.home.get("has_fan") is bool or not initial.home.get("fan_on") is bool or (initial.home.fan_on and not initial.home.has_fan): return ContentValidation.fail("session.initial")
@@ -33,8 +48,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if bundle.has("ui"):
   var ui: Variant = bundle.ui
   if not ui is Dictionary: return ContentValidation.fail("ui")
-  for key in ["title","subtitle","new_game","continue","save","saved","save_failed","load_failed","notebook","close","help","money","day_time","hunger","rest","mood","stock","held","empty_hands","open","closed","talk","serve","consume","interaction","secondary","success"]:
+  for key in ["title","subtitle","new_game","continue","save","saved","save_failed","load_failed","notebook","close","help","money","day_time","hunger","rest","mood","stock","held","empty_hands","open","closed","talk","serve","consume","interaction","secondary","success","sleep_title","sleep_hours_suffix","sleep_confirm","sleep_cancel","sleep_preview","sleep_oversleep","sleep_on_time","sleep_recovery","sleeping","sleep_completed","craft_mood_penalty","work_mood_hint"]:
    if not ui.get(key) is String: return ContentValidation.fail("ui."+key)
+  if not ui.get("sleep_dim_color") is String or not Color.html_is_valid(ui.sleep_dim_color): return ContentValidation.fail("ui.sleep_dim_color")
   for key in ["theme","input","errors","transition","toasts"]:
    if not ui.get(key) is Dictionary: return ContentValidation.fail("ui."+key)
   for key in ["background","border","text","accent"]:
@@ -42,7 +58,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not ContentValidation.bounded(ui.theme.get("font_size"),12,48) or not ContentValidation.bounded(ui.toasts.get("duration"),0.1,30): return ContentValidation.fail("ui.theme")
   for key in ["fade_out","fade_in"]:
    if not ContentValidation.bounded(ui.transition.get(key),0.01,10): return ContentValidation.fail("ui.transition")
-  for action in ["move_left","move_right","move_up","move_down","interact_primary","interact_secondary","notebook"]:
+  for action in ["move_left","move_right","move_up","move_down","interact_primary","interact_secondary","notebook","cancel"]:
    if not ui.input.get(action) is Array or ui.input[action].is_empty(): return ContentValidation.fail("ui.input."+action)
    for key in ui.input[action]:
     if not key is String or OS.find_keycode_from_string(key)==KEY_NONE: return ContentValidation.fail("ui.input."+action)

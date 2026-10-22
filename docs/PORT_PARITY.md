@@ -58,3 +58,31 @@ qualification results.
    GitHub workflow currently covers compilation/import/release export only.
 
 The prototype remains untouched. No build has been published or deployed.
+
+## Approved sleep/mood update — 2026-10-22
+
+The player explicitly replaced the prototype sleep contract: 1–12 selected
+hours, calendar rollover at midnight, no extra rent for same-day naps, recovery
+proportional to sleep duration, bounded mood/rest-based oversleep with a visible
+preview, and a mood modifier on preparation quality. These are intentional
+changes to HTML parity.
+
+`MoodPolicy` reads `content/wellbeing.json`; `DailyRoutine` handles waking and
+once-per-day rent; `NeedsService` applies hourly recovery. `SleepPanel` supplies
+the duration and preview. Cooking captures its mood penalty on starting a job,
+persists it, and applies it to the technique result when the food is prepared.
+Unattended cooking and both clock domains consume elapsed sleep time; visitors
+and their orders end before the skip while same-day encounter flags persist.
+
+Save schema 2 records rent assessment and job modifiers. `SaveMigrations` reads
+schema 1 without writing or charging on load. `StableJson` normalizes JSON number
+types and preserves floating-point precision for persistent checksums. The old
+checksum issue was reproduced as a version-1 save rejection plus a format probe:
+Godot stringifies an integer as `1` and its JSON-parsed value as `1.0`. Legacy
+files are verified against the exact original compact payload before upgrading;
+legacy displayed Ink frames recover their declared numeric types for validation.
+
+Existing daily-life assertions were adapted to the approved sleep signature and
+calendar result. No automated suites were added or run in this update. Current
+manual browser observations and any remaining acceptance limits are recorded in
+`docs/notes/2026-10-22-playtest-feedback.md`.

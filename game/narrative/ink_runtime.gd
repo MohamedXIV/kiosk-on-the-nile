@@ -85,11 +85,10 @@ func snapshot() -> Dictionary:
  if _player == null: return {}
  var state: String = _player.get_state()
  var displayed := _frame.to_dict()
- return {"story_id":str(_definition.id),"story_hash":_definition.sha256,"ink":state,"frame":displayed,"state_hash":(state+JSON.stringify(displayed,"",true)).sha256_text()}
+ return {"story_id":str(_definition.id),"story_hash":_definition.sha256,"ink":state,"frame":displayed,"state_hash":(state+StableJson.stringify(displayed)).sha256_text()}
 func restore(data: Dictionary) -> ActionResult:
  if _player == null or data.get("story_hash") != _definition.sha256 or data.get("story_id") != str(_definition.id) or not data.get("ink") is String or not JSON.parse_string(data.ink) is Dictionary or not data.get("frame") is Dictionary:
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE, &"incompatible_story")
- if not data.get("ink") is String or data.get("state_hash")!=(data.ink+JSON.stringify(data.frame,"",true)).sha256_text(): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_story_state")
  var state: Dictionary = JSON.parse_string(data.ink)
  if not ContentValidation.integer(state.get("inkSaveVersion")) or not state.get("flows") is Dictionary or state.flows.size()!=1 or not state.get("variablesState") is Dictionary or not state.get("evalStack") is Array or not state.get("visitCounts") is Dictionary or not state.get("turnIndices") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_state")
  for flow in state.flows.values():
@@ -100,6 +99,17 @@ func restore(data: Dictionary) -> ActionResult:
   if not choice is Dictionary or not choice.get("id") is String or not choice.get("text") is String or not ContentValidation.integer(choice.get("index")): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_choice")
  for effect in displayed.effects:
   if not effect is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_effect")
+ var valid_hash: bool = data.get("state_hash")== (data.ink+StableJson.stringify(displayed)).sha256_text()
+ if not valid_hash:
+  # Legacy frames serialized choice indexes as integers and durations/effects
+  # as floats. Recover those declared types before checking the old hash.
+  var legacy := displayed.duplicate(true)
+  legacy.duration = float(legacy.duration)
+  for choice in legacy.choices: choice.index=int(choice.index)
+  for effect in legacy.effects:
+   if effect.get("kind")=="mood" and ContentValidation.number(effect.get("amount")): effect.amount=float(effect.amount)
+  valid_hash = data.get("state_hash")== (data.ink+JSON.stringify(legacy,"",true)).sha256_text()
+ if not valid_hash: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_story_state")
  var previous: String = _player.get_state()
  _player.set_state(data.ink)
  if not _error.is_empty() or _player.current_choices.size()!=displayed.choices.size():

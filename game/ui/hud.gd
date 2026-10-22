@@ -4,6 +4,7 @@ signal save_requested
 signal notebook_requested
 signal diagnostics_requested
 var dialogue: DialoguePanel
+var sleep_panel: SleepPanel
 var notebook: Notebook
 var toast: ToastStack
 var _session: GameSession
@@ -70,6 +71,16 @@ func configure(text: UiText) -> void:
  notebook = Notebook.new()
  add_child(notebook)
  notebook.configure(text)
+ var sleep_scrim := ColorRect.new()
+ sleep_scrim.color = Color(text.data.sleep_dim_color)
+ sleep_scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ sleep_scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+ sleep_scrim.hide()
+ add_child(sleep_scrim)
+ sleep_panel = SleepPanel.new()
+ add_child(sleep_panel)
+ sleep_panel.configure(text)
+ sleep_panel.visibility_changed.connect(func():sleep_scrim.visible=sleep_panel.visible)
  toast = ToastStack.new()
  toast.text_direction = Control.TEXT_DIRECTION_RTL
  toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -96,5 +107,7 @@ func present(target: InteractionTarget) -> void:
   var status := StationController.new(_session.cooking,str(_text.data.input.interact_primary[0])).status_label(StringName(id),true)
   if not status.is_empty(): station_labels.append(status)
  _station.text = "  ·  ".join(station_labels)
+ var penalty := _session.mood_policy.quality_penalty(_session.needs.mood)
+ if penalty>0: _station.text += "\n"+_text.text("work_mood_hint",{"penalty":penalty})
  var focused := _session.narrative.focused_session()
  dialogue.present(focused,_session.narrative.choices(focused))

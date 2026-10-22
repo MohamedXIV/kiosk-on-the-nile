@@ -6,7 +6,7 @@ func run(check, _tree) -> void:
  if not FileAccess.file_exists(path): return
  var Clock = load("res://game/time/game_clock.gd")
  var Coordinator = load(path)
- var clock = Clock.new({"minutes_per_second":2.5,"start_day":1,"start_minutes":930,"wake_minutes":900})
+ var clock = Clock.new({"minutes_per_second":2.5,"start_day":1,"start_minutes":930})
  var coordinator = Coordinator.new()
  var observed: Array = []
  var handlers := {"needs":func(frame):observed.append(["needs",frame.minutes]),"actors":func(frame):observed.append(["actors",frame.minutes])}

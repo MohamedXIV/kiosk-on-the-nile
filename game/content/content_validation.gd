@@ -5,9 +5,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  var time: Dictionary = bundle.get("time",{})
  if not number(time.get("minutes_per_second")) or float(time.minutes_per_second) <= 0: return fail("time.minutes_per_second")
  if bundle.has("visitors"):
-  for field in ["start_day","start_minutes","wake_minutes","fixed_step"]:
+  for field in ["start_day","start_minutes","fixed_step"]:
    if not number(time.get(field)): return fail("time."+field)
-  if not integer(time.start_day) or time.start_day<1 or time.start_minutes<0 or not bounded(time.wake_minutes,0,1440) or not bounded(time.fixed_step,0.001,0.1): return fail("time.initial")
+  if not integer(time.start_day) or time.start_day<1 or not bounded(time.start_minutes,0,1439.999999) or not bounded(time.fixed_step,0.001,0.1): return fail("time.initial")
   if not time.get("system_dependencies") is Dictionary: return fail("time.system_dependencies")
   var handlers: Dictionary = {}
   for id in ["needs","cooking","motion","visitors","narrative","scheduler"]: handlers[id]=func(_frame):return ActionResult.success()
@@ -27,7 +27,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   var needs: Dictionary = bundle.needs
   for key in ["hunger_decay","work_rest_decay","rest_decay","low_rest","low_hunger","low_needs_mood_decay","river_mood","fan_on_mood","good_service_mood"]:
    if not bounded(needs.get(key),0,100): return fail("needs."+key)
-  var groups := {"initial":["hunger","rest","mood","baseline"],"sleep":["fan_baseline","fan_rest","fan_mood_floor","normal_rest","normal_mood_floor","hunger_floor","hunger_cost"],"snack":["hunger","mood"],"tea":["hunger","base_mood","quality_mood"],"kebda":["hunger","base_mood","quality_mood"]}
+  var groups := {"initial":["hunger","rest","mood","baseline"],"sleep":["fan_baseline","rest_per_hour","mood_per_hour","hunger_per_hour","fan_rest_multiplier","fan_mood_multiplier"],"snack":["hunger","mood"],"tea":["hunger","base_mood","quality_mood"],"kebda":["hunger","base_mood","quality_mood"]}
   for group in groups:
    if not needs.get(group) is Dictionary: return fail("needs."+group)
    for key in groups[group]:

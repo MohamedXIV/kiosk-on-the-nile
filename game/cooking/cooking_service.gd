@@ -8,6 +8,7 @@ var _jobs: Dictionary = {}
 var _stock: Dictionary = {}
 var _held: PreparedItem
 var _next_item: int = 1
+var _quality_provider: Callable
 var _rules := {"tea":TeaRules.new(),"kebda":KebdaRules.new()}
 func configure(data: Dictionary) -> ActionResult:
  var validation := ContentValidation.validate_recipes(data)
@@ -30,8 +31,15 @@ func act(station_id: StringName) -> ActionResult:
  var current := job(station_id)
  if current == null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"unknown_station")
  var recipe := current.recipe
+ var starting := current.stage==&"EMPTY"
+ var penalty := 0
+ if starting and _quality_provider.is_valid():
+  var projected: Variant = _quality_provider.call()
+  if not ContentValidation.integer(projected) or not ContentValidation.bounded(projected,0,2): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_work_quality")
+  penalty = int(projected)
  var result: ActionResult = _rules[str(recipe.rules_id)].act(current,stock_count(recipe.stock_key)>=recipe.portion_cost,_held==null)
  if not result.ok: return result
+ if starting: current.quality_penalty=penalty
  if result.details.has("stock_debit"): _stock[str(recipe.stock_key)] = stock_count(recipe.stock_key)-int(result.details.stock_debit)
  if result.details.get("completed",false):
   var item := PreparedItem.new()
@@ -40,7 +48,11 @@ func act(station_id: StringName) -> ActionResult:
   item.recipe_id = recipe.id
   item.food_id = recipe.food_id
   item.sugar_id = current.sugar_id
-  item.quality_score = int(result.details.score)
+  var technique_score := int(result.details.score)
+  item.quality_score = maxi(1,technique_score-current.quality_penalty) if technique_score>0 else 0
+  result.details["technique_score"] = technique_score
+  result.details["mood_penalty"] = current.quality_penalty
+  result.details["score"] = item.quality_score
   item.quality_key = StringName(recipe.data.quality_keys[item.quality_score])
   _held = item
   result.details["item"] = item
@@ -134,3 +146,6 @@ func restore(data: Dictionary) -> ActionResult:
 
 func station_ids() -> Array:
  return _jobs.keys()
+
+func set_quality_provider(provider: Callable) -> void:
+ _quality_provider = provider
