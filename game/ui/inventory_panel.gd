@@ -33,11 +33,11 @@ func refresh() -> void:
  var state := _session.items.snapshot()
  for container in state.containers.values():
   if container.location_id!=str(_session.location_id) and container.kind!="purchase_bag":continue
-  if not container.kind in ["dry","cold","purchase_bag"]:continue
+  if not container.kind in ["dry","cold","purchase_bag","storage"]:continue
   var entries := _session.items.items_in(StringName(container.id))
   var count := 0
   for item in entries:count+=int(item.quantity)
-  var title := _text.text("inventory_bag") if container.kind=="purchase_bag" else _text.text("inventory_cold") if container.kind=="cold" else _text.text("inventory_dry")
+  var title := _text.text("inventory_bag") if container.kind=="purchase_bag" else _text.text("inventory_cold") if container.kind=="cold" else _text.text("inventory_furniture") if container.kind=="storage" else _text.text("inventory_dry")
   _rows.add_child(UiText.label(title+" · %d/%d" % [count,int(container.capacity)]))
   if container.kind=="cold" and _session.items.get_item(_session.inventory.held_id()).get("kind")=="batch":
    var storage_id := StringName(container.id)

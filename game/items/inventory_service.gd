@@ -173,6 +173,14 @@ func unpack_purchase_bag(bag_id: StringName, location_id: StringName) -> ActionR
  containers.sort()
  for item in items.items_in(bag_id):
   var quantity := int(item.quantity)
+  if item.kind in ["furniture","equipment"]:
+   var destination := str(location_id)+"_furniture"
+   if not change.state.containers.has(destination):return ContentValidation.fail("inventory.furniture_storage")
+   change.state.items[item.id].container_id=destination
+   for hosted in change.state.containers.values():
+    if hosted.host_id==item.id:hosted.location_id=str(location_id)
+   moved.append({"definition_id":item.definition_id,"quantity":1})
+   continue
   var storage := str(items.definition(StringName(item.definition_id)).get("required_storage","dry"))
   for id in containers:
    var container: Dictionary=change.state.containers[id]
@@ -203,10 +211,19 @@ func pack(item_id: StringName) -> ActionResult:
  var item := items.get_item(item_id)
  if item.is_empty() or player_pose==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_item")
  var container := items.get_container(StringName(item.container_id))
- if container.location_id!=str(player_pose.location_id) or not container.kind in ["dry","cold"]:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"item_wrong_location")
+ if container.location_id!=str(player_pose.location_id) or not container.kind in ["dry","cold","storage"]:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"item_wrong_location")
  for lines in items.snapshot().reservations.values():
   for line in lines:
    if line.item_id==str(item_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"ingredient_reserved")
+ if item.kind in ["furniture","equipment"]:
+  if spaces==null or not spaces.placement(item_id).is_empty() or (equipment!=null and equipment.is_busy(item_id)):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"equipment_busy")
+  var change := items.candidate()
+  for hosted in change.state.containers.values():
+   if hosted.host_id==str(item_id) and not items.items_in(StringName(hosted.id)).is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"surface_not_empty")
+  if not change.state.containers.has("player_furniture_bag"):
+   change.state.containers["player_furniture_bag"]={"id":"player_furniture_bag","location_id":"player","kind":"purchase_bag","capacity":1,"allowed_tags":["furniture","equipment"],"host_id":""}
+  change.state.items[str(item_id)].container_id="player_furniture_bag"
+  return items.commit(change)
  var result := items.prepare_moves([{"item_id":str(item_id),"quantity":int(item.quantity),"from_container":item.container_id,"to_container":"player_bag"}])
  return items.commit(result.details.change) if result.ok else result
 func _usable_storage(container: Dictionary, location_id: StringName, storage: String) -> bool:

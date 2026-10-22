@@ -228,5 +228,6 @@
   "sleep_dirty_bed": "السرير متسخ؛ استعادة الراحة أقل ١٠٪",
   "venue_reputation": "سمعة الكشك: {label}",
   "station_options": "السكر والعناية",
-  "change_sugar": "غيّر كمية السكر"
+  "change_sugar": "غيّر كمية السكر",
+  "inventory_furniture": "الأثاث المخزن · انقله بالحقيبة ثم فرغه في المكان الآخر"
 }
