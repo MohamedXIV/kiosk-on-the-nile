@@ -35,6 +35,8 @@ func present(instance_id: StringName, _recipes: Array[Dictionary] = []) -> void:
 func _refresh() -> void:
  for child in _rows.get_children():_rows.remove_child(child);child.queue_free()
  _progress.clear()
+ var station := _session.cooking.job(_instance_id)
+ if station!=null and station.stage==&"EMPTY" and station.recipe.rules_id==&"tea":_rows.add_child(UiText.button(_text.text("change_sugar"),func():_apply(_session.cooking.cycle_sugar(_instance_id))))
  var hygiene := _session.hygiene.state(_instance_id)
  if not hygiene.is_empty():
   _rows.add_child(UiText.label(str(hygiene.label)))

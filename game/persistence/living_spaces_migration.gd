@@ -26,6 +26,10 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   candidate.state["learning"]={"attempts":{},"results":{}}
   if candidate.state.get("equipment")=={}:candidate.state.equipment={"reservations":{},"revision":0}
   candidate.schema_revision=3
+ if candidate.schema_revision==3 and target_revision>=4:
+  var result := _add_hygiene(candidate,config)
+  if not result.ok:return result
+  candidate.schema_revision=4
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})
@@ -169,3 +173,32 @@ static func _repair_pose(pose: Dictionary, config: SessionConfig, spaces: SpaceS
  return _fail("no_migration_position")
 static func _fail(reason: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"incompatible_save",{"reason":reason})
+
+static func _add_hygiene(candidate: Dictionary, config: SessionConfig) -> ActionResult:
+ var state: Variant=candidate.get("state")
+ if not state is Dictionary or not state.get("items") is Dictionary or not state.items.get("items") is Dictionary or not state.items.get("containers") is Dictionary or not state.get("clock") is Dictionary or not ContentValidation.number(state.clock.get("world_minutes")) or not state.get("service") is Dictionary or not state.service.get("orders") is Dictionary:return _fail("hygiene_components")
+ var targets: Dictionary={}
+ for id in config.section("spaces").locations:targets["floor:"+id]={"cleanliness":100.0,"cleaning":{}}
+ for item in state.items.items.values():
+  if not item is Dictionary:return _fail("hygiene_item")
+  if config.section("hygiene").item_profiles.has(str(item.get("definition_id",""))):targets[str(item.get("id",""))]={"cleanliness":100.0,"cleaning":{}}
+ for container in state.items.containers.values():
+  if container.kind in ["surface","hand"] and not "ingredient" in container.allowed_tags:container.allowed_tags.append("ingredient")
+ state["hygiene"]={"targets":targets,"applied":{},"last_at":float(state.clock.world_minutes),"action":{}}
+ state["customer_experience"]={"active":{},"recent":{},"customers":{},"closed":{}}
+ for order in state.service.orders.values():
+  if not order is Dictionary:return _fail("hygiene_order")
+  for key in ["created_at","served_at","closed_at"]:
+   if not order.has(key):order[key]=-1.0
+  if not order.has("served_quality"):order["served_quality"]=-1
+  if not order.has("timing_known"):order["timing_known"]=false
+ if state.get("equipment")=={}:state.equipment={"reservations":{},"revision":0}
+ if not state.get("cooking") is Dictionary or not state.cooking.get("jobs") is Dictionary:return _fail("hygiene_kitchen")
+ for job in state.cooking.jobs.values():
+  if not job is Dictionary:return _fail("hygiene_legacy_job")
+  if not job.has("hygiene_evidence"):job["hygiene_evidence"]={}
+ if state.get("shops") is Dictionary and state.shops.get("receipts") is Dictionary:
+  for receipt in state.shops.receipts.values():
+   if not receipt is Dictionary:return _fail("hygiene_receipt")
+   if not receipt.has("granted"):receipt["granted"]=[];receipt["grants_known"]=false
+ return ActionResult.success()

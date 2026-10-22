@@ -26,6 +26,9 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
  floor_view.z_index = -100
  add_child(floor_view)
  floor_view.configure(data.data.floor,mapping,data.data.font_path)
+ var floor_grime := HygieneView.new()
+ floor_view.add_child(floor_grime)
+ floor_grime.configure(StringName("floor:"+str(data.id)),session.hygiene,250)
  if data.data.has("water"):
   var river := RiverView.new()
   river.z_index = -110

@@ -4,6 +4,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  var spaces: Variant = bundle.get("spaces")
  var initial: Variant = bundle.get("initial_layout")
  if not spaces is Dictionary or not spaces.get("locations") is Dictionary or not spaces.get("base_solids") is Dictionary or not initial is Dictionary or not initial.get("placements") is Dictionary or not initial.get("instances") is Array: return ContentValidation.fail("spaces")
+ if not spaces.get("labels") is Dictionary:return ContentValidation.fail("spaces.labels")
+ for key in ["recipes","surface","inventory","care","clean","clean_item","sleep","door_open","door_close"]:
+  if not spaces.labels.get(key) is String:return ContentValidation.fail("spaces.labels")
  var global_ids: Dictionary = {}
  for id in spaces.locations:
   var s: Variant = spaces.locations[id]

@@ -83,9 +83,6 @@ func is_busy(instance_id: StringName) -> bool:
 func snapshot() -> Dictionary:
  return {"reservations":_reservations.duplicate(true),"revision":_revision}
 func restore(data: Dictionary) -> ActionResult:
- if data.is_empty():
-  _reservations={}
-  return ActionResult.success()
  if not data.get("reservations") is Dictionary or not ContentValidation.integer(data.get("revision")) or data.revision<0:return _fail("invalid_equipment")
  var occupied: Dictionary={}
  for job_id in data.reservations:

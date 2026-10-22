@@ -226,5 +226,7 @@
   "clean_floor": "نضّف أرضية المكان",
   "clean_progress": "التنظيف شغال… باقي {minutes} دقيقة؛ الحركة بعيدًا توقفه",
   "sleep_dirty_bed": "السرير متسخ؛ استعادة الراحة أقل ١٠٪",
-  "venue_reputation": "سمعة الكشك: {label}"
+  "venue_reputation": "سمعة الكشك: {label}",
+  "station_options": "السكر والعناية",
+  "change_sugar": "غيّر كمية السكر"
 }

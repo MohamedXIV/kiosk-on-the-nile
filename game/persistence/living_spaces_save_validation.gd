@@ -1,7 +1,7 @@
 class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
- if envelope.get("schema_revision")!=3: return _fail("schema_revision")
+ if envelope.get("schema_revision")!=4: return _fail("schema_revision")
  var items := session.items.snapshot()
  var placements: Dictionary = session.spaces.snapshot().placements
  for id in items.items:
@@ -53,6 +53,36 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
  elif not session.locations.is_physical(session.location_id):return _fail("orphan_virtual_pose")
  for receipt in session.shops.snapshot().receipts.values():
   if session.items.get_container(StringName(receipt.bag_id)).get("kind")!="purchase_bag":return _fail("receipt_bag")
+ var experiences := session.customer_experience.snapshot()
+ for id in experiences.active:
+  var record: Dictionary=experiences.active[id]
+  var visit: VisitState=session.visitors.visits.get(id)
+  if visit==null or visit.phase==&"leaving" or record.get("character_id")!=str(visit.character_id) or record.get("location_id")!=str(visit.pose.location_id):return _fail("orphan_visit_experience")
+  if record.order_id!="":
+   var order := session.service.order(StringName(record.order_id))
+   if order==null or str(order.visit_id)!=id:return _fail("experience_order")
+   if not record.food.is_empty() and (order.status!=&"delivered" or str(order.delivered_item_id)!=record.food.item_id or order.served_quality!=record.food.quality):return _fail("experience_food")
+ for summaries in experiences.recent.values():
+  for summary in summaries:
+   if not summary.food.is_empty():
+    var order := session.service.order(StringName(str(summary.food.get("order_id",""))))
+    if order==null or order.status!=&"delivered" or str(order.visit_id)!=summary.visit_id or str(order.delivered_item_id)!=summary.food.item_id or order.served_quality!=summary.food.quality:return _fail("historical_experience_food")
+ for id in experiences.closed:
+  if not _counter_id(id,"visit_",int(session.visitors.snapshot().next_id)):return _fail("experience_visit_counter")
+  if not session.hygiene.snapshot().applied.has("visit:"+str(id)):return _fail("experience_floor_event")
+ var item_counter := int(items.next_id)
+ for order in session.service.snapshot().orders.values():
+  if order.delivered_item_id!="" and not _counter_id(order.delivered_item_id,"food_",item_counter):return _fail("delivered_food_counter")
+ for receipt in session.shops.snapshot().receipts.values():
+  if not _counter_id(receipt.journey_id,"journey_",int(session.travel.snapshot().next_id)):return _fail("purchase_journey_counter")
+  for grant in receipt.get("granted",[]):
+   if not _counter_id(str(grant.get("item_id","")),"item_",item_counter):return _fail("purchased_item_counter")
+   if not journey.is_empty() and receipt.journey_id==journey.id and journey.phase in ["browsing","returning"]:
+    var item := session.items.get_item(StringName(grant.item_id))
+    if item.is_empty() or item.container_id!=receipt.bag_id or item.definition_id!=grant.definition_id or item.quantity!=grant.quantity:return _fail("missing_journey_purchase")
  return ActionResult.success()
+static func _counter_id(value: String, prefix: String, next_id: int) -> bool:
+ var suffix := value.trim_prefix(prefix)
+ return value.begins_with(prefix) and suffix.is_valid_int() and int(suffix)>0 and int(suffix)<next_id
 static func _fail(reason: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_living_spaces",{"reason":reason})

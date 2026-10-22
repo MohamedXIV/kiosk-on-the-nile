@@ -27,7 +27,8 @@
       "kind": "fan",
       "height": 1.15,
       "rotation_speed": 21
-    }
+    },
+    "behavior": "toggle_equipment"
   },
   "counter": {
     "label": "سطح تحضير",
@@ -123,7 +124,8 @@
       ]
     },
     "movable": true,
-    "surface": false
+    "surface": false,
+    "behavior": "sleep"
   },
   "desk": {
     "label": "مكتب",
@@ -314,7 +316,8 @@
       "kind": "box",
       "top": "#6b4634",
       "front": "#574a40"
-    }
+    },
+    "behavior": "toggle_equipment"
   },
   "marinating_bowl": {
     "kind": "batch",

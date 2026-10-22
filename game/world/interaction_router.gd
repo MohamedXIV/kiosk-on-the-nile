@@ -21,6 +21,7 @@ func nearest() -> InteractionTarget:
   if _session.cooking.job(target.id):
    target.primary = StationController.new(_session.cooking,str(_text.data.input.interact_primary[0])).status_label(target.id)
    if _session.cooking.job(target.id).stage!=&"EMPTY": target.secondary=""
+   elif _session.cooking.job(target.id).recipe.rules_id==&"tea":target.secondary=_text.text("station_options")
   if target.id==&"sign": target.primary=_text.text("close_kiosk") if _session.kiosk_open else _text.text("open_kiosk")
  if _session.location_id==&"kiosk":
   for visit: VisitState in _session.visitors.visits.values():
@@ -64,7 +65,7 @@ func execute(secondary: bool) -> ActionResult:
    return result
   "door": return _session.spaces.set_door_open(StringName(record.door_id),not bool(record.opened))
   "cook": return _session.cooking.act(StringName(record.station_id))
-  "sugar": return _session.cooking.cycle_sugar(StringName(record.station_id))
+  "sugar": return ActionResult.success({"show_recipes":str(record.station_id)})
   "buy_stock": return _session.supplies.buy_stock()
   "buy_fan": return _session.supplies.buy_fan()
   "snack": return _session.life.snack()

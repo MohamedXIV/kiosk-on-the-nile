@@ -211,10 +211,17 @@ func snapshot() -> Dictionary:
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("jobs") is Dictionary or not ContentValidation.integer(data.get("next_id")) or data.next_id<1:return _fail("invalid_workflows")
  for id in data.jobs:
+  var suffix := str(id).trim_prefix("cook_")
+  if not str(id).begins_with("cook_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_workflow_counter")
   var job: Variant=data.jobs[id]
-  if not job is Dictionary or job.get("id")!=id or not job.get("definition") is Dictionary or not job.get("status") in ["active","completed","cancelled"] or job.get("time_domain")!="world_minutes" or not ContentValidation.integer(job.get("step_index")) or not ContentValidation.number(job.get("elapsed")) or job.elapsed<0 or not ContentValidation.number(job.get("last_world_minutes")) or job.last_world_minutes>_clock.world_minutes+0.001 or not job.get("devices") is Dictionary or not job.get("step_results") is Array or not job.get("inputs_consumed") is bool:return _fail("invalid_workflow")
+  if not job is Dictionary or job.get("id")!=id or not job.get("definition") is Dictionary or not job.get("status") in ["active","completed","cancelled"] or job.get("time_domain")!="world_minutes" or not ContentValidation.integer(job.get("step_index")) or not ContentValidation.number(job.get("elapsed")) or job.elapsed<0 or not ContentValidation.number(job.get("last_world_minutes")) or (job.last_world_minutes<0 or job.last_world_minutes>_clock.world_minutes+0.001) or not job.get("devices") is Dictionary or not job.get("step_results") is Array or not job.get("inputs_consumed") is bool:return _fail("invalid_workflow")
   var result := CookingWorkflowValidation.validate_recipes({str(job.recipe_id):job.definition},_inventory.items)
   if not result.ok or job.step_index<0 or job.step_index>=job.definition.steps.size():return _fail("invalid_workflow_definition")
+  if not job.get("recipe_id") is String or job.get("recipe_version")!=job.definition.version:return _fail("invalid_recipe_version")
+  for step in job.definition.steps:
+   if not job.devices.get(step.capability) is String:return _fail("missing_workflow_device")
+  for evidence in job.step_results:
+   if not evidence is Dictionary or not evidence.get("step_id") is String or not ContentValidation.integer(evidence.get("grade")) or evidence.grade<0 or evidence.grade>3 or not ContentValidation.number(evidence.get("elapsed")) or evidence.elapsed<0:return _fail("invalid_step_evidence")
   if not ContentValidation.integer(job.get("quality_penalty")) or job.quality_penalty<0 or job.quality_penalty>2 or not job.get("sugar_id") is String:return _fail("invalid_workflow_quality")
   if job.status=="active" and job.definition.has("vessel_definition") and job.step_index>=1:
    var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))

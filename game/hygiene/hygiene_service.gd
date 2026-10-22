@@ -23,6 +23,12 @@ func configure(definitions: Dictionary, items: ItemStore, spaces: SpaceService, 
  items.changed.connect(func(_revision):_sync_targets())
  return ActionResult.success()
 func _sync_targets() -> void:
+ var expected: Dictionary={}
+ for location_id in _spaces.definitions().locations:expected["floor:"+location_id]=true
+ for item in _items.snapshot().items.values():
+  if _definitions.item_profiles.has(item.definition_id):expected[item.id]=true
+ for id in _targets.keys():
+  if not expected.has(id):_targets.erase(id)
  for id in _spaces.definitions().locations:
   if not _targets.has("floor:"+id):_targets["floor:"+id]={"cleanliness":100.0,"cleaning":{}}
  for item in _items.snapshot().items.values():
@@ -30,6 +36,7 @@ func _sync_targets() -> void:
 func state(target_id: StringName) -> Dictionary:
  if not _targets.has(str(target_id)):return {}
  var value: Dictionary=_targets[str(target_id)].duplicate(true)
+ value["visible_dirt"]=float(value.cleanliness)<float(_definitions.thresholds.wipe)
  value["id"]=str(target_id)
  value["location_id"]=_location(target_id)
  value["label"]=_definitions.labels.clean if value.cleanliness>=float(_definitions.thresholds.wipe) else _definitions.labels.wipe if value.cleanliness>=float(_definitions.thresholds.dirty) else _definitions.labels.dirty
@@ -58,7 +65,7 @@ func begin_clean(target_id: StringName) -> ActionResult:
  var target: Dictionary=_targets[str(target_id)]
  if target.cleaning.is_empty():
   var duration := float(_profile(target_id).clean_minutes)
-  target.cleaning={"required_minutes":duration,"completed_minutes":0.0,"rate":(100.0-float(target.cleanliness))/duration}
+  target.cleaning={"required_minutes":duration,"completed_minutes":0.0,"rate":100.0/duration}
  _action=CleaningAction.new()
  _action.target_id=target_id
  _action.location_id=StringName(_location(target_id))
@@ -100,9 +107,10 @@ func _advance(now: float, allow_cleaning: bool) -> void:
  var pose: ActorPose=_player.call()
  if str(id).begins_with("floor:") and pose.ground.distance_to(_action.anchor)>0.35:interrupt_clean();return
  var target: Dictionary=_targets[str(id)]
- var used := minf(elapsed,maxf(0,_action.required_minutes-_action.completed_minutes))
+ var remaining := maxf(0,_action.required_minutes-_action.completed_minutes)
+ var used := minf(elapsed,remaining)
  target.cleaning.completed_minutes=float(target.cleaning.completed_minutes)+used
- target.cleanliness=minf(100,float(target.cleanliness)+used*float(target.cleaning.rate))
+ if remaining>0:target.cleanliness=minf(100,float(target.cleanliness)+(100.0-float(target.cleanliness))*used/remaining)
  if _action.completed_minutes>=_action.required_minutes-0.00001:
   target.cleanliness=100.0
   target.cleaning={}

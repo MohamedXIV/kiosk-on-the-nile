@@ -83,7 +83,12 @@ func purchase(quote: ShopQuote, request_id: StringName) -> ActionResult:
     for i in range(quantity):grants.append({"definition_id":part.definition_id,"quantity":1,"container_id":journey.purchase_container_id,"attributes":{"enabled":false} if part.definition_id in ["fan","radio"] else {}})
  var prepared := _items.prepare_grants(grants)
  if not prepared.ok:return prepared
- var receipt := {"id":"receipt_%d" % _next_receipt,"request_id":str(request_id),"journey_id":journey.id,"bag_id":journey.purchase_container_id,"quote":quote.snapshot(),"total_minor":quote.total_minor,"at":_clock.world_minutes}
+ var granted: Array=[]
+ for id in prepared.details.change.state.items:
+  if not _items.get_item(StringName(id)).is_empty():continue
+  var item: Dictionary=prepared.details.change.state.items[id]
+  granted.append({"item_id":id,"definition_id":item.definition_id,"quantity":item.quantity})
+ var receipt := {"grants_known":true,"granted":granted,"id":"receipt_%d" % _next_receipt,"request_id":str(request_id),"journey_id":journey.id,"bag_id":journey.purchase_container_id,"quote":quote.snapshot(),"total_minor":quote.total_minor,"at":_clock.world_minutes}
  var committed := _items.commit(prepared.details.change,false)
  if not committed.ok:return committed
  # No await or observer between commit and debit; all preconditions checked above.
@@ -139,10 +144,20 @@ func restore(data: Dictionary) -> ActionResult:
  for shop_id in _data.shops:
   if not data.stock.get(shop_id) is Dictionary or data.stock[shop_id].size()!=_data.shops[shop_id].stock.size():return _fail("invalid_shop_stock")
   for id in _data.shops[shop_id].stock:
-   if not ContentValidation.integer(data.stock[shop_id].get(id)) or data.stock[shop_id][id]<0 or data.stock[shop_id][id]>_data.shops[shop_id].stock[id]:return _fail("invalid_shop_stock")
+   if not ContentValidation.integer(data.stock[shop_id].get(id)) or data.stock[shop_id][id]<0 or data.stock[shop_id][id]>1000000000:return _fail("invalid_shop_stock")
  for id in data.receipts:
   var receipt: Variant=data.receipts[id]
   if not receipt is Dictionary or receipt.get("request_id")!=id or not receipt.get("quote") is Dictionary or not receipt.get("journey_id") is String or not receipt.get("bag_id") is String or not ContentValidation.integer(receipt.get("total_minor")) or receipt.total_minor<1:return _fail("invalid_shop_receipt")
+  if not receipt.get("grants_known") is bool or not receipt.get("granted") is Array:return _fail("invalid_shop_grants")
+  if receipt.grants_known and receipt.granted.is_empty():return _fail("missing_shop_grants")
+  var total := 0
+  if not receipt.quote.get("lines") is Array:return _fail("invalid_shop_quote")
+  for line in receipt.quote.lines:
+   if not line is Dictionary or not ContentValidation.integer(line.get("quantity")) or line.quantity<1 or not ContentValidation.integer(line.get("unit_price_minor")) or line.unit_price_minor<1:return _fail("invalid_shop_quote")
+   total+=int(line.quantity)*int(line.unit_price_minor)
+  if total!=receipt.total_minor:return _fail("invalid_shop_receipt_total")
+  var suffix := str(receipt.get("id","")).trim_prefix("receipt_")
+  if not str(receipt.get("id","")).begins_with("receipt_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_receipt):return _fail("invalid_receipt_counter")
  for value in data.delivered.values():
   if value!=true:return _fail("invalid_shop_delivery")
  _stock=data.stock.duplicate(true)

@@ -66,7 +66,9 @@ func close_visit(visit_id: StringName, reason: StringName, ended_at: float) -> A
  var components: Dictionary={}
  var environment := _environment(record.observations)
  if environment>=0:components["environment"]=environment
- if not record.food.is_empty():components["food"]=float(_data.quality_scores[int(record.food.quality)])
+ if not record.food.is_empty():
+  record.food["score"]=float(_data.quality_scores[int(record.food.quality)])
+  components["food"]=record.food.score
  var wait_end := float(record.food.served_at) if not record.food.is_empty() else ended_at
  if record.timing_known and record.order_id!="":components["wait"]=clampf(100.0*(1.0-maxf(0,wait_end-float(record.order_started_at))/float(record.patience)),0,100)
  var weights: Dictionary=_data.weights.duplicate(true)
@@ -99,6 +101,7 @@ func context(visit_id: StringName) -> Dictionary:
  return {"visit_id":str(visit_id),"dirty_observed":dirty,"dirty_category":dirty_category,"improved_observed":improved,"food_memory":not food.is_empty(),"previous_visit_id":str(last.get("visit_id","")),"food_visit_id":str(food.get("visit_id","")),"previous_food_id":str(food.get("food",{}).get("food_id","")),"previous_food_quality":int(food.get("food",{}).get("quality",-1)),"environment":current}
 func reputation(location_id: StringName) -> Dictionary:
  var history: Array=_recent.get(str(location_id),[])
+ history=history.slice(maxi(0,history.size()-int(_data.window)))
  var scores: Array=[]
  for summary in history:
   if summary.score>=0:scores.append(float(summary.score))
@@ -150,14 +153,25 @@ func restore(data: Dictionary) -> ActionResult:
  for id in data.active:
   var record: Variant=data.active[id]
   if not record is Dictionary or record.get("id")!=id or data.closed.has(id) or not record.get("observations") is Dictionary or not record.get("food") is Dictionary or not record.get("order_id") is String or not record.get("timing_known") is bool:return _fail("invalid_active_experience")
+  if not record.get("character_id") is String or not _spaces.definitions().locations.has(str(record.get("location_id",""))):return _fail("invalid_experience_location")
+  if not record.food.is_empty():
+   if record.food.get("order_id")!=record.order_id or not record.food.get("item_id") is String or not record.food.get("food_id") is String or not ContentValidation.integer(record.food.get("quality")) or record.food.quality<0 or record.food.quality>3 or not ContentValidation.number(record.food.get("served_at")) or record.food.served_at<0 or record.food.served_at>_clock.world_minutes:return _fail("invalid_experience_food")
+  for key in ["last_observed_at","order_started_at","patience"]:
+   if not ContentValidation.number(record.get(key)):return _fail("invalid_experience_timing")
+  if record.patience<0 or (record.timing_known and (record.order_started_at<0 or record.patience<=0)):return _fail("invalid_experience_timing")
   for observation in record.observations.values():
    if not observation is Dictionary or not _data.environment_weights.has(str(observation.get("category",""))) or not ContentValidation.bounded(observation.get("cleanliness"),0,100) or not ContentValidation.number(observation.get("at")) or observation.at>_clock.world_minutes:return _fail("invalid_observation")
  for location_id in data.recent:
-  if not _spaces.definitions().locations.has(location_id) or not data.recent[location_id] is Array or data.recent[location_id].size()>int(_data.window):return _fail("invalid_recent_experiences")
+  if not _spaces.definitions().locations.has(location_id) or not data.recent[location_id] is Array or data.recent[location_id].size()>100:return _fail("invalid_recent_experiences")
   var seen: Dictionary={}
   for summary in data.recent[location_id]:
    if not summary is Dictionary or not summary.get("visit_id") is String or seen.has(summary.visit_id) or not data.closed.has(summary.visit_id) or summary.get("location_id")!=location_id or not summary.get("components") is Dictionary or not ContentValidation.bounded(summary.get("score"),-1,100):return _fail("invalid_experience_summary")
+   if not _valid_summary(summary):return _fail("invalid_experience_summary")
    seen[summary.visit_id]=true
+ for customer in data.customers.values():
+  if not customer is Dictionary or not customer.get("last_visit") is Dictionary or not customer.get("last_food") is Dictionary:return _fail("invalid_customer_memory")
+  for key in ["last_visit","last_food"]:
+   if not customer[key].is_empty() and (not _valid_summary(customer[key]) or not data.closed.has(str(customer[key].get("visit_id","")))):return _fail("invalid_customer_memory")
  _active=data.active.duplicate(true)
  _recent=data.recent.duplicate(true)
  _customers=data.customers.duplicate(true)
@@ -165,3 +179,16 @@ func restore(data: Dictionary) -> ActionResult:
  return ActionResult.success()
 func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,StringName(key))
+
+func _valid_summary(summary: Dictionary) -> bool:
+ if not summary.get("character_id") is String or not summary.get("food") is Dictionary or not summary.get("components") is Dictionary or not summary.get("weights") is Dictionary or not ContentValidation.number(summary.get("ended_at")) or summary.ended_at<0 or summary.ended_at>_clock.world_minutes or not _spaces.definitions().locations.has(str(summary.get("location_id",""))):return false
+ for key in summary.components:
+  if not _data.weights.has(key) or not ContentValidation.bounded(summary.components[key],0,100):return false
+ for key in summary.weights:
+  if not _data.weights.has(key) or not ContentValidation.bounded(summary.weights[key],0,5):return false
+ if not ContentValidation.number(summary.get("score")) or absf(float(summary.score)-_weighted(summary.components,summary.weights))>0.001:return false
+ if summary.components.has("food")==summary.food.is_empty():return false
+ if not summary.food.is_empty():
+  if summary.food.get("score")!=summary.components.food:return false
+  if not ContentValidation.integer(summary.food.get("quality")) or summary.food.quality<0 or summary.food.quality>3 or not summary.food.get("food_id") is String or not summary.food.get("item_id") is String:return false
+ return true

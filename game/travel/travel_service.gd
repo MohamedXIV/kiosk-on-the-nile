@@ -98,6 +98,8 @@ func restore(data: Dictionary) -> ActionResult:
   for key in ["started_at","due_at"]:
    if not ContentValidation.number(record.get(key)) or record[key]<0:return _fail("invalid_journey")
   if record.due_at<record.started_at or record.origin_pose.get("location_id")!=record.return_location:return _fail("invalid_journey")
+  var suffix := str(record.id).trim_prefix("journey_")
+  if not str(record.id).begins_with("journey_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_journey_counter")
   var origin := ActorPose.new()
   if not origin.restore(record.origin_pose).ok:return _fail("invalid_journey")
   var selected_route: Dictionary=_config.routes[record.route_id]

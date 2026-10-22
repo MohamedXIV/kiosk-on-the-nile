@@ -2,6 +2,7 @@ class_name SpaceSceneAdapter
 extends RefCounted
 static func location(source: Dictionary, location_id: StringName, spaces: SpaceService, items: ItemStore) -> Dictionary:
  var result := source.duplicate(true)
+ var labels: Dictionary=spaces.definitions().labels
  result.solids = spaces.solids(location_id)
  var props: Array = []
  for prop in result.props:
@@ -31,24 +32,30 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   prop_by_id[id]=prop
   if record.host_id=="":result.props.append(prop)
   else:mounted.append({"host_id":record.host_id,"prop":prop})
+  var mapped := false
   for target in source.interactions:
    if target.get("instance_id")==id or (target.get("instance_id")=="legacy_fan" and item.definition_id=="fan"):
     var moved: Dictionary = target.duplicate(true)
     moved.ground = [ground.x,ground.y]
-    if not moved.has("secondary_action"):moved.merge({"secondary":"تنظيف","secondary_action":"clean"})
+    moved.instance_id=id
+    if definition.get("behavior")=="toggle_equipment":
+     moved.id="equipment:"+id
+     moved.action="toggle_equipment"
+    if not moved.has("secondary_action"):moved.merge({"secondary":labels.clean,"secondary_action":"clean"})
     result.interactions.append(moved)
-  if item.kind in ["furniture","equipment"] and not definition.get("surface",false) and not definition.has("container") and not definition.has("station_id"):
-   result.interactions.append({"id":"care:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":"تنظيف "+str(definition.label),"action":"clean"})
-  if item.definition_id in ["radio","fan"]:
-   result.interactions.append({"id":"equipment:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":str(definition.label),"action":"toggle_equipment"})
+    mapped=true
+  if item.kind=="furniture" and not mapped and not definition.get("surface",false) and definition.get("behavior","")=="":
+   result.interactions.append({"id":"care:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":str(labels.clean_item).format({"item":str(definition.label)}),"action":"clean"})
+  if definition.get("behavior")=="toggle_equipment" and not mapped:
+   result.interactions.append({"id":"equipment:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.2,"primary":str(definition.label),"action":"toggle_equipment","secondary":labels.clean,"secondary_action":"clean"})
   if definition.has("container"):
-   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"افتح مخزون المكان","action":"inventory","container_id":id+":"+str(definition.container.kind),"secondary":"العناية بالجهاز","secondary_action":"recipes"})
-  if item.definition_id=="bed" and id!="bed":
-   result.interactions.append({"id":"bed:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":"اختيار مدة النوم والراحة","action":"sleep"})
+   result.interactions.append({"id":"storage:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":labels.inventory,"action":"inventory","container_id":id+":"+str(definition.container.kind),"secondary":labels.care,"secondary_action":"recipes"})
+  if definition.get("behavior")=="sleep" and not mapped:
+   result.interactions.append({"id":"bed:"+id,"instance_id":id,"ground":[ground.x,ground.y],"radius":1.3,"primary":labels.sleep,"action":"sleep","secondary":labels.clean,"secondary_action":"clean"})
   if item.kind=="equipment" and not definition.has("station_id") and not definition.has("container"):
    result.interactions.append({"id":"recipe:"+id,"ground":[ground.x,ground.y],"radius":1.3,"primary":str(definition.label),"action":"recipes","instance_id":id})
   if definition.get("surface",false):
-   result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":"سطح التحضير","secondary":str(spaces.definitions().get("recipe_label","الوصفات")),"secondary_action":"recipes","action":"surface","instance_id":id,"slot_id":id+":top"})
+   result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":labels.surface,"secondary":labels.recipes,"secondary_action":"recipes","action":"surface","instance_id":id,"slot_id":id+":top"})
  for child in mounted:
   if prop_by_id.has(child.host_id):
    var host: Dictionary=prop_by_id[child.host_id]
@@ -59,7 +66,7 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   var point := Vector2(door.cell[0],door.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])
   if not opened:
    result.props.append({"kind":"box","ground":[point.x,point.y],"size":[0.08 if door.axis=="y" else float(door.length)*space.cell_size,float(door.length)*space.cell_size if door.axis=="y" else 0.08,1.7],"top":"#99764e","front":"#6c5032"})
-  result.interactions.append({"id":door.id,"ground":[point.x,point.y],"radius":0.9,"primary":"اقفل الباب" if opened else "افتح الباب","action":"door","door_id":door.id,"opened":opened})
+  result.interactions.append({"id":door.id,"ground":[point.x,point.y],"radius":0.9,"primary":labels.door_close if opened else labels.door_open,"action":"door","door_id":door.id,"opened":opened})
  for wall in space.walls:
   var point := Vector2(wall.cell[0],wall.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])
   var size := Vector2(0.08,float(wall.length)*space.cell_size) if wall.axis=="y" else Vector2(float(wall.length)*space.cell_size,0.08)

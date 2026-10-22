@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 3
-const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","scheduler"]
+const SCHEMA_REVISION := 4
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","hygiene","customer_experience","scheduler"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -36,15 +36,15 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
  if not result.ok:
   candidate.queue_free()
   return result
+ result = candidate.player_pose.restore(restored_data.state.player_pose)
+ if not result.ok or candidate.locations.kind(candidate.location_id)==&"":
+  candidate.queue_free()
+  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_pose")
  for id in COMPONENTS:
   result = candidate.get(id).restore(restored_data.state[id])
   if not result.ok:
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,result.message_key,{"component":id})
- result = candidate.player_pose.restore(restored_data.state.player_pose)
- if not result.ok or candidate.locations.kind(candidate.location_id)==&"":
-  candidate.queue_free()
-  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_pose")
  if candidate.locations.is_physical(candidate.location_id):
   var location: Dictionary = config.section("locations")[str(candidate.location_id)]
   var bounds: Array = location.player_bounds
