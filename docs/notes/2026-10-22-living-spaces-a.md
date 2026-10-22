@@ -7,3 +7,4 @@
 - Manual cooking/serving/reload and viewport acceptance are pending; import/export success is not gameplay acceptance.
 - A2: shared grid placement, structural door state, six counters, mounted legacy stations, kiosk fridge and owned home furniture wired to rendered geometry and navigation. Moved standing markers invalidate NPC paths without replaying arrival dialogue/orders.
 - A2 builds `/tmp/kiosk-living-a2` and native application boot succeeded. A real Chromium Web session reached title and New Game; screenshot `/tmp/kiosk-living-home-a2.png` shows the home/partition/HUD. No script error appeared in browser console during this observation. Placement/trap/door acceptance remains pending until A4 exposes player arrangement.
+- A3: editor dock and shared layout document added. Godot import/Web export `/tmp/kiosk-living-a3` succeeded with plugin enabled and excluded from player pack. Interactive editor add/undo/export/reopen acceptance not yet performed.
