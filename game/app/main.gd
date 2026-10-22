@@ -215,7 +215,7 @@ func _unhandled_input(event: InputEvent) -> void:
   elif event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
    var room: LocationView=_rooms[str(_session.location_id)]
    var ground := room.mapping.to_ground(room.get_local_mouse_position())
-   _build_panel.move_cursor(Vector2i(floori(ground.x/0.25),floori(ground.y/0.25)))
+   _build_panel.ground_clicked(ground,room.mapping.height_scale/room.mapping.depth_scale)
   get_viewport().set_input_as_handled()
   return
  if _hud.sleep_panel.visible:

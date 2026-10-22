@@ -84,7 +84,8 @@
     "cleaning_out_of_reach": "قرّب من القطعة في نفس المكان الأول",
     "placement_crosses_building": "القطعة لازم تكون بالكامل داخل المبنى أو بالكامل برّه.",
     "placement_inside_only": "القطعة دي مكانها داخل المبنى فقط.",
-    "placement_outside_only": "القطعة دي مكانها في المساحة الخارجية فقط."
+    "placement_outside_only": "القطعة دي مكانها في المساحة الخارجية فقط.",
+    "arrange_select_piece": "اختار قطعة من المكان أو من القائمة الأول."
   },
   "theme": {
     "font_size": 19,
@@ -177,7 +178,7 @@
   "arrange_close": "إنهاء الترتيب",
   "arrange_floor": "على الأرض",
   "arrange_stored": "في المخزن",
-  "arrange_help": "اضغط على الشبكة لاختيار المكان؛ الوقت مستمر.",
+  "arrange_help": "اختار قطعة، واضغط على الشبكة لنقلها. R تدوير · Enter تثبيت · Esc إلغاء. الوقت مستمر.",
   "surface_put": "حط اللي في إيدك",
   "surface_take": "خد اللي على السطح",
   "surface_empty": "سطح تحضير فاضي",
@@ -235,5 +236,6 @@
   "inventory_furniture": "الأثاث المخزن · انقله بالحقيبة ثم فرغه في المكان الآخر",
   "arrange_inside": "داخل المبنى فقط",
   "arrange_outside": "خارج المبنى فقط",
-  "arrange_either": "مسموح داخل وخارج المبنى"
+  "arrange_either": "مسموح داخل وخارج المبنى",
+  "arrange_select_piece": "اختار قطعة من المكان أو من القائمة الأول."
 }

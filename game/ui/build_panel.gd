@@ -73,7 +73,8 @@ func _refresh_choices() -> void:
    _host.add_item(item.label+" · "+item.id)
    _host.set_item_metadata(_host.item_count-1,item.id)
  _updating=false
- if _choices.item_count>0: _select(StringName(_choices.get_item_metadata(_choices.selected)))
+ if selected!="" and _choices.item_count>0:_select(StringName(selected))
+ else:_choices.select(-1)
 func _controller_items_definition(item: Dictionary) -> Dictionary:
  return _controller.definition(StringName(item.definition_id))
 func _select(id: StringName) -> void:
@@ -100,6 +101,33 @@ func _preview() -> void:
  _controller.preview(Vector2i(int(_x.value),int(_y.value)),_rotation,host_id,&"top" if not host_id.is_empty() else &"")
 func _present_result() -> void:
  _status.text=_text.text("arrange_help") if _controller.last_result.ok else _text.outcome(_controller.last_result)
+ if _controller.request!=null:
+  var policy: Dictionary=_controller.definition(StringName(_controller_items_definition_for_request())).get("placement",{})
+  var key := "arrange_inside" if policy.get("environment")=="interior" else "arrange_outside" if policy.get("environment")=="exterior" else "arrange_either"
+  _status.text+="\n"+_text.text(key)
+
+func _controller_items_definition_for_request() -> String:
+ for item in _controller.choices():
+  if item.id==str(_controller.request.instance_id):return str(item.definition_id)
+ return ""
+func ground_clicked(point: Vector2, height_ratio: float = 0.0) -> void:
+ var hit := _controller.instance_at(point,height_ratio)
+ if not hit.is_empty():
+  var hit_definition: Dictionary={}
+  for item in _controller.choices():
+   if item.id==str(hit):hit_definition=_controller.definition(StringName(item.definition_id));break
+  if _controller.request!=null and hit_definition.get("surface",false) and _controller.definition(StringName(_controller_items_definition_for_request())).get("mountable",false):
+   for index in range(_host.item_count):
+    if str(_host.get_item_metadata(index))==str(hit):_host.select(index);_select_host(index);return
+  _select(hit)
+  for index in range(_choices.item_count):
+   if str(_choices.get_item_metadata(index))==str(hit):_choices.select(index);break
+  return
+ if _controller.request==null:
+  _status.text=_text.text("arrange_select_piece")
+  return
+ _host.select(0)
+ move_cursor(Vector2i(floori(point.x/0.25),floori(point.y/0.25)))
 
 func _select_host(index: int) -> void:
  if _updating:return

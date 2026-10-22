@@ -43,6 +43,27 @@ func select(instance_id: StringName) -> ActionResult:
  request.location_id=location_id
  if placed.is_empty(): request.cell=Vector2i(roundi(_pose.ground.x/0.25),roundi(_pose.ground.y/0.25))
  return preview(request.cell,request.rotation,request.host_id,request.slot_id)
+func instance_at(point: Vector2, height_ratio: float = 0.0) -> StringName:
+ var selected := &""
+ var height := -1.0
+ var space: Dictionary=_spaces.definitions().locations[str(location_id)]
+ for record in _spaces.snapshot().placements.values():
+  if record.location_id!=str(location_id):continue
+  var item := _items.get_item(StringName(record.instance_id))
+  var definition := _items.definition(StringName(item.definition_id))
+  var box := GridPlacementRules.footprint(record,definition,space)
+  var mount_height := 0.0
+  if record.host_id!="":mount_height=float(_items.definition(StringName(_items.get_item(StringName(record.host_id)).definition_id)).get("height",0.96))
+  var item_height := float(definition.get("height",0))
+  var visual_box := Rect2(box.position-Vector2(0,(mount_height+item_height)*height_ratio),box.size+Vector2(0,item_height*height_ratio))
+  if not definition.get("movable",false) or not visual_box.has_point(point):continue
+  var rank := float(definition.get("height",0))+ (10.0 if record.host_id!="" else 0.0)
+  if rank>height:selected=StringName(record.instance_id);height=rank
+ return selected
+func select_at(ground: Vector2) -> ActionResult:
+ var id := instance_at(ground)
+ if id.is_empty():return _failure("arrange_select_piece")
+ return select(id)
 func preview(cell: Vector2i, rotation: int, host_id: StringName = &"", slot_id: StringName = &"") -> ActionResult:
  if not active or request==null or _pose.location_id!=location_id: return _failure("invalid_destination")
  request.cell=cell
