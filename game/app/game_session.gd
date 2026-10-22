@@ -6,6 +6,7 @@ var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
 var items: ItemStore
+var spaces: SpaceService
 var inventory: InventoryService
 var home: HomeService
 var knowledge: KnowledgeBook
@@ -56,8 +57,29 @@ func configure(source: SessionConfig) -> ActionResult:
  item_result = inventory.restock_legacy(source.section("recipes").initial_stock)
  if not item_result.ok: return item_result
  home = HomeService.new(items)
+ var initial_layout := source.section("initial_layout")
+ var initial_grants: Array[Dictionary] = []
+ initial_grants.assign(initial_layout.instances)
+ for grant in initial_grants:
+  var definition := items.definition(StringName(grant.definition_id))
+  if definition.get("surface",false):
+   var container_change := items.candidate()
+   var slot_id := str(grant.id)+":top"
+   container_change.state.containers[slot_id] = {"id":slot_id,"location_id":str(grant.container_id).trim_suffix("_world"),"kind":"surface","capacity":1,"allowed_tags":["prepared","batch"],"host_id":grant.id}
+   var slot_result := items.commit(container_change,false)
+   if not slot_result.ok: return slot_result
+ var furniture_result := items.prepare_grants(initial_grants)
+ if not furniture_result.ok: return furniture_result
+ furniture_result = items.commit(furniture_result.details.change,false)
+ if not furniture_result.ok: return furniture_result
  var initial_home := home.restore(source.section("session").home)
  if not initial_home.ok: return initial_home
+ var layout := {"placements":initial_layout.placements,"door_states":initial_layout.door_states}
+ for fan in items.instances(&"fan"):
+  if fan.container_id=="rooftop_world": layout.placements[fan.id]={"instance_id":fan.id,"location_id":"rooftop","cell":[2,-3],"rotation":0,"host_id":"","slot_id":""}
+ spaces = SpaceService.new()
+ var space_result := spaces.configure(source.section("spaces"),layout,items,_actor_snapshots,func(id):return cooking!=null and cooking.job(id)!=null and cooking.job(id).stage!=&"EMPTY")
+ if not space_result.ok: return space_result
  kiosk_open = source.section("session").kiosk_open
  var social_data := source.section("social")
  var amounts: Dictionary = {}
@@ -144,3 +166,9 @@ func _sleep_elapsed(frame: Dictionary) -> void:
  cooking.tick(float(frame.delta))
  scheduler.tick(frame)
  changed.emit()
+
+func _actor_snapshots() -> Array[Dictionary]:
+ var result: Array[Dictionary] = [player_pose.snapshot()]
+ if visitors!=null:
+  for visit in visitors.visits.values(): result.append(visit.pose.snapshot())
+ return result

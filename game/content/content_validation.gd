@@ -5,6 +5,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if bundle.has("items") or bundle.has("containers"):
   var items_result := ItemContentValidation.validate(bundle.get("items",{}),bundle.get("containers",{}))
   if not items_result.ok: return items_result
+ if bundle.has("spaces") or bundle.has("initial_layout"):
+  var spaces_result := SpaceContentValidation.validate(bundle)
+  if not spaces_result.ok: return spaces_result
  var time: Dictionary = bundle.get("time",{})
  if not number(time.get("minutes_per_second")) or float(time.minutes_per_second) <= 0: return fail("time.minutes_per_second")
  if bundle.has("visitors"):

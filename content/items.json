@@ -20,6 +20,192 @@
     ],
     "height": 1.2,
     "color": "#82999c",
+    "movable": true,
+    "visual": {
+      "kind": "fan",
+      "height": 1.15,
+      "rotation_speed": 21
+    }
+  },
+  "counter": {
+    "label": "سطح تحضير",
+    "kind": "furniture",
+    "footprint": [
+      4,
+      3
+    ],
+    "height": 0.96,
+    "visual": {
+      "kind": "box",
+      "size": [
+        3.45,
+        0.72,
+        0.96
+      ],
+      "top": "#9c6e42",
+      "front": "#6e4b2a"
+    },
+    "movable": true,
+    "surface": true
+  },
+  "kettle": {
+    "label": "براد شاي",
+    "kind": "equipment",
+    "footprint": [
+      2,
+      2
+    ],
+    "height": 0.4,
+    "visual": {
+      "kind": "kettle",
+      "station_id": "tea",
+      "body": "#b87333",
+      "lid": "#d99658"
+    },
+    "movable": true,
+    "mountable": true,
+    "station_id": "tea"
+  },
+  "griddle": {
+    "label": "جريل كبدة",
+    "kind": "equipment",
+    "footprint": [
+      2,
+      2
+    ],
+    "height": 0.4,
+    "visual": {
+      "kind": "grill",
+      "station_id": "kebda",
+      "body": "#1f2024",
+      "raw": "#8b322c",
+      "cooked": "#4f2412"
+    },
+    "movable": true,
+    "mountable": true,
+    "station_id": "kebda"
+  },
+  "bed": {
+    "label": "سرير",
+    "kind": "furniture",
+    "footprint": [
+      8,
+      5
+    ],
+    "height": 0.42,
+    "visual": {
+      "kind": "box",
+      "size": [
+        2.05,
+        1.25,
+        0.42
+      ],
+      "top": "#c8b8a6",
+      "front": "#4e3620",
+      "details": [
+        {
+          "kind": "rect",
+          "offset": [
+            -0.65,
+            0,
+            0.45
+          ],
+          "rect": [
+            -14,
+            -18,
+            28,
+            36
+          ],
+          "color": "#e8dfd5"
+        }
+      ]
+    },
+    "movable": true,
+    "surface": false
+  },
+  "desk": {
+    "label": "مكتب",
+    "kind": "furniture",
+    "footprint": [
+      5,
+      3
+    ],
+    "height": 0.72,
+    "visual": {
+      "kind": "box",
+      "size": [
+        1.2,
+        0.7,
+        0.72
+      ],
+      "top": "#8c6239",
+      "front": "#5c3e22",
+      "details": [
+        {
+          "kind": "circle",
+          "offset": [
+            0,
+            0,
+            0.75
+          ],
+          "center": [
+            -12,
+            0
+          ],
+          "radius": 9,
+          "color": "#dedede"
+        }
+      ]
+    },
+    "movable": true,
+    "surface": true
+  },
+  "fridge": {
+    "label": "ثلاجة",
+    "kind": "equipment",
+    "footprint": [
+      3,
+      4
+    ],
+    "height": 1.6,
+    "visual": {
+      "kind": "box",
+      "top": "#c2c4ba",
+      "front": "#92988d"
+    },
+    "movable": true,
+    "storage": "cold"
+  },
+  "chair": {
+    "label": "كرسي",
+    "kind": "furniture",
+    "footprint": [
+      2,
+      2
+    ],
+    "height": 0.45,
+    "visual": {
+      "kind": "stool",
+      "height": 0.45,
+      "pole": "#3d2816",
+      "top": "#7c5330"
+    },
+    "movable": true
+  },
+  "table": {
+    "label": "طاولة",
+    "kind": "furniture",
+    "footprint": [
+      6,
+      5
+    ],
+    "height": 0.72,
+    "visual": {
+      "kind": "table",
+      "height": 0.72,
+      "pole": "#1f425c",
+      "top": "#2d5a7b"
+    },
     "movable": true
   }
 }

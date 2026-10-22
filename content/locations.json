@@ -254,7 +254,8 @@
             "raw": "#8b322c",
             "cooked": "#4f2412"
           }
-        ]
+        ],
+        "owned": true
       },
       {
         "kind": "stool",
@@ -264,7 +265,8 @@
         ],
         "height": 0.45,
         "pole": "#3d2816",
-        "top": "#7c5330"
+        "top": "#7c5330",
+        "owned": true
       },
       {
         "kind": "stool",
@@ -274,7 +276,8 @@
         ],
         "height": 0.45,
         "pole": "#3d2816",
-        "top": "#7c5330"
+        "top": "#7c5330",
+        "owned": true
       },
       {
         "kind": "table",
@@ -284,7 +287,8 @@
         ],
         "height": 0.72,
         "pole": "#1f425c",
-        "top": "#2d5a7b"
+        "top": "#2d5a7b",
+        "owned": true
       }
     ],
     "solids": [
@@ -380,7 +384,8 @@
         "action": "cook",
         "station_id": "tea",
         "secondary": "تغيير السكر",
-        "secondary_action": "sugar"
+        "secondary_action": "sugar",
+        "instance_id": "tea"
       },
       {
         "id": "kebda",
@@ -391,7 +396,8 @@
         "radius": 1.6,
         "primary": "الجريل جاهز",
         "action": "cook",
-        "station_id": "kebda"
+        "station_id": "kebda",
+        "instance_id": "kebda"
       },
       {
         "id": "sign",
@@ -558,7 +564,8 @@
             ],
             "color": "#e8dfd5"
           }
-        ]
+        ],
+        "owned": true
       },
       {
         "id": "desk",
@@ -589,7 +596,8 @@
             "radius": 9,
             "color": "#dedede"
           }
-        ]
+        ],
+        "owned": true
       },
       {
         "kind": "fan",
@@ -598,7 +606,8 @@
           -1.4
         ],
         "height": 1.15,
-        "rotation_speed": 21
+        "rotation_speed": 21,
+        "owned": true
       }
     ],
     "solids": [
@@ -650,7 +659,8 @@
         ],
         "radius": 1.65,
         "primary": "اختار مدة النوم والراحة",
-        "action": "sleep"
+        "action": "sleep",
+        "instance_id": "bed"
       },
       {
         "id": "snack",
@@ -660,7 +670,8 @@
         ],
         "radius": 1.55,
         "primary": "لقمة خفيفة بـ {snack_price} ج.م (يسد الجوع)",
-        "action": "snack"
+        "action": "snack",
+        "instance_id": "desk"
       },
       {
         "id": "fan",
@@ -673,7 +684,8 @@
         "action": "toggle_fan",
         "requires": {
           "home_item_owned": "fan"
-        }
+        },
+        "instance_id": "legacy_fan"
       },
       {
         "id": "exit",

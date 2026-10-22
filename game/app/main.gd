@@ -5,6 +5,7 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _physical: PhysicalWorldController
 var _world: Node2D
 var _rooms: Dictionary = {}
 var _motor: ActorMotor
@@ -113,33 +114,19 @@ func _install(candidate: GameSession) -> void:
  _session = candidate
  _world = Node2D.new()
  add_child(_world)
- _rooms.clear()
- for id in _config.section("locations"):
-  var room := LocationView.new()
-  _world.add_child(room)
-  room.configure(LocationDefinition.new(StringName(id),_config.section("locations")[id]),_session)
-  _rooms[id] = room
- _motor = ActorMotor.new()
- var room: LocationView = _rooms[str(_session.location_id)]
- room.add_child(_motor)
- _motor.pose = _session.player_pose
- var spatial: Dictionary = _config.section("spatial")
- _motor.configure(room.mapping,float(spatial.player_speed),float(spatial.foot_radius))
- _motor.teleport(_session.location_id,_session.player_ground)
- _character = preload("res://game/presentation/character_view.tscn").instantiate()
- _motor.add_child(_character)
- _character.configure(spatial.character)
- _camera = Camera2D.new()
- _world.add_child(_camera)
- _camera.enabled = true
- _camera.position_smoothing_enabled = true
- _camera.position_smoothing_speed = float(spatial.camera_smoothing)
- _camera.global_position = _motor.global_position
- _camera.reset_smoothing()
- _visitors = VisitorController.new()
- _world.add_child(_visitors)
- _visitors.configure(_session.visitors,_rooms.kiosk)
+ _physical = PhysicalWorldController.new()
+ var world_result := _physical.configure(_session,_world)
+ if not world_result.ok: push_error(str(world_result.details));return
+ _rooms = _physical.rooms
+ _motor = _physical.motor
+ _character = _physical.character
+ _camera = _physical.camera
+ _visitors = _physical.visitors
+ _physical.input_provider = func():
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible
+  return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.motion_step = _step_motion
+ var room: LocationView = _rooms[str(_session.location_id)]
  _router = InteractionRouter.new(_session,room,_text)
  if _hud: _hud.free()
  _hud = Hud.new()
@@ -208,11 +195,8 @@ func _commit_transition(details: Dictionary) -> ActionResult:
  var result := _session.life.sleep(int(details.sleep_hours)) if details.has("sleep_hours") else _session.life.travel(StringName(details.destination))
  if not result.ok: return result
  var room: LocationView = _rooms[str(_session.location_id)]
- _motor.reparent(room,false)
- _motor.teleport(_session.location_id,_session.player_ground)
+ _physical.set_active_location(_session.location_id)
  _router = InteractionRouter.new(_session,room,_text)
- _camera.global_position = _motor.global_position
- _camera.reset_smoothing()
  return result
 func _request_save() -> void:
  if _session==null: return
@@ -237,10 +221,7 @@ func _notification(what: int) -> void:
   if _sound and _session: _sound.set_muted(false)
 
 func _step_motion(delta: float) -> void:
- var locked := _transition.active or _hud.notebook.visible or _hud.sleep_panel.visible
- var direction := Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
- _motor.step_input(direction,delta)
- _visitors.step(delta)
+ _physical.step(delta)
 
 func _diagnostics() -> void:
  var diagnostics := Diagnostics.new()

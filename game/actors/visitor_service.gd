@@ -190,3 +190,13 @@ func _eligible(id: String) -> bool:
  for visit: VisitState in visits.values():
   if character(visit.character_id).marker==definition.marker: return false
  return true
+
+func update_markers(markers: Dictionary) -> void:
+ _markers = markers.duplicate(true)
+ for visit in visits.values():
+  if visit.phase==&"leaving": continue
+  var definition := character(visit.character_id)
+  var marker: Array = _markers[definition.marker]
+  var target := Vector2(marker[0],marker[1])
+  if visit.destination.distance_to(target)>0.01:
+   visit.destination = target

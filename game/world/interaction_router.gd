@@ -48,6 +48,7 @@ func execute(secondary: bool) -> ActionResult:
   if data.id==str(target.id): record=data;break
  var action: String = record.get("secondary_action","") if secondary and not target.secondary.is_empty() else record.get("action","") if not secondary else ""
  match action:
+  "door": return _session.spaces.set_door_open(StringName(record.door_id),not bool(record.opened))
   "cook": return _session.cooking.act(StringName(record.station_id))
   "sugar": return _session.cooking.cycle_sugar(StringName(record.station_id))
   "buy_stock": return _session.supplies.buy_stock()

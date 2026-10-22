@@ -7,9 +7,11 @@ var navigation := KioskNavigation.new()
 var station_views: Dictionary = {}
 var _fan: FanView
 var _sign: SignView
+var _geometry: Array[Node] = []
 func configure(data: LocationDefinition, source: GameSession) -> void:
- definition = data
  session = source
+ definition = LocationDefinition.new(data.id,SpaceSceneAdapter.location(data.data,data.id,source.spaces,source.items))
+ data = definition
  mapping = SpatialMapping.new(source.config.section("spatial"))
  position = Vector2(data.data.canvas_origin[0],data.data.canvas_origin[1])
  y_sort_enabled = true
@@ -46,6 +48,7 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
  for box in [[bounds[0]-1,bounds[1]-1,bounds[0],bounds[3]+1],[bounds[2],bounds[1]-1,bounds[2]+1,bounds[3]+1],[bounds[0],bounds[1]-1,bounds[2],bounds[1]],[bounds[0],bounds[3],bounds[2],bounds[3]+1]]:
   _add_solid({"kind":"rect","rect":box},solids,4)
  navigation.configure(data,mapping)
+ _geometry.assign(get_children())
 func _add_solid(data: Dictionary, parent: Node, layer: int) -> void:
  var body := StaticBody2D.new()
  body.collision_layer = layer
@@ -92,3 +95,18 @@ func interaction_targets() -> Array[InteractionTarget]:
  return targets
 func _permitted(rule: Dictionary) -> bool:
  return session.conditions.permits(rule)
+
+func refresh_layout() -> void:
+ for child in _geometry:
+  if is_instance_valid(child):
+   remove_child(child)
+   child.free()
+ _geometry.clear()
+ station_views.clear()
+ _fan = null
+ _sign = null
+ var base := LocationDefinition.new(definition.id,session.config.section("locations")[str(definition.id)])
+ # Actor nodes stay alive. Only retain freshly generated geometry for next refresh.
+ var actors := get_children()
+ configure(base,session)
+ for actor in actors: _geometry.erase(actor)
