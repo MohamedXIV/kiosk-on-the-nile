@@ -296,6 +296,14 @@ func _progress_slice(job: Dictionary, delta: float) -> void:
 
 func available_foods(location_id: StringName) -> PackedStringArray:
  var result := PackedStringArray()
+ # Finished portions remain sellable after their last raw inputs were consumed.
+ for item in _inventory.items.snapshot().items.values():
+  if item.kind!="prepared":continue
+  var container := _inventory.items.get_container(StringName(item.container_id))
+  var local: bool = container.location_id==str(location_id) and container.kind!="purchase_bag"
+  var carried: bool = container.id=="player_hand" and _inventory.player_pose!=null and _inventory.player_pose.location_id==location_id
+  var food_id := str(item.attributes.get("food_id",""))
+  if (local or carried) and food_id!="" and not food_id in result:result.append(food_id)
  for recipe_id in _recipes:
   var definition: Dictionary=_recipes[recipe_id]
   if definition.has("vessel_definition"):continue
@@ -327,5 +335,5 @@ func available_foods(location_id: StringName) -> PackedStringArray:
     for job in _jobs.values():
      if job.status=="active" and job.location_id==str(location_id) and job.recipe_id==precursor_id:intermediate=true
    if not intermediate:usable=false
-  if usable and (active or _inventory.available(location_id,inputs).ok):result.append(str(definition.output.food_id))
+  if usable and (active or _inventory.available(location_id,inputs).ok) and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
  return result

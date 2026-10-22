@@ -27,8 +27,6 @@ func sleep(hours: int) -> ActionResult:
  sleep_started.emit()
  _session.kiosk_open = false
  result = _session.routine.sleep(hours)
- var item := _session.cooking.held_item()
- if item: _session.cooking.take_held(item.id)
  _session.kiosk_open = false
  var spawn: Array = _session.config.section("locations").rooftop.spawn
  _session.player_ground = Vector2(spawn[0],spawn[1])

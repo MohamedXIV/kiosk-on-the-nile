@@ -35,3 +35,15 @@
 Full shawarma vessel→fridge→spit→three slices→assembly→paid service, interrupted cleaning/save/resume, dirty-bed recovery, furniture cross-location transport through the UI, all five adversarial review cases and interactive native editor authoring remain unverified manually. The implementation is a preview, not a fully accepted D4 release. Default multi-day economy and visitor pacing are also not accepted by the externally tuned session.
 
 - Confirmed the appliance purchase of a shawarma spit through review/confirm: money 48500→39500 minor, then actual return to kiosk with cooking/customers still active. The long description exposed shop vertical overflow; details now have their own scrolling area so return stays in the panel. `/tmp/spit-purchase-confirmed.png`.
+
+## Continued D4 manual cycle
+
+- Continued normal UI play from the prior save. Bought chicken, marinade, oil, bread and sauce, unpacked into the actual venue dry/fridge containers, mounted purchased rotisserie `item_17` on `counter_4`, and started preparation on `counter_6`.
+- Real bowl `item_23` moved from hand into `kiosk_fridge:cold`; cold elapsed advanced there. Retrieved that bowl physically and loaded it into the spit. After 22.625 world minutes roasting, switched heat off and sliced one real filling `item_24`; original bowl retained two portions. Mood penalty 1 and food-contact evidence were captured on the filling.
+- Saved through the HUD with the filling in hand and two portions left; observed confirmation and read-only browser persistence showed revision4 at world minute2312.2916666675096 with both jobs, batch and filling. Actual Continue is being checked next. The earlier first slice screenshot alone was not counted as save evidence because its save menu click had not landed; no product persistence failure was inferred.
+- Manual-only content additionally sets need decay to zero during prolonged review. Default release values remain unchanged.
+
+- Actual Continue restored filling `item_24`, bowl `item_23` with two portions and frozen roast elapsed22.625. Put the filling onto `counter_5:top` and picked up the same ID, then assembled actual `food_25` shawarma quality2 from technique3/mood1/hygiene0. `/tmp/assemble-after-continue.png`, `/tmp/shawarma-sandwich-saved.png`.
+- Packed stored `counter_2`, travelled home and unpacked it into rooftop storage through UI, retaining its identity. `/tmp/furniture-arrived-home.png`.
+- Normal sleep requested1 hour, preview added1 for mood52/rest0, recovered24 rest; crossing midnight assessed rent once. Accelerated manual-only bed dirt remains for the dirty-bed observation.
+- Manual findings: ready food was absent from customer availability once its last raw inputs were used; include actual local prepared instances and the physically present player's carried portion. Sleeping still had the legacy silent held-food deletion; remove that debit so owned food is not consumed without a consumption action. Both corrections remain subject to build/manual continuation below.
