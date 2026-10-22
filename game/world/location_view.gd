@@ -94,7 +94,10 @@ func _process(_delta: float) -> void:
  visible = session.location_id == definition.id
  for id in station_views:
   var job := session.cooking.job(StringName(id))
-  if job: station_views[id].present({"stage":str(job.stage),"heat_elapsed":job.heat_elapsed,"brew_elapsed":job.brew_elapsed})
+  if job:
+   station_views[id].present({"stage":str(job.stage),"heat_elapsed":job.heat_elapsed,"brew_elapsed":job.brew_elapsed})
+   for child in station_views[id].get_children():
+    if child is StationVapour:child.job=job
  if _fan: _fan.present(session.home.snapshot())
  if _sign: _sign.present(session.kiosk_open)
  for slot in _surface_foods:

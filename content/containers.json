@@ -74,5 +74,15 @@
       "batch"
     ],
     "host_id": ""
+  },
+  "rooftop_dry": {
+    "id": "rooftop_dry",
+    "location_id": "rooftop",
+    "kind": "dry",
+    "capacity": 48,
+    "allowed_tags": [
+      "ingredient"
+    ],
+    "host_id": ""
   }
 }

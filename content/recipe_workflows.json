@@ -1,0 +1,121 @@
+{
+  "tea": {
+    "version": 1,
+    "label": "شاي",
+    "learning_fact": "",
+    "consume_on_start": false,
+    "presentation_minutes_per_second": 2.5,
+    "inputs": [
+      {
+        "definition_id": "tea_portion",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "water",
+        "kind": "heat",
+        "capability": "heat_water",
+        "duration": 8,
+        "action": "add_tea",
+        "label": "حط الشاي والسكر بعد الغليان",
+        "assess": false,
+        "consume_inputs": true,
+        "after": []
+      },
+      {
+        "id": "brew",
+        "kind": "brew",
+        "capability": "heat_water",
+        "duration": 6.25,
+        "good_until": 21.25,
+        "okay_until": 30,
+        "action": "pour",
+        "label": "صب الشاي",
+        "after": [
+          "water"
+        ]
+      }
+    ],
+    "output": {
+      "food_id": "tea"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ]
+  },
+  "kebda": {
+    "version": 1,
+    "label": "كبدة إسكندراني",
+    "learning_fact": "",
+    "consume_on_start": true,
+    "presentation_minutes_per_second": 2.5,
+    "inputs": [
+      {
+        "definition_id": "kebda_portion",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "side_a",
+        "kind": "heat",
+        "capability": "griddle",
+        "duration": 4.5,
+        "action": "flip",
+        "label": "قلّب الكبدة",
+        "assess": false,
+        "after": []
+      },
+      {
+        "id": "side_b",
+        "kind": "heat",
+        "capability": "griddle",
+        "duration": 0,
+        "action": "season",
+        "label": "تبّل الكبدة",
+        "assess": false,
+        "after": [
+          "side_a"
+        ]
+      },
+      {
+        "id": "finish",
+        "kind": "heat",
+        "capability": "griddle",
+        "duration": 0,
+        "action": "take",
+        "label": "عبّي في الفينو",
+        "assess": false,
+        "inherit_elapsed": true,
+        "after": [
+          "side_b"
+        ]
+      }
+    ],
+    "quality": {
+      "kind": "two_sides",
+      "burnt_after": 37.5,
+      "excellent_a_min": 5.5,
+      "excellent_a_max": 17.5,
+      "excellent_b_min": 4.5,
+      "excellent_b_max": 17.5,
+      "good_total_min": 8.75,
+      "good_total_max": 31.25
+    },
+    "output": {
+      "food_id": "kebda"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ]
+  }
+}

@@ -72,7 +72,7 @@ func _safe_return_pose() -> void:
  var solids := _inventory.spaces.solids(_pose.location_id)
  if not FootprintGeometry.blocked(_pose.ground,solids,0.18):return
  var candidates: Array[Vector2]=[]
- var bounds: Array=_inventory.spaces.definitions().locations[str(_pose.location_id)].navigation_bounds
+ var bounds: Array=_config.physical_spawns[str(_pose.location_id)].player_bounds
  for x in range(ceili(bounds[0]/0.25),floori(bounds[2]/0.25)+1):
   for y in range(ceili(bounds[1]/0.25),floori(bounds[3]/0.25)+1):
    var point := Vector2(x,y)*0.25

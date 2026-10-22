@@ -17,6 +17,8 @@ var home: HomeService
 var knowledge: KnowledgeBook
 var routine: DailyRoutine
 var mood_policy: MoodPolicy
+var learning: RecipeLearning
+var workflow: RecipeWorkflow
 var cooking: CookingService
 var supplies: SupplyService
 var life: LifeActions
@@ -117,6 +119,15 @@ func configure(source: SessionConfig) -> ActionResult:
  var kitchen := cooking.configure(source.section("recipes"),inventory)
  if not kitchen.ok: return kitchen
  cooking.set_quality_provider(func():return mood_policy.quality_penalty(needs.mood))
+ workflow=RecipeWorkflow.new()
+ var workflow_result := workflow.configure(source.section("recipe_workflows"),inventory,equipment,clock,knowledge)
+ if not workflow_result.ok:return workflow_result
+ workflow.quality_provider=func():return mood_policy.quality_penalty(needs.mood)
+ cooking.set_workflow(workflow)
+ learning=RecipeLearning.new()
+ learning.configure(workflow,items,source.section("learning").families)
+ workflow.attempt_started.connect(func(id,recipe,evidence):learning.record_attempt(id,recipe,evidence))
+ workflow.item_completed.connect(func(id,item,quality):learning.record_result(id,item,quality))
  supplies = SupplyService.new(travel,home,knowledge)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
@@ -156,7 +167,9 @@ func configure(source: SessionConfig) -> ActionResult:
  scheduler.configure({})
  return rebuild_order()
 func rebuild_order() -> ActionResult:
- var handlers := {"needs":func(frame):needs.tick(frame.delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):cooking.tick(frame.delta),"visitors":func(frame):visitors.tick(frame.delta),"narrative":func(frame):narrative.tick(frame.delta),"motion":func(frame):
+ var handlers := {"needs":func(frame):needs.tick(frame.delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):
+  cooking.tick(frame.delta)
+  workflow.tick(frame),"visitors":func(frame):visitors.tick(frame.delta),"narrative":func(frame):narrative.tick(frame.delta),"motion":func(frame):
   if motion_step.is_valid(): motion_step.call(frame.delta)}
  handlers["travel"]=func(frame):travel.tick(frame)
  handlers["shops"]=func(frame):shops.tick(frame)
@@ -190,6 +203,7 @@ func _sleep_elapsed(frame: Dictionary) -> void:
  # Sleep skips travel/social scenes, while unattended stations and due jobs
  # consume the same elapsed clock frame. Recovery has already been applied.
  cooking.tick(float(frame.delta))
+ workflow.tick(frame)
  scheduler.tick(frame)
  changed.emit()
 

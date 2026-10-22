@@ -26,6 +26,8 @@
     "initial_layout": "initial_layout.json",
     "equipment": "equipment.json",
     "travel": "travel.json",
-    "shops": "shops.json"
+    "shops": "shops.json",
+    "recipe_workflows": "recipe_workflows.json",
+    "learning": "learning.json"
   }
 }

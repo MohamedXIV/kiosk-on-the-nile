@@ -1,7 +1,7 @@
 class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
- if envelope.get("schema_revision")!=2: return _fail("schema_revision")
+ if envelope.get("schema_revision")!=3: return _fail("schema_revision")
  var items := session.items.snapshot()
  var placements: Dictionary = session.spaces.snapshot().placements
  for id in items.items:
@@ -26,7 +26,11 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
    if not placements.has(container.host_id):return _fail("food_on_stored_surface")
    for p in placements.values():
     if p.host_id==container.host_id:return _fail("food_on_occupied_surface")
- if not items.reservations.is_empty():return _fail("unknown_live_reservation")
+ var workflows: Dictionary=session.workflow.snapshot().jobs
+ for id in items.reservations:
+  if not workflows.has(id) or workflows[id].status!="active":return _fail("orphan_ingredient_reservation")
+ for id in session.equipment.snapshot().reservations:
+  if not workflows.has(id) or workflows[id].status!="active":return _fail("orphan_equipment_reservation")
  if session.home.snapshot()!=envelope.state.home:return _fail("home_projection")
  for actor in session._actor_snapshots():
   if session.locations.kind(StringName(actor.location_id))==&"":return _fail("actor_location")

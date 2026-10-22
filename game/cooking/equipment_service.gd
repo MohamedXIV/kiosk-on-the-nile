@@ -40,8 +40,9 @@ func candidates(location_id: StringName, capability: StringName) -> PackedString
 func reserve(job_id: StringName, instance_id: StringName, requirements: Dictionary) -> ActionResult:
  var result := prepare_reservations(job_id,[{"instance_id":str(instance_id),"capability":str(requirements.get("capability","")),"units":requirements.get("units",1)}])
  return commit_reservations(result.details.state) if result.ok else result
-func prepare_reservations(job_id: StringName, requirements: Array[Dictionary]) -> ActionResult:
+func prepare_reservations(job_id: StringName, requirements: Array[Dictionary], replace_existing: bool = false) -> ActionResult:
  var candidate := _reservations.duplicate(true)
+ if replace_existing:candidate.erase(str(job_id))
  var lines: Array=candidate.get(str(job_id),[])
  for requirement in requirements:
   var id := StringName(str(requirement.get("instance_id","")))

@@ -60,6 +60,9 @@ func prepare_grants(grants: Array[Dictionary]) -> ActionResult:
    var container_id := id+":"+str(container_spec.kind)
    change.state.containers[container_id]={"id":container_id,"location_id":owner.get("location_id",""),"kind":container_spec.kind,"capacity":container_spec.capacity,"allowed_tags":container_spec.allowed_tags.duplicate(),"host_id":id}
  return _prepared(change)
+func validate_change(change: ItemChangeSet) -> ActionResult:
+ if change==null or change.revision!=revision:return _fail("stale_item_change")
+ return _validate_state(change.state)
 func commit(change: ItemChangeSet, notify: bool = true) -> ActionResult:
  if change==null or change.revision!=revision: return _fail("stale_item_change")
  var result := _validate_state(change.state)

@@ -18,6 +18,12 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   var result := _add_shopping(candidate,config)
   if not result.ok:return result
   candidate.schema_revision=2
+ if candidate.schema_revision==2 and target_revision>=3:
+  if not candidate.state.items.containers.has("rooftop_dry"):candidate.state.items.containers.rooftop_dry=config.section("containers").rooftop_dry
+  candidate.state["workflow"]={"jobs":{},"next_id":1}
+  candidate.state["learning"]={"attempts":{},"results":{}}
+  if candidate.state.get("equipment")=={}:candidate.state.equipment={"reservations":{},"revision":0}
+  candidate.schema_revision=3
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})
@@ -26,6 +32,7 @@ static func _add_shopping(candidate: Dictionary, config: SessionConfig) -> Actio
  var state: Dictionary=candidate.state
  var containers: Dictionary=state.items.containers
  if not containers.has("player_bag"):containers.player_bag=config.section("containers").player_bag
+ if not containers.has("rooftop_dry"):containers.rooftop_dry=config.section("containers").rooftop_dry
  for item in state.items.items.values():
   if not item is Dictionary or not config.section("items").has(str(item.get("definition_id",""))) or not containers.has(str(item.get("container_id",""))):return _fail("shopping_item")
   var definition: Dictionary=config.section("items")[item.definition_id]
