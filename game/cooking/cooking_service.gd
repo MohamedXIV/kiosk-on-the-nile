@@ -107,14 +107,9 @@ func quality_label(item: PreparedItem) -> String:
 func snapshot() -> Dictionary:
  var jobs: Dictionary = {}
  for id in _jobs: jobs[id] = _jobs[id].snapshot()
- var held := held_item()
- return {"stock":inventory_snapshot(),"jobs":jobs,"held":held.snapshot() if held else null,"next_item":int(_inventory.items.snapshot().next_id)}
+ return {"jobs":jobs}
 func restore(data: Dictionary) -> ActionResult:
- if not data.get("stock") is Dictionary or not data.get("jobs") is Dictionary or not ContentValidation.integer(data.get("next_item")) or int(data.next_item)<1:
-  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kitchen")
- if data.stock.size()!=_stock_keys.size() or data.jobs.size()!=_jobs.size(): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"incompatible_kitchen")
- for id in _stock_keys:
-  if not ContentValidation.integer(data.stock.get(id)) or float(data.stock[id])<0: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_stock")
+ if not data.get("jobs") is Dictionary or data.jobs.size()!=_jobs.size(): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kitchen")
  var jobs: Dictionary = {}
  for id in _jobs:
   if not data.jobs.get(id) is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_job")
@@ -124,24 +119,8 @@ func restore(data: Dictionary) -> ActionResult:
   if candidate.stage == &"EMPTY":
    candidate.recipe = _recipes[str(candidate.recipe.id)]
   jobs[id] = candidate
- var held: PreparedItem
- if data.get("held") != null:
-  var item: Variant = data.held
-  if not item is Dictionary or not item.get("id") is String or not _recipes.has(item.get("recipe_id")) or not ContentValidation.integer(item.get("quality_score")) or not float(item.quality_score) in [0,1,2,3] or not item.get("sugar_id") is String:
-   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_food")
-  var recipe: RecipeDefinition = _recipes[item.recipe_id]
-  if item.get("food_id")!=str(recipe.food_id) or item.get("quality_key")!=recipe.data.quality_keys[int(item.quality_score)]: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_food")
-  var suffix: String = item.id.trim_prefix("food_")
-  if not item.id.begins_with("food_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_item): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_food_identity")
-  if recipe.rules_id==&"tea":
-   var known_sugar := false
-   for option in recipe.data.sugars:
-    if option.id==item.sugar_id: known_sugar=true
-   if not known_sugar: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_food_sugar")
-  elif item.sugar_id!="": return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_food_sugar")
-  held = PreparedItem.from_dict(item)
  _jobs = jobs
- return _inventory.restore_legacy(data.stock,held,int(data.next_item))
+ return ActionResult.success()
 
 func station_ids() -> Array:
  return _jobs.keys()

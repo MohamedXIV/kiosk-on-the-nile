@@ -35,6 +35,9 @@ func can_place(request: PlacementRequest) -> ActionResult:
  if item.is_empty(): return _fail("structure_dev_only")
  var source := _items.get_container(StringName(item.container_id))
  if source.location_id!=str(request.location_id): return _fail("item_wrong_location")
+ if not request.host_id.is_empty():
+  for container in _items.snapshot().containers.values():
+   if container.host_id==str(request.host_id) and not _items.items_in(StringName(container.id)).is_empty():return _fail("surface_not_empty")
  if _busy.is_valid() and _busy.call(request.instance_id): return _fail("equipment_busy")
  for id in _layout.placements:
   if _layout.placements[id].host_id==str(request.instance_id) and _busy.is_valid() and _busy.call(StringName(id)): return _fail("equipment_busy")
@@ -120,7 +123,7 @@ func _items_definitions() -> Dictionary:
  for item in _items.snapshot().items.values(): result[item.definition_id]=_items.definition(StringName(item.definition_id))
  return result
 func _validate_layout(data: Dictionary) -> ActionResult:
- if not data.get("placements") is Dictionary or not data.get("door_states") is Dictionary: return _fail("invalid_layout")
+ if not data.get("placements") is Dictionary or not data.get("door_states") is Dictionary or data.get("starter_granted")!=true: return _fail("invalid_layout")
  var known_doors: Array = []
  for space in _definitions.locations.values():
   for door in space.doors: known_doors.append(door.id)

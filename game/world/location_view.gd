@@ -9,6 +9,7 @@ var _fan: FanView
 var _sign: SignView
 var _geometry: Array[Node] = []
 var _surface_foods: Dictionary = {}
+var _item_visuals: Dictionary = {}
 func configure(data: LocationDefinition, source: GameSession) -> void:
  session = source
  definition = LocationDefinition.new(data.id,SpaceSceneAdapter.location(data.data,data.id,source.spaces,source.items))
@@ -52,8 +53,11 @@ func configure(data: LocationDefinition, source: GameSession) -> void:
   if container.kind!="surface" or container.location_id!=str(data.id) or session.spaces.placement(StringName(container.host_id)).is_empty(): continue
   var view := HeldItemView.new()
   var ground := session.spaces.ground(StringName(container.host_id))
-  view.position=mapping.to_canvas(ground,0.96)+Vector2(0,34)
-  add_child(view)
+  view.position=Vector2(0,-0.96*mapping.height_scale+34)
+  if _item_visuals.has(container.host_id):_item_visuals[container.host_id].add_child(view)
+  else:
+   view.position+=mapping.to_canvas(ground)
+   add_child(view)
   _surface_foods[container.id]=view
  navigation.configure(data,mapping)
  _geometry.assign(get_children())
@@ -76,6 +80,7 @@ func _add_visual(data: Dictionary, parent: Node2D, parent_ground: Vector2) -> vo
  visual.position = mapping.to_canvas(ground-parent_ground,float(data.get("height_offset",0)))
  parent.add_child(visual)
  visual.configure(data,mapping)
+ if data.has("instance_id"):_item_visuals[data.instance_id]=visual
  if data.has("station_id"):
   station_views[data.station_id] = visual
   var vapour := StationVapour.new()
@@ -118,6 +123,7 @@ func refresh_layout() -> void:
  _geometry.clear()
  station_views.clear()
  _surface_foods.clear()
+ _item_visuals.clear()
  _fan = null
  _sign = null
  var base := LocationDefinition.new(definition.id,session.config.section("locations")[str(definition.id)])

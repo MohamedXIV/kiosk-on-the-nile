@@ -73,9 +73,9 @@ func configure(source: SessionConfig) -> ActionResult:
  if not furniture_result.ok: return furniture_result
  furniture_result = items.commit(furniture_result.details.change,false)
  if not furniture_result.ok: return furniture_result
- var initial_home := home.restore(source.section("session").home)
+ var initial_home := home.restore(source.section("session").home,true)
  if not initial_home.ok: return initial_home
- var layout := {"placements":initial_layout.placements,"door_states":initial_layout.door_states}
+ var layout := {"placements":initial_layout.placements,"door_states":initial_layout.door_states,"starter_granted":true}
  for fan in items.instances(&"fan"):
   if fan.container_id=="rooftop_world": layout.placements[fan.id]={"instance_id":fan.id,"location_id":"rooftop","cell":[2,-3],"rotation":0,"host_id":"","slot_id":""}
  spaces = SpaceService.new()

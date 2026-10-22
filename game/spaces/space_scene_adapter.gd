@@ -11,6 +11,8 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
  for target in result.interactions:
   if not target.has("instance_id"): interactions.append(target)
  result.interactions = interactions
+ var prop_by_id: Dictionary = {}
+ var mounted: Array[Dictionary] = []
  var definitions: Dictionary = spaces.definitions().locations
  var space: Dictionary = definitions[str(location_id)]
  for id in spaces.snapshot().placements:
@@ -25,7 +27,10 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   prop["size"] = [box.size.x,box.size.y,float(definition.get("height",0.8))]
   prop["height_offset"] = float(definition.get("mount_height",0.96)) if record.host_id!="" else 0.0
   if definition.has("station_id"): prop["station_id"] = definition.station_id
-  result.props.append(prop)
+  prop["instance_id"]=id
+  prop_by_id[id]=prop
+  if record.host_id=="":result.props.append(prop)
+  else:mounted.append({"host_id":record.host_id,"prop":prop})
   for target in source.interactions:
    if target.get("instance_id")==id or (target.get("instance_id")=="legacy_fan" and item.definition_id=="fan"):
     var moved: Dictionary = target.duplicate(true)
@@ -33,6 +38,11 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
     result.interactions.append(moved)
   if definition.get("surface",false):
    result.interactions.append({"id":"surface:"+id,"ground":[ground.x,ground.y],"radius":1.1,"primary":"سطح التحضير","secondary":"","action":"surface","instance_id":id,"slot_id":id+":top"})
+ for child in mounted:
+  if prop_by_id.has(child.host_id):
+   var host: Dictionary=prop_by_id[child.host_id]
+   if not host.has("children"):host["children"]=[]
+   host.children.append(child.prop)
  for door in space.doors:
   var opened: bool = spaces.snapshot().door_states.get(door.id,door.open)
   var point := Vector2(door.cell[0],door.cell[1])*float(space.cell_size)+Vector2(space.origin[0],space.origin[1])

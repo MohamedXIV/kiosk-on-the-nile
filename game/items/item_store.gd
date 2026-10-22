@@ -76,6 +76,9 @@ func _validate_state(data: Dictionary) -> ActionResult:
  for id in data.items:
   var item: Variant = data.items[id]
   if not item is Dictionary or item.get("id")!=id or not _definitions.has(str(item.get("definition_id",""))) or not ContentValidation.integer(item.get("quantity")) or item.quantity<1 or not item.get("attributes") is Dictionary: return _fail("invalid_item")
+  if str(id).begins_with("food_") or str(id).begins_with("item_"):
+   var suffix := str(id).substr(str(id).find("_")+1)
+   if not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_item_counter")
   var definition: Dictionary = _definitions[item.definition_id]
   if item.get("kind")!=definition.kind or (definition.kind!="ingredient" and int(item.quantity)!=1) or not data.containers.has(str(item.get("container_id",""))): return _fail("invalid_item_owner")
   var container: Dictionary = data.containers[item.container_id]

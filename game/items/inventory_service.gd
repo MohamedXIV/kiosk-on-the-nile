@@ -9,7 +9,8 @@ func stock_count(location_id: StringName, ingredient_id: StringName) -> int:
  var total := 0
  var definition_id := str(_aliases.get(str(ingredient_id),str(ingredient_id)))
  for item in items.instances(StringName(definition_id)):
-  if items.get_container(StringName(item.container_id)).get("location_id")==str(location_id): total += int(item.quantity)
+  var container := items.get_container(StringName(item.container_id))
+  if container.get("location_id")==str(location_id) and container.get("kind") in ["dry","cold"]: total += int(item.quantity)
  return total
 func held_id() -> StringName:
  var held := items.items_in(&"player_hand")
@@ -28,7 +29,8 @@ func debit_legacy(ingredient_id: StringName, quantity: int) -> ActionResult:
  var change := items.candidate()
  var remaining := quantity
  for item in items.instances(StringName(definition_id)):
-  if items.get_container(StringName(item.container_id)).location_id!="kiosk": continue
+  var container := items.get_container(StringName(item.container_id))
+  if container.location_id!="kiosk" or not container.kind in ["dry","cold"]: continue
   var taken := mini(remaining,int(item.quantity))
   change.state.items[item.id].quantity -= taken
   remaining -= taken

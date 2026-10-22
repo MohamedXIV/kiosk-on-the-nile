@@ -14,7 +14,9 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
  _controller=controller
  _text=text
  theme=text.make_theme()
- layout_direction=Control.LAYOUT_DIRECTION_RTL
+ layout_direction=Control.LAYOUT_DIRECTION_LTR
+ grow_vertical=Control.GROW_DIRECTION_BEGIN
+ custom_minimum_size.x=330
  anchor_left=1
  anchor_right=1
  anchor_top=1
