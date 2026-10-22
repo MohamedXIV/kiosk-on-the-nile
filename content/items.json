@@ -1,0 +1,25 @@
+{
+  "tea_portion": {
+    "kind": "ingredient",
+    "label": "وحدة شاي"
+  },
+  "kebda_portion": {
+    "kind": "ingredient",
+    "label": "وحدة كبدة"
+  },
+  "prepared_food": {
+    "kind": "prepared",
+    "label": "أكل جاهز"
+  },
+  "fan": {
+    "kind": "furniture",
+    "label": "مروحة",
+    "footprint": [
+      2,
+      2
+    ],
+    "height": 1.2,
+    "color": "#82999c",
+    "movable": true
+  }
+}

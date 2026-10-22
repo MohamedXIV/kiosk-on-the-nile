@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("items") or bundle.has("containers"):
+  var items_result := ItemContentValidation.validate(bundle.get("items",{}),bundle.get("containers",{}))
+  if not items_result.ok: return items_result
  var time: Dictionary = bundle.get("time",{})
  if not number(time.get("minutes_per_second")) or float(time.minutes_per_second) <= 0: return fail("time.minutes_per_second")
  if bundle.has("visitors"):

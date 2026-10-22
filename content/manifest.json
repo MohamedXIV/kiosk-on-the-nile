@@ -19,6 +19,8 @@
     "wellbeing": "wellbeing.json",
     "legacy_story_amgad": "legacy/amgad.ink.json",
     "legacy_story_visitors": "legacy/visitors.ink.json",
-    "legacy_story_football": "legacy/football.ink.json"
+    "legacy_story_football": "legacy/football.ink.json",
+    "items": "items.json",
+    "containers": "containers.json"
   }
 }

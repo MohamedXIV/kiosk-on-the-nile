@@ -1,6 +1,6 @@
 class_name SessionConfig
 extends RefCounted
-const REQUIRED_SECTIONS := ["time","balance","needs","social","spatial","locations","recipes","visitors","encounters","ui","atmosphere","session","wellbeing"]
+const REQUIRED_SECTIONS := ["time","balance","needs","social","spatial","locations","recipes","visitors","encounters","ui","atmosphere","session","wellbeing","items","containers"]
 var data: Dictionary
 var fingerprint: String
 var source_root: String

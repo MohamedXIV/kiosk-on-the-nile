@@ -102,7 +102,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   actors.append("player")
   var relationship_validation := RelationshipStore.new(bundle.social,actors).restore({"values":bundle.social.get("initial_relationships",{})})
   if not relationship_validation.ok: return ContentValidation.fail("social.initial_relationships")
-  var evaluator := ConditionEvaluator.new(KnowledgeBook.new(bundle.social),RelationshipStore.new(bundle.social,actors),GameClock.new(bundle.time),VisitorService.new(),HomeService.new(),ActorPose.new(),bundle.social.facts,actors,bundle.get("locations",{}).keys())
+  var evaluator := ConditionEvaluator.new(KnowledgeBook.new(bundle.social),RelationshipStore.new(bundle.social,actors),GameClock.new(bundle.time),VisitorService.new(),HomeService.new(ItemStore.new()),ActorPose.new(),bundle.social.facts,actors,bundle.get("locations",{}).keys())
   for id in bundle.encounters:
    var definition: Variant = bundle.encounters[id]
    if not definition is Dictionary or not definition.get("story") is String or not bundle.get("story_"+str(definition.story)) is Dictionary: return ContentValidation.fail("encounters."+id)

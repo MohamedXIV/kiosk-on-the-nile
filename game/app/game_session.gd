@@ -5,6 +5,8 @@ var config: SessionConfig
 var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
+var items: ItemStore
+var inventory: InventoryService
 var home: HomeService
 var knowledge: KnowledgeBook
 var routine: DailyRoutine
@@ -47,7 +49,13 @@ func configure(source: SessionConfig) -> ActionResult:
  clock = GameClock.new(source.section("time"))
  wallet = WalletService.new(int(balance.starting_money))
  needs = NeedsService.new(source.section("needs"))
- home = HomeService.new()
+ items = ItemStore.new()
+ var item_result := items.configure(source.section("items"),source.section("containers"))
+ if not item_result.ok: return item_result
+ inventory = InventoryService.new(items,{"tea":"tea_portion","kebda":"kebda_portion"})
+ item_result = inventory.restock_legacy(source.section("recipes").initial_stock)
+ if not item_result.ok: return item_result
+ home = HomeService.new(items)
  var initial_home := home.restore(source.section("session").home)
  if not initial_home.ok: return initial_home
  kiosk_open = source.section("session").kiosk_open
@@ -60,10 +68,10 @@ func configure(source: SessionConfig) -> ActionResult:
  mood_policy = MoodPolicy.new(source.section("wellbeing"))
  routine = DailyRoutine.new(clock,wallet,needs,home,int(balance.daily_rent),mood_policy)
  cooking = CookingService.new()
- var kitchen := cooking.configure(source.section("recipes"))
+ var kitchen := cooking.configure(source.section("recipes"),inventory)
  if not kitchen.ok: return kitchen
  cooking.set_quality_provider(func():return mood_policy.quality_penalty(needs.mood))
- supplies = SupplyService.new(wallet,cooking,home,knowledge,balance)
+ supplies = SupplyService.new(wallet,cooking,home,knowledge,balance,items)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
  visitors = VisitorService.new()
