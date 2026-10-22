@@ -149,9 +149,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.equal(rejected_snapshot, before_action_snapshot)
   ```
 - [ ] **Step 2 — Record red:** Run `cooking`; confirm each recipe's success and failure assertions actually execute.
-- [ ] **Step 3 — Implement:** Preserve the source stage transitions, thresholds and consumption moments. Tea reaches boiled at 3.2 seconds, brewing readiness at 2.5 seconds, and uses the same cumulative brew timer after readiness; quality is 3 through 8.5 seconds, 2 above 8.5 through 12, 1 above 12. Stock is spent on starting the brew and sugar resets to مظبوط after pouring. Kebda stock is spent on starting side A; score 0 if total time exceeds 15, otherwise 3 if side A is 2.2–7 and side B is 1.8–7 and seasoned, otherwise 2 if total is 3.5–12.5, otherwise 1. Use authored recipe families with focused tea/kebda rules and separate jobs; definition data can vary timings without editing UI. Keep cooking ticking when another location is shown. Bind real item/tray and station visuals/status.
+- [x] **Step 3 — Implement:** Preserve the source stage transitions, thresholds and consumption moments. Tea reaches boiled at 3.2 seconds, brewing readiness at 2.5 seconds, and uses the same cumulative brew timer after readiness; quality is 3 through 8.5 seconds, 2 above 8.5 through 12, 1 above 12. Stock is spent on starting the brew and sugar resets to مظبوط after pouring. Kebda stock is spent on starting side A; score 0 if total time exceeds 15, otherwise 3 if side A is 2.2–7 and side B is 1.8–7 and seasoned, otherwise 2 if total is 3.5–12.5, otherwise 1. Use authored recipe families with focused tea/kebda rules and separate jobs; definition data can vary timings without editing UI. Keep cooking ticking when another location is shown. Bind real item/tray and station visuals/status.
 - [ ] **Step 4 — Verify:** Run `cooking` and native regressions. Add a second tea station using another resource instance and assert independent jobs share the intended stock but not mutable definition state. Restore a job at mid-brew using its snapshot and assert matching completion/quality.
-- [ ] **Step 5 — Commit:** Stage Task 5 paths; commit `feat: add tactile tea and kebda cooking with real item state`.
+- [x] **Step 5 — Commit:** Stage Task 5 paths; commit `feat: add tactile tea and kebda cooking with real item state`.
 
 ### Task 6: Make service, supplies and home actions transactional
 
@@ -169,9 +169,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.equal(rejected_purchase_snapshot, before_purchase_snapshot)
   ```
 - [ ] **Step 2 — Record red:** Run `service_and_home` with a fake availability predicate that rejects a departed visit; no real NPC implementation is needed yet.
-- [ ] **Step 3 — Implement:** Validate every prerequisite before synchronously committing related state. Match source price/tip and need formulas. Use `KnowledgeBook.has(&"KNOWN_CHEAP_FAN")` for the offer; a UI-supplied assertion is not evidence of knowledge. Sleep pays affordable rent once, clears held food, asks actors to reset daily visits through a signal wired in Task 7, and preserves cooking jobs. Travel to kiosk opens it; returning home closes it. Emit outcomes after commit so audio/UI cannot cause partial transactions.
+- [x] **Step 3 — Implement:** Validate every prerequisite before synchronously committing related state. Match source price/tip and need formulas. Use `KnowledgeBook.has(&"KNOWN_CHEAP_FAN")` for the offer; a UI-supplied assertion is not evidence of knowledge. Sleep pays affordable rent once, clears held food, asks actors to reset daily visits through a signal wired in Task 7, and preserves cooking jobs. Travel to kiosk opens it; returning home closes it. Emit outcomes after commit so audio/UI cannot cause partial transactions.
 - [ ] **Step 4 — Verify:** Run `service_and_home`, `cooking` and `daily_life`. Add `test_repeated_action_cannot_duplicate_purchase_or_settlement` with the same order/item IDs and duplicate fan request; inspect snapshots before/after rejection for equality.
-- [ ] **Step 5 — Commit:** Stage Task 6 paths; commit `feat: integrate paid service supplies and home life actions`.
+- [x] **Step 5 — Commit:** Stage Task 6 paths; commit `feat: integrate paid service supplies and home life actions`.
 
 ### Task 7: Add visitors, memory and source encounter pacing
 
@@ -188,9 +188,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.is_true(not visitor_service.is_available(departed_visit_id))
   ```
 - [ ] **Step 2 — Record red:** Run `visitors`; use the actual service API for remembered paid food and a seeded RNG for spawn selection.
-- [ ] **Step 3 — Implement:** Author the named visitors, colors, destinations, food intentions and source stay times 32/36/20/8/15 seconds. Preserve initial cooldown 2 seconds and subsequent ambient delay 14–24 seconds; do not reinterpret the source's asymmetric capacity rules as a new universal maximum. Emit narrative requests without hardcoding spoken text. Native navigation follows real paths; public pose is its actual result, including when visitors are offscreen. Restore RNG state and daily flags to avoid duplicate arrivals after load.
+- [x] **Step 3 — Implement:** Author the named visitors, colors, destinations, food intentions and source stay times 32/36/20/8/15 seconds. Preserve initial cooldown 2 seconds and subsequent ambient delay 14–24 seconds; do not reinterpret the source's asymmetric capacity rules as a new universal maximum. Emit narrative requests without hardcoding spoken text. Native navigation follows real paths; public pose is its actual result, including when visitors are offscreen. Restore RNG state and daily flags to avoid duplicate arrivals after load.
 - [ ] **Step 4 — Verify:** Run `visitors`, `locations` and `service_and_home`. Assert a route avoids the table/counter and speech/interaction anchors use that same resulting pose. Snapshot/recreate the visitor service and advance both with equal deltas; compare future visit IDs, intentions and spawn choices.
-- [ ] **Step 5 — Commit:** Stage Task 7 paths; commit `feat: add independent visitors regular memory and quiet pacing`.
+- [x] **Step 5 — Commit:** Stage Task 7 paths; commit `feat: add independent visitors regular memory and quiet pacing`.
 
 ### Task 8: Author all conversation in Ink and integrate independent sessions
 
@@ -207,9 +207,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.equal(cross_session_choice.code, ActionResult.Code.INVALID_CHOICE)
   ```
 - [ ] **Step 2 — Record red:** Run `conversations` with the real pinned adapter, not a fake Ink-shaped object.
-- [ ] **Step 3 — Implement:** Transcribe the existing Arabic spoken lines and replies into original Ink stories; include first/repeat greetings, requests, quality reactions, fan referral and ambient remarks. Preserve the football 3.4-second exchange delay and 2.5-second follow-up timing where applicable. Optional football join uses the source 8.5-unit range around `(6,1.6)` and an authored 8-second offer expiry before its listening branch; keep this cleanup tunable in encounter data. Player-initiated choices persist until chosen/cancelled/participant departure. Read actual day/memory/knowledge at boundaries and apply permitted effects through feature owners. No dialogue directly spawns, pays or cooks.
+- [x] **Step 3 — Implement:** Transcribe the existing Arabic spoken lines and replies into original Ink stories; include first/repeat greetings, requests, quality reactions, fan referral and ambient remarks. Preserve the football 3.4-second exchange delay and 2.5-second follow-up timing where applicable. Optional football join uses the source 8.5-unit range around `(6,1.6)` and an authored 8-second offer expiry before its listening branch; keep this cleanup tunable in encounter data. Player-initiated choices persist until chosen/cancelled/participant departure. Read actual day/memory/knowledge at boundaries and apply permitted effects through feature owners. No dialogue directly spawns, pays or cooks.
 - [ ] **Step 4 — Verify:** Run `conversations`, `ink_runtime`, `visitors` and `cooking`. Snapshot a pending two-person choice and another active session; recreate adapters, choose once and assert unchanged participant identity, no duplicate knowledge/mood effect and correct reconvergence. Scan game scripts for player reply/spoken text accidentally left outside `.ink`.
-- [ ] **Step 5 — Commit:** Stage Task 8 paths and generated story JSON; commit `feat: author game conversations in Ink with independent sessions`.
+- [x] **Step 5 — Commit:** Stage Task 8 paths and generated story JSON; commit `feat: author game conversations in Ink with independent sessions`.
 
 ### Task 9: Save and restore one complete validated session
 
@@ -226,9 +226,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.equal(previous_good_bytes_after_failure, previous_good_bytes)
   ```
 - [ ] **Step 2 — Record red:** Run `persistence` with temporary isolated storage and actual initialized Ink adapters; compare the saved envelope, not just money.
-- [ ] **Step 3 — Implement:** Collect snapshots at a completed simulation boundary after pending initialization settles; defer a save requested during a fade until the transition commits and the next completed simulation boundary is available. Decode and validate all components before accepting a candidate. Native storage writes a temporary file, retains the previous good save and replaces only after successful close/validation. Web uses supported `user://` persistence, requests the engine-supported filesystem sync and reports unavailable persistent storage accurately; the harness waits for the supported flush before testing reload. A corrupt primary can offer a valid previous save without overwriting it. No legacy HTML save import.
+- [x] **Step 3 — Implement:** Collect snapshots at a completed simulation boundary after pending initialization settles; defer a save requested during a fade until the transition commits and the next completed simulation boundary is available. Decode and validate all components before accepting a candidate. Native storage writes a temporary file, retains the previous good save and replaces only after successful close/validation. Web uses supported `user://` persistence, requests the engine-supported filesystem sync and reports unavailable persistent storage accurately; the harness waits for the supported flush before testing reload. A corrupt primary can offer a valid previous save without overwriting it. No legacy HTML save import.
 - [ ] **Step 4 — Verify:** Run `persistence` and earlier suites. Add `test_duplicate_delivery_after_reload` and `test_save_during_fade_is_deferred` asserting exactly-once payment and a coherent before/after location snapshot. Extend the real Web harness with scenario `resume`, hard reload and `SESSION_BROWSER_RESUME_PASS`; test a separately isolated storage-disabled context for truthful failure feedback.
-- [ ] **Step 5 — Commit:** Stage Task 9 paths; commit `feat: persist and validate complete native and Web game sessions`.
+- [x] **Step 5 — Commit:** Stage Task 9 paths; commit `feat: persist and validate complete native and Web game sessions`.
 
 ### Task 10: Wire the actual entry, Arabic HUD and deliberate input
 
@@ -245,9 +245,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.is_true(all_required_controls_inside_viewport)
   ```
 - [ ] **Step 2 — Record red:** Run `game_entry` against real Controls and input dispatch; don't replace the UI with direct service calls.
-- [ ] **Step 3 — Implement:** Set the actual main scene, route keyboard actions through `_unhandled_input`/InputMap and ignore key echo, keep notebook focus distinct from nonblocking choices, and preserve F-secondary priority. Match the source warm dark cards, headers, needs bars, station gauges, notebook and toasts with the bundled font and explicit RTL/container layouts. Add New/Continue, accurate save outcomes and source transitions with 0.65-second fade-out/0.35-second fade-in. Use fixed simulation steps; do not calculate background-tab wall-clock catch-up. Handle lost focus by clearing input and resuming without stuck movement. Diagnostics use isolated fixture services/storage. Debug-only `?qa=ink` boots the dedicated qualification scene so the original `ink` browser scenario remains usable after changing the project entry; release builds ignore QA queries and expose no probe. Normal gameplay scenarios use the actual main scene.
+- [x] **Step 3 — Implement:** Set the actual main scene, route keyboard actions through `_unhandled_input`/InputMap and ignore key echo, keep notebook focus distinct from nonblocking choices, and preserve F-secondary priority. Match the source warm dark cards, headers, needs bars, station gauges, notebook and toasts with the bundled font and explicit RTL/container layouts. Add New/Continue, accurate save outcomes and source transitions with 0.65-second fade-out/0.35-second fade-in. Use fixed simulation steps; do not calculate background-tab wall-clock catch-up. Handle lost focus by clearing input and resuming without stuck movement. Diagnostics use isolated fixture services/storage. Debug-only `?qa=ink` boots the dedicated qualification scene so the original `ink` browser scenario remains usable after changing the project entry; release builds ignore QA queries and expose no probe. Normal gameplay scenarios use the actual main scene.
 - [ ] **Step 4 — Verify:** Run `game_entry` plus all native suites. Extend Web scenario `gameplay` to walk through real home→kiosk controls, prepare/serve food, open notes, save/reload and continue. Assert `GAMEPLAY_BROWSER_PASS` and capture compact/wide views. Check movement does not trigger while typing/focusing UI, and choices do not freeze station progress.
-- [ ] **Step 5 — Commit:** Stage Task 10 paths; commit `feat: connect the playable Arabic game entry and HUD`.
+- [x] **Step 5 — Commit:** Stage Task 10 paths; commit `feat: connect the playable Arabic game entry and HUD`.
 
 ### Task 11: Restore procedural sound and atmospheric motion
 
@@ -264,9 +264,9 @@ Test commands assume the runner created in Task 1: `godot --headless --path . --
   check.equal(second_generation_wav_bytes, first_generation_wav_bytes)
   ```
 - [ ] **Step 2 — Record red:** Run `atmosphere`, including a scene instance with actual bus/player state; audible feel remains a separate human check.
-- [ ] **Step 3 — Implement:** Generate source-like filtered noise/tone audio without external music, bind action outcomes after successful commits and smoothly fade contextual layers. Animate the boat at 0.45 logical units/sec with the source wrap, fan using delta rather than frame count, river shimmer, smoke/steam and warm local light pools. Match source time-of-day darkening at 18:00–20:00 and night. Do not add a new needs/comfort system through audio or VFX.
+- [x] **Step 3 — Implement:** Generate source-like filtered noise/tone audio without external music, bind action outcomes after successful commits and smoothly fade contextual layers. Animate the boat at 0.45 logical units/sec with the source wrap, fan using delta rather than frame count, river shimmer, smoke/steam and warm local light pools. Match source time-of-day darkening at 18:00–20:00 and night. Do not add a new needs/comfort system through audio or VFX.
 - [ ] **Step 4 — Verify:** Run `atmosphere` and native regressions, then browser `gameplay` with an actual audio context started by the user's Start click. Capture active tea/grill/fan and compare daytime/night scenes. Review audible source and port locally where possible; record any unavailable subjective listening separately from automated layer checks.
-- [ ] **Step 5 — Commit:** Stage Task 11 paths; commit `feat: restore Nile cooking and rooftop atmosphere`.
+- [x] **Step 5 — Commit:** Stage Task 11 paths; commit `feat: restore Nile cooking and rooftop atmosphere`.
 
 ### Task 12: Prove full parity, publish repeatable instructions and add lean CI
 
@@ -317,3 +317,17 @@ These user changes supersede older Resource-authoring paths and the simpler cloc
 4. **Knowledge and relationship foundation:** Canonical KnowledgeBook and hidden directional RelationshipStore feed a finite ConditionEvaluator: all/any/not, fact_known, relationship_at_least, visit_count_at_least, day_at_least, time_window, participants_available and distance_at_most. Validate all IDs/operators/thresholds. Narrative context exposes read-only canonical queries/projections to real Ink. Gate encounter starts, optional interjections and offered choices; revalidate at selection and after load. Default content preserves HTML encounters while tests exercise knowledgeable/unknown and familiar/unfamiliar variants. Persist relations, fact provenance and pending conditions; no visible friendship meter or invented progression grind.
 
 Implementation mapping: Task 1 adds ContentStore/JSON reload tests and latest-engine qualification; Task 2 adds game/time coordinator/scheduler with dependency-cycle, prerequisite and deterministic-order tests; Task 8 adds RelationshipStore/ConditionEvaluator plus real conditional Ink tests; Task 9 persists those additions; Task 12 verifies external JSON and compiled Ink changes take effect without an engine rebuild. UI .tscn and reusable code-only visual scenes remain native Godot assets; gameplay definitions and all tuning values live in JSON.
+
+## Integration status — 2026-10-22
+
+Tasks 5–11 implementation is now wired into the actual game entry, including the
+four authorized amendments. Step 3 checkmarks record implemented code, not a
+claim that every acceptance step has passed. Remaining unchecked verification
+steps and Task 12 acceptance work are tracked in `docs/PORT_PARITY.md`. Latest
+work performed import/Ink compilation/export and an independent static review;
+it did not add or execute new gameplay tests.
+
+Implementation commit: `d1142dd` groups the coupled Tasks 5–11 integration so
+new cross-feature interfaces land together in a bootable state. Their original
+per-task commit messages above are superseded by that integration commit.
+Documentation/build tooling follows separately.
