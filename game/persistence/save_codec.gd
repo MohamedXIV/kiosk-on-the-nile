@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 1
-const COMPONENTS := ["clock","items","spaces","routine","wallet","needs","home","knowledge","relationships","effects","cooking","service","visitors","scheduler"]
+const SCHEMA_REVISION := 2
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","service","visitors","scheduler"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -42,15 +42,16 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,result.message_key,{"component":id})
  result = candidate.player_pose.restore(restored_data.state.player_pose)
- if not result.ok or not config.section("locations").has(str(candidate.location_id)):
+ if not result.ok or candidate.locations.kind(candidate.location_id)==&"":
   candidate.queue_free()
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_pose")
- var location: Dictionary = config.section("locations")[str(candidate.location_id)]
- var bounds: Array = location.player_bounds
- var ground := candidate.player_ground
- if ground.x<float(bounds[0]) or ground.x>float(bounds[2]) or ground.y<float(bounds[1]) or ground.y>float(bounds[3]) or FootprintGeometry.blocked(ground,candidate.spaces.solids(candidate.location_id),0):
-  candidate.queue_free()
-  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_position")
+ if candidate.locations.is_physical(candidate.location_id):
+  var location: Dictionary = config.section("locations")[str(candidate.location_id)]
+  var bounds: Array = location.player_bounds
+  var ground := candidate.player_ground
+  if ground.x<float(bounds[0]) or ground.x>float(bounds[2]) or ground.y<float(bounds[1]) or ground.y>float(bounds[3]) or FootprintGeometry.blocked(ground,candidate.spaces.solids(candidate.location_id),0):
+   candidate.queue_free()
+   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_position")
  candidate.kiosk_open = restored_data.state.kiosk_open
  for order in candidate.service.snapshot().orders.values():
   if order.status=="pending" and not candidate.visitors.is_available(StringName(order.visit_id)):

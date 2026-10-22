@@ -2,19 +2,44 @@ class_name LivingSpacesMigration
 extends RefCounted
 static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision: int) -> ActionResult:
  if not SaveCodec.valid_digest(envelope): return _fail("checksum")
+ var candidate: Dictionary
  if envelope.get("schema_version")==4:
-  if envelope.get("schema_revision")!=target_revision: return _fail("unsupported_revision")
-  return ActionResult.success({"data":envelope.duplicate(true)})
- if envelope.get("schema_version")!=3 or target_revision!=1: return _fail("schema")
- var result := _convert(envelope,config)
- if not result.ok: return result
- var candidate: Dictionary = result.details.data
- candidate.schema_version=4
- candidate["schema_revision"]=1
- candidate["migrated_from"]=envelope.get("migrated_from",3)
+  if not ContentValidation.integer(envelope.get("schema_revision")) or envelope.schema_revision<1 or envelope.schema_revision>target_revision:return _fail("unsupported_revision")
+  candidate=envelope.duplicate(true)
+ elif envelope.get("schema_version")==3:
+  var result := _convert(envelope,config)
+  if not result.ok:return result
+  candidate=result.details.data
+  candidate.schema_version=4
+  candidate["schema_revision"]=1
+  candidate["migrated_from"]=envelope.get("migrated_from",3)
+ else:return _fail("schema")
+ if candidate.schema_revision==1 and target_revision>=2:
+  var result := _add_shopping(candidate,config)
+  if not result.ok:return result
+  candidate.schema_revision=2
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})
+static func _add_shopping(candidate: Dictionary, config: SessionConfig) -> ActionResult:
+ if not candidate.get("state") is Dictionary or not candidate.state.get("items") is Dictionary or not candidate.state.items.get("items") is Dictionary or not candidate.state.items.get("containers") is Dictionary or not candidate.state.get("clock") is Dictionary:return _fail("shopping_components")
+ var state: Dictionary=candidate.state
+ var containers: Dictionary=state.items.containers
+ if not containers.has("player_bag"):containers.player_bag=config.section("containers").player_bag
+ for item in state.items.items.values():
+  if not item is Dictionary or not config.section("items").has(str(item.get("definition_id",""))) or not containers.has(str(item.get("container_id",""))):return _fail("shopping_item")
+  var definition: Dictionary=config.section("items")[item.definition_id]
+  var spec: Dictionary=definition.get("container",{})
+  if spec.is_empty():continue
+  var id := str(item.id)+":"+str(spec.kind)
+  if not containers.has(id):containers[id]={"id":id,"location_id":containers[item.container_id].location_id,"kind":spec.kind,"capacity":spec.capacity,"allowed_tags":spec.allowed_tags.duplicate(),"host_id":item.id}
+ state["travel"]={"journey":{},"next_id":1}
+ state["equipment"]={}
+ var stock: Dictionary={}
+ for shop_id in config.section("shops").shops:stock[shop_id]=config.section("shops").shops[shop_id].stock.duplicate(true)
+ if not ContentValidation.integer(state.clock.get("day")) or state.clock.day<1:return _fail("shopping_clock")
+ state["shops"]={"stock":stock,"receipts":{},"delivered":{},"revision":1,"next_quote":1,"next_receipt":1,"next_restock_at":float(state.clock.day)*1440+float(config.section("shops").restock_minutes)}
+ return ActionResult.success()
 static func _convert(envelope: Dictionary, config: SessionConfig) -> ActionResult:
  var candidate := envelope.duplicate(true)
  var state: Variant = candidate.get("state")

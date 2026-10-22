@@ -35,7 +35,11 @@ func configure(text: UiText) -> void:
  _menu.theme = theme
  add_child(_menu)
  var actions := VBoxContainer.new()
- _menu.add_child(actions)
+ var menu_scroll := ScrollContainer.new()
+ menu_scroll.custom_minimum_size=Vector2(280,180)
+ _menu.add_child(menu_scroll)
+ actions.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ menu_scroll.add_child(actions)
  for entry in [{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
@@ -119,6 +123,7 @@ func present(target: InteractionTarget) -> void:
  dialogue.present(focused,_session.narrative.choices(focused))
 
 func _open_menu() -> void:
+ _menu.size=Vector2i(320,int(minf(560,get_viewport_rect().size.y-_strip.size.y-35)))
  _menu.popup()
  _menu.position = Vector2i(int(_strip.position.x),int(_strip.position.y+_strip.size.y+8))
 

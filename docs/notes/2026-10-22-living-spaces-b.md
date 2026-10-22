@@ -10,3 +10,5 @@
 - B3: three browsable catalogues, live price/quantity review, confirmed purchases, shared ingredient stock for the 4+4 pack, receipt idempotency, 09:00 capped restock, returned furniture storage and manual grocery unpacking implemented. The Amgad fan offer shares owned-instance checks and is excluded from daily restock.
 - Phone supply/fan interactions now start the same journeys; no instant grants remain there. Purchased counters create their own surface slots.
 - Build `/tmp/kiosk-living-b3` succeeded; real purchase/return and stale/duplicate confirmation observations remain open for B4/full-cycle review.
+- B4: schema 4/revision 2 saves travel, equipment and shop owners, absolute journey deadlines, delivered journeys and purchase receipts. Migration adds missing B containers/owners only to earlier revisions; a revision claiming current owners must supply them.
+- `/tmp/kiosk-living-b` import/export succeeded. Menu now scrolls so added travel actions fit smaller viewports. Live browser review loading the saved A layout into B is in progress.

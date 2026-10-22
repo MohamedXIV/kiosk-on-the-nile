@@ -1,7 +1,7 @@
 class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
- if envelope.get("schema_revision")!=1: return _fail("schema_revision")
+ if envelope.get("schema_revision")!=2: return _fail("schema_revision")
  var items := session.items.snapshot()
  var placements: Dictionary = session.spaces.snapshot().placements
  for id in items.items:
@@ -29,8 +29,21 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
  if not items.reservations.is_empty():return _fail("unknown_live_reservation")
  if session.home.snapshot()!=envelope.state.home:return _fail("home_projection")
  for actor in session._actor_snapshots():
-  if not session.config.section("locations").has(actor.location_id):return _fail("actor_location")
+  if session.locations.kind(StringName(actor.location_id))==&"":return _fail("actor_location")
+  if not session.locations.is_physical(StringName(actor.location_id)):continue
   if FootprintGeometry.blocked(Vector2(actor.ground[0],actor.ground[1]),session.spaces.solids(StringName(actor.location_id)),0):return _fail("actor_in_furniture")
+ var journey: Dictionary=session.travel.snapshot().journey
+ if not journey.is_empty():
+  var phase := str(journey.phase)
+  var route := session.travel.route()
+  var expected := "transit" if phase in ["outbound","returning"] else str(route.destination) if phase=="browsing" else str(session.location_id)
+  if str(session.location_id)!=expected:return _fail("journey_pose")
+  if route.kind=="shop":
+   var bag := session.items.get_container(StringName(journey.purchase_container_id))
+   if bag.get("kind")!="purchase_bag" or bag.location_id!=journey.return_location:return _fail("journey_bag")
+ elif not session.locations.is_physical(session.location_id):return _fail("orphan_virtual_pose")
+ for receipt in session.shops.snapshot().receipts.values():
+  if session.items.get_container(StringName(receipt.bag_id)).get("kind")!="purchase_bag":return _fail("receipt_bag")
  return ActionResult.success()
 static func _fail(reason: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_living_spaces",{"reason":reason})
