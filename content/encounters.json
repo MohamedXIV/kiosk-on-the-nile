@@ -248,5 +248,78 @@
         "requires": {}
       }
     ]
+  },
+  "shawarma_learning": {
+    "story": "shawarma_learning",
+    "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "choice_conditions": {},
+    "learning_recipe": "shawarma",
+    "topics": [
+      {
+        "id": "shawarma_result",
+        "scope": "evidence",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "characters": [
+          "farid"
+        ],
+        "requires": {
+          "recipe_completed": "shawarma"
+        },
+        "recipe_id": "shawarma"
+      },
+      {
+        "id": "shawarma_attempt",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "characters": [
+          "farid"
+        ],
+        "requires": {
+          "all": [
+            {
+              "recipe_attempted": "shawarma"
+            },
+            {
+              "not": {
+                "recipe_completed": "shawarma"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "shawarma_basics",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "characters": [
+          "farid"
+        ],
+        "requires": {
+          "not": {
+            "fact_known": "KNOWN_SHAWARMA_BASICS"
+          }
+        }
+      }
+    ]
   }
 }

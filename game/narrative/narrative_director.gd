@@ -43,7 +43,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
   if not existing.finished and existing.encounter_id==encounter_id and existing.participants==participants and int(existing.context_extra.get("mode",0))==int(extra.get("mode",0)): return ActionResult.success({"session_id":str(existing.id)})
  var selected := _select_topic(encounter_id,participants,extra)
  if definition.has("topics") and selected.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
- if encounter_id in [&"amgad",&"visitors"] and int(extra.get("mode",0))==0:
+ if definition.get("manual",encounter_id in [&"amgad",&"visitors"]) and int(extra.get("mode",0))==0:
   for existing: ConversationSession in sessions.values():
    if existing.participants==participants and existing.current.choices.is_empty() and existing.encounter_id!=&"football": _finish(existing)
  _opening[key] = true
@@ -55,7 +55,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  conversation.optional = bool(definition.get("optional",false))
  conversation.topic_selection = selected
  conversation.context_extra = extra.duplicate(true)
- if not selected.is_empty(): conversation.context_extra.merge({"topic_id":selected.topic_id,"line_variant":selected.variant},true)
+ if not selected.is_empty(): conversation.context_extra.merge({"topic_id":selected.topic_id,"line_variant":selected.variant,"source_item_id":selected.get("source_id","")},true)
  conversation.runtime = InkRuntime.new()
  add_child(conversation.runtime)
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation))
@@ -235,6 +235,11 @@ func _report_failure(conversation: ConversationSession, result: ActionResult) ->
 
 func _context_for(conversation: ConversationSession) -> Dictionary:
  var projected := context(conversation.participants,conversation.context_extra)
+ var learning_recipe := str(_definitions[str(conversation.encounter_id)].get("learning_recipe",""))
+ if not learning_recipe.is_empty():
+  var knowledge := _session.learning.context(StringName(learning_recipe))
+  var source := _session.learning.result_evidence(StringName(str(conversation.context_extra.get("source_item_id",""))))
+  projected.merge({"shawarma_attempted":knowledge.attempted,"shawarma_completed":knowledge.completed,"shawarma_quality":int(source.get("quality",knowledge.last_quality))},true)
  for key in _definitions[str(conversation.encounter_id)].get("context_conditions",{}):
   projected[key] = _session.conditions.permits(_definitions[str(conversation.encounter_id)].context_conditions[key],conversation.participants)
  return projected
@@ -242,16 +247,30 @@ func _context_for(conversation: ConversationSession) -> Dictionary:
 func can_talk(visit_id: StringName) -> bool:
  if not _session.visitors.is_available(visit_id): return false
  var visit: VisitState = _session.visitors.visits[str(visit_id)]
- var encounter: StringName = &"amgad" if visit.character_id==&"amgad" else &"visitors"
  for conversation: ConversationSession in sessions.values():
-  if str(visit_id) in conversation.participants and (conversation.encounter_id==&"football" or (conversation.encounter_id==encounter and int(conversation.context_extra.get("mode",0))==0)): return false
- return not _select_topic(encounter,PackedStringArray([str(visit_id)]),{}).is_empty()
+  if str(visit_id) in conversation.participants and (conversation.encounter_id==&"football" or int(conversation.context_extra.get("mode",0))==0):return false
+ return not talk_encounter(visit_id).is_empty()
+func talk_encounter(visit_id: StringName) -> StringName:
+ var visit: VisitState=_session.visitors.visits.get(str(visit_id))
+ if visit==null:return &""
+ var fallback: Array=["amgad"] if visit.character_id==&"amgad" else ["visitors"]
+ var encounters: Array=_session.visitors.character(visit.character_id).get("manual_encounters",fallback)
+ for id in encounters:
+  if not _select_topic(StringName(id),PackedStringArray([str(visit_id)]),{}).is_empty():return StringName(id)
+ return &""
 func _select_topic(encounter: StringName, participants: PackedStringArray, extra: Dictionary) -> Dictionary:
  if participants.is_empty() or not _session.visitors.visits.has(participants[0]): return {}
  return history.select(encounter,_definitions[str(encounter)],_session.visitors.visits[participants[0]],_session,int(extra.get("mode",0)))
 func _saved_story(record: Dictionary) -> StoryDefinition:
  var story: StoryDefinition = _stories[_definitions[record.encounter_id].story]
  if record.runtime.get("story_hash")==story.sha256: return story
+ var section: String=_session.config.section("story_archive").get(str(story.id),{}).get(str(record.runtime.get("story_hash","")),"")
+ if not section.is_empty():
+  var saved := StoryDefinition.new()
+  saved.id=story.id
+  saved.raw_json=JSON.stringify(_session.config.section(section),"",true)
+  saved.sha256=saved.raw_json.sha256_text()
+  if saved.sha256==record.runtime.get("story_hash"):return saved
  # Retain the previous published Ink for already-open choices only. New starts
  # always use current content; no cursor is transplanted into a changed story.
  var archived: Dictionary = _session.config.section("legacy_story_"+str(story.id))

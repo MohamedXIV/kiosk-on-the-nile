@@ -5,6 +5,8 @@ signal departed(visit_id: StringName)
 var visits: Dictionary = {}
 var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
+var food_selector: Callable
+var foods: FoodRegistry
 var _data: Dictionary
 var _markers: Dictionary
 var _clock: GameClock
@@ -16,6 +18,7 @@ var _next: int = 1
 var _other_visit_counts: Dictionary = {}
 var _flags: Dictionary = {}
 func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: ServiceSystem, open: Callable) -> void:
+ if foods!=null:history.food_ids=foods.ids()
  _data = data.duplicate(true)
  _markers = markers.duplicate(true)
  _clock = clock
@@ -33,7 +36,7 @@ func spawn(character_id: StringName) -> VisitState:
  visit.id = StringName("visit_%d" % _next)
  _next += 1
  visit.character_id = character_id
- visit.food_id = StringName(definition.food_id)
+ visit.food_id=StringName(str(food_selector.call(character_id))) if food_selector.is_valid() else StringName(definition.food_id)
  visit.stay_seconds = float(definition.stay_seconds)
  visit.pose.location_id = &"kiosk"
  var spawn_position: Array = _markers[_data.spawn_markers[_rng.randi_range(0,_data.spawn_markers.size()-1)]]
@@ -129,6 +132,7 @@ func restore(data: Dictionary) -> ActionResult:
  if not data.get("visits") is Dictionary or not data.get("memory") is Dictionary or not data.get("flags") is Dictionary or not ContentValidation.number(data.get("cooldown")) or not ContentValidation.integer(data.get("next_id")) or data.next_id<1 or not data.get("rng_state") is String or not data.rng_state.is_valid_int(): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visitors")
  if not ContentValidation.integer(data.memory.get("amgad_visits")) or data.memory.amgad_visits<0 or not data.memory.get("last_served_quality") is String: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_memory")
  var restored_history := VisitorHistory.new()
+ restored_history.food_ids=foods.ids() if foods!=null else history.food_ids.duplicate()
  if not data.get("history") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visitor_history")
  var history_result := restored_history.restore(data.history,_data.characters,_clock)
  if not history_result.ok: return history_result
@@ -138,7 +142,7 @@ func restore(data: Dictionary) -> ActionResult:
   if not record is Dictionary or record.get("id")!=id or not _data.characters.has(record.get("character_id")) or not record.get("phase") in ["arriving","staying","leaving"] or not ContentValidation.vector(record.get("destination"),2) or not ContentValidation.number(record.get("elapsed")) or record.elapsed<0 or not record.get("served") is bool or not record.get("order_id") is String or not record.get("pose") is Dictionary or not ContentValidation.number(record.get("remark_remaining")): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit")
   var suffix: String = str(id).trim_prefix("visit_")
   if not str(id).begins_with("visit_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_identity")
-  if not record.get("food_id") in ["tea","kebda",""] or not ContentValidation.number(record.get("stay_seconds")) or record.stay_seconds<=0: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_intention")
+  if (record.get("food_id")!="" and (foods==null or not foods.has_food(StringName(str(record.get("food_id","")))))) or not ContentValidation.number(record.get("stay_seconds")) or record.stay_seconds<=0: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_intention")
   var visit := VisitState.new()
   var result := visit.pose.restore(record.pose)
   if not result.ok or visit.pose.location_id!=&"kiosk": return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_pose")
@@ -200,3 +204,6 @@ func update_markers(markers: Dictionary) -> void:
   var target := Vector2(marker[0],marker[1])
   if visit.destination.distance_to(target)>0.01:
    visit.destination = target
+
+func random_index(size: int) -> int:
+ return _rng.randi_range(0,maxi(0,size-1))

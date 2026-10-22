@@ -16,3 +16,6 @@ VAR bought_fan = false
 VAR visit_count = 0
 VAR previous_quality = -1
 VAR previous_food = ""
+VAR shawarma_attempted = false
+VAR shawarma_completed = false
+VAR shawarma_quality = -1

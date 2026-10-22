@@ -9,3 +9,7 @@
 - Raw filling/vessels now render and can move through hand/surfaces/fridge without duplicating IDs. Current resource reservations and batch/save references are checked.
 - FoodRegistry/display/nourishment moved forward from C4 so new foods are usable as soon as C3 creates them; C4 still wires customer menus and authored Ink learning. Original legacy prices/tips/nourishment copied into data.
 - Builds `/tmp/kiosk-living-c3` and `/tmp/kiosk-living-c3-final` succeeded after correcting a GDScript inferred-Variant local. Full manual batch/cut/reload sequence remains pending.
+- C4: authored Farid Ink introduction, attempt follow-up and per-result feedback added; topics use canonical RecipeLearning evidence, and result conversations freeze their source item so a later result cannot change a pending reply.
+- Archived pre-context-change Ink by story/hash under `content/archive`, retaining the original legacy archive. Matching cursors restore to their actual compiled version; unknown hashes are rejected.
+- Customer food choices now use the real offered menu and data preferences; orders keep frozen prices/tips and intended food. Paid service/history/save validation accept FoodRegistry IDs. New orders record actual timestamps/quality for the next customer-experience phase; legacy unknown timing stays explicitly unknown.
+- Ink compilation, `/tmp/kiosk-living-c-final` import/export and native application boot succeeded. Full batch/service/learning/old-choice manual review remains open for final integrated review; these build observations do not assert it passed.

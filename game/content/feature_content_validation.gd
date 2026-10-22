@@ -41,7 +41,13 @@ static func validate(bundle: Dictionary) -> ActionResult:
     if not key is String or not ContentValidation.vector(markers.get(key),2): return ContentValidation.fail("visitors.spawn_marker")
   for id in data.characters:
    var character: Variant = data.characters[id]
-   if not character is Dictionary or not character.get("name") is String or not character.get("color") is String or not Color.html_is_valid(character.color) or not character.get("marker") is String or not markers.has(character.marker) or not character.get("food_id") in ["tea","kebda",""] or not ContentValidation.number(character.get("stay_seconds")) or character.stay_seconds<=0 or not character.get("ambient") is bool: return ContentValidation.fail("visitors.characters."+id)
+   if not character is Dictionary or not character.get("name") is String or not character.get("color") is String or not Color.html_is_valid(character.color) or not character.get("marker") is String or not markers.has(character.marker) or (character.get("food_id")!="" and not bundle.get("foods",{}).has(str(character.get("food_id","")))) or not ContentValidation.number(character.get("stay_seconds")) or character.stay_seconds<=0 or not character.get("ambient") is bool: return ContentValidation.fail("visitors.characters."+id)
+   if character.has("food_preferences"):
+    if not character.food_preferences is Dictionary:return ContentValidation.fail("visitors.food_preferences")
+    for food_id in character.food_preferences:
+     if not bundle.get("foods",{}).has(food_id) or not ContentValidation.integer(character.food_preferences[food_id]) or character.food_preferences[food_id]<1 or character.food_preferences[food_id]>20:return ContentValidation.fail("visitors.food_preferences")
+   for encounter in character.get("manual_encounters",[]):
+    if not bundle.get("encounters",{}).has(encounter):return ContentValidation.fail("visitors.manual_encounter")
    if not character.get("visit_policy") is Dictionary: return ContentValidation.fail("visitors.visit_policy."+id)
    var policy: Dictionary = character.visit_policy
    if not ContentValidation.integer(policy.get("daily_limit")) or not ContentValidation.bounded(policy.daily_limit,1,20) or not ContentValidation.bounded(policy.get("return_after_minutes"),0,10080) or not ContentValidation.vector(policy.get("time_window"),2) or policy.time_window[0]<0 or policy.time_window[0]>=policy.time_window[1] or policy.time_window[1]>1440: return ContentValidation.fail("visitors.visit_policy."+id)
@@ -103,6 +109,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   var relationship_validation := RelationshipStore.new(bundle.social,actors).restore({"values":bundle.social.get("initial_relationships",{})})
   if not relationship_validation.ok: return ContentValidation.fail("social.initial_relationships")
   var evaluator := ConditionEvaluator.new(KnowledgeBook.new(bundle.social),RelationshipStore.new(bundle.social,actors),GameClock.new(bundle.time),VisitorService.new(),HomeService.new(ItemStore.new()),ActorPose.new(),bundle.social.facts,actors,bundle.get("locations",{}).keys())
+  evaluator.recipe_ids=bundle.get("recipe_workflows",{}).keys()+bundle.get("learning",{}).get("families",{}).values()
   for id in bundle.encounters:
    var definition: Variant = bundle.encounters[id]
    if not definition is Dictionary or not definition.get("story") is String or not bundle.get("story_"+str(definition.story)) is Dictionary: return ContentValidation.fail("encounters."+id)
@@ -118,7 +125,8 @@ static func validate(bundle: Dictionary) -> ActionResult:
     if not definition.topics is Array or definition.topics.is_empty(): return ContentValidation.fail("encounters.topics")
     var topics: Dictionary = {}
     for topic in definition.topics:
-     if not topic is Dictionary or not topic.get("id") is String or not topic.id.is_valid_identifier() or topics.has(topic.id) or not topic.get("scope") in ["once","day","visit"] or not ContentValidation.integer(topic.get("variants")) or not ContentValidation.bounded(topic.variants,1,16) or not topic.get("modes") is Array or topic.modes.is_empty() or not evaluator.validate(topic.get("requires",{})): return ContentValidation.fail("encounters.topics."+id)
+     if not topic is Dictionary or not topic.get("id") is String or not topic.id.is_valid_identifier() or topics.has(topic.id) or not topic.get("scope") in ["once","day","visit","evidence"] or not ContentValidation.integer(topic.get("variants")) or not ContentValidation.bounded(topic.variants,1,16) or not topic.get("modes") is Array or topic.modes.is_empty() or not evaluator.validate(topic.get("requires",{})): return ContentValidation.fail("encounters.topics."+id)
+     if topic.scope=="evidence" and not topic.get("recipe_id") in evaluator.recipe_ids:return ContentValidation.fail("encounters.evidence_recipe")
      topics[topic.id] = true
      for mode in topic.modes:
       if not ContentValidation.integer(mode) or not ContentValidation.bounded(mode,0,4): return ContentValidation.fail("encounters.topics.mode")

@@ -53,3 +53,6 @@ func _family(recipe_id: String) -> String:
  return str(_families.get(recipe_id,recipe_id))
 func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,StringName(key))
+
+func result_evidence(item_id: StringName) -> Dictionary:
+ return _results.get(str(item_id),{}).duplicate(true)

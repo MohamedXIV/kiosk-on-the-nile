@@ -28,3 +28,6 @@ func label(item: PreparedItem) -> String:
 func quality_label(item: PreparedItem) -> String:
  var food := definition(item.food_id)
  return str(food.quality_names[item.quality_score]) if not food.is_empty() else ""
+
+func ids() -> Array:
+ return _definitions.keys()

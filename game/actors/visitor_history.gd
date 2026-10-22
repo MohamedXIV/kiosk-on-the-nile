@@ -1,6 +1,7 @@
 class_name VisitorHistory
 extends RefCounted
 ## Visit reservations and actual paid service memories, independent of presentation.
+var food_ids: Array=[]
 var _visits: Dictionary = {}
 var _services: Dictionary = {}
 func eligible(id: String, policy: Dictionary, clock: GameClock) -> bool:
@@ -34,7 +35,7 @@ func restore(data: Dictionary, characters: Dictionary, clock: GameClock) -> Acti
   if not characters.has(id) or not records is Array or records.size()>2: return _invalid()
   var orders: Dictionary = {}
   for record in records:
-   if not record is Dictionary or not record.get("order_id") is String or record.order_id.is_empty() or orders.has(record.order_id) or not record.get("visit_id") is String or record.visit_id.is_empty() or not record.get("food_id") in ["tea","kebda"] or not ContentValidation.integer(record.get("quality")) or record.quality<0 or record.quality>3: return _invalid()
+   if not record is Dictionary or not record.get("order_id") is String or record.order_id.is_empty() or orders.has(record.order_id) or not record.get("visit_id") is String or record.visit_id.is_empty() or not record.get("food_id") in food_ids or not ContentValidation.integer(record.get("quality")) or record.quality<0 or record.quality>3: return _invalid()
    orders[record.order_id] = true
  _visits = data.visits.duplicate(true)
  _services = data.services.duplicate(true)

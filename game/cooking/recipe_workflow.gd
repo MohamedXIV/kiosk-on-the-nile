@@ -275,3 +275,39 @@ func _progress_slice(job: Dictionary, delta: float) -> void:
  var resources := _equipment.prepare_reservations(StringName(candidate.id),lines,true)
  if not resources.ok:return
  _commit(change,resources.details.state,candidate)
+
+func available_foods(location_id: StringName) -> PackedStringArray:
+ var result := PackedStringArray()
+ for recipe_id in _recipes:
+  var definition: Dictionary=_recipes[recipe_id]
+  if definition.has("vessel_definition"):continue
+  var fact := StringName(str(definition.get("learning_fact","")))
+  if not fact.is_empty() and not _knowledge.has(fact):continue
+  var usable := true
+  for step in definition.steps:
+   if _equipment.candidates(location_id,StringName(step.capability)).is_empty():usable=false
+  if not usable:continue
+  var active := false
+  for job in _jobs.values():
+   if job.status=="active" and job.location_id==str(location_id) and job.recipe_id==recipe_id:active=true
+  var inputs: Array[Dictionary]=[]
+  for input in definition.inputs:
+   if input.get("required_storage")!="hand":inputs.append(input);continue
+   var intermediate := false
+   for item in _inventory.items.instances(StringName(input.definition_id)):
+    var container := _inventory.items.get_container(StringName(item.container_id))
+    if (container.location_id==str(location_id) and container.kind!="purchase_bag") or (container.id=="player_hand" and _inventory.player_pose.location_id==location_id):intermediate=true
+   for precursor_id in _recipes:
+    var precursor: Dictionary=_recipes[precursor_id]
+    if precursor.get("filling_definition")!=input.definition_id:continue
+    var precursor_inputs: Array[Dictionary]=[]
+    precursor_inputs.assign(precursor.inputs)
+    var capable := true
+    for step in precursor.steps:
+     if _equipment.candidates(location_id,StringName(step.capability)).is_empty():capable=false
+    if capable and _inventory.available(location_id,precursor_inputs).ok:intermediate=true
+    for job in _jobs.values():
+     if job.status=="active" and job.location_id==str(location_id) and job.recipe_id==precursor_id:intermediate=true
+   if not intermediate:usable=false
+  if usable and (active or _inventory.available(location_id,inputs).ok):result.append(str(definition.output.food_id))
+ return result

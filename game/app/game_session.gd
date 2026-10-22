@@ -137,7 +137,9 @@ func configure(source: SessionConfig) -> ActionResult:
  life = LifeActions.new(self)
  service = ServiceSystem.new()
  visitors = VisitorService.new()
- service.configure(wallet,cooking,visitors.is_available,balance)
+ visitors.foods=foods
+ visitors.food_selector=_choose_food
+ service.configure(wallet,cooking,visitors.is_available,balance,foods,clock)
  visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open)
  service.settled.connect(visitors.record_service)
  service.settled.connect(func(_order,_visit,item,_payment):
@@ -150,6 +152,8 @@ func configure(source: SessionConfig) -> ActionResult:
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships
  conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,locations.ids())
+ conditions.learning=learning
+ conditions.recipe_ids=source.section("recipe_workflows").keys()+source.section("learning").families.values()
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
  narrative = NarrativeDirector.new()
  add_child(narrative)
@@ -202,7 +206,9 @@ func _encounter_requested(kind: StringName, participants: PackedStringArray, ext
 func talk(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState = visitors.visits[str(visit_id)]
- return await narrative.start(&"amgad" if visit.character_id==&"amgad" else &"visitors",PackedStringArray([str(visit_id)]))
+ var encounter := narrative.talk_encounter(visit_id)
+ if encounter.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
+ return await narrative.start(encounter,PackedStringArray([str(visit_id)]))
 
 func _sleep_elapsed(frame: Dictionary) -> void:
  # Sleep skips travel/social scenes, while unattended stations and due jobs
@@ -220,3 +226,15 @@ func _actor_snapshots() -> Array[Dictionary]:
 
 func _equipment_busy(id: StringName) -> bool:
  return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id))
+
+func _choose_food(character_id: StringName) -> StringName:
+ var character := visitors.character(character_id)
+ if str(character.get("food_id","")).is_empty():return &""
+ var offered := workflow.available_foods(&"kiosk")
+ var preferences: Dictionary=character.get("food_preferences",{str(character.food_id):1})
+ var pool: Array[String]=[]
+ for id in preferences:
+  if not id in offered:continue
+  for i in range(int(preferences[id])):pool.append(id)
+ if pool.is_empty():return &""
+ return StringName(pool[visitors.random_index(pool.size())])

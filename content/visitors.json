@@ -31,6 +31,11 @@
           900,
           1440
         ]
+      },
+      "food_preferences": {
+        "tea": 4,
+        "shawarma": 2,
+        "potato_baked": 1
       }
     },
     "mahmoud": {
@@ -47,6 +52,11 @@
           900,
           1440
         ]
+      },
+      "food_preferences": {
+        "tea": 4,
+        "shawarma": 2,
+        "potato_baked": 1
       }
     },
     "samir": {
@@ -63,6 +73,11 @@
           900,
           1440
         ]
+      },
+      "food_preferences": {
+        "kebda": 4,
+        "shawarma": 2,
+        "potato_baked": 1
       }
     },
     "hassan": {
@@ -79,6 +94,11 @@
           930,
           1320
         ]
+      },
+      "food_preferences": {
+        "tea": 4,
+        "shawarma": 2,
+        "potato_fried": 1
       }
     },
     "nadia": {
@@ -95,6 +115,11 @@
           990,
           1200
         ]
+      },
+      "food_preferences": {
+        "kebda": 4,
+        "shawarma": 2,
+        "potato_fried": 1
       }
     },
     "passer": {
@@ -127,6 +152,11 @@
           900,
           1080
         ]
+      },
+      "food_preferences": {
+        "tea": 4,
+        "shawarma": 2,
+        "potato_baked": 1
       }
     },
     "mona": {
@@ -159,6 +189,15 @@
           960,
           1170
         ]
+      },
+      "manual_encounters": [
+        "shawarma_learning",
+        "visitors"
+      ],
+      "food_preferences": {
+        "kebda": 4,
+        "shawarma": 2,
+        "potato_fried": 1
       }
     },
     "youssef": {
@@ -175,6 +214,11 @@
           1080,
           1440
         ]
+      },
+      "food_preferences": {
+        "tea": 4,
+        "shawarma": 2,
+        "potato_baked": 1
       }
     }
   },

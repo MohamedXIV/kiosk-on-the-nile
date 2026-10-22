@@ -12,8 +12,13 @@ func select(encounter: StringName, definition: Dictionary, visit: VisitState, se
   var key := _key(str(encounter),str(topic.id),str(visit.character_id))
   var previous: Dictionary = _records.get(key,{})
   var scope := "once" if topic.scope=="once" else "day_%d" % session.clock.day if topic.scope=="day" else str(visit.id)
+  var source_id := ""
+  if topic.scope=="evidence":
+   source_id=str(session.learning.context(StringName(str(topic.get("recipe_id","")))).last_item_id)
+   if source_id.is_empty():continue
+   scope="result:"+source_id
   if previous.get("scope")==scope: continue
-  return {"topic_id":str(topic.id),"key":key,"scope":scope,"variant":(int(previous.get("variant",-1))+1)%int(topic.variants)}
+  return {"topic_id":str(topic.id),"key":key,"scope":scope,"variant":(int(previous.get("variant",-1))+1)%int(topic.variants),"source_id":source_id}
  return {}
 func commit(selection: Dictionary) -> void:
  if not selection.is_empty(): _records[selection.key]=selection.duplicate(true)
@@ -28,7 +33,7 @@ func restore(data: Dictionary, definitions: Dictionary, characters: Dictionary) 
    for topic: Dictionary in definitions[encounter].get("topics",[]):
     for actor in characters:
      if key==_key(encounter,str(topic.id),actor) and record.topic_id==topic.id:
-      found = record.variant>=0 and record.variant<int(topic.variants) and (record.scope=="once" if topic.scope=="once" else _numbered(record.scope,"day_") if topic.scope=="day" else _numbered(record.scope,"visit_"))
+      found = record.variant>=0 and record.variant<int(topic.variants) and (record.scope=="once" if topic.scope=="once" else _numbered(record.scope,"day_") if topic.scope=="day" else record.scope.begins_with("result:") and _numbered(record.scope.trim_prefix("result:"),"food_") if topic.scope=="evidence" else _numbered(record.scope,"visit_"))
   if not found: return _invalid()
  _records = data.duplicate(true)
  return ActionResult.success()
