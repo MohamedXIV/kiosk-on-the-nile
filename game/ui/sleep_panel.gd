@@ -19,6 +19,7 @@ func configure(text: UiText) -> void:
  box.add_child(UiText.label(text.text("sleep_title")))
  _hours = SpinBox.new()
  _hours.rounded = true
+ _hours.update_on_text_changed = true
  _hours.suffix = text.text("sleep_hours_suffix")
  box.add_child(_hours)
  _preview = UiText.label()

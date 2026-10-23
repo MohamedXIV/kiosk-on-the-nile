@@ -37,8 +37,10 @@ func open() -> void:
  _feedback.text="التغيير يطبّق مع خطوة المحاكاة التالية. الأسماء تحت names بمُعرّف الشخصية."
  show()
 func _apply_text() -> void:
- var parsed: Variant=JSON.parse_string(_editor.text)
- if not parsed is Dictionary:_feedback.text="JSON غير صالح؛ القيم السابقة محفوظة.";return
+ var parser := JSON.new()
+ var error := parser.parse(_editor.text)
+ var parsed: Variant=parser.data
+ if error!=OK or not parsed is Dictionary:_feedback.text="JSON غير صالح؛ القيم السابقة محفوظة.";return
  var result := _session.tuning.propose(parsed)
  _feedback.text="تم قبول المرشح؛ يُطبّق في خطوة المحاكاة التالية." if result.ok else "الإعدادات مرفوضة؛ القيم السابقة لم تتغير."
 func _export() -> void:
