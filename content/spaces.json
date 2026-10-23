@@ -1906,20 +1906,6 @@
         }
       ],
       "marker_bindings": {
-        "counter_1": {
-          "instance_id": "counter_1",
-          "offset": [
-            0,
-            1.25
-          ]
-        },
-        "counter_2": {
-          "instance_id": "counter_5",
-          "offset": [
-            0,
-            1.25
-          ]
-        },
         "table_a": {
           "instance_id": "table_1",
           "offset": [
@@ -3797,7 +3783,7 @@
     "recipes": "التحضير والعناية",
     "surface": "سطح التحضير",
     "inventory": "افتح مخزون المكان",
-    "care": "العناية بالجهاز",
+    "care": "الاستخدام والعناية",
     "clean": "تنظيف",
     "clean_item": "تنظيف {item}",
     "sleep": "اختيار مدة النوم والراحة",

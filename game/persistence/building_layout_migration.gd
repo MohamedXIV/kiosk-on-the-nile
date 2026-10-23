@@ -4,6 +4,18 @@ extends RefCounted
 static func upgrade(source: Dictionary, config: SessionConfig) -> ActionResult:
  var state := source.duplicate(true)
  if not state.get("spaces") is Dictionary or not state.spaces.get("placements") is Dictionary or not state.get("items") is Dictionary or not state.items.get("items") is Dictionary or not state.items.get("containers") is Dictionary:return _fail("building_components")
+ for component in ["workflow","equipment","cooking","hygiene","travel"]:
+  if not state.get(component) is Dictionary:return _fail("building_"+component)
+ for component in ["workflow","cooking"]:
+  if not state[component].get("jobs") is Dictionary:return _fail("building_jobs")
+  for job in state[component].jobs.values():
+   if not job is Dictionary:return _fail("building_job")
+   if component=="workflow" and not job.get("devices") is Dictionary:return _fail("building_devices")
+ if not state.equipment.get("reservations") is Dictionary:return _fail("building_reservations")
+ for lines in state.equipment.reservations.values():
+  if not lines is Array:return _fail("building_reservation_lines")
+  for line in lines:
+   if not line is Dictionary:return _fail("building_reservation_line")
  var store := ItemStore.new()
  var result := store.configure(config.section("items"),config.section("containers"))
  if not result.ok:return result
@@ -23,7 +35,7 @@ static func upgrade(source: Dictionary, config: SessionConfig) -> ActionResult:
   if not p is Dictionary or p.get("instance_id")!=id or not definitions.locations.has(str(p.get("location_id",""))) or not ContentValidation.vector(p.get("cell"),2) or not ContentValidation.integer(p.cell[0]) or not ContentValidation.integer(p.cell[1]) or not ContentValidation.integer(p.get("rotation")) or p.rotation<0 or p.rotation>3 or not p.get("host_id") is String or not p.get("slot_id") is String or not state.items.items.has(id):return _fail("building_placement")
   if state.items.items[id].container_id!=p.location_id+"_world":return _fail("building_owner")
   if p.host_id=="":roots.append(id)
-  elif not old.has(p.host_id) or old[p.host_id].get("host_id")!="":return _fail("building_host")
+  elif not old.get(p.host_id) is Dictionary or old[p.host_id].get("host_id")!="":return _fail("building_host")
  roots.sort()
  var protected := _protected(state)
  var pending: Array[String]=[]
@@ -67,9 +79,13 @@ static func upgrade(source: Dictionary, config: SessionConfig) -> ActionResult:
    if not state.items.containers.has(storage):return _fail("building_no_storage:"+member)
    state.items.items[member].container_id=storage
    report.stored.append(member)
+ if state.hygiene.get("action") is Dictionary and not state.hygiene.action.is_empty():
+  var target := str(state.hygiene.action.get("target_id",""))
+  if target in report.moved or target in report.stored:state.hygiene.action["active"]=false
  state.spaces={"placements":layout.placements,"door_states":doors,"starter_granted":true}
  result=store.restore(state.items)
  if not result.ok:return result
+ state.home=HomeService.new(store).snapshot()
  var spaces := SpaceService.new()
  result=spaces.configure(definitions,state.spaces,store,Callable(),Callable())
  if not result.ok:return _fail("building_final_layout:"+str(result.message_key))

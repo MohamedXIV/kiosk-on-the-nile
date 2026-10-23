@@ -34,9 +34,23 @@ func nearest() -> InteractionTarget:
    if not (item and order and order.food_id==item.food_id) and not _session.narrative.can_talk(visit.id): continue
    target.primary = _text.text("serve",{"item":_session.cooking.item_label(item),"name":character.name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":character.name})
    targets.append(target)
- return InteractionSelector.nearest(_session.player_ground,targets)
+ var selected := InteractionSelector.nearest(_session.player_ground,targets)
+ var people: Array[InteractionTarget]=[]
+ for target in targets:
+  if not target.visit_id.is_empty():people.append(target)
+ var person := InteractionSelector.nearest(_session.player_ground,people)
+ if person!=null and selected!=null and selected.visit_id.is_empty():
+  var item := _session.cooking.held_item()
+  var order := _session.service.pending_for(person.visit_id)
+  if item and order and item.food_id==order.food_id:return person
+  selected.secondary=person.primary
+  selected.secondary_visit_id=person.visit_id
+ return selected
 func execute(secondary: bool) -> ActionResult:
  var target := nearest()
+ if secondary and target!=null and not target.secondary_visit_id.is_empty():
+  _session.hygiene.interrupt_clean()
+  return await _session.talk(target.secondary_visit_id)
  if secondary and _session.cooking.held_item() and (target==null or target.secondary.is_empty()): return _session.life.consume_held()
  if target==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_target")
  if not target.visit_id.is_empty():

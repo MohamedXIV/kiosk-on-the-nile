@@ -6,6 +6,7 @@ var radius: float
 var available: bool = true
 var primary: String = ""
 var secondary: String = ""
+var secondary_visit_id: StringName
 var visit_id: StringName
 func _init(identity: StringName = &"", anchor: Vector2 = Vector2.ZERO, reach: float = 1.6) -> void:
  id = identity
