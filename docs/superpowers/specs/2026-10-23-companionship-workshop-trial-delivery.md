@@ -28,7 +28,8 @@ Observed:
 - Returned and heard both Youssef and Farid's first-day reports, including that continued days still needed agreement. Explicitly relayed/confirmed the two-day arrangement with Farid and then Youssef after the completed trial: outcome changed to `week_trial` with the same start/end and one completion receipt. Saved and continued this completed/late-agreement state under strengthened validation.
 - Manual review found an obsolete appointment topic offering future plans after completion; added authored topic phase filters. Historical appointment facts/cursors remain compatible, but completed cases offer actual follow-ups.
 - Actual schema4/revision4 save restored under the new product: money38200, Farid's pending kebda/order4, Amgad's tea/order5, running tea and shawarma_batch/item23, paused floor cleaning and previous visit memories retained; social receipts remained empty and activity idle.
-- A new revision7 saved consent/disclosure state restored under strengthened provenance validation.
+- A new revision7 saved consent/disclosure state and the completed late-agreement state restored under strengthened provenance validation.
+- Specific continuation topic let Youssef describe the agreed two-day trial week; `WORK_TRIAL_WEEK` was recorded at the actual spoken occurrence with Youssef/time provenance. Notebook people tab displayed the heard actors, familiarity stages/bars and their reported workshop connection. No new trial or referral moment was created.
 
 Remaining manual coverage: the opposite disclosure order, agreement before the first trial, exhaustive saves during every activity phase, a held choice exactly at the trial appointment, and long-term default pacing. Code review/build evidence does not claim these UI paths were exercised.
 
