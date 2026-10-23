@@ -6,6 +6,7 @@ var top_inset: float = 12
 func present(session: GameSession, room: LocationView, camera: Camera2D) -> void:
  _present_orders(session,room,camera)
  var active: Dictionary = {}
+ var caption_boxes: Array[Rect2]=[]
  var focused := session.narrative.focused_session()
  if session.location_id==&"kiosk":
   for conversation: ConversationSession in session.narrative.sessions.values():
@@ -37,6 +38,19 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
     for key in _orders:
      if str(key).begins_with(str(visit_id)+":"):ceiling=minf(ceiling,_orders[key].position.y-8)
     label.position = Vector2(clampf(screen.x-150,8,get_viewport_rect().size.x-308),clampf(ceiling-label.size.y,top_inset,get_viewport_rect().size.y-180))
+    var obstacles := caption_boxes.duplicate()
+    for badge in _orders.values():obstacles.append(Rect2(badge.position,badge.size))
+    for attempt in range(8):
+     var moved := false
+     for box in obstacles:
+      if Rect2(label.position,label.size).grow(3).intersects(box):
+       var next_y := maxf(top_inset,box.position.y-label.size.y-8)
+       if next_y==label.position.y:label.position.x=clampf(box.end.x+8,8,get_viewport_rect().size.x-label.size.x-8)
+       else:label.position.y=next_y
+       moved=true
+       break
+     if not moved:break
+    caption_boxes.append(Rect2(label.position,label.size))
  for id in _labels.keys():
   if not active.has(id):
    _labels[id].queue_free()
