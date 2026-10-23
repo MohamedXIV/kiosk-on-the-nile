@@ -66,7 +66,9 @@ func restore(data: Dictionary) -> ActionResult:
   if a.refused:
    counts[str(int(a.day))]=int(counts.get(str(int(a.day)),0))+1
    last=maxf(last,float(a.at))
- if StableJson.stringify(counts)!=StableJson.stringify(data.daily) or absf(last-float(data.last_refusal))>0.001:return _deny("invalid_refusal_provenance")
+ if StableJson.stringify(counts)!=StableJson.stringify(data.daily) or absf(last-float(data.last_refusal))>0.001:
+  push_warning("Refusal provenance mismatch: computed=%s saved=%s last=%.12f saved_last=%.12f" % [StableJson.stringify(counts),StableJson.stringify(data.daily),last,float(data.last_refusal)])
+  return _deny("invalid_refusal_provenance")
  for id in data.effort:
   var e: Variant=data.effort[id]
   if not id is String or id.is_empty() or not e is Dictionary or not _data.effort.has(e.get("kind")) or not ContentValidation.bounded(e.get("amount"),0,100) or not ContentValidation.bounded(e.get("at"),0,_session.clock.world_minutes):return _deny("invalid_effort_history")
