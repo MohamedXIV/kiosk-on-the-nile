@@ -89,7 +89,7 @@ func tick(delta: float) -> void:
     if not _can_hear(conversation):
      _finish(conversation)
      continue
-    var listen := str(definition.get("listen_choice",2))
+    var listen := str(int(definition.get("listen_choice",2)))
     choose(conversation.id,StringName("%s:%d:%s" % [conversation.id,conversation.beat,listen]),true)
    elif _focus.is_empty() and _can_offer(conversation): _focus = conversation.id; changed.emit()
   elif conversation.elapsed>=maxf(conversation.current.duration,0.05):
@@ -132,7 +132,7 @@ func _advance(conversation: ConversationSession) -> void:
    return
  if not conversation.current.text.is_empty() and _can_hear(conversation):
   _session.social_life.heard(speaker)
-  if conversation.encounter_id!=&"social_invitation" or conversation.context_extra.get("invitation_answered",false):
+  if conversation.encounter_id!=&"social_invitation" or conversation.context_extra.get("invitation_listening",false):
    var topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
    _session.social_life.heard_topic(topic)
  if _focus.is_empty() and not conversation.current.choices.is_empty() and _can_offer(conversation): _focus = conversation.id
@@ -159,6 +159,7 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   if conversation.encounter_id==&"social_invitation":
    conversation.optional=false
    conversation.context_extra["invitation_answered"]=true
+   conversation.context_extra["invitation_listening"]=int(choice.index)==0
   if _focus==session_id: _focus = &""
   _advance(conversation)
   return ActionResult.success({"cue":"chime"})

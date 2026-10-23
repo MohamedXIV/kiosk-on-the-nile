@@ -113,7 +113,7 @@ func people() -> Array[Dictionary]:
   for stage in _data.relationships.stages:
    if score>=float(stage.at):label=stage.label
   var connection := ""
-  if actor in _data.trial.actors and (_session.knowledge.has(&"WORK_TRIAL_APPOINTMENT") or _session.knowledge.has(&"WORK_TRIAL_RESULT")):connection="يعرف يوسف من تجربة الورشة" if actor=="farid" else "يعرف فريد من تجربة الورشة"
+  if actor in _data.trial.actors and (_session.knowledge.has(&"WORK_TRIAL_APPOINTMENT") or _session.knowledge.has(&"WORK_TRIAL_RESULT")):connection=("جرّب الشغل مع يوسف" if actor=="farid" else "جرّب الشغل مع فريد") if _session.knowledge.has(&"WORK_TRIAL_RESULT") else ("تواصل مع يوسف لترتيب تجربة" if actor=="farid" else "تواصل مع فريد لترتيب تجربة")
   result.append({"name":_session.visitors.character(StringName(actor)).name,"score":score,"stage":label,"connection":connection})
  return result
 func heard(actor: String) -> void:
@@ -168,7 +168,7 @@ func _validate(data: Dictionary) -> ActionResult:
   if activity.start_at!=-1 or activity.end_at!=-1:return _fail("premature_trial")
  if (activity.phase=="completed")!=data.receipts.has("trial_complete"):return _fail("invalid_trial_receipt")
  if activity.phase=="completed":
-  if activity.end_at>now+0.001 or activity.outcome!=("week_trial" if data.receipts.has("days_farid") and data.receipts.has("days_youssef") else "days_pending"):return _fail("invalid_trial_outcome")
+  if float(data.receipts.trial_complete.at)<float(activity.end_at) or activity.end_at>now+0.001 or activity.outcome!=("week_trial" if data.receipts.has("days_farid") and data.receipts.has("days_youssef") else "days_pending"):return _fail("invalid_trial_outcome")
  elif activity.outcome!="":return _fail("premature_outcome")
  for id in data.receipts:
   if not _data.actions[id].phases.is_empty() and not activity.phase in _data.actions[id].phases:return _fail("premature_social_receipt")
@@ -181,6 +181,15 @@ func cross_validate() -> ActionResult:
  for id in _state.receipts:
   var action: Dictionary=_data.actions[id]
   if action.learn!="" and not _session.knowledge.has(StringName(action.learn)):return _fail("missing_social_knowledge")
+ var facts: Dictionary=_session.knowledge.snapshot().facts
+ for fact in ["WORKSHOP_OPPORTUNITY","YOUSSEF_WORK_STUDY","WORK_TRIAL_APPOINTMENT","WORK_TRIAL_RESULT","WORK_TRIAL_WEEK"]:
+  if not facts.has(fact):continue
+  var grounded := false
+  var record: Dictionary=facts[fact]
+  for id in _state.receipts:
+   var receipt: Dictionary=_state.receipts[id]
+   if _data.actions[id].learn==fact and record.get("source")==receipt.source and record.get("speaker")==receipt.actor and ContentValidation.number(record.get("at")) and absf(float(record.at)-float(receipt.at))<0.001:grounded=true
+  if not grounded:return _fail("ungrounded_social_knowledge")
  return ActionResult.success()
 func _fail(reason: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,StringName(reason))
@@ -212,7 +221,7 @@ func step_companionship(delta: float) -> void:
   var near := visit.phase==&"staying" and _session.location_id==visit.pose.location_id and _session.player_ground.distance_to(visit.pose.ground)<=float(config.radius)
   if not near:invitation.elapsed=0.0;continue
   if invitation.offered or blocked or not _session.narrative.sessions.is_empty():continue
-  var topics := topics_for(visit.id)
+  var topics := topics_for(visit.id).filter(func(topic):return bool(_data.topics[topic.id].automatic))
   if topics.is_empty():continue
   invitation.elapsed=minf(float(invitation.wait),float(invitation.elapsed)+delta)
   if invitation.elapsed<float(invitation.wait):continue
@@ -228,4 +237,6 @@ func dialogue_context(id: String) -> Dictionary:
  var minute := fposmod(appointment,1440.0)
  return {"topic_id":id,"trial_week":activity.outcome=="week_trial","appointment_label":"يوم %d الساعة %02d:%02d" % [floori(appointment/1440.0)+1,int(minute)/60,int(minute)%60]}
 func heard_topic(id: String) -> void:
- if _data.topics.has(id):_state.topic_history[id]=_session.clock.day
+ if not _data.topics.has(id):return
+ var action := str(_data.topics[id].action)
+ if action.is_empty() or done(action):_state.topic_history[id]=_session.clock.day

@@ -27,18 +27,18 @@
 **Files:** create `game/social/social_life.gd`, `game/content/social_life_validation.gd`, `content/social_life.json`; modify session wiring, finite conditions, migration/save validation and time dependencies.
 **Interfaces:** `SocialLife.configure(session)`, `available(action_id)`, `apply(action_id, source) -> ActionResult`, `tick(frame)`, `snapshot/restore`, `reserved(actor_id)`, `people()`.
 
-- [ ] Author finite action IDs, provenance, separate consents and day agreements, candidate transactions, once-only relationship moments and daily caps.
-- [ ] Implement next-day coordination, lead-window reservation, delayed start until both physically absent, actual start/end/outcome and late agreement.
-- [ ] Integrate save revision7, migration and strict state/reference validation; build/import.
+- [x] Author finite action IDs, provenance, separate consents and day agreements, candidate transactions, once-only relationship moments and daily caps.
+- [x] Implement next-day coordination, lead-window reservation, delayed start until both physically absent, actual start/end/outcome and late agreement.
+- [x] Integrate save revision7, migration and strict state/reference validation; build/import.
 
 ### Task 2: Authored dialogue and companionship
 
 **Files:** new `content/stories/companionship.ink`, encounter/topic declarations; modify InkRuntime, NarrativeEffects, NarrativeDirector and VisitorPanel.
 **Interfaces:** finite `effect:social|action_id`; topic listing and explicit encounter start; invitation wait uses shared frame and saved per-visit state.
 
-- [ ] Author acquaintance, disclosure, referrals, individual consents, days and truthful first-day/study follow-ups for both voices.
-- [ ] Implement invitation separate from disclosure consumption; silence listens, refusal/walkaway consumes no personal information.
-- [ ] Preserve order recall and old personal topics; reject failed effects before displaying their claimed event; compile Ink and export.
+- [x] Author acquaintance, disclosure, referrals, individual consents, days and truthful first-day/study follow-ups for both voices.
+- [x] Implement invitation separate from disclosure consumption; silence listens, refusal/walkaway consumes no personal information.
+- [x] Preserve order recall and old personal topics; reject failed effects before displaying their claimed event; compile Ink and export.
 
 ### Task 3: Relationship notebook and manual acceptance
 
