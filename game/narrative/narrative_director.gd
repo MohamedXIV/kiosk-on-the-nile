@@ -11,6 +11,8 @@ var _session: GameSession
 var _next: int = 1
 var _focus: StringName
 var _opening: Dictionary = {}
+var _pending_choices: Dictionary = {}
+var _manual_opening: bool = false
 func configure(session: GameSession, definitions: Dictionary, stories: Dictionary) -> ActionResult:
  _session = session
  _definitions = definitions.duplicate(true)
@@ -38,8 +40,11 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  data.merge(extra,true)
  return data
 func start(encounter_id: StringName, participants: PackedStringArray, extra: Dictionary = {}) -> ActionResult:
+ if encounter_id==&"social_invitation" and _session.personal.active():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
  var definition: Dictionary = _definitions.get(str(encounter_id),{})
  if definition.is_empty() or not _encounter_available(definition,participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
+ var wants_manual := bool(extra.get("manual_read",definition.get("advancement","automatic")=="manual" and int(extra.get("mode",0))==0))
+ if wants_manual and (_manual_opening or not _session.personal.can_acquire(participants)):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
  var social_topic := str(definition.get("social_topic",""))
  if not social_topic.is_empty():
   if not _session.social_life.topic_available(social_topic) or participants.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
@@ -55,6 +60,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
   for existing: ConversationSession in sessions.values():
    if existing.participants==participants and existing.current.choices.is_empty() and existing.encounter_id!=&"football": _finish(existing)
  _opening[key] = true
+ if wants_manual:_manual_opening=true
  var conversation := ConversationSession.new()
  conversation.id = StringName("conversation_%d" % _next)
  _next += 1
@@ -70,11 +76,16 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  add_child(conversation.runtime)
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation))
  _opening.erase(key)
+ if wants_manual:_manual_opening=false
  if not result.ok or not _encounter_available(definition,participants):
   conversation.runtime.queue_free()
   return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  sessions[str(conversation.id)] = conversation
- _advance(conversation)
+ if wants_manual and not _session.personal.adopt(conversation):
+  _finish(conversation,&"cancelled")
+  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
+ var advanced := _advance(conversation)
+ if not advanced.ok:return advanced
  return ActionResult.success({"session_id":str(conversation.id)})
 func tick(delta: float) -> void:
  for conversation: ConversationSession in sessions.values():
@@ -100,7 +111,7 @@ func tick(delta: float) -> void:
 func _can_offer(conversation: ConversationSession) -> bool:
  var definition: Dictionary = _definitions[str(conversation.encounter_id)]
  return _session.conditions.permits(definition.get("offer_requires",{}),conversation.participants)
-func _advance(conversation: ConversationSession) -> void:
+func _advance(conversation: ConversationSession) -> ActionResult:
  conversation.runtime.set_context(_context_for(conversation))
  conversation.current = conversation.runtime.advance()
  conversation.beat += 1
@@ -109,28 +120,33 @@ func _advance(conversation: ConversationSession) -> void:
  if not conversation.current.result.ok:
   _report_failure(conversation,conversation.current.result)
   _finish(conversation)
-  return
+  return conversation.current.result
  var speaker := str(conversation.current.speaker_id)
  if not speaker.is_empty():
   var valid_speaker := false
   for id in conversation.participants:
    if _session.visitors.visits.has(id) and str(_session.visitors.visits[id].character_id)==speaker: valid_speaker=true
   if not valid_speaker:
-   _report_failure(conversation,ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_story_speaker"))
+   var rejected := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_story_speaker")
+   _report_failure(conversation,rejected)
    _finish(conversation)
-   return
+   return rejected
  for effect in conversation.current.effects:
   if not _session.effects.valid(effect):
-   _report_failure(conversation,ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect"))
+   var rejected := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect")
+   _report_failure(conversation,rejected)
    _finish(conversation)
-   return
+   return rejected
  for i in range(conversation.current.effects.size()):
   if not _can_hear(conversation):continue
   var applied := _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
   if not applied.ok:
    _report_failure(conversation,applied)
    _finish(conversation)
-   return
+   return applied
+ if _pending_choices.has(str(conversation.id)):
+  if _can_hear(conversation):_session.journal.append_once(_pending_choices[str(conversation.id)])
+  _pending_choices.erase(str(conversation.id))
  if not conversation.current.text.is_empty() and _can_hear(conversation):
   history.commit(conversation.topic_selection)
   _journal_line(conversation)
@@ -140,6 +156,7 @@ func _advance(conversation: ConversationSession) -> void:
    _session.social_life.heard_topic(topic)
  if _focus.is_empty() and (manual(conversation) or not conversation.current.choices.is_empty()) and _can_offer(conversation): _focus = conversation.id
  changed.emit()
+ return ActionResult.success()
 func choices(conversation: ConversationSession) -> Array[Dictionary]:
  var offered: Array[Dictionary] = []
  if conversation == null or conversation.finished or not _can_offer(conversation): return offered
@@ -156,20 +173,26 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
  if automatic and conversation.optional: candidates = conversation.current.choices.map(func(choice):return {"id":str(conversation.choice_id(choice)),"index":choice.index})
  for choice in candidates:
   if choice.id != str(choice_id): continue
+  var becomes_manual := manual(conversation) or (conversation.encounter_id==&"social_invitation" and int(choice.index)==0)
+  if becomes_manual and (_manual_opening or not _session.personal.can_acquire(conversation.participants,conversation.id)):
+   if automatic:_finish(conversation,&"cancelled")
+   return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
   conversation.runtime.set_context(_context_for(conversation))
   var result := conversation.runtime.choose(int(choice.index))
   if not result.ok: return result
   if _can_hear(conversation) and not automatic:
-   _session.journal.append_once({"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":str(_session.config.section("ui").get("player_name","أنا")),"text":str(conversation.current.choices[int(choice.index)].text),"channel":"choice","at":_session.clock.world_minutes})
+   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":str(_session.config.section("ui").get("player_name","أنا")),"text":str(conversation.current.choices[int(choice.index)].text),"channel":"choice","at":_session.clock.world_minutes}
   if conversation.encounter_id==&"social_invitation":
    conversation.optional=false
    conversation.context_extra["invitation_answered"]=true
    conversation.context_extra["invitation_listening"]=int(choice.index)==0
    if int(choice.index)==0:conversation.context_extra["manual_read"]=true
-  if manual(conversation):_session.personal.adopt(conversation)
+  if manual(conversation) and not _session.personal.adopt(conversation):
+   _finish(conversation,&"cancelled")
+   return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
   if _focus==session_id: _focus = &""
-  _advance(conversation)
-  return ActionResult.success({"cue":"chime"})
+  var advanced := _advance(conversation)
+  return ActionResult.success({"cue":"chime"}) if advanced.ok else advanced
  return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
 func focused_session() -> ConversationSession:
  var conversation: ConversationSession = sessions.get(str(_focus))
@@ -180,6 +203,7 @@ func cancel(session_id: StringName) -> void:
  var conversation: ConversationSession = sessions.get(str(session_id))
  if conversation: _finish(conversation,&"cancelled")
 func _finish(conversation: ConversationSession, reason: StringName = &"completed") -> void:
+ _pending_choices.erase(str(conversation.id))
  conversation.finished = true
  if conversation.encounter_id==&"service_availability" and not conversation.participants.is_empty():_session.visitors.reset_request(StringName(conversation.participants[0]))
  sessions.erase(str(conversation.id))
@@ -352,7 +376,7 @@ func advance_manual(id: StringName) -> ActionResult:
  if conversation==null or not manual(conversation) or not _can_hear(conversation) or not _encounter_available(_definitions[str(conversation.encounter_id)],conversation.participants):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
  if not conversation.current.choices.is_empty():return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"choose_a_reply")
  if conversation.current.ended:_finish(conversation)
- else:_advance(conversation)
+ else:return _advance(conversation)
  return ActionResult.success()
 func _journal_line(conversation: ConversationSession) -> void:
  var actor := str(conversation.current.speaker_id)
@@ -381,8 +405,7 @@ func start_manual_topic(visit_id: StringName, key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
 func validate_paused(record: Dictionary) -> ActionResult:
  if not _definitions.has(record.get("encounter_id")) or not ContentValidation.integer(record.get("beat")) or record.beat<1 or not ContentValidation.number(record.get("elapsed")) or record.elapsed<0 or not ContentValidation.number(record.get("choice_elapsed")) or record.choice_elapsed<0 or not record.get("topic_selection") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
- var suffix := str(record.id).trim_prefix("conversation_")
- if not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=_next:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
+ if not valid_sequence(str(record.id),"conversation_",_next):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not record.topic_selection.is_empty():
   var validation := ConversationHistory.new().restore({record.topic_selection.get("key",""):record.topic_selection},_definitions,_session.config.section("visitors").characters)
   if not validation.ok:return validation
@@ -424,3 +447,24 @@ func resume_record(record: Dictionary, visit_id: StringName) -> ActionResult:
  _focus=conversation.id
  changed.emit()
  return ActionResult.success({"session_id":str(conversation.id)})
+
+func valid_sequence(id: String, prefix: String, limit: int) -> bool:
+ var suffix := id.trim_prefix(prefix)
+ return id.begins_with(prefix) and suffix.is_valid_int() and int(suffix)>0 and suffix==str(int(suffix)) and int(suffix)<limit
+func validate_sequences() -> ActionResult:
+ for id in sessions:
+  if not valid_sequence(str(id),"conversation_",_next):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_conversation_sequence")
+ var references: Array=[]
+ references.append_array(_session.effects.snapshot().applied.keys())
+ for fact in _session.knowledge.snapshot().facts.values():
+  if str(fact.source).begins_with("conversation_"):references.append(fact.source)
+ for receipt in _session.social_life.snapshot().receipts.values():
+  if str(receipt.source).begins_with("conversation_"):references.append(receipt.source)
+ for e in _session.journal.entries():
+  if e.channel not in ["speech","choice"]:continue
+  var parts := str(e.id).split("/")
+  if parts.size()!=3 or parts[0]!=e.chapter or parts[2]!=e.channel or not valid_sequence(parts[0],"conversation_",_next) or not parts[1].is_valid_int() or int(parts[1])<1 or parts[1]!=str(int(parts[1])) or (e.channel=="choice" and e.actor!="player"):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_journal_sequence")
+ for reference in references:
+  var parts := str(reference).split("/")
+  if parts.size()!=3 or not valid_sequence(parts[0],"conversation_",_next) or not parts[1].is_valid_int() or int(parts[1])<1 or not parts[2].is_valid_int() or int(parts[2])<0:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_effect_sequence")
+ return ActionResult.success()

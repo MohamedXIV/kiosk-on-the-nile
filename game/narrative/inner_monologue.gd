@@ -61,6 +61,8 @@ func restore(data: Dictionary) -> ActionResult:
   if not data.current.get("rule") in ids or not data.current.get("id") is String or not data.current.get("text") is String or not ContentValidation.bounded(data.current.get("remaining"),0,120):return _fail()
   var recorded := _session.journal.event(data.current.id)
   if recorded.is_empty() or recorded.channel!="thought" or recorded.text!=data.current.text:return _fail()
+ for event in _session.journal.entries({"channel":"thought"}):
+  if event.actor!="player" or event.chapter!=event.id or not _session.narrative.valid_sequence(str(event.id),"thought_",int(data.next_id)):return _fail()
  _next=int(data.next_id)
  _next_at=float(data.next_at)
  _heard=data.heard.duplicate()

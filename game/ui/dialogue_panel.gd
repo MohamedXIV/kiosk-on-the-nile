@@ -34,6 +34,11 @@ func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
  if _begin(signature):
   _line(str(view.name))
   if conversation:
+   for event in view.get("recent",[]):
+    var preceding := UiText.label(str(event.name)+": "+str(event.text))
+    preceding.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+    preceding.modulate.a=0.65
+    _box.add_child(preceding)
    _line(conversation.current.text)
    var choices := director.choices(conversation)
    if choices.is_empty():_button(_text.text("dialogue_continue"),func():advance_requested.emit())

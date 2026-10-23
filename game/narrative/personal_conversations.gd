@@ -31,12 +31,18 @@ func open_for(id: StringName) -> ActionResult:
    _paused.erase(_hub.actor_id)
   return result
  return ActionResult.success()
-func adopt(conversation: ConversationSession) -> void:
- if conversation.participants.size()!=1:return
+func can_acquire(participants: PackedStringArray, chapter: StringName = &"") -> bool:
+ if participants.size()!=1:return false
+ if active() and (_hub.visit_id!=participants[0] or (_hub.session_id!="" and _hub.session_id!=str(chapter))):return false
+ for other: ConversationSession in _session.narrative.sessions.values():
+  if other.id!=chapter and _session.narrative.manual(other):return false
+ return true
+func adopt(conversation: ConversationSession) -> bool:
+ if not can_acquire(conversation.participants,conversation.id):return false
  var visit: VisitState=_session.visitors.visits.get(conversation.participants[0])
- if visit==null:return
- if active() and _hub.session_id!=str(conversation.id):return
+ if visit==null:return false
  _hub={"visit_id":str(visit.id),"actor_id":str(visit.character_id),"session_id":str(conversation.id)}
+ return true
 func select_topic(key: String) -> ActionResult:
  if not active() or _opening or not _near(StringName(_hub.visit_id)) or not _hub.session_id.is_empty():return _fail()
  _opening=true
@@ -62,7 +68,12 @@ func tick() -> void:
 func view() -> Dictionary:
  if not active():return {}
  var conversation: ConversationSession=_session.narrative.sessions.get(_hub.session_id)
- return {"actor_id":_hub.actor_id,"name":_session.visitors.character(StringName(_hub.actor_id)).get("name",""),"conversation":conversation,"topics":_session.narrative.manual_topics_for(StringName(_hub.visit_id)) if conversation==null else [],"opening":_opening}
+ var recent: Array[Dictionary]=[]
+ if conversation!=null:
+  for event in _session.journal.entries({"chapter":str(conversation.id)}):
+   if event.id!="%s/%d/speech" % [conversation.id,conversation.beat]:recent.append(event)
+  if recent.size()>2:recent=recent.slice(recent.size()-2)
+ return {"recent":recent,"actor_id":_hub.actor_id,"name":_session.visitors.character(StringName(_hub.actor_id)).get("name",""),"conversation":conversation,"topics":_session.narrative.manual_topics_for(StringName(_hub.visit_id)) if conversation==null else [],"opening":_opening}
 func _finished(id: StringName, _reason: StringName) -> void:
  if active() and _hub.session_id==str(id):_hub.session_id=""
 func _near(id: StringName) -> bool:
@@ -87,6 +98,12 @@ func restore(data: Dictionary) -> ActionResult:
  _paused=data.paused.duplicate(true)
  return ActionResult.success()
 func validate_links() -> ActionResult:
+ var sequence_result := _session.narrative.validate_sequences()
+ if not sequence_result.ok:return sequence_result
+ var manual_count := 0
+ for conversation: ConversationSession in _session.narrative.sessions.values():
+  if _session.narrative.manual(conversation):manual_count+=1
+ if manual_count>1:return _fail()
  var ids: Dictionary={}
  for actor in _paused:
   var record: Dictionary=_paused[actor]
@@ -101,6 +118,8 @@ func validate_links() -> ActionResult:
  if not active():
   for conversation: ConversationSession in _session.narrative.sessions.values():
    if _session.narrative.manual(conversation):adopt(conversation);break
+ for conversation: ConversationSession in _session.narrative.sessions.values():
+  if _session.narrative.manual(conversation) and (not active() or _hub.session_id!=str(conversation.id) or not holds_visit(StringName(conversation.participants[0]))):return _fail()
  return ActionResult.success()
 func _fail() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
