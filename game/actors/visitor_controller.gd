@@ -34,7 +34,8 @@ func step(delta: float) -> void:
   if _destinations.get(id) != visit.destination:
    _destinations[id] = visit.destination
    _paths[id] = _room.navigation.path(visit.pose.ground,visit.destination)
-  if visit.phase in [&"arriving",&"leaving"] or visit.pose.ground.distance_to(visit.destination)>float(_room.session.config.section("visitors").arrival_radius): motor.step_path(_paths[id],delta)
+  if visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id):motor.step_input(Vector2.ZERO,delta)
+  elif visit.phase in [&"arriving",&"leaving"] or visit.pose.ground.distance_to(visit.destination)>float(_room.session.config.section("visitors").arrival_radius): motor.step_path(_paths[id],delta)
   else: motor.step_input(Vector2.ZERO,delta)
   _service.commit_pose(visit.id,motor.pose)
   motor.get_node("Visual").present(motor.pose,Color(_service.character(visit.character_id).color),false)

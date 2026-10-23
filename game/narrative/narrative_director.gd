@@ -38,7 +38,7 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  return data
 func start(encounter_id: StringName, participants: PackedStringArray, extra: Dictionary = {}) -> ActionResult:
  var definition: Dictionary = _definitions.get(str(encounter_id),{})
- if definition.is_empty() or not _session.conditions.permits(definition.get("requires",{}),participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
+ if definition.is_empty() or not _encounter_available(definition,participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  var key := str(encounter_id)+":"+",".join(participants)
  if _opening.has(key): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_opening")
  for existing in sessions.values():
@@ -64,7 +64,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  add_child(conversation.runtime)
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation))
  _opening.erase(key)
- if not result.ok or not _session.conditions.permits(definition.get("requires",{}),participants):
+ if not result.ok or not _encounter_available(definition,participants):
   conversation.runtime.queue_free()
   return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  sessions[str(conversation.id)] = conversation
@@ -74,7 +74,7 @@ func tick(delta: float) -> void:
  for conversation: ConversationSession in sessions.values():
   if conversation.finished: continue
   var definition: Dictionary = _definitions[str(conversation.encounter_id)]
-  if not _session.conditions.permits(definition.get("requires",{}),conversation.participants):
+  if not _encounter_available(definition,conversation.participants):
    cancel(conversation.id)
    continue
   conversation.elapsed += delta
@@ -134,7 +134,7 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
  var conversation: ConversationSession = sessions.get(str(session_id))
  if conversation == null or conversation.finished: return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
  var definition: Dictionary = _definitions[str(conversation.encounter_id)]
- if not _session.conditions.permits(definition.get("requires",{}),conversation.participants): return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
+ if not _encounter_available(definition,conversation.participants): return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
  var candidates: Array = choices(conversation)
  if automatic and conversation.optional: candidates = conversation.current.choices.map(func(choice):return {"id":str(conversation.choice_id(choice)),"index":choice.index})
  for choice in candidates:
@@ -252,7 +252,19 @@ func _context_for(conversation: ConversationSession) -> Dictionary:
   projected[key] = _session.conditions.permits(_definitions[str(conversation.encounter_id)].context_conditions[key],conversation.participants)
  return projected
 
+func _encounter_available(definition: Dictionary, participants: PackedStringArray) -> bool:
+ if not _session.conditions.permits(definition.get("requires",{}),participants):return false
+ if definition.get("requires_pending_order",false):
+  if participants.is_empty():return false
+  for id in participants:
+   if _session.service.pending_for(StringName(id))==null:return false
+ return true
+func speech_active(visit_id: StringName) -> bool:
+ for conversation: ConversationSession in sessions.values():
+  if not conversation.finished and str(visit_id) in conversation.participants and (not conversation.current.choices.is_empty() or conversation.elapsed<conversation.current.duration):return true
+ return false
 func can_talk(visit_id: StringName) -> bool:
+ if speech_active(visit_id):return false
  if not _session.visitors.is_available(visit_id): return false
  var visit: VisitState = _session.visitors.visits[str(visit_id)]
  for conversation: ConversationSession in sessions.values():

@@ -158,6 +158,7 @@ func configure(source: SessionConfig) -> ActionResult:
  if not experience_result.ok:return experience_result
  customer_experience.visit_provider=func(id):return visitors.visits.get(str(id))
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
+ visitors.purchase_blocked=func(id):return narrative!=null and narrative.speech_active(StringName(id))
  visitors.departed.connect(_close_experience)
  service.settled.connect(visitors.record_service)
  service.settled.connect(func(order_id,visit_id,_item,_payment):_sync_experience(visit_id,order_id))
@@ -249,14 +250,14 @@ func recall_order(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id) or service.pending_for(visit_id)==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
  var visit: VisitState=visitors.visits[str(visit_id)]
  if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("visitors").interaction_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
- for conversation: ConversationSession in narrative.sessions.values():
-  if not conversation.finished and conversation.encounter_id==&"orders" and str(visit_id) in conversation.participants and conversation.elapsed<conversation.current.duration:return ActionResult.success()
+ if narrative.speech_active(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_in_progress")
  var next := visitors.random_index(3 if visit.recall_variant<0 else 2)
  if visit.recall_variant>=0 and next>=visit.recall_variant:next+=1
  var result := await narrative.start(&"orders",PackedStringArray([str(visit_id)]),{"mode":6,"line_variant":next})
  if result.ok:visit.recall_variant=next
  return result
 func talk(visit_id: StringName) -> ActionResult:
+ if not narrative.can_talk(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
  if not visitors.is_available(visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState = visitors.visits[str(visit_id)]
  var encounter := narrative.talk_encounter(visit_id)

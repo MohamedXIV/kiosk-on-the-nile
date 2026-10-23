@@ -309,5 +309,6 @@
   "stay_multiplier": [
     1,
     1.5
-  ]
+  ],
+  "personal_space": 0.65
 }

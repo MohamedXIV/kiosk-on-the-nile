@@ -398,6 +398,7 @@
       ]
     },
     "offer_requires": {},
-    "choice_conditions": {}
+    "choice_conditions": {},
+    "requires_pending_order": true
   }
 }

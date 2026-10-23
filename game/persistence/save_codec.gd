@@ -54,7 +54,6 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_position")
  candidate.kiosk_open = restored_data.state.kiosk_open
- candidate.visitors.sync_open_state()
  for order in candidate.service.snapshot().orders.values():
   if order.status=="pending" and not candidate.visitors.is_available(StringName(order.visit_id)):
    candidate.queue_free()

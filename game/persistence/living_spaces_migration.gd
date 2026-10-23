@@ -42,6 +42,7 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
    if not visit is Dictionary:return _fail("visit_decision")
    visit["decision_remaining"]=0.0
    visit["recall_variant"]=-1
+   visit["arrival_counted"]=visit.get("phase")!="arriving"
    visit["shopping_state"]="served" if visit.get("served",false) else "pending" if visit.get("phase")=="staying" and visit.get("order_id","")!="" else "approaching" if visit.get("phase")=="arriving" and visit.get("food_id","")!="" else "declined"
    # Leaving orders were cancelled already; they must never be replayed.
    if visit.get("phase")=="leaving":visit.shopping_state="declined"

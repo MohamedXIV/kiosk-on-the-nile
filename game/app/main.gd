@@ -182,6 +182,7 @@ func _install(candidate: GameSession) -> void:
  _captions.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  _captions.mouse_filter = Control.MOUSE_FILTER_IGNORE
  _hud.add_child(_captions)
+ _hud.move_child(_captions,0)
  _title.hide()
  _session.start_new()
  _sound.set_muted(false)

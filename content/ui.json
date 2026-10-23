@@ -85,7 +85,8 @@
     "placement_crosses_building": "القطعة لازم تكون بالكامل داخل المبنى أو بالكامل برّه.",
     "placement_inside_only": "القطعة دي مكانها داخل المبنى فقط.",
     "placement_outside_only": "القطعة دي مكانها في المساحة الخارجية فقط.",
-    "arrange_select_piece": "اختار قطعة من المكان أو من القائمة الأول."
+    "arrange_select_piece": "اختار قطعة من المكان أو من القائمة الأول.",
+    "conversation_in_progress": "خلّي الكلام الحالي يخلص الأول"
   },
   "theme": {
     "font_size": 19,

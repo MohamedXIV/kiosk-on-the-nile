@@ -24,7 +24,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   var data: Variant = bundle.visitors
   if not data is Dictionary or not data.get("characters") is Dictionary or data.characters.is_empty(): return ContentValidation.fail("visitors.characters")
   if not ContentValidation.integer(data.get("seed")) or not ContentValidation.integer(data.get("capacity")) or data.capacity<1 or data.capacity>4:return ContentValidation.fail("visitors.capacity")
-  for field in ["arrival_radius","interaction_radius","waiting_reminder_seconds","max_wait_seconds"]:
+  for field in ["arrival_radius","interaction_radius","waiting_reminder_seconds","max_wait_seconds","personal_space"]:
    if not ContentValidation.number(data.get(field)) or data[field]<=0:return ContentValidation.fail("visitors."+field)
   for field in ["initial_delay","arrival_delay","purchase_delay","purchase_retry_delay","stay_multiplier","ambient_remark_delay"]:
    if not ContentValidation.vector(data.get(field),2) or data[field][0]<=0 or data[field][0]>data[field][1]:return ContentValidation.fail("visitors."+field)
@@ -112,6 +112,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
    if not definition is Dictionary or not definition.get("story") is String or not bundle.get("story_"+str(definition.story)) is Dictionary: return ContentValidation.fail("encounters."+id)
    var story: Dictionary = bundle["story_"+definition.story]
    if not ContentValidation.integer(story.get("inkVersion")) or not story.get("root") is Array: return ContentValidation.fail("story_"+definition.story)
+   if not definition.get("requires_pending_order",false) is bool:return ContentValidation.fail("encounters.pending_order")
    for field in ["requires","offer_requires"]:
     if not evaluator.validate(definition.get(field,{})): return ContentValidation.fail("encounters."+id+"."+field)
    if not definition.get("choice_conditions",{}) is Dictionary: return ContentValidation.fail("encounters.choice_conditions")

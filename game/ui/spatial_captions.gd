@@ -33,7 +33,10 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
     label.size.x = 300
     var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,113)
     var screen: Vector2 = camera.get_canvas_transform()*canvas
-    label.position = Vector2(clampf(screen.x-150,8,get_viewport_rect().size.x-308),clampf(screen.y-label.size.y,top_inset,get_viewport_rect().size.y-180))
+    var ceiling := screen.y
+    for key in _orders:
+     if str(key).begins_with(str(visit_id)+":"):ceiling=minf(ceiling,_orders[key].position.y-8)
+    label.position = Vector2(clampf(screen.x-150,8,get_viewport_rect().size.x-308),clampf(ceiling-label.size.y,top_inset,get_viewport_rect().size.y-180))
  for id in _labels.keys():
   if not active.has(id):
    _labels[id].queue_free()
@@ -41,6 +44,7 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
 
 func _present_orders(session: GameSession, room: LocationView, camera: Camera2D) -> void:
  var active: Dictionary={}
+ var occupied: Array[Rect2]=[]
  if session.location_id==&"kiosk":
   for visit: VisitState in session.visitors.visits.values():
    var order := session.service.pending_for(visit.id)
@@ -53,8 +57,18 @@ func _present_orders(session: GameSession, room: LocationView, camera: Camera2D)
     add_child(badge)
     _orders[key]=badge
    var badge: OrderBadge=_orders[key]
+   badge.reset_size()
    var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,57)
    var screen: Vector2=camera.get_canvas_transform()*canvas
    badge.position=Vector2(clampf(screen.x-badge.size.x/2,8,get_viewport_rect().size.x-badge.size.x-8),clampf(screen.y-badge.size.y,top_inset,get_viewport_rect().size.y-badge.size.y-145))
+   for attempt in range(8):
+    var overlap := false
+    for box in occupied:
+     if Rect2(badge.position,badge.size).grow(3).intersects(box):
+      badge.position.y=maxf(top_inset,box.position.y-badge.size.y-7)
+      overlap=true
+      break
+    if not overlap:break
+   occupied.append(Rect2(badge.position,badge.size))
  for key in _orders.keys():
   if not active.has(key):_orders[key].queue_free();_orders.erase(key)

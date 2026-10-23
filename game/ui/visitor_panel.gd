@@ -32,7 +32,7 @@ func _process(_delta: float) -> void:
  if visible:_refresh()
 func _refresh() -> void:
  if not _valid():hide();return
- _recall.disabled=_session.service.pending_for(_visit_id)==null
+ _recall.disabled=_session.service.pending_for(_visit_id)==null or _session.narrative.speech_active(_visit_id)
  _talk.disabled=not _session.narrative.can_talk(_visit_id)
 func _valid() -> bool:
  if not _session.visitors.is_available(_visit_id):return false

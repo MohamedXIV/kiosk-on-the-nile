@@ -57,7 +57,7 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
   var pending := session.service.pending_for(visit.id)
   if (visit.shopping_state==&"pending")!=(pending!=null):return _fail("visit_pending_order")
   if pending!=null and (pending.food_id!=visit.food_id or pending.id!=visit.order_id or visit.served):return _fail("visit_order_projection")
-  if visit.shopping_state==&"approaching" and (visit.phase!=&"arriving" or visit.food_id.is_empty()):return _fail("visit_approach")
+  if visit.shopping_state==&"approaching" and (not visit.phase in [&"arriving",&"staying"] or visit.food_id.is_empty()):return _fail("visit_approach")
  var experiences := session.customer_experience.snapshot()
  for id in experiences.active:
   var record: Dictionary=experiences.active[id]
