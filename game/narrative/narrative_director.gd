@@ -176,6 +176,7 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   if choice.id != str(choice_id): continue
   var becomes_manual := manual(conversation) or (conversation.encounter_id==&"social_invitation" and int(choice.index)==0)
   if conversation.encounter_id==&"social_invitation" and int(choice.index)==0 and not _session.actions.preview(&"personal_focus").ok:
+   if automatic:_finish(conversation,&"cancelled")
    return _session.actions.preview(&"personal_focus")
   if becomes_manual and (_manual_opening or not _session.personal.can_acquire(conversation.participants,conversation.id)):
    if automatic:_finish(conversation,&"cancelled")
@@ -184,7 +185,7 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   var result := conversation.runtime.choose(int(choice.index))
   if not result.ok: return result
   if _can_hear(conversation) and not automatic:
-   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":str(_session.config.section("ui").get("player_name","أنا")),"text":str(conversation.current.choices[int(choice.index)].text),"channel":"choice","at":_session.clock.world_minutes}
+   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":_session.tuning.display_name("player",str(_session.config.section("ui").get("player_name","أنا"))),"text":str(conversation.current.choices[int(choice.index)].text),"channel":"choice","at":_session.clock.world_minutes}
   if conversation.encounter_id==&"social_invitation":
    conversation.optional=false
    conversation.context_extra["invitation_answered"]=true

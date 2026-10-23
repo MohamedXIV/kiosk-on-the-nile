@@ -82,7 +82,7 @@ func confirm() -> ActionResult:
   var permitted := policy.attempt(&"ordinary_effort",policy.opportunity(&"ordinary_effort","build:"+str(_spaces.revision)))
   if not permitted.ok:return permitted
  last_result=_spaces.place(request)
- if last_result.ok and policy!=null:policy.record_effort("build:%d:%d" % [_spaces.revision,_items.revision],&"arranging")
+ if last_result.ok and policy!=null:policy.record_activity(&"arranging")
  changed.emit()
  return last_result
 func store_selected() -> ActionResult:
@@ -91,7 +91,7 @@ func store_selected() -> ActionResult:
   var permitted := policy.attempt(&"ordinary_effort",policy.opportunity(&"ordinary_effort","store:"+str(_spaces.revision)))
   if not permitted.ok:return permitted
  last_result=_spaces.store(request.instance_id)
- if last_result.ok and policy!=null:policy.record_effort("store:%d:%d" % [_spaces.revision,_items.revision],&"arranging")
+ if last_result.ok and policy!=null:policy.record_activity(&"arranging")
  changed.emit()
  return last_result
 func cancel() -> void:

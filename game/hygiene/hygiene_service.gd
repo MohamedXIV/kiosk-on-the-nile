@@ -118,7 +118,7 @@ func _advance(now: float, allow_cleaning: bool) -> void:
  if _action.completed_minutes>=_action.required_minutes-0.00001:
   target.cleanliness=100.0
   target.cleaning={}
-  if policy!=null:policy.record_effort("clean:%s:%d" % [id,_clock.tick],&"cleaning")
+  if policy!=null:policy.record_activity(&"cleaning")
   _action.active=false
  changed.emit(id)
 func food_contact_evidence(target_ids: PackedStringArray) -> Dictionary:

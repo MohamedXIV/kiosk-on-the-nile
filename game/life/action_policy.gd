@@ -5,6 +5,7 @@ var _session: GameSession
 var _data: Dictionary
 var _attempts: Dictionary={}
 var _effort: Dictionary={}
+var _activity_next: int=1
 var _last_refusal: float=-1
 var _daily: Dictionary={}
 func configure(session: GameSession) -> void:
@@ -52,9 +53,11 @@ func record_effort(source_id: String, kind: StringName, amount: float = 1.0) -> 
  _effort[source_id]={"kind":str(kind),"amount":amount,"at":_session.clock.world_minutes}
  return ActionResult.success()
 func snapshot() -> Dictionary:
- return {"attempts":_attempts.duplicate(true),"effort":_effort.duplicate(true),"last_refusal":_last_refusal,"daily":_daily.duplicate()}
+ return {"next_activity":_activity_next,"attempts":_attempts.duplicate(true),"effort":_effort.duplicate(true),"last_refusal":_last_refusal,"daily":_daily.duplicate()}
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("attempts") is Dictionary or not data.get("effort") is Dictionary or not data.get("daily") is Dictionary or not ContentValidation.bounded(data.get("last_refusal"),-1,_session.clock.world_minutes):return _deny("invalid_action_policy")
+ var activity_limit: Variant=data.get("next_activity",1)
+ if not ContentValidation.integer(activity_limit) or activity_limit<1:return _deny("invalid_effort_sequence")
  var counts: Dictionary={}
  var last := -1.0
  for id in data.attempts:
@@ -67,6 +70,10 @@ func restore(data: Dictionary) -> ActionResult:
  for id in data.effort:
   var e: Variant=data.effort[id]
   if not id is String or id.is_empty() or not e is Dictionary or not _data.effort.has(e.get("kind")) or not ContentValidation.bounded(e.get("amount"),0,100) or not ContentValidation.bounded(e.get("at"),0,_session.clock.world_minutes):return _deny("invalid_effort_history")
+  if e.kind in ["cleaning","arranging"]:
+   var suffix := str(id).trim_prefix("activity_")
+   if not str(id).begins_with("activity_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(activity_limit):return _deny("invalid_effort_sequence")
+ _activity_next=int(activity_limit)
  _attempts=data.attempts.duplicate(true)
  _effort=data.effort.duplicate(true)
  _last_refusal=float(data.last_refusal)
@@ -74,3 +81,8 @@ func restore(data: Dictionary) -> ActionResult:
  return ActionResult.success()
 func _deny(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
+
+func record_activity(kind: StringName) -> ActionResult:
+ var result := record_effort("activity_%d" % _activity_next,kind)
+ if result.ok:_activity_next+=1
+ return result

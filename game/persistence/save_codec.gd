@@ -17,6 +17,7 @@ func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
  if data.get("schema_version")!=SCHEMA_VERSION or data.get("schema_revision")!=SCHEMA_REVISION or not data.get("content_fingerprint") is String or not data.get("state") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_save_envelope")
  for id in COMPONENTS+["narrative","player_pose"]:
   if not data.state.get(id) is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_saved_component",{"component":id})
+ if not data.state.items.get("consumed") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_consumption_history")
  if not data.state.get("kiosk_open") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kiosk_state")
  return ActionResult.success()
 func create_candidate(data: Dictionary, config: SessionConfig, destination: Node = null) -> ActionResult:

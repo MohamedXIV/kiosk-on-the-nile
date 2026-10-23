@@ -16,8 +16,8 @@ func consume_held() -> ActionResult:
  if item == null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
  var effect: Dictionary = _session.foods.definition(item.food_id).get("nourishment",{})
  if effect.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"unknown_food")
- var taken := _session.cooking.take_held(item.id,false)
- if taken==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
+ var taken := _session.inventory.consume_for_player(item.id,_session.clock.world_minutes)
+ if not taken.ok:return taken
  _session.alertness.consume(item.food_id,str(item.id))
  _session.needs.apply_delta(effect.hunger,0,effect.base_mood+item.quality_score*effect.quality_mood)
  _session.cooking.held_changed.emit()

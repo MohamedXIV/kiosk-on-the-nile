@@ -32,6 +32,7 @@ func configure(session: GameSession) -> void:
  column.add_child(UiText.button("اقفل",hide))
  hide()
 func open() -> void:
+ get_parent().move_child(self,get_parent().get_child_count()-1)
  _editor.text=JSON.stringify(_session.tuning.snapshot(),"  ")
  _feedback.text="التغيير يطبّق مع خطوة المحاكاة التالية. الأسماء تحت names بمُعرّف الشخصية."
  show()

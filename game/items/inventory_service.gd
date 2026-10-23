@@ -247,3 +247,12 @@ func pick_up_storage(item_id: StringName) -> ActionResult:
  if not _usable_storage(container,player_pose.location_id,"cold") or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
  var result := items.prepare_moves([{"item_id":str(item_id),"quantity":1,"from_container":item.container_id,"to_container":"player_hand"}])
  return items.commit(result.details.change) if result.ok else result
+
+func consume_for_player(expected_id: StringName, at: float) -> ActionResult:
+ if expected_id.is_empty() or held_id()!=expected_id:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
+ var change := items.candidate()
+ var item: Dictionary=change.state.items[str(expected_id)]
+ if item.kind!="prepared":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"unknown_food")
+ change.state.consumed[str(expected_id)]={"item":item.duplicate(true),"at":at}
+ change.state.items.erase(str(expected_id))
+ return items.commit(change,false)

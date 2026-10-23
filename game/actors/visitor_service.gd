@@ -47,6 +47,7 @@ func spawn(character_id: StringName) -> VisitState:
  visit.character_id = character_id
  visit.decision_remaining=_delay("purchase_delay")
  visit.stay_seconds = float(definition.stay_seconds)*_delay("stay_multiplier")
+ visit.maximum_wait=float(_data.max_wait_seconds)
  visit.pose.location_id = &"kiosk"
  var spawn_position: Array = _markers[_data.spawn_markers[_rng.randi_range(0,_data.spawn_markers.size()-1)]]
  visit.pose.ground = Vector2(spawn_position[0],spawn_position[1])
@@ -64,7 +65,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     visit.elapsed += elapsed
     _consider_purchase(visit,elapsed)
     _remarks(visit,delta)
-   if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=float(_data.max_wait_seconds):
+   if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
     visit.destination = Vector2(exit_position[0],exit_position[1])
@@ -197,6 +198,8 @@ func restore(data: Dictionary) -> ActionResult:
   visit.id = StringName(id)
   visit.character_id = StringName(record.character_id)
   visit.food_id = StringName(record.food_id)
+  if not ContentValidation.bounded(record.get("maximum_wait"),0.01,86400):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_deadline")
+  visit.maximum_wait=float(record.maximum_wait)
   visit.stay_seconds = float(record.stay_seconds)
   visit.destination = Vector2(record.destination[0],record.destination[1])
   visit.phase = StringName(record.phase)

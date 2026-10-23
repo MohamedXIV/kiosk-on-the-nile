@@ -20,6 +20,18 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
    if raw.has("source_job_id"):
     var job := session.workflow.job(StringName(raw.source_job_id))
     if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("food_source")
+ for id in items.consumed:
+  var receipt: Dictionary=items.consumed[id]
+  if float(receipt.at)>session.clock.world_minutes+0.001:return _fail("consumed_time")
+  var item: Dictionary=receipt.item
+  var raw: Dictionary=item.attributes
+  var food := session.foods.definition(StringName(str(raw.get("food_id",""))))
+  if raw.get("id")!=id or food.is_empty() or not ContentValidation.integer(raw.get("quality_score")) or not ContentValidation.bounded(raw.quality_score,0,3) or raw.get("quality_key")!=food.quality_keys[int(raw.quality_score)]:return _fail("consumed_food")
+  if raw.has("source_job_id"):
+   var job := session.workflow.job(StringName(raw.source_job_id))
+   if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("consumed_source")
+  for order in session.service.snapshot().orders.values():
+   if order.get("delivered_item_id")==id:return _fail("consumed_delivered_food")
  for container in items.containers.values():
   if container.host_id!="" and not items.items.has(container.host_id):return _fail("container_host")
   if container.kind=="surface" and not session.items.items_in(StringName(container.id)).is_empty():
@@ -27,6 +39,11 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
    for p in placements.values():
     if p.host_id==container.host_id:return _fail("food_on_occupied_surface")
  var workflows: Dictionary=session.workflow.snapshot().jobs
+ for id in session.actions.snapshot().effort:
+  var evidence: Dictionary=session.actions.snapshot().effort[id]
+  if evidence.kind!="preparation":continue
+  var parts := str(id).split("/")
+  if parts.size()!=3 or parts[1]!="step" or not workflows.has(parts[0]) or not parts[2].is_valid_int() or int(parts[2])<0 or int(parts[2])>int(workflows[parts[0]].step_index):return _fail("effort_source")
  for id in items.reservations:
   if not workflows.has(id) or workflows[id].status!="active":return _fail("orphan_ingredient_reservation")
  for id in workflows:

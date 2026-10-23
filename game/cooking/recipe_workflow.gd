@@ -136,7 +136,8 @@ func tick(frame: Dictionary) -> void:
     if _inventory._usable_storage(container,StringName(job.location_id),"cold"):job.elapsed=float(job.elapsed)+delta
   elif step.kind=="batch_heat":
    if job.get("heat_on",true):job.elapsed=float(job.elapsed)+delta
-   _progress_slice(job,delta)
+   var slice_delta := float(frame.delta)*float(job.definition.get("presentation_minutes_per_second",1)) if job.get("reaction_time_domain","")=="simulation_seconds" else delta
+   _progress_slice(job,slice_delta)
   elif step.kind in ["heat","brew","wait"] or _near(StringName(job.devices[step.capability]),StringName(job.location_id)):job.elapsed=float(job.elapsed)+delta
 func job(id: StringName) -> Dictionary:
  return _jobs.get(str(id),{}).duplicate(true)

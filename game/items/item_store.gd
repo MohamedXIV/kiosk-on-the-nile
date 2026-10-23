@@ -2,13 +2,13 @@ class_name ItemStore
 extends RefCounted
 signal changed(revision: int)
 var _definitions: Dictionary = {}
-var _state: Dictionary = {"items":{},"containers":{},"reservations":{},"next_id":1}
+var _state: Dictionary = {"items":{},"containers":{},"reservations":{},"consumed":{},"next_id":1}
 var revision: int = 0
 func configure(definitions: Dictionary, containers: Dictionary) -> ActionResult:
  var result := ItemContentValidation.validate(definitions,containers)
  if not result.ok: return result
  _definitions = definitions.duplicate(true)
- _state = {"items":{},"containers":containers.duplicate(true),"reservations":{},"next_id":1}
+ _state = {"items":{},"containers":containers.duplicate(true),"reservations":{},"consumed":{},"next_id":1}
  revision = 0
  return ActionResult.success()
 func definition(id: StringName) -> Dictionary:
@@ -75,6 +75,7 @@ func restore(data: Dictionary) -> ActionResult:
  var result := _validate_state(data)
  if not result.ok: return result
  _state = data.duplicate(true)
+ if not _state.has("consumed"):_state["consumed"]={}
  revision += 1
  return ActionResult.success()
 func _prepared(change: ItemChangeSet) -> ActionResult:
@@ -98,6 +99,12 @@ func _validate_state(data: Dictionary) -> ActionResult:
   used[item.container_id] = int(used.get(item.container_id,0))+int(item.quantity)
   if int(used[item.container_id])>int(container.capacity): return _fail("container_full")
  var reserved: Dictionary = {}
+ if not data.get("consumed",{}) is Dictionary:return _fail("invalid_consumption_history")
+ for id in data.get("consumed",{}):
+  var receipt: Variant=data.consumed[id]
+  if not receipt is Dictionary or not receipt.get("item") is Dictionary or receipt.item.get("id")!=id or data.items.has(id) or receipt.item.get("container_id")!="player_hand" or receipt.item.get("kind")!="prepared" or receipt.item.get("quantity")!=1 or not receipt.item.get("attributes") is Dictionary or not ContentValidation.number(receipt.get("at")) or receipt.at<0:return _fail("invalid_consumption_receipt")
+  var suffix := str(id).trim_prefix("food_")
+  if not str(id).begins_with("food_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_consumption_id")
  for job_id in data.reservations:
   if not data.reservations[job_id] is Array: return _fail("invalid_reservation")
   for line in data.reservations[job_id]:

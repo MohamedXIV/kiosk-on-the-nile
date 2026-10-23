@@ -40,7 +40,7 @@ func _speak(rule: Dictionary) -> void:
   if output.result.ok and output.ended and output.choices.is_empty() and output.effects.is_empty() and output.speaker_id==&"player" and not output.text.is_empty():
    var id := "thought_%d" % _next
    _next+=1
-   var event := {"id":id,"chapter":id,"actor":"player","name":str(_session.config.section("ui").player_name),"text":output.text,"channel":"thought","at":_session.clock.world_minutes}
+   var event := {"id":id,"chapter":id,"actor":"player","name":_session.tuning.display_name("player",str(_session.config.section("ui").player_name)),"text":output.text,"channel":"thought","at":_session.clock.world_minutes}
    if _session.journal.append_once(event).ok:
     _current={"id":id,"rule":str(rule.id),"text":output.text,"remaining":output.duration}
     _heard[rule.id]=_session.clock.world_minutes
