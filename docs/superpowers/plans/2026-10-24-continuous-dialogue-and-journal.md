@@ -7,6 +7,10 @@
 **Tech Stack:** Godot4.7.2/GDScript/Ink/external JSON.
 **Spec:** `docs/superpowers/specs/2026-10-23-everyday-life-dialogue-and-obligations-design.md`, sections1–4 and10–12. Parent: `2026-10-24-everyday-life-execution.md`.
 
+## Delivery status
+
+Implemented and published as preview `dialogue-journal-7e3818d`. See [delivery evidence and acceptance limits](../../notes/2026-10-24-continuous-dialogue-and-journal.md). Checklist items below retain their original intended gates; unexercised manual cases are explicitly listed in that record.
+
 ## Global Constraints
 
 - User approved manual progression for personal speech, automatic ambient/thoughts; world keeps running.
