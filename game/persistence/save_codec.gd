@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 7
-const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","hygiene","customer_experience","scheduler","social_life"]
+const SCHEMA_REVISION := 8
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -75,6 +75,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
   candidate.queue_free()
   return result
  result = await candidate.narrative.restore(restored_data.state.narrative)
+ if not result.ok:
+  candidate.queue_free()
+  return result
+ result = await candidate.personal.validate_links()
  if not result.ok:
   candidate.queue_free()
   return result

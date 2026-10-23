@@ -208,7 +208,7 @@ func start_topic(visit_id: StringName, id: String) -> ActionResult:
  if visit==null or not topic_available(id) or _data.topics[id].actor!=str(visit.character_id):return _fail("nothing_new_to_say")
  return await _session.narrative.start(StringName(_data.topics[id].encounter),PackedStringArray([str(visit_id)]))
 func step_companionship(delta: float) -> void:
- if _session.narrative==null:return
+ if _session.narrative==null or (_session.personal!=null and _session.personal.active()):return
  var config: Dictionary=_data.companionship
  var blocked := participation_blocked.is_valid() and bool(participation_blocked.call())
  for visit: VisitState in _session.visitors.visits.values():

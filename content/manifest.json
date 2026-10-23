@@ -44,6 +44,9 @@
     "story_venue_comments": "stories/venue_comments.ink.json",
     "story_orders": "stories/orders.ink.json",
     "social_life": "social_life.json",
-    "story_companionship": "stories/companionship.ink.json"
+    "story_companionship": "stories/companionship.ink.json",
+    "narration": "narration.json",
+    "story_inner_monologue": "stories/inner_monologue.ink.json",
+    "story_service_availability": "stories/service_availability.ink.json"
   }
 }

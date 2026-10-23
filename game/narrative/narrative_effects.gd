@@ -1,5 +1,6 @@
 class_name NarrativeEffects
 extends RefCounted
+var service_provider: Callable
 var social_life: SocialLife
 var _knowledge: KnowledgeBook
 var _needs: NeedsService
@@ -11,14 +12,18 @@ func _init(knowledge: KnowledgeBook, needs: NeedsService, facts: Array) -> void:
  _facts = facts.duplicate()
 func valid(effect: Dictionary) -> bool:
  match effect.get("kind"):
+  "service":return service_provider.is_valid() and effect.get("action_id") in ["accept","decline"]
   "social":return social_life!=null and effect.get("action_id") is String and social_life.action_known(effect.action_id)
   "mood": return ContentValidation.bounded(effect.get("amount"),-100,100)
   "learn": return effect.get("fact_id") in _facts and effect.get("note") is String
  return false
-func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "") -> ActionResult:
+func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "", participants: PackedStringArray = PackedStringArray()) -> ActionResult:
  if not valid(effect): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect")
  if _applied.has(str(occurrence_id)): return ActionResult.success({"duplicate":true})
  match effect.kind:
+  "service":
+   var result: ActionResult=service_provider.call(effect.action_id,participants)
+   if not result.ok:return result
   "social":
    var result := social_life.apply(effect.action_id,str(occurrence_id),speaker)
    if not result.ok:return result

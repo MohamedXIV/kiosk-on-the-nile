@@ -33,7 +33,8 @@
         "variants": 1,
         "requires": {
           "home_item_owned": "fan"
-        }
+        },
+        "label": "المروحة نفعتني"
       },
       {
         "id": "fan_referral",
@@ -53,7 +54,8 @@
               }
             }
           ]
-        }
+        },
+        "label": "كنت بتقول على مروحة؟"
       },
       {
         "id": "introduction",
@@ -66,7 +68,8 @@
           "not": {
             "day_at_least": 2
           }
-        }
+        },
+        "label": "نتعرف ونقعد شوية"
       },
       {
         "id": "memory",
@@ -77,7 +80,8 @@
         "variants": 1,
         "requires": {},
         "requires_previous_service": true,
-        "minimum_visits": 2
+        "minimum_visits": 2,
+        "label": "فاكر قعدتنا اللي فاتت؟"
       },
       {
         "id": "smalltalk",
@@ -86,9 +90,11 @@
           0
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "أخبارك إيه؟"
       }
-    ]
+    ],
+    "advancement": "manual"
   },
   "amgad_arrival": {
     "story": "amgad",
@@ -105,9 +111,11 @@
           1
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "نكمل كلامنا"
       }
-    ]
+    ],
+    "advancement": "automatic"
   },
   "amgad_served": {
     "story": "amgad",
@@ -124,9 +132,11 @@
           2
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "نكمل كلامنا"
       }
-    ]
+    ],
+    "advancement": "automatic"
   },
   "football": {
     "story": "football",
@@ -155,9 +165,11 @@
           0
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "نكمل كلامنا"
       }
-    ]
+    ],
+    "advancement": "automatic"
   },
   "visitors": {
     "story": "visitors",
@@ -182,7 +194,8 @@
           "farid",
           "salma",
           "youssef"
-        ]
+        ],
+        "label": "نكمل كلامنا"
       },
       {
         "id": "waiting",
@@ -191,7 +204,8 @@
           3
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "نكمل كلامنا"
       },
       {
         "id": "ambient",
@@ -206,7 +220,8 @@
           "mona",
           "passer",
           "youssef"
-        ]
+        ],
+        "label": "نكمل كلامنا"
       },
       {
         "id": "memory",
@@ -217,7 +232,8 @@
         "variants": 1,
         "requires": {},
         "requires_previous_service": true,
-        "minimum_visits": 2
+        "minimum_visits": 2,
+        "label": "فاكر قعدتنا اللي فاتت؟"
       },
       {
         "id": "smalltalk",
@@ -226,9 +242,11 @@
           0
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "أخبارك إيه؟"
       }
-    ]
+    ],
+    "advancement": "automatic"
   },
   "visitors_served": {
     "story": "visitors",
@@ -245,9 +263,11 @@
           2
         ],
         "variants": 3,
-        "requires": {}
+        "requires": {},
+        "label": "نكمل كلامنا"
       }
-    ]
+    ],
+    "advancement": "automatic"
   },
   "shawarma_learning": {
     "story": "shawarma_learning",
@@ -279,7 +299,8 @@
         "requires": {
           "recipe_completed": "shawarma"
         },
-        "recipe_id": "shawarma"
+        "recipe_id": "shawarma",
+        "label": "أحكيلك عن آخر طبخة"
       },
       {
         "id": "shawarma_attempt",
@@ -302,7 +323,8 @@
               }
             }
           ]
-        }
+        },
+        "label": "جربت اللي حكيت لي عليه"
       },
       {
         "id": "shawarma_basics",
@@ -318,9 +340,11 @@
           "not": {
             "fact_known": "KNOWN_SHAWARMA_BASICS"
           }
-        }
+        },
+        "label": "احكيلي عن الشاورما"
       }
-    ]
+    ],
+    "advancement": "manual"
   },
   "venue_comments": {
     "story": "venue_comments",
@@ -351,7 +375,8 @@
         "variants": 1,
         "requires": {
           "venue_observation": "improved"
-        }
+        },
+        "label": "حاسس المكان اتحسن؟"
       },
       {
         "id": "venue_dirty",
@@ -366,7 +391,8 @@
         "variants": 1,
         "requires": {
           "venue_observation": "dirty"
-        }
+        },
+        "label": "المكان محتاج يتظبط؟"
       },
       {
         "id": "venue_food_memory",
@@ -381,9 +407,11 @@
         "variants": 1,
         "requires": {
           "venue_observation": "food"
-        }
+        },
+        "label": "فاكر آخر طلب؟"
       }
-    ]
+    ],
+    "advancement": "manual"
   },
   "orders": {
     "story": "orders",
@@ -399,7 +427,8 @@
     },
     "offer_requires": {},
     "choice_conditions": {},
-    "requires_pending_order": true
+    "requires_pending_order": true,
+    "advancement": "automatic"
   },
   "social_result_farid": {
     "story": "companionship",
@@ -415,7 +444,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_result_youssef": {
     "story": "companionship",
@@ -431,7 +461,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_continuation_farid": {
     "story": "companionship",
@@ -447,7 +478,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_continuation_youssef": {
     "story": "companionship",
@@ -463,7 +495,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_days_farid": {
     "story": "companionship",
@@ -479,7 +512,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_days_youssef": {
     "story": "companionship",
@@ -495,7 +529,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_refer_farid": {
     "story": "companionship",
@@ -511,7 +546,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_refer_youssef": {
     "story": "companionship",
@@ -527,7 +563,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_consent_farid": {
     "story": "companionship",
@@ -543,7 +580,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_consent_youssef": {
     "story": "companionship",
@@ -559,7 +597,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_appointment_farid": {
     "story": "companionship",
@@ -575,7 +614,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_appointment_youssef": {
     "story": "companionship",
@@ -591,7 +631,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_hear_farid": {
     "story": "companionship",
@@ -607,7 +648,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_hear_youssef": {
     "story": "companionship",
@@ -623,7 +665,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_meet_farid": {
     "story": "companionship",
@@ -639,7 +682,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_meet_youssef": {
     "story": "companionship",
@@ -655,7 +699,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_pending_farid": {
     "story": "companionship",
@@ -671,7 +716,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_pending_youssef": {
     "story": "companionship",
@@ -687,7 +733,8 @@
         }
       ]
     },
-    "offer_requires": {}
+    "offer_requires": {},
+    "advancement": "manual"
   },
   "social_invitation": {
     "story": "companionship",
@@ -701,6 +748,22 @@
         },
         {
           "distance_at_most": 1.8
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "automatic"
+  },
+  "service_availability": {
+    "story": "service_availability",
+    "advancement": "manual",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
         }
       ]
     },

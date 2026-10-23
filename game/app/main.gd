@@ -178,6 +178,9 @@ func _install(candidate: GameSession) -> void:
  _hud.diagnostics_requested.connect(_diagnostics)
  _session.narrative.failed.connect(func(_result):_hud.toast.show_message(_text.text("narrative_failed")))
  _hud.dialogue.choice_selected.connect(_choose)
+ _hud.dialogue.advance_requested.connect(func():_session.personal.advance())
+ _hud.dialogue.topic_selected.connect(func(key):await _session.personal.select_topic(key))
+ _hud.dialogue.leave_requested.connect(func():_session.personal.leave())
  _hud.sleep_panel.confirmed.connect(_begin_sleep)
  _captions = SpatialCaptions.new()
  _captions.theme = _text.make_theme()
@@ -241,6 +244,15 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   return
  if _hud.notebook.visible: return
+ if _session.personal.active():
+  if event.is_action_pressed("cancel"):
+   _session.personal.leave()
+   get_viewport().set_input_as_handled()
+   return
+  if event.is_action_pressed("ui_accept"):
+   _session.personal.advance()
+   get_viewport().set_input_as_handled()
+   return
  if event.is_action_pressed("interact_primary") or event.is_action_pressed("interact_secondary"):
   get_viewport().set_input_as_handled()
   _busy = true
@@ -289,7 +301,7 @@ func _toggle_notebook() -> void:
  else:
   var notes := _session.knowledge.notes()
   notes.append(_text.text("venue_reputation",{"label":_session.customer_experience.reputation(&"kiosk").label}))
-  _hud.notebook.present(notes,_session.social_life.people())
+  _hud.notebook.present(notes,_session.social_life.people(),_session.journal.entries(),_config.section("ui"),_session.knowledge.note_sources())
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   _focused = false

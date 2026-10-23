@@ -18,6 +18,7 @@ var _menu: PopupPanel
 var _prompt_panel: PanelContainer
 var _prompt: Label
 var _station: Label
+var _thought: Label
 func configure(text: UiText) -> void:
  _text = text
  theme = text.make_theme()
@@ -101,6 +102,11 @@ func configure(text: UiText) -> void:
  add_child(toast)
 func bind(session: GameSession) -> void:
  _session = session
+ _thought=UiText.label("")
+ _thought.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ _thought.anchor_left=0.05;_thought.anchor_right=0.48;_thought.anchor_top=0.65;_thought.anchor_bottom=0.8
+ _thought.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_child(_thought)
 func present(target: InteractionTarget) -> void:
  if _session==null: return
  _strip.present(_session)
@@ -123,7 +129,12 @@ func present(target: InteractionTarget) -> void:
  _prompt_panel.visible = _prompt.visible or _station.visible
  _prompt_panel.offset_top = _prompt_panel.offset_bottom-_prompt_panel.get_combined_minimum_size().y
  var focused := _session.narrative.focused_session()
- dialogue.present(focused,_session.narrative.choices(focused))
+ if notebook.visible or sleep_panel.visible:dialogue.hide()
+ elif _session.personal.active():dialogue.present_personal(_session.personal.view(),_session.narrative)
+ else:dialogue.present(focused,_session.narrative.choices(focused))
+ var thought := _session.inner.view()
+ _thought.text="" if thought.is_empty() else _text.text("thought_name")+": "+str(thought.text)
+ _thought.visible=not thought.is_empty() and not _session.personal.active() and focused==null and not notebook.visible and not sleep_panel.visible
 
 func _open_menu() -> void:
  _menu.size=Vector2i(320,int(minf(560,get_viewport_rect().size.y-_strip.size.y-35)))

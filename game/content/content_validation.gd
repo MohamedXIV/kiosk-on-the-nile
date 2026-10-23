@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("narration"):
+  var narration_result := NarrationValidation.validate(bundle)
+  if not narration_result.ok:return narration_result
  if bundle.has("social_life"):
   var social_result := SocialLifeValidation.validate(bundle)
   if not social_result.ok:return social_result

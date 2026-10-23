@@ -33,6 +33,9 @@ var social_life: SocialLife
 var relationships: RelationshipStore
 var conditions: ConditionEvaluator
 var effects: NarrativeEffects
+var inner: InnerMonologue
+var personal: PersonalConversations
+var journal: InteractionJournal
 var narrative: NarrativeDirector
 var motion_step: Callable
 var coordinator := SimulationCoordinator.new()
@@ -158,6 +161,8 @@ func configure(source: SessionConfig) -> ActionResult:
  var experience_result := customer_experience.configure(source.section("customer_experience"),hygiene,spaces,clock)
  if not experience_result.ok:return experience_result
  customer_experience.visit_provider=func(id):return visitors.visits.get(str(id))
+ visitors.service_presence=func():return location_id==&"kiosk"
+ visitors.service_busy=func():return personal!=null and personal.active() or narrative!=null and narrative.focused_session()!=null
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
  visitors.purchase_blocked=func(id):return narrative!=null and narrative.speech_active(StringName(id))
  visitors.departed.connect(_close_experience)
@@ -170,6 +175,8 @@ func configure(source: SessionConfig) -> ActionResult:
  clock.day_changed.connect(func(_previous,_current):visitors.begin_day())
  var actors: Array = source.section("visitors").characters.keys()
  actors.append("player")
+ journal=InteractionJournal.new()
+ journal.configure(actors,clock)
  relationships = RelationshipStore.new(source.section("social"),actors)
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships
@@ -186,6 +193,7 @@ func configure(source: SessionConfig) -> ActionResult:
  conditions.recipe_ids=source.section("recipe_workflows").keys()+source.section("learning").families.values()
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
  effects.social_life=social_life
+ effects.service_provider=_service_effect
  narrative = NarrativeDirector.new()
  add_child(narrative)
  var stories: Dictionary = {}
@@ -199,12 +207,20 @@ func configure(source: SessionConfig) -> ActionResult:
   stories[id] = story
  var narrative_result := narrative.configure(self,source.section("encounters"),stories)
  if not narrative_result.ok: return narrative_result
+ personal=PersonalConversations.new()
+ personal.configure(self)
+ inner=InnerMonologue.new()
+ add_child(inner)
+ inner.configure(self)
  visitors.encounter_requested.connect(_encounter_requested)
  _encounter_ready.connect(_start_encounter)
+ life.sleep_started.connect(personal.leave)
  life.sleep_started.connect(narrative.cancel_all)
  routine.slept.connect(_sleep_elapsed)
  life.travelled.connect(func(destination):
-  if destination!=&"kiosk": narrative.cancel_all())
+  if destination!=&"kiosk":
+   personal.leave()
+   narrative.cancel_all())
  scheduler.configure({})
  return rebuild_order()
 func rebuild_order() -> ActionResult:
@@ -232,8 +248,16 @@ func _step_narrative(frame: Dictionary) -> void:
  var pending := _pending_encounters.duplicate()
  _pending_encounters.clear()
  for event in pending:_encounter_ready.emit(event.kind,event.participants,event.extra)
+ personal.tick()
  narrative.tick(float(frame.delta))
+ inner.tick(frame)
 func _start_encounter(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
+ if kind==&"service_request":
+  var result := await narrative.start(&"service_availability",participants,{"manual_read":true,"line_variant":visitors.random_index(3)})
+  var conversation: ConversationSession=narrative.sessions.get(result.details.get("session_id","")) if result.ok else null
+  if conversation!=null:personal.adopt(conversation)
+  elif not participants.is_empty():visitors.reset_request(StringName(participants[0]))
+  return
  if kind in [&"reminder",&"ambient",&"served"]:
   for conversation: ConversationSession in narrative.sessions.values():
    if conversation.elapsed>=conversation.current.duration and conversation.current.choices.is_empty(): continue
@@ -255,8 +279,7 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
  await narrative.start(id,participants,context_data)
 func person_interaction(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
- if service.pending_for(visit_id)!=null or not social_life.topics_for(visit_id).is_empty():return ActionResult.success({"show_visitor":str(visit_id)})
- return await talk(visit_id)
+ return await personal.open_for(visit_id)
 func recall_order(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id) or service.pending_for(visit_id)==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
  var visit: VisitState=visitors.visits[str(visit_id)]
@@ -268,6 +291,8 @@ func recall_order(visit_id: StringName) -> ActionResult:
  if result.ok:visit.recall_variant=next
  return result
 func talk(visit_id: StringName) -> ActionResult:
+ return await personal.open_for(visit_id)
+func _legacy_talk(visit_id: StringName) -> ActionResult:
  if not narrative.can_talk(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
  if not visitors.is_available(visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState = visitors.visits[str(visit_id)]
@@ -339,3 +364,13 @@ func _step_experiences(_frame: Dictionary) -> ActionResult:
   var result := _sync_experience(visit.id,visit.order_id)
   if not result.ok:return result
  return ActionResult.success()
+
+func request_can_prepare(food_id: StringName) -> bool:
+ return str(food_id) in workflow.available_foods(&"kiosk")
+func _service_effect(action: String, participants: PackedStringArray) -> ActionResult:
+ if participants.size()!=1 or not visitors.is_available(StringName(participants[0])):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ var visit: VisitState=visitors.visits[participants[0]]
+ if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("spatial").hearing_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ if action=="decline":return visitors.decline_request(visit.id)
+ if not request_can_prepare(visit.food_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_ingredients")
+ return visitors.accept_request(visit.id)

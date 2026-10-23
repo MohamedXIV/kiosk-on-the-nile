@@ -1,0 +1,38 @@
+{
+  "thought_delay_minutes": 90,
+  "thought_retry_minutes": 15,
+  "thoughts": [
+    {
+      "id": "rest",
+      "once": false,
+      "cooldown_minutes": 240,
+      "need": "rest",
+      "below": 25,
+      "requires": {}
+    },
+    {
+      "id": "hunger",
+      "once": false,
+      "cooldown_minutes": 240,
+      "need": "hunger",
+      "below": 25,
+      "requires": {}
+    },
+    {
+      "id": "mood",
+      "once": false,
+      "cooldown_minutes": 240,
+      "need": "mood",
+      "below": 25,
+      "requires": {}
+    },
+    {
+      "id": "quiet",
+      "once": true,
+      "cooldown_minutes": 1440,
+      "need": "",
+      "below": 100,
+      "requires": {}
+    }
+  ]
+}

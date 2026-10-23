@@ -109,6 +109,8 @@ static func validate(bundle: Dictionary) -> ActionResult:
   evaluator.social_actions=bundle.get("social_life",{}).get("actions",{}).keys()
   evaluator.social_topics=bundle.get("social_life",{}).get("topics",{}).keys()
   evaluator.recipe_ids=bundle.get("recipe_workflows",{}).keys()+bundle.get("learning",{}).get("families",{}).values()
+  for rule in bundle.get("narration",{}).get("thoughts",[]):
+   if not evaluator.validate(rule.requires):return ContentValidation.fail("narration.thought.requires")
   for id in bundle.encounters:
    var definition: Variant = bundle.encounters[id]
    if not definition is Dictionary or not definition.get("story") is String or not bundle.get("story_"+str(definition.story)) is Dictionary: return ContentValidation.fail("encounters."+id)

@@ -50,6 +50,11 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
  if candidate.schema_revision==6 and target_revision>=7:
   candidate.state["social_life"]=SocialLife.empty_state()
   candidate.schema_revision=7
+ if candidate.schema_revision==7 and target_revision>=8:
+  candidate.state["journal"]={"events":[]}
+  candidate.state["personal"]={"hub":{},"paused":{}}
+  candidate.state["inner"]={"next_id":1,"next_at":float(candidate.state.clock.world_minutes)+float(config.section("narration").thought_delay_minutes),"heard":{},"current":{}}
+  candidate.schema_revision=8
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

@@ -247,5 +247,18 @@
   "personal_talk": "نتكلم شوية",
   "visitor_actions": "كلّم {name}",
   "notebook_notes": "اللي سمعته",
-  "notebook_people": "ناس القعدة"
+  "notebook_people": "ناس القعدة",
+  "player_name": "أنا",
+  "dialogue_continue": "كمّل",
+  "dialogue_leave": "أستأذنك دلوقتي",
+  "dialogue_topics": "تحب نحكي في إيه؟",
+  "journal_title": "الكلام اللي دار",
+  "journal_all": "كل القعدات",
+  "journal_all_days": "كل الأيام",
+  "journal_empty": "لسه مفيش كلام اتسجل هنا.",
+  "thought_name": "بينّي وبين نفسي",
+  "request_accept": "طبعًا، أعمله لك",
+  "request_rest": "كنت بروّق دماغي شوية، معلش نخليها بعدين",
+  "request_stock": "محتاج أجيب طلبات الأول",
+  "sign_advisory": "اليافطة مجرد إشارة؛ تقدر تتكلم وتتفق على طلب"
 }

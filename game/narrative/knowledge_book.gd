@@ -11,7 +11,7 @@ func has(fact: StringName) -> bool:
  return _facts.has(str(fact))
 func learn(fact: StringName, note: String, source: String = "") -> bool:
  if has(fact) or (not _catalog.is_empty() and not str(fact) in _catalog): return false
- _facts[str(fact)] = {"source":source}
+ _facts[str(fact)] = {"source":source,"note":note}
  if not note.is_empty(): _notes.push_front(note)
  return true
 func learn_from(fact: StringName, note: String, source: String, speaker: String, at: float) -> bool:
@@ -36,3 +36,9 @@ func restore(data: Dictionary) -> ActionResult:
  _facts = data.facts.duplicate(true)
  _notes.assign(data.notes)
  return ActionResult.success()
+func note_sources() -> Array[Dictionary]:
+ var result: Array[Dictionary]=[]
+ for record in _facts.values():
+  if record.get("note","").is_empty() or not str(record.source).begins_with("conversation_"):continue
+  result.append({"chapter":str(record.source).get_slice("/",0),"label":str(record.note)})
+ return result

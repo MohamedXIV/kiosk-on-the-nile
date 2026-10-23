@@ -3,8 +3,9 @@ extends RefCounted
 ## A topic is consumed by committed speech, not by an E press or opening Ink.
 ## Keep the latest occurrence per authored topic/character, not an endless log.
 var _records: Dictionary = {}
-func select(encounter: StringName, definition: Dictionary, visit: VisitState, session: GameSession, mode: int) -> Dictionary:
+func select(encounter: StringName, definition: Dictionary, visit: VisitState, session: GameSession, mode: int, requested: String = "") -> Dictionary:
  for topic: Dictionary in definition.get("topics",[]):
+  if not requested.is_empty() and topic.id!=requested:continue
   if not topic.modes.any(func(value):return int(value)==mode) or (topic.has("characters") and not str(visit.character_id) in topic.characters): continue
   if not session.conditions.permits(topic.get("requires",{}),PackedStringArray([str(visit.id)])): continue
   if session.visitors.visit_count(visit.character_id)<int(topic.get("minimum_visits",0)): continue

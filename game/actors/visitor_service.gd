@@ -5,6 +5,8 @@ signal departed(visit_id: StringName)
 var visits: Dictionary = {}
 var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
+var service_presence: Callable
+var service_busy: Callable
 var availability_provider: Callable
 var purchase_blocked: Callable
 var demand_provider: Callable
@@ -94,20 +96,13 @@ func _arrived(visit: VisitState) -> void:
   if visit.character_id==&"amgad":memory.amgad_visits+=1
   else:_other_visit_counts[str(visit.character_id)]=visit_count(visit.character_id)+1
  if visit.shopping_state==&"approaching":
-  if not _open.call():
-   visit.shopping_state=&"declined"
+  if not _present() or (service_busy.is_valid() and service_busy.call()):
+   visit.shopping_state=&"undecided"
    visit.food_id=&""
    _return_to_leisure(visit)
    return
-  var order := _orders.place_order(visit.id,visit.food_id)
-  if order:
-   visit.order_id=order.id
-   visit.shopping_state=&"pending"
-   encounter_requested.emit(&"order",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
-  else:
-   visit.food_id=&""
-   visit.shopping_state=&"declined"
-   _return_to_leisure(visit)
+  visit.shopping_state=&"requesting"
+  encounter_requested.emit(&"service_request",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
   return
  encounter_requested.emit(&"arrival",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
  # A conversation may happen when friends happen to meet; no scheduled pair spawn.
@@ -133,7 +128,7 @@ func _consider_purchase(visit: VisitState, delta: float) -> void:
  visit.decision_remaining=maxf(0,visit.decision_remaining-delta)
  if visit.decision_remaining>0:return
  visit.decision_remaining=_delay("purchase_retry_delay")
- if not _open.call():return
+ if not _present() or (service_busy.is_valid() and service_busy.call()):return
  var definition := character(visit.character_id)
  var service_marker: Array=_markers[definition.marker]
  if not _position_available(Vector2(service_marker[0],service_marker[1]),visit.id):return
@@ -204,7 +199,7 @@ func restore(data: Dictionary) -> ActionResult:
   visit.elapsed = float(record.elapsed)
   visit.remark_remaining = float(record.remark_remaining)
   visit.served = record.served
-  if not record.get("shopping_state") in ["undecided","approaching","pending","declined","served"] or not ContentValidation.bounded(record.get("decision_remaining"),0,86400):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_purchase_decision")
+  if not record.get("shopping_state") in ["undecided","approaching","requesting","pending","declined","served"] or not ContentValidation.bounded(record.get("decision_remaining"),0,86400):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_purchase_decision")
   if not ContentValidation.integer(record.get("recall_variant")) or record.recall_variant< -1 or record.recall_variant>2:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_recall_variant")
   if not record.get("arrival_counted") is bool:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_arrival_count")
   visit.arrival_counted=record.arrival_counted
@@ -256,7 +251,7 @@ func update_markers(markers: Dictionary) -> void:
  for visit in visits.values():
   if visit.phase==&"leaving": continue
   var definition := character(visit.character_id)
-  var key := str(definition.marker) if visit.shopping_state in [&"approaching",&"pending",&"served"] else str(definition.leisure_marker)
+  var key := str(definition.marker) if visit.shopping_state in [&"approaching",&"requesting",&"pending",&"served"] else str(definition.leisure_marker)
   var marker: Array = _markers[key]
   var target := Vector2(marker[0],marker[1])
   if visit.destination.distance_to(target)>0.01:
@@ -267,3 +262,31 @@ func random_index(size: int) -> int:
 
 func random_chance(probability: float) -> bool:
  return _rng.randf()<clampf(probability,0,1)
+
+func _present() -> bool:
+ return service_presence.is_valid() and bool(service_presence.call())
+func accept_request(id: StringName) -> ActionResult:
+ var visit: VisitState=visits.get(str(id))
+ if visit==null or visit.phase!=&"staying" or not _present():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ var existing := _orders.pending_for(id)
+ if existing!=null:return ActionResult.success({"order_id":str(existing.id),"duplicate":true})
+ if visit.shopping_state!=&"requesting":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
+ var order := _orders.place_order(id,visit.food_id)
+ if order==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
+ visit.order_id=order.id
+ visit.shopping_state=&"pending"
+ return ActionResult.success({"order_id":str(order.id)})
+func decline_request(id: StringName) -> ActionResult:
+ var visit: VisitState=visits.get(str(id))
+ if visit==null or visit.shopping_state!=&"requesting":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
+ visit.food_id=&""
+ visit.shopping_state=&"declined"
+ _return_to_leisure(visit)
+ return ActionResult.success()
+func reset_request(id: StringName) -> void:
+ var visit: VisitState=visits.get(str(id))
+ if visit==null or visit.shopping_state!=&"requesting":return
+ visit.food_id=&""
+ visit.shopping_state=&"undecided"
+ visit.decision_remaining=_delay("purchase_retry_delay")
+ _return_to_leisure(visit)

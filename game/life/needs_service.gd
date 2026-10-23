@@ -11,8 +11,8 @@ func _init(config: Dictionary = {}) -> void:
  rest = float(config.get("initial",{}).get("rest",90))
  mood = float(config.get("initial",{}).get("mood",75))
  baseline = float(config.get("initial",{}).get("baseline",70))
-func tick(delta: float, kiosk_open: bool) -> void:
- apply_delta(-delta * _config.hunger_decay,-delta * (_config.work_rest_decay if kiosk_open else _config.rest_decay),0)
+func tick(delta: float, _kiosk_open: bool) -> void:
+ apply_delta(-delta * _config.hunger_decay,-delta * _config.rest_decay,0)
  if rest < _config.low_rest or hunger < _config.low_hunger:
   apply_delta(0,0,-delta * _config.low_needs_mood_decay)
 func apply_delta(hunger_delta: float, rest_delta: float, mood_delta: float) -> void:
