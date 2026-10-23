@@ -43,7 +43,14 @@ func advance() -> NarrativeTypes.Frame:
   _frame.result = ActionResult.failure(ActionResult.Code.NOT_AVAILABLE, &"story_unavailable")
   return _frame
  if _player.can_continue:
-  _frame.text = _player.continue_story().strip_edges()
+  # Ink may yield formatting-only newlines before the next spoken beat.
+  # They carry no timing/choice/effect and must not create an invisible 5.5s beat.
+  for empty_line in range(256):
+   _frame.text = _player.continue_story().strip_edges()
+   if not _frame.text.is_empty() or not _player.current_tags.is_empty() or not _player.current_choices.is_empty() or not _player.can_continue:break
+   if empty_line==255:
+    _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"empty_story_run")
+    return _frame
   for tag in _player.current_tags:
    var parts: PackedStringArray = str(tag).split(":", true, 1)
    if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join"]:

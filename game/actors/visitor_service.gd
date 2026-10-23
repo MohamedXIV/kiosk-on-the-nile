@@ -114,7 +114,7 @@ func _arrived(visit: VisitState) -> void:
   var pair := PackedStringArray()
   for other in visits.values():
    if other.character_id in [&"mahmoud",&"samir"] and other.phase==&"staying":pair.append(str(other.id))
-  if pair.size()==2 and not pair.any(func(id):return busy_in_conversation(StringName(id))):
+  if pair.size()==2 and not Array(pair).any(func(id):return busy_in_conversation(StringName(id))):
    _flags.football_started=true
    encounter_requested.emit(&"football",pair,{})
 func busy_in_conversation(visit_id: StringName) -> bool:
