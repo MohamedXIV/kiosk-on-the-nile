@@ -1,5 +1,6 @@
 class_name Hud
 extends Control
+signal tuning_requested
 signal clean_floor_requested
 signal travel_requested(route_id: StringName)
 signal inventory_requested
@@ -48,6 +49,12 @@ func configure(text: UiText) -> void:
  for entry in [{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();travel_requested.emit(route_id)))
+ actions.add_child(UiText.button(text.text("fatigue_accessibility"),func():
+  if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
+  _menu.hide()))
+ var tuning_button := UiText.button(text.text("tuning"),func():_menu.hide();tuning_requested.emit())
+ tuning_button.name="TuningButton"
+ actions.add_child(tuning_button)
  var help := UiText.label(text.text("help"))
  help.custom_minimum_size.x = 280
  help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -101,6 +108,7 @@ func configure(text: UiText) -> void:
  toast.duration = float(text.data.toasts.duration)
  add_child(toast)
 func bind(session: GameSession) -> void:
+ _menu.find_child("TuningButton",true,false).visible=session.config.section("tuning").dev_panel_enabled
  _session = session
  _thought=UiText.label("")
  _thought.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART

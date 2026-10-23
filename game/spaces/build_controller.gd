@@ -1,6 +1,7 @@
 class_name BuildController
 extends RefCounted
 signal changed
+var policy: ActionPolicy
 var active: bool = false
 var location_id: StringName
 var request: PlacementRequest
@@ -75,12 +76,22 @@ func preview(cell: Vector2i, rotation: int, host_id: StringName = &"", slot_id: 
  return last_result
 func confirm() -> ActionResult:
  if not active or request==null or _pose.location_id!=location_id: return _failure("invalid_destination")
+ var valid := _spaces.can_place(request)
+ if not valid.ok:return valid
+ if policy!=null:
+  var permitted := policy.attempt(&"ordinary_effort",policy.opportunity(&"ordinary_effort","build:"+str(_spaces.revision)))
+  if not permitted.ok:return permitted
  last_result=_spaces.place(request)
+ if last_result.ok and policy!=null:policy.record_effort("build:%d:%d" % [_spaces.revision,_items.revision],&"arranging")
  changed.emit()
  return last_result
 func store_selected() -> ActionResult:
  if not active or request==null or _pose.location_id!=location_id: return _failure("invalid_destination")
+ if policy!=null:
+  var permitted := policy.attempt(&"ordinary_effort",policy.opportunity(&"ordinary_effort","store:"+str(_spaces.revision)))
+  if not permitted.ok:return permitted
  last_result=_spaces.store(request.instance_id)
+ if last_result.ok and policy!=null:policy.record_effort("store:%d:%d" % [_spaces.revision,_items.revision],&"arranging")
  changed.emit()
  return last_result
 func cancel() -> void:

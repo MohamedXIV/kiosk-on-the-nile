@@ -1,6 +1,8 @@
 class_name ServiceSystem
 extends RefCounted
 signal settled(order_id: StringName, visit_id: StringName, item: PreparedItem, payment: int)
+var policy: ActionPolicy
+var personal_item: Callable
 var _foods: FoodRegistry
 var _clock: GameClock
 var _wallet: WalletService
@@ -43,6 +45,8 @@ func deliver(order_id: StringName) -> ActionResult:
  if value == null or value.status != &"pending" or not _available.call(value.visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
  var item := _cooking.held_item()
  if item == null or item.food_id != value.food_id: return ActionResult.failure(ActionResult.Code.WRONG_ORDER,&"wrong_order")
+ if personal_item.is_valid() and personal_item.call(item.id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"personal_food")
+ if policy!=null and policy.business_allowed.is_valid() and not policy.business_allowed.call():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  var payment := value.base_price+int(value.tips[item.quality_score])
  # Commit all owners before notifying observers.
  _cooking.take_held(item.id,false)

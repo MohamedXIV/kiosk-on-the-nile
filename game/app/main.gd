@@ -5,6 +5,9 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _tuning_panel: TuningPanel
+var _fatigue_overlay: FatigueOverlay
+var _fatigue_layer: CanvasLayer
 var _visitor_panel: VisitorPanel
 var _recipe_panel: RecipePanel
 var _shop_panel: ShopPanel
@@ -100,6 +103,8 @@ func begin_new_game() -> void:
   push_error("Session rejected: "+str(result.details))
   _busy = false
   return
+ var local := candidate.tuning.load_local()
+ if not local.ok:push_warning("Invalid local tuning ignored")
  _install(candidate)
  _busy = false
 func continue_game() -> void:
@@ -119,9 +124,15 @@ func continue_game() -> void:
   _title.add_child(error)
  _busy = false
 func _install(candidate: GameSession) -> void:
+ if _fatigue_layer:_fatigue_layer.free()
  if _world: _world.free()
  if _session: _session.queue_free()
  _session = candidate
+ _fatigue_layer=CanvasLayer.new()
+ _fatigue_layer.layer=1
+ add_child(_fatigue_layer)
+ _fatigue_overlay=FatigueOverlay.new()
+ _fatigue_layer.add_child(_fatigue_overlay)
  _world = Node2D.new()
  add_child(_world)
  _physical = PhysicalWorldController.new()
@@ -133,10 +144,10 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible)
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.social_life.participation_blocked=func():
-  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or not _session.travel.snapshot().journey.is_empty()
+  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible) or not _session.travel.snapshot().journey.is_empty()
  _session.motion_step = _step_motion
  var room: LocationView = _rooms.get(str(_session.location_id))
  _router = InteractionRouter.new(_session,room,_text)
@@ -145,6 +156,10 @@ func _install(candidate: GameSession) -> void:
  _ui_layer.add_child(_hud)
  _hud.configure(_text)
  _hud.bind(_session)
+ _tuning_panel=TuningPanel.new()
+ _hud.add_child(_tuning_panel)
+ _tuning_panel.configure(_session)
+ _hud.tuning_requested.connect(func():_tuning_panel.open())
  _build_panel=BuildPanel.new()
  _hud.add_child(_build_panel)
  _build_panel.configure(_text,_session.build,_session)
@@ -195,6 +210,7 @@ func _install(candidate: GameSession) -> void:
 func _physics_process(delta: float) -> void:
  if _session==null or not _focused: return
  _session.tick(delta)
+ _fatigue_overlay.present(_session.fatigue.view())
  _sound.present(_session.location_id,_session.cooking,_session.home,_session.items,_session.spaces,_session.workflow)
  _atmosphere.present(_session.clock.minutes,_session.location_id)
  _character.present(_session.player_pose,Color(_config.section("spatial").character.player_color),true)
@@ -213,6 +229,12 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _tuning_panel!=null and _tuning_panel.visible:
+  if event.is_action_pressed("cancel"):_tuning_panel.hide()
+  return
+ if event is InputEventKey and event.pressed and event.keycode==KEY_F8 and _session.config.section("tuning").dev_panel_enabled:
+  _tuning_panel.open()
+  return
  if _visitor_panel.visible:
   if event.is_action_pressed("cancel"):_visitor_panel.hide()
   return

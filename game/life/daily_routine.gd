@@ -30,6 +30,7 @@ func sleep(hours: int) -> ActionResult:
  if not result.ok: return result
  var before := wallet.balance
  var frame := clock.elapse_minutes(float(result.details.actual_hours)*60)
+ frame["sleep_hours"]=float(result.details.actual_hours)
  needs.recover_sleep(float(result.details.actual_hours),home.has_fan and home.fan_on,float(result.details.rest_multiplier))
  result.details["rent_spent"] = before-wallet.balance
  result.details["cue"] = "chime"

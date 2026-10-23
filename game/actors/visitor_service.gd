@@ -11,6 +11,7 @@ var availability_provider: Callable
 var purchase_blocked: Callable
 var demand_provider: Callable
 var food_selector: Callable
+var tuning: TuningStore
 var foods: FoodRegistry
 var _data: Dictionary
 var _markers: Dictionary
@@ -33,7 +34,9 @@ func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: 
  else:_rng.seed = int(data.seed)
  _cooldown = _delay("initial_delay")
 func character(id: StringName) -> Dictionary:
- return _data.characters.get(str(id),{}).duplicate(true)
+ var result: Dictionary=_data.characters.get(str(id),{}).duplicate(true)
+ if not result.is_empty() and tuning!=null:result.name=tuning.display_name(str(id),str(result.name))
+ return result
 func spawn(character_id: StringName) -> VisitState:
  var definition := character(character_id)
  if definition.is_empty() or _has_character(character_id): return null
@@ -51,14 +54,15 @@ func spawn(character_id: StringName) -> VisitState:
  visit.destination = Vector2(marker[0],marker[1])
  visits[str(visit.id)] = visit
  return visit
-func tick(delta: float) -> void:
+func tick(delta: float, calendar_delta: float = -1) -> void:
+ var elapsed := delta if calendar_delta<0 else calendar_delta
  for id in visits.keys():
   var visit: VisitState = visits[id]
   if (visit.phase==&"arriving" or visit.shopping_state==&"approaching") and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): _arrived(visit)
   elif visit.phase == &"staying":
    if not busy_in_conversation(visit.id):
-    visit.elapsed += delta
-    _consider_purchase(visit,delta)
+    visit.elapsed += elapsed
+    _consider_purchase(visit,elapsed)
     _remarks(visit,delta)
    if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=float(_data.max_wait_seconds):
     visit.phase = &"leaving"
@@ -68,7 +72,7 @@ func tick(delta: float) -> void:
     visit.shopping_state=&"declined"
     departed.emit(visit.id)
   elif visit.phase == &"leaving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): visits.erase(id)
- _cooldown=maxf(0,_cooldown-delta)
+ _cooldown=maxf(0,_cooldown-elapsed)
  if _cooldown<=0:
   _cooldown=_delay("arrival_delay")
   if visits.size()<int(_data.capacity):

@@ -1,5 +1,5 @@
 {
-  "minutes_per_second": 2.5,
+  "minutes_per_second": 1,
   "start_day": 1,
   "start_minutes": 930,
   "fixed_step": 0.016666666666666666,
@@ -12,7 +12,7 @@
       "narrative"
     ],
     "cooking": [
-      "needs"
+      "body"
     ],
     "visitors": [
       "hygiene"
@@ -37,6 +37,9 @@
     ],
     "social_life": [
       "customer_experience"
+    ],
+    "body": [
+      "needs"
     ]
   }
 }

@@ -36,3 +36,8 @@ func restore(data: Dictionary) -> ActionResult:
  mood = float(data.mood)
  baseline = float(data.baseline)
  return ActionResult.success()
+
+func apply_tuning(tuning: TuningStore) -> void:
+ for key in ["hunger_decay","rest_decay","low_needs_mood_decay"]:_config[key]=tuning.value(key)
+ _config.low_rest=tuning.value("fatigue_warning")
+ _config.low_hunger=tuning.value("hunger_denial")

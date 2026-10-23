@@ -1,7 +1,7 @@
 class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
- if envelope.get("schema_revision")!=8: return _fail("schema_revision")
+ if envelope.get("schema_revision")!=9: return _fail("schema_revision")
  var social_result := session.social_life.cross_validate()
  if not social_result.ok:return social_result
  var items := session.items.snapshot()

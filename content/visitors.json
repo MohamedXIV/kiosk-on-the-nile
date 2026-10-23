@@ -8,7 +8,7 @@
       "color": "#5c7a67",
       "marker": "counter_1",
       "food_id": "tea",
-      "stay_seconds": 32,
+      "stay_seconds": 48.0,
       "ambient": false,
       "visit_policy": {
         "daily_limit": 1,
@@ -36,7 +36,7 @@
       "color": "#8c3b3b",
       "marker": "table_a",
       "food_id": "tea",
-      "stay_seconds": 36,
+      "stay_seconds": 54.0,
       "ambient": false,
       "visit_policy": {
         "daily_limit": 1,
@@ -64,7 +64,7 @@
       "color": "#3b598c",
       "marker": "table_b",
       "food_id": "kebda",
-      "stay_seconds": 36,
+      "stay_seconds": 54.0,
       "ambient": false,
       "visit_policy": {
         "daily_limit": 1,
@@ -92,7 +92,7 @@
       "color": "#705d4e",
       "marker": "railing_1",
       "food_id": "tea",
-      "stay_seconds": 20,
+      "stay_seconds": 30.0,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -120,7 +120,7 @@
       "color": "#7c4d6b",
       "marker": "takeaway",
       "food_id": "kebda",
-      "stay_seconds": 8,
+      "stay_seconds": 12.0,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -148,7 +148,7 @@
       "color": "#4b6e75",
       "marker": "railing_2",
       "food_id": "",
-      "stay_seconds": 15,
+      "stay_seconds": 22.5,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -171,7 +171,7 @@
       "color": "#a16c47",
       "marker": "counter_2",
       "food_id": "tea",
-      "stay_seconds": 38,
+      "stay_seconds": 57.0,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -199,7 +199,7 @@
       "color": "#687e96",
       "marker": "railing_2",
       "food_id": "",
-      "stay_seconds": 42,
+      "stay_seconds": 63.0,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -222,7 +222,7 @@
       "color": "#847549",
       "marker": "takeaway",
       "food_id": "kebda",
-      "stay_seconds": 10,
+      "stay_seconds": 15.0,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -251,7 +251,7 @@
       "color": "#507976",
       "marker": "counter_2",
       "food_id": "tea",
-      "stay_seconds": 30,
+      "stay_seconds": 45.0,
       "ambient": true,
       "visit_policy": {
         "daily_limit": 1,
@@ -295,8 +295,8 @@
     24
   ],
   "arrival_delay": [
-    16,
-    34
+    28,
+    52
   ],
   "purchase_delay": [
     5,
@@ -310,5 +310,6 @@
     1,
     1.5
   ],
-  "personal_space": 0.65
+  "personal_space": 0.65,
+  "time_domain": "world_minutes"
 }

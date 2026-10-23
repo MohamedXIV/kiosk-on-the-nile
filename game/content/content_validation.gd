@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("tuning"):
+  var tuning_result := TuningValidation.validate(bundle)
+  if not tuning_result.ok:return tuning_result
  if bundle.has("narration"):
   var narration_result := NarrationValidation.validate(bundle)
   if not narration_result.ok:return narration_result
@@ -44,6 +47,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not time.get("system_dependencies") is Dictionary: return fail("time.system_dependencies")
   var handlers: Dictionary = {}
   for id in ["needs","cooking","motion","visitors","narrative","scheduler"]: handlers[id]=func(_frame):return ActionResult.success()
+  if bundle.has("tuning"):handlers["body"]=func(_frame):return ActionResult.success()
   if bundle.has("travel"):handlers["travel"]=func(_frame):return ActionResult.success()
   if bundle.has("shops"):handlers["shops"]=func(_frame):return ActionResult.success()
   if bundle.has("hygiene"):handlers["hygiene"]=func(_frame):return ActionResult.success()

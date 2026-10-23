@@ -55,6 +55,26 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   candidate.state["personal"]={"hub":{},"paused":{}}
   candidate.state["inner"]={"next_id":1,"next_at":float(candidate.state.clock.world_minutes)+float(config.section("narration").thought_delay_minutes),"heard":{},"current":{}}
   candidate.schema_revision=8
+ if candidate.schema_revision==8 and target_revision>=9:
+  var now := float(candidate.state.clock.world_minutes)
+  var seconds := float(candidate.state.clock.simulation_seconds)
+  var tuning := TuningStore.new()
+  var configured := tuning.configure(config.section("tuning"),config.section("visitors").characters.keys()+["player"])
+  if not configured.ok:return configured
+  tuning.apply_at_boundary(false)
+  candidate.state["tuning"]=tuning.snapshot()
+  candidate.state["alertness"]={"doses":{},"exemption_used":0.0,"last_world":now}
+  candidate.state["actions"]={"attempts":{},"effort":{},"last_refusal":-1.0,"daily":{}}
+  candidate.state["fatigue"]={"next_at":seconds+5.0,"pulse_end":seconds,"sequence":1,"severity":0.0,"visual_scale":1.0}
+  # Existing elapsed amounts, job definitions, quality and ingredient contracts
+  # stay intact. Reaction windows use their frozen authored presentation rate.
+  for job in candidate.state.workflow.jobs.values():job["reaction_time_domain"]="simulation_seconds"
+  # Legacy residual visit durations were simulation seconds at 2.5 game min/s.
+  # Convert units once to preserve their old world-calendar remaining duration.
+  candidate.state.visitors.cooldown=float(candidate.state.visitors.cooldown)*2.5
+  for visit in candidate.state.visitors.visits.values():
+   for key in ["elapsed","stay_seconds","decision_remaining"]:visit[key]=float(visit.get(key,0))*2.5
+  candidate.schema_revision=9
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

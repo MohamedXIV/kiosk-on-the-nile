@@ -1,5 +1,6 @@
 class_name HygieneService
 extends RefCounted
+var policy: ActionPolicy
 signal changed(target_id: StringName)
 var _definitions: Dictionary
 var _items: ItemStore
@@ -61,6 +62,9 @@ func begin_clean(target_id: StringName) -> ActionResult:
  if value.is_empty() or not _reachable(target_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"cleaning_out_of_reach")
  if _busy.is_valid() and _busy.call(target_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"equipment_busy")
  if float(value.cleanliness)>=100:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"already_clean")
+ if policy!=null:
+  var permitted := policy.attempt(&"ordinary_effort",policy.opportunity(&"ordinary_effort","clean:"+str(target_id)))
+  if not permitted.ok:return permitted
  interrupt_clean()
  var target: Dictionary=_targets[str(target_id)]
  if target.cleaning.is_empty():
@@ -114,6 +118,7 @@ func _advance(now: float, allow_cleaning: bool) -> void:
  if _action.completed_minutes>=_action.required_minutes-0.00001:
   target.cleanliness=100.0
   target.cleaning={}
+  if policy!=null:policy.record_effort("clean:%s:%d" % [id,_clock.tick],&"cleaning")
   _action.active=false
  changed.emit(id)
 func food_contact_evidence(target_ids: PackedStringArray) -> Dictionary:

@@ -3,6 +3,7 @@ extends RefCounted
 signal changed
 signal attempt_started(job_id: StringName, recipe_id: StringName, evidence: Dictionary)
 signal item_completed(job_id: StringName, item_id: StringName, quality: int)
+var policy: ActionPolicy
 var quality_provider: Callable
 var sugar_provider: Callable
 var use_provider: Callable
@@ -35,7 +36,7 @@ func available_recipes(location_id: StringName, instance_id: StringName) -> Arra
   var eligibility := _requirements(definition,location_id,[str(instance_id)])
   result.append({"id":id,"definition":definition.duplicate(true),"available":eligibility.ok,"missing":eligibility.message_key,"details":eligibility.details})
  return result
-func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedStringArray) -> ActionResult:
+func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedStringArray, for_self: bool = false) -> ActionResult:
  if not _recipes.has(str(recipe_id)):return _fail("unknown_recipe")
  var definition: Dictionary=_recipes[str(recipe_id)].duplicate(true)
  if instance_ids.is_empty():return _fail("recipe_station_mismatch")
@@ -47,6 +48,10 @@ func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedS
  devices[str(definition.steps[0].capability)]=str(instance_ids[0])
  var first: Dictionary=definition.steps[0]
  if not _near(StringName(devices[first.capability]),location_id):return _fail("equipment_out_of_reach")
+ var action_class: StringName=&"cooking_for_self" if for_self else &"commercial_preparation"
+ if policy!=null:
+  var permitted := policy.attempt(action_class,policy.opportunity(action_class,str(recipe_id)+":"+str(_next_id)))
+  if not permitted.ok:return permitted
  var id := "cook_%d" % _next_id
  var change := _inventory.items.candidate()
  var inputs: Array[Dictionary]=[]
@@ -57,6 +62,8 @@ func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedS
  var evidence: Array=[]
  for source in available.details.sources:evidence.append(change.state.items[source.item_id].duplicate(true))
  var job := {"id":id,"recipe_id":str(recipe_id),"recipe_version":int(definition.version),"definition":definition,"time_domain":"world_minutes","location_id":str(location_id),"step_index":0,"elapsed":0.0,"last_world_minutes":_clock.world_minutes,"step_results":[],"devices":devices,"input_evidence":evidence,"quality_penalty":int(quality_provider.call()) if quality_provider.is_valid() else 0,"sugar_id":str(sugar_provider.call(StringName(instance_ids[0]))) if sugar_provider.is_valid() and not instance_ids.is_empty() else "","status":"active","inputs_consumed":false}
+ job["personal_use"]=for_self
+ job["reaction_time_domain"]="simulation_seconds"
  job["current_hygiene_evidence"]=_hygiene_evidence(job,first)
  if definition.get("consume_on_start",true):_consume_all(change,job)
  var resources: Array[Dictionary]=[{"instance_id":devices[first.capability],"capability":first.capability,"units":1}]
@@ -120,6 +127,8 @@ func tick(frame: Dictionary) -> void:
   var delta := maxf(0,float(frame.world_minutes)-float(job.last_world_minutes))
   job.last_world_minutes=float(frame.world_minutes)
   var step: Dictionary=job.definition.steps[int(job.step_index)]
+  if job.get("reaction_time_domain","")=="simulation_seconds" and step.kind not in ["cold_wait","batch_heat"]:
+   delta=float(frame.delta)*float(job.definition.get("presentation_minutes_per_second",1))
   if step.kind=="cold_wait":
    var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
    if not bowl.is_empty():
@@ -191,7 +200,7 @@ func _prepared_output(job: Dictionary, change: ItemChangeSet) -> PreparedItem:
  item.quality_score=maxi(1,technique-int(job.quality_penalty)-hygiene_penalty) if technique>0 else 0
  item.quality_key=StringName(job.definition.quality_keys[item.quality_score])
  var attributes := item.snapshot()
- attributes.merge({"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"hygiene_penalty":hygiene_penalty,"step_evidence":job.step_results.duplicate(true)})
+ attributes.merge({"personal_use":bool(job.get("personal_use",false)) or job.input_evidence.any(func(input):return input.attributes.get("personal_use",false)),"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"hygiene_penalty":hygiene_penalty,"step_evidence":job.step_results.duplicate(true)})
  change.state.items[str(item.id)]={"id":str(item.id),"definition_id":"prepared_food","kind":"prepared","quantity":1,"container_id":"player_hand","attributes":attributes}
  return item
 func _hygiene_evidence(job: Dictionary, step: Dictionary) -> Dictionary:

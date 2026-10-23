@@ -2,6 +2,10 @@ class_name GameSession
 extends Node
 signal _encounter_ready(kind: StringName, participants: PackedStringArray, extra: Dictionary)
 signal changed
+var tuning: TuningStore
+var alertness: AlertnessService
+var actions: ActionPolicy
+var fatigue: FatigueService
 var config: SessionConfig
 var clock: GameClock
 var wallet: WalletService
@@ -66,6 +70,18 @@ func configure(source: SessionConfig) -> ActionResult:
  clock = GameClock.new(source.section("time"))
  wallet = WalletService.new(int(balance.starting_money))
  needs = NeedsService.new(source.section("needs"))
+ tuning=TuningStore.new()
+ var tuned := tuning.configure(source.section("tuning"),source.section("visitors").characters.keys()+["player"])
+ if not tuned.ok:return tuned
+ tuning.apply_at_boundary(false)
+ alertness=AlertnessService.new()
+ alertness.configure(self)
+ actions=ActionPolicy.new()
+ actions.configure(self)
+ fatigue=FatigueService.new()
+ fatigue.configure(self)
+ tuning.applied.connect(_apply_tuning)
+ _apply_tuning()
  items = ItemStore.new()
  var item_result := items.configure(source.section("items"),source.section("containers"))
  if not item_result.ok: return item_result
@@ -111,6 +127,7 @@ func configure(source: SessionConfig) -> ActionResult:
  var travel_result := travel.configure(travel_config,clock,player_pose,inventory,locations)
  if not travel_result.ok:return travel_result
  build=BuildController.new(spaces,items,player_pose)
+ build.policy=actions
  kiosk_open = source.section("session").kiosk_open
  var social_data := source.section("social")
  var amounts: Dictionary = {}
@@ -134,9 +151,11 @@ func configure(source: SessionConfig) -> ActionResult:
  workflow=RecipeWorkflow.new()
  var workflow_result := workflow.configure(source.section("recipe_workflows"),inventory,equipment,clock,knowledge)
  if not workflow_result.ok:return workflow_result
+ workflow.policy=actions
  workflow.quality_provider=func():return mood_policy.quality_penalty(needs.mood)
  cooking.foods=foods
  hygiene=HygieneService.new()
+ hygiene.policy=actions
  var hygiene_result := hygiene.configure(source.section("hygiene"),items,spaces,clock,func():return player_pose,func(id):return cooking.legacy_busy(id) or equipment.is_busy(id))
  if not hygiene_result.ok:return hygiene_result
  cooking.set_hygiene_provider(hygiene.food_contact_evidence,func(id):hygiene.record_use(StringName("legacy:"+str(id)),id,&"batch"))
@@ -152,7 +171,10 @@ func configure(source: SessionConfig) -> ActionResult:
  supplies = SupplyService.new(travel,home,knowledge)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
+ service.policy=actions
+ service.personal_item=func(id):return items.get_item(id).get("attributes",{}).get("personal_use",false)
  visitors = VisitorService.new()
+ visitors.tuning=tuning
  visitors.foods=foods
  visitors.food_selector=_choose_food
  service.configure(wallet,cooking,visitors.is_available,balance,foods,clock)
@@ -224,10 +246,11 @@ func configure(source: SessionConfig) -> ActionResult:
  scheduler.configure({})
  return rebuild_order()
 func rebuild_order() -> ActionResult:
- var handlers := {"needs":func(frame):needs.tick(frame.delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):
+ var handlers := {"needs":func(frame):needs.tick(frame.world_delta,kiosk_open),"scheduler":func(frame):scheduler.tick(frame),"cooking":func(frame):
   cooking.tick(frame.delta)
-  workflow.tick(frame),"visitors":func(frame):visitors.tick(frame.delta),"narrative":_step_narrative,"motion":func(frame):
+  workflow.tick(frame),"visitors":func(frame):visitors.tick(frame.delta,frame.world_delta),"narrative":_step_narrative,"motion":func(frame):
   if motion_step.is_valid(): motion_step.call(frame.delta)}
+ handlers["body"]=func(frame):alertness.tick(frame);fatigue.tick(frame)
  handlers["travel"]=func(frame):travel.tick(frame)
  handlers["shops"]=func(frame):shops.tick(frame)
  handlers["hygiene"]=func(frame):hygiene.tick(frame)
@@ -238,6 +261,8 @@ func start_new() -> void:
  running = true
 func tick(delta: float) -> void:
  if not running: return
+ var tuned := tuning.apply_at_boundary()
+ if not tuned.ok:last_result=tuned;return
  last_result = coordinator.step(delta)
  changed.emit()
 
@@ -301,12 +326,14 @@ func _legacy_talk(visit_id: StringName) -> ActionResult:
  return await narrative.start(encounter,PackedStringArray([str(visit_id)]))
 
 func _sleep_elapsed(frame: Dictionary) -> void:
+ alertness.recover_sleep(float(frame.get("sleep_hours",0)))
+ fatigue.recover_sleep()
  # Sleep skips travel/social scenes, while unattended stations and due jobs
  # consume the same elapsed clock frame. Recovery has already been applied.
  cooking.tick(float(frame.delta))
  workflow.tick(frame)
- hygiene.elapse(float(frame.delta)*float(config.section("time").minutes_per_second))
- shops.elapse(float(frame.delta)*float(config.section("time").minutes_per_second))
+ hygiene.elapse(float(frame.world_delta))
+ shops.elapse(float(frame.world_delta))
  hygiene.record_use(StringName("sleep:"+str(clock.tick)),routine.bed_id,&"sleep")
  scheduler.tick(frame)
  social_life.tick(frame)
@@ -338,6 +365,7 @@ func _record_cooking_use(job_id: StringName, step_index: int, instance_id: Strin
  var use_id: StringName=&"prep" if kind==&"prepare" else &"assembly" if kind==&"assemble" else &"batch"
  var source := str(job_id)+"/step/"+str(step_index) if use_id!=&"batch" else str(job_id)+"/appliance/"+str(instance_id)
  hygiene.record_use(StringName(source),instance_id,use_id)
+ actions.record_effort("%s/step/%d" % [job_id,step_index],&"preparation")
 
 func _sync_experience(visit_id: StringName, order_id: StringName = &"") -> ActionResult:
  var visit: VisitState=visitors.visits.get(str(visit_id))
@@ -374,3 +402,7 @@ func _service_effect(action: String, participants: PackedStringArray) -> ActionR
  if action=="decline":return visitors.decline_request(visit.id)
  if not request_can_prepare(visit.food_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_ingredients")
  return visitors.accept_request(visit.id)
+
+func _apply_tuning() -> void:
+ clock.set_speed(tuning.value("clock_speed"))
+ needs.apply_tuning(tuning)

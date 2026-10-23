@@ -7,6 +7,7 @@ var minutes: float
 var world_minutes: float
 var simulation_seconds: float = 0.0
 var tick: int = 0
+var last_world_delta: float=0
 var _config: Dictionary
 func _init(config: Dictionary = {}) -> void:
  _config = config.duplicate(true)
@@ -17,7 +18,8 @@ func _init(config: Dictionary = {}) -> void:
 func advance(delta: float) -> void:
  if delta<0 or not is_finite(delta): return
  simulation_seconds += delta
- var elapsed := delta*float(_config.get("minutes_per_second",2.5))
+ var elapsed := delta*float(_config.get("minutes_per_second",1.0))
+ last_world_delta=elapsed
  var previous := day
  var total := minutes+elapsed
  day += floori(total/1440.0)
@@ -30,7 +32,7 @@ func elapse_minutes(elapsed: float) -> Dictionary:
  advance(delta)
  return frame(delta)
 func frame(delta: float) -> Dictionary:
- return {"delta":delta,"tick":tick,"day":day,"minutes":minutes,"world_minutes":world_minutes,"simulation_seconds":simulation_seconds}
+ return {"delta":delta,"tick":tick,"day":day,"minutes":minutes,"world_minutes":world_minutes,"simulation_seconds":simulation_seconds,"world_delta":last_world_delta}
 func snapshot() -> Dictionary:
  var value := frame(0)
  value.erase("delta")
@@ -45,4 +47,9 @@ func restore(data: Dictionary) -> ActionResult:
  world_minutes = float(data.world_minutes)
  simulation_seconds = float(data.simulation_seconds)
  tick = int(data.tick)
+ return ActionResult.success()
+
+func set_speed(minutes_per_second: float) -> ActionResult:
+ if not ContentValidation.bounded(minutes_per_second,0.1,10):return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_clock_speed")
+ _config["minutes_per_second"]=minutes_per_second
  return ActionResult.success()

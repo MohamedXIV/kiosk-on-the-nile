@@ -16,13 +16,15 @@ func can_open(id: StringName) -> bool:
  var visit: VisitState=_session.visitors.visits.get(str(id))
  return visit!=null and (_paused.has(str(visit.character_id)) or holds_visit(id) or not _session.narrative.manual_topics_for(id).is_empty())
 func open_for(id: StringName) -> ActionResult:
+ var eligibility := _session.actions.preview(&"personal_focus")
+ if not eligibility.ok and _session.service.pending_for(id)==null:return eligibility
  if _opening or not _near(id):return _fail()
  if holds_visit(id):return ActionResult.success()
  if _session.narrative.speech_active(id):return _fail()
  leave()
  var visit: VisitState=_session.visitors.visits[str(id)]
  _hub={"visit_id":str(id),"actor_id":str(visit.character_id),"session_id":""}
- if _paused.has(_hub.actor_id):
+ if eligibility.ok and _paused.has(_hub.actor_id):
   _opening=true
   var result := await _session.narrative.resume_record(_paused[_hub.actor_id],id)
   _opening=false
@@ -45,6 +47,9 @@ func adopt(conversation: ConversationSession) -> bool:
  return true
 func select_topic(key: String) -> ActionResult:
  if not active() or _opening or not _near(StringName(_hub.visit_id)) or not _hub.session_id.is_empty():return _fail()
+ if key!="order_recall":
+  var eligibility := _session.actions.preview(&"personal_focus")
+  if not eligibility.ok:return eligibility
  _opening=true
  var result := await _session.narrative.start_manual_topic(StringName(_hub.visit_id),key)
  _opening=false
@@ -73,9 +78,11 @@ func view() -> Dictionary:
   for event in _session.journal.entries({"chapter":str(conversation.id)}):
    if event.id!="%s/%d/speech" % [conversation.id,conversation.beat]:recent.append(event)
   if recent.size()>2:recent=recent.slice(recent.size()-2)
- return {"recent":recent,"actor_id":_hub.actor_id,"name":_session.visitors.character(StringName(_hub.actor_id)).get("name",""),"conversation":conversation,"topics":_session.narrative.manual_topics_for(StringName(_hub.visit_id)) if conversation==null else [],"opening":_opening}
+ return {"recent":recent,"actor_id":_hub.actor_id,"name":_session.visitors.character(StringName(_hub.actor_id)).get("name",""),"conversation":conversation,"topics":_topics() if conversation==null else [],"opening":_opening}
 func _finished(id: StringName, _reason: StringName) -> void:
- if active() and _hub.session_id==str(id):_hub.session_id=""
+ if active() and _hub.session_id==str(id):
+  _hub.session_id=""
+  if not _session.actions.preview(&"personal_focus").ok:_hub={}
 func _near(id: StringName) -> bool:
  if not _session.visitors.is_available(id):return false
  var visit: VisitState=_session.visitors.visits[str(id)]
@@ -123,3 +130,8 @@ func validate_links() -> ActionResult:
  return ActionResult.success()
 func _fail() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
+
+func _topics() -> Array[Dictionary]:
+ var topics := _session.narrative.manual_topics_for(StringName(_hub.visit_id))
+ if not _session.actions.preview(&"personal_focus").ok:topics=topics.filter(func(topic):return topic.key=="order_recall")
+ return topics

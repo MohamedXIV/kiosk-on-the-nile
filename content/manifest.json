@@ -47,6 +47,8 @@
     "story_companionship": "stories/companionship.ink.json",
     "narration": "narration.json",
     "story_inner_monologue": "stories/inner_monologue.ink.json",
-    "story_service_availability": "stories/service_availability.ink.json"
+    "story_service_availability": "stories/service_availability.ink.json",
+    "tuning": "tuning.json",
+    "action_policy": "action_policy.json"
   }
 }

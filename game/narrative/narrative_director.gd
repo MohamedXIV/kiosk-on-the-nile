@@ -43,6 +43,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  if encounter_id==&"social_invitation" and _session.personal.active():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
  var definition: Dictionary = _definitions.get(str(encounter_id),{})
  if definition.is_empty() or not _encounter_available(definition,participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
+ if encounter_id==&"social_invitation" and not _session.actions.preview(&"personal_focus").ok:return _session.actions.preview(&"personal_focus")
  var wants_manual := bool(extra.get("manual_read",definition.get("advancement","automatic")=="manual" and int(extra.get("mode",0))==0))
  if wants_manual and (_manual_opening or not _session.personal.can_acquire(participants)):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
  var social_topic := str(definition.get("social_topic",""))
@@ -174,6 +175,8 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
  for choice in candidates:
   if choice.id != str(choice_id): continue
   var becomes_manual := manual(conversation) or (conversation.encounter_id==&"social_invitation" and int(choice.index)==0)
+  if conversation.encounter_id==&"social_invitation" and int(choice.index)==0 and not _session.actions.preview(&"personal_focus").ok:
+   return _session.actions.preview(&"personal_focus")
   if becomes_manual and (_manual_opening or not _session.personal.can_acquire(conversation.participants,conversation.id)):
    if automatic:_finish(conversation,&"cancelled")
    return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")

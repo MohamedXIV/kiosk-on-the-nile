@@ -78,6 +78,9 @@ func _refresh() -> void:
   var button := UiText.button(_text.text("recipe_start"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]))))
   button.disabled=not recipe.available
   _rows.add_child(button)
+  var self_button := UiText.button(_text.text("self_cooking"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]),true)))
+  self_button.disabled=not recipe.available
+  _rows.add_child(self_button)
 func _apply(result: ActionResult) -> void:
  _feedback.text=_text.outcome(result)
  _refresh()

@@ -71,6 +71,10 @@ func present(session: GameSession) -> void:
  _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
  _money.text = _text.text("money",{"amount":"%.2f" % (session.wallet.balance/100.0)})
  _state.text = _text.text("open") if session.kiosk_open else _text.text("closed")
+ if not session.actions.preview(&"personal_focus").ok:_state.text+=" · محتاج نوم"
+ elif session.needs.rest<session.tuning.value("fatigue_warning"):_state.text+=" · مرهق"
+ _state.tooltip_text="راحة حقيقية %.1f — تركيز فعّال %.1f" % [session.needs.rest,session.alertness.effective_focus()]
+ if session.fatigue.visual_scale<1:_state.tooltip_text+=" · مؤثر الإرهاق البصري %.0f%%" % [session.fatigue.visual_scale*100]
  var stock := session.cooking.inventory_snapshot()
  _inventory.text = _text.text("stock_short",{"tea":int(stock.tea),"kebda":int(stock.kebda)})
  _held.text = _text.text("held",{"item":session.cooking.item_label(session.cooking.held_item())}) if session.cooking.held_item() else _text.text("empty_hands")
