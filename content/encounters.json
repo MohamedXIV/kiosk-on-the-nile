@@ -400,5 +400,310 @@
     "offer_requires": {},
     "choice_conditions": {},
     "requires_pending_order": true
+  },
+  "social_result_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "result_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_result_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "result_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_continuation_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "continuation_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_continuation_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "continuation_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_days_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "days_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_days_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "days_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_refer_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "refer_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_refer_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "refer_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_consent_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "consent_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_consent_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "consent_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_appointment_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "appointment_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_appointment_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "appointment_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_hear_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "hear_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_hear_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "hear_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_meet_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "meet_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_meet_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "meet_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_pending_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "pending_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_pending_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "pending_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {}
+  },
+  "social_invitation": {
+    "story": "companionship",
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 0,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 1.8
+        }
+      ]
+    },
+    "offer_requires": {}
   }
 }

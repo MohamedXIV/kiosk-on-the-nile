@@ -135,6 +135,8 @@ func _install(candidate: GameSession) -> void:
  _physical.input_provider = func():
   var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
+ _session.social_life.participation_blocked=func():
+  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or not _session.travel.snapshot().journey.is_empty()
  _session.motion_step = _step_motion
  var room: LocationView = _rooms.get(str(_session.location_id))
  _router = InteractionRouter.new(_session,room,_text)
@@ -287,7 +289,7 @@ func _toggle_notebook() -> void:
  else:
   var notes := _session.knowledge.notes()
   notes.append(_text.text("venue_reputation",{"label":_session.customer_experience.reputation(&"kiosk").label}))
-  _hud.notebook.present(notes)
+  _hud.notebook.present(notes,_session.social_life.people())
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   _focused = false

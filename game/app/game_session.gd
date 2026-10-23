@@ -29,6 +29,7 @@ var supplies: SupplyService
 var life: LifeActions
 var service: ServiceSystem
 var visitors: VisitorService
+var social_life: SocialLife
 var relationships: RelationshipStore
 var conditions: ConditionEvaluator
 var effects: NarrativeEffects
@@ -172,11 +173,19 @@ func configure(source: SessionConfig) -> ActionResult:
  relationships = RelationshipStore.new(source.section("social"),actors)
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships
+ social_life=SocialLife.new()
+ social_life.configure(self)
+ visitors.availability_provider=func(actor):return not social_life.reserved(actor)
+ life.sleep_started.connect(social_life.before_time_jump)
  conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,locations.ids())
+ conditions.social_life=social_life
+ conditions.social_actions=source.section("social_life").actions.keys()
+ conditions.social_topics=source.section("social_life").topics.keys()
  conditions.customer_experience=customer_experience
  conditions.learning=learning
  conditions.recipe_ids=source.section("recipe_workflows").keys()+source.section("learning").families.values()
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
+ effects.social_life=social_life
  narrative = NarrativeDirector.new()
  add_child(narrative)
  var stories: Dictionary = {}
@@ -207,6 +216,7 @@ func rebuild_order() -> ActionResult:
  handlers["shops"]=func(frame):shops.tick(frame)
  handlers["hygiene"]=func(frame):hygiene.tick(frame)
  handlers["customer_experience"]=_step_experiences
+ handlers["social_life"]=func(frame):return social_life.tick(frame)
  return coordinator.prepare(clock,handlers,config.section("time").system_dependencies)
 func start_new() -> void:
  running = true
@@ -218,6 +228,7 @@ func tick(delta: float) -> void:
 func _encounter_requested(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
  _pending_encounters.append({"kind":kind,"participants":participants.duplicate(),"extra":extra.duplicate(true)})
 func _step_narrative(frame: Dictionary) -> void:
+ social_life.step_companionship(float(frame.delta))
  var pending := _pending_encounters.duplicate()
  _pending_encounters.clear()
  for event in pending:_encounter_ready.emit(event.kind,event.participants,event.extra)
@@ -244,7 +255,7 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
  await narrative.start(id,participants,context_data)
 func person_interaction(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
- if service.pending_for(visit_id)!=null:return ActionResult.success({"show_visitor":str(visit_id)})
+ if service.pending_for(visit_id)!=null or not social_life.topics_for(visit_id).is_empty():return ActionResult.success({"show_visitor":str(visit_id)})
  return await talk(visit_id)
 func recall_order(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id) or service.pending_for(visit_id)==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
@@ -273,6 +284,7 @@ func _sleep_elapsed(frame: Dictionary) -> void:
  shops.elapse(float(frame.delta)*float(config.section("time").minutes_per_second))
  hygiene.record_use(StringName("sleep:"+str(clock.tick)),routine.bed_id,&"sleep")
  scheduler.tick(frame)
+ social_life.tick(frame)
  changed.emit()
 
 func _actor_snapshots() -> Array[Dictionary]:

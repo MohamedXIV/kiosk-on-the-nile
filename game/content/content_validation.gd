@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("social_life"):
+  var social_result := SocialLifeValidation.validate(bundle)
+  if not social_result.ok:return social_result
  if bundle.has("items") or bundle.has("containers"):
   var items_result := ItemContentValidation.validate(bundle.get("items",{}),bundle.get("containers",{}))
   if not items_result.ok: return items_result
@@ -41,6 +44,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if bundle.has("travel"):handlers["travel"]=func(_frame):return ActionResult.success()
   if bundle.has("shops"):handlers["shops"]=func(_frame):return ActionResult.success()
   if bundle.has("hygiene"):handlers["hygiene"]=func(_frame):return ActionResult.success()
+  if bundle.has("social_life"):handlers["social_life"]=func(_frame):return ActionResult.success()
   if bundle.has("customer_experience"):handlers["customer_experience"]=func(_frame):return ActionResult.success()
   var ordering := SimulationCoordinator.new().prepare(GameClock.new(time),handlers,time.system_dependencies)
   if not ordering.ok: return ordering

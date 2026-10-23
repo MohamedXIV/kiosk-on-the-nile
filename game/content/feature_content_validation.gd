@@ -106,6 +106,8 @@ static func validate(bundle: Dictionary) -> ActionResult:
   var relationship_validation := RelationshipStore.new(bundle.social,actors).restore({"values":bundle.social.get("initial_relationships",{})})
   if not relationship_validation.ok: return ContentValidation.fail("social.initial_relationships")
   var evaluator := ConditionEvaluator.new(KnowledgeBook.new(bundle.social),RelationshipStore.new(bundle.social,actors),GameClock.new(bundle.time),VisitorService.new(),HomeService.new(ItemStore.new()),ActorPose.new(),bundle.social.facts,actors,bundle.get("locations",{}).keys())
+  evaluator.social_actions=bundle.get("social_life",{}).get("actions",{}).keys()
+  evaluator.social_topics=bundle.get("social_life",{}).get("topics",{}).keys()
   evaluator.recipe_ids=bundle.get("recipe_workflows",{}).keys()+bundle.get("learning",{}).get("families",{}).values()
   for id in bundle.encounters:
    var definition: Variant = bundle.encounters[id]

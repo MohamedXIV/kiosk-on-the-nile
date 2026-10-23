@@ -47,6 +47,9 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
    # Leaving orders were cancelled already; they must never be replayed.
    if visit.get("phase")=="leaving":visit.shopping_state="declined"
   candidate.schema_revision=6
+ if candidate.schema_revision==6 and target_revision>=7:
+  candidate.state["social_life"]=SocialLife.empty_state()
+  candidate.schema_revision=7
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

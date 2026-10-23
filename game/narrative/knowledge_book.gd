@@ -14,6 +14,11 @@ func learn(fact: StringName, note: String, source: String = "") -> bool:
  _facts[str(fact)] = {"source":source}
  if not note.is_empty(): _notes.push_front(note)
  return true
+func learn_from(fact: StringName, note: String, source: String, speaker: String, at: float) -> bool:
+ if not learn(fact,note,source):return false
+ _facts[str(fact)]["speaker"]=speaker
+ _facts[str(fact)]["at"]=at
+ return true
 func notes() -> PackedStringArray:
  return PackedStringArray(_notes)
 func snapshot() -> Dictionary:
@@ -23,6 +28,9 @@ func restore(data: Dictionary) -> ActionResult:
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_knowledge")
  for id in data.facts:
   if (not _catalog.is_empty() and not id in _catalog) or not data.facts[id] is Dictionary or not data.facts[id].get("source") is String: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_fact_provenance")
+ for record in data.facts.values():
+  if record.has("speaker") or record.has("at"):
+   if not record.get("speaker") is String or record.speaker.is_empty() or not ContentValidation.number(record.get("at")) or record.at<0:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_fact_provenance")
  for note in data.notes:
   if not note is String: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_note")
  _facts = data.facts.duplicate(true)

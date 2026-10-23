@@ -42,6 +42,8 @@
     "wellbeing": "wellbeing.json",
     "customer_experience": "customer_experience.json",
     "story_venue_comments": "stories/venue_comments.ink.json",
-    "story_orders": "stories/orders.ink.json"
+    "story_orders": "stories/orders.ink.json",
+    "social_life": "social_life.json",
+    "story_companionship": "stories/companionship.ink.json"
   }
 }

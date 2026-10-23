@@ -5,6 +5,7 @@ signal departed(visit_id: StringName)
 var visits: Dictionary = {}
 var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
+var availability_provider: Callable
 var purchase_blocked: Callable
 var demand_provider: Callable
 var food_selector: Callable
@@ -242,6 +243,7 @@ func _has_character(character_id: StringName) -> bool:
  return false
 
 func _eligible(id: String) -> bool:
+ if availability_provider.is_valid() and not availability_provider.call(id):return false
  var definition: Dictionary = _data.characters[id]
  if _has_character(StringName(id)) or not history.eligible(id,definition.visit_policy,_clock): return false
  var window: Array = definition.visit_policy.time_window

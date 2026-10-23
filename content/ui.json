@@ -245,5 +245,7 @@
   "recipe_station_mismatch": "ابدأ من محطة مناسبة للخطوة الأولى",
   "recall_order": "كنت طالب إيه؟",
   "personal_talk": "نتكلم شوية",
-  "visitor_actions": "كلّم {name}"
+  "visitor_actions": "كلّم {name}",
+  "notebook_notes": "اللي سمعته",
+  "notebook_people": "ناس القعدة"
 }

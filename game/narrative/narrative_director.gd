@@ -39,6 +39,11 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
 func start(encounter_id: StringName, participants: PackedStringArray, extra: Dictionary = {}) -> ActionResult:
  var definition: Dictionary = _definitions.get(str(encounter_id),{})
  if definition.is_empty() or not _encounter_available(definition,participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
+ var social_topic := str(definition.get("social_topic",""))
+ if not social_topic.is_empty():
+  if not _session.social_life.topic_available(social_topic) or participants.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
+  var visit: VisitState=_session.visitors.visits.get(participants[0])
+  if visit==null or str(visit.character_id)!=_session.social_life.topic_actor(social_topic):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  var key := str(encounter_id)+":"+",".join(participants)
  if _opening.has(key): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_opening")
  for existing in sessions.values():
@@ -120,7 +125,16 @@ func _advance(conversation: ConversationSession) -> void:
  if not conversation.current.text.is_empty() and _can_hear(conversation): history.commit(conversation.topic_selection)
  for i in range(conversation.current.effects.size()):
   if not _can_hear(conversation):continue
-  _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]))
+  var applied := _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker)
+  if not applied.ok:
+   _report_failure(conversation,applied)
+   _finish(conversation)
+   return
+ if not conversation.current.text.is_empty() and _can_hear(conversation):
+  _session.social_life.heard(speaker)
+  if conversation.encounter_id!=&"social_invitation" or conversation.context_extra.get("invitation_answered",false):
+   var topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
+   _session.social_life.heard_topic(topic)
  if _focus.is_empty() and not conversation.current.choices.is_empty() and _can_offer(conversation): _focus = conversation.id
  changed.emit()
 func choices(conversation: ConversationSession) -> Array[Dictionary]:
@@ -142,6 +156,9 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   conversation.runtime.set_context(_context_for(conversation))
   var result := conversation.runtime.choose(int(choice.index))
   if not result.ok: return result
+  if conversation.encounter_id==&"social_invitation":
+   conversation.optional=false
+   conversation.context_extra["invitation_answered"]=true
   if _focus==session_id: _focus = &""
   _advance(conversation)
   return ActionResult.success({"cue":"chime"})
@@ -199,7 +216,7 @@ func restore(data: Dictionary) -> ActionResult:
   conversation.beat = int(record.beat)
   conversation.elapsed = float(record.elapsed)
   conversation.choice_elapsed = float(record.choice_elapsed)
-  conversation.optional = bool(_definitions[record.encounter_id].get("optional",false))
+  conversation.optional = bool(_definitions[record.encounter_id].get("optional",false)) and not conversation.context_extra.get("invitation_answered",false)
   conversation.runtime = InkRuntime.new()
   add_child(conversation.runtime)
   candidates[id] = conversation
@@ -239,6 +256,9 @@ func _report_failure(conversation: ConversationSession, result: ActionResult) ->
 
 func _context_for(conversation: ConversationSession) -> Dictionary:
  var projected := context(conversation.participants,conversation.context_extra)
+ var social_topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
+ if not social_topic.is_empty() and str(conversation.encounter_id).begins_with("social_"):
+  projected.merge(_session.social_life.dialogue_context(social_topic),true)
  var experience: Dictionary=conversation.context_extra.get("experience_context",{})
  if not experience.is_empty():
   var food := _session.foods.definition(StringName(str(experience.get("previous_food_id",""))))

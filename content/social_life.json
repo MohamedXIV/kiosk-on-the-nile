@@ -1,0 +1,414 @@
+{
+  "companionship": {
+    "actors": [
+      "farid",
+      "youssef"
+    ],
+    "radius": 1.8,
+    "wait_seconds": [
+      6,
+      12
+    ],
+    "choice_expiry": 8
+  },
+  "trial": {
+    "actors": [
+      "farid",
+      "youssef"
+    ],
+    "appointment_minute": 960,
+    "duration_minutes": 120,
+    "reservation_lead_minutes": 60,
+    "peer_gains": {
+      "farid": {
+        "familiarity": 8,
+        "trust": 3
+      },
+      "youssef": {
+        "familiarity": 10,
+        "trust": 4
+      }
+    }
+  },
+  "relationships": {
+    "daily_cap": 12,
+    "stages": [
+      {
+        "at": 0,
+        "label": "لسه بنتعرف"
+      },
+      {
+        "at": 12,
+        "label": "وش مألوف"
+      },
+      {
+        "at": 30,
+        "label": "بينكم عِشرة"
+      },
+      {
+        "at": 60,
+        "label": "قعدة وونس"
+      }
+    ]
+  },
+  "actions": {
+    "meet_farid": {
+      "actor": "farid",
+      "needs": [],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "meet_farid",
+      "familiarity": 4,
+      "trust": 1
+    },
+    "meet_youssef": {
+      "actor": "youssef",
+      "needs": [],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "meet_youssef",
+      "familiarity": 4,
+      "trust": 1
+    },
+    "hear_farid": {
+      "actor": "farid",
+      "needs": [
+        "meet_farid"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "WORKSHOP_OPPORTUNITY",
+      "note": "فريد محتاج حد يساعده في مهام بسيطة ويتعلم في الورشة؛ المعتاد ثلاثة عصاري في الأسبوع.",
+      "moment": "hear_farid",
+      "familiarity": 6,
+      "trust": 1
+    },
+    "hear_youssef": {
+      "actor": "youssef",
+      "needs": [
+        "meet_youssef"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "YOUSSEF_WORK_STUDY",
+      "note": "يوسف بيدور على شغل جنب الدراسة، ومتاح يومين بعد المحاضرات.",
+      "moment": "hear_youssef",
+      "familiarity": 6,
+      "trust": 1
+    },
+    "refer_farid": {
+      "actor": "farid",
+      "needs": [
+        "hear_farid",
+        "hear_youssef"
+      ],
+      "facts": [
+        "WORKSHOP_OPPORTUNITY",
+        "YOUSSEF_WORK_STUDY"
+      ],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "work_referral",
+      "familiarity": 5,
+      "trust": 1
+    },
+    "consent_farid": {
+      "actor": "farid",
+      "needs": [
+        "refer_farid"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "consent_farid",
+      "familiarity": 3,
+      "trust": 1
+    },
+    "refer_youssef": {
+      "actor": "youssef",
+      "needs": [
+        "hear_farid",
+        "hear_youssef"
+      ],
+      "facts": [
+        "WORKSHOP_OPPORTUNITY",
+        "YOUSSEF_WORK_STUDY"
+      ],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "work_referral",
+      "familiarity": 5,
+      "trust": 1
+    },
+    "consent_youssef": {
+      "actor": "youssef",
+      "needs": [
+        "refer_youssef"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "consent_youssef",
+      "familiarity": 3,
+      "trust": 1
+    },
+    "days_farid": {
+      "actor": "farid",
+      "needs": [
+        "consent_farid"
+      ],
+      "facts": [
+        "YOUSSEF_WORK_STUDY"
+      ],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "days_farid",
+      "familiarity": 3,
+      "trust": 1
+    },
+    "days_youssef": {
+      "actor": "youssef",
+      "needs": [
+        "consent_youssef",
+        "days_farid"
+      ],
+      "facts": [
+        "YOUSSEF_WORK_STUDY"
+      ],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "days_youssef",
+      "familiarity": 3,
+      "trust": 1
+    },
+    "appointment_farid": {
+      "actor": "farid",
+      "needs": [],
+      "facts": [],
+      "phases": [
+        "scheduled",
+        "waiting",
+        "active",
+        "completed"
+      ],
+      "learn": "WORK_TRIAL_APPOINTMENT",
+      "note": "فريد ويوسف نسقوا مع بعض واتفقوا على تجربة في الورشة. تفاصيل الموعد سمعتها منهم.",
+      "moment": "appointment_farid",
+      "familiarity": 2,
+      "trust": 1
+    },
+    "result_farid": {
+      "actor": "farid",
+      "needs": [],
+      "facts": [],
+      "phases": [
+        "completed"
+      ],
+      "learn": "WORK_TRIAL_RESULT",
+      "note": "تجربة يوسف في الورشة حصلت فعلًا؛ المهام والتعاون كانوا مناسبين مبدئيًا. الاستمرار مرتبط باتفاق الأيام.",
+      "moment": "result_farid",
+      "familiarity": 4,
+      "trust": 1
+    },
+    "continuation_farid": {
+      "actor": "farid",
+      "needs": [
+        "days_farid",
+        "days_youssef",
+        "result_farid"
+      ],
+      "facts": [],
+      "phases": [
+        "completed"
+      ],
+      "learn": "WORK_TRIAL_WEEK",
+      "note": "فريد ويوسف اتفقوا يكملوا أسبوع تجربة شغل يومين، بما يناسب الدراسة.",
+      "moment": "continuation_farid",
+      "familiarity": 3,
+      "trust": 1
+    },
+    "appointment_youssef": {
+      "actor": "youssef",
+      "needs": [],
+      "facts": [],
+      "phases": [
+        "scheduled",
+        "waiting",
+        "active",
+        "completed"
+      ],
+      "learn": "WORK_TRIAL_APPOINTMENT",
+      "note": "فريد ويوسف نسقوا مع بعض واتفقوا على تجربة في الورشة. تفاصيل الموعد سمعتها منهم.",
+      "moment": "appointment_youssef",
+      "familiarity": 2,
+      "trust": 1
+    },
+    "result_youssef": {
+      "actor": "youssef",
+      "needs": [],
+      "facts": [],
+      "phases": [
+        "completed"
+      ],
+      "learn": "WORK_TRIAL_RESULT",
+      "note": "تجربة يوسف في الورشة حصلت فعلًا؛ المهام والتعاون كانوا مناسبين مبدئيًا. الاستمرار مرتبط باتفاق الأيام.",
+      "moment": "result_youssef",
+      "familiarity": 4,
+      "trust": 1
+    },
+    "continuation_youssef": {
+      "actor": "youssef",
+      "needs": [
+        "days_farid",
+        "days_youssef",
+        "result_youssef"
+      ],
+      "facts": [],
+      "phases": [
+        "completed"
+      ],
+      "learn": "WORK_TRIAL_WEEK",
+      "note": "فريد ويوسف اتفقوا يكملوا أسبوع تجربة شغل يومين، بما يناسب الدراسة.",
+      "moment": "continuation_youssef",
+      "familiarity": 3,
+      "trust": 1
+    },
+    "trial_complete": {
+      "actor": "",
+      "needs": [
+        "consent_farid",
+        "consent_youssef"
+      ],
+      "facts": [],
+      "phases": [
+        "active",
+        "completed"
+      ],
+      "learn": "",
+      "note": "",
+      "moment": "",
+      "familiarity": 0,
+      "trust": 0
+    }
+  },
+  "topics": {
+    "result_farid": {
+      "actor": "farid",
+      "label": "عملتوا إيه في تجربة الشغل؟",
+      "action": "result_farid",
+      "encounter": "social_result_farid"
+    },
+    "result_youssef": {
+      "actor": "youssef",
+      "label": "أول يوم في الورشة كان عامل إيه؟",
+      "action": "result_youssef",
+      "encounter": "social_result_youssef"
+    },
+    "continuation_farid": {
+      "actor": "farid",
+      "label": "الأيام نفعت مع دراسة يوسف؟",
+      "action": "continuation_farid",
+      "encounter": "social_continuation_farid"
+    },
+    "continuation_youssef": {
+      "actor": "youssef",
+      "label": "عرفت توفق الأيام مع الدراسة؟",
+      "action": "continuation_youssef",
+      "encounter": "social_continuation_youssef"
+    },
+    "days_farid": {
+      "actor": "farid",
+      "label": "يوسف متاح يومين بس مع الدراسة",
+      "action": "days_farid",
+      "encounter": "social_days_farid"
+    },
+    "days_youssef": {
+      "actor": "youssef",
+      "label": "فريد موافق على يومين؛ يناسبك؟",
+      "action": "days_youssef",
+      "encounter": "social_days_youssef"
+    },
+    "refer_farid": {
+      "actor": "farid",
+      "label": "أحكيلك عن يوسف اللي بيدور على شغل",
+      "action": "refer_farid",
+      "encounter": "social_refer_farid"
+    },
+    "refer_youssef": {
+      "actor": "youssef",
+      "label": "فريد حكى لي عن فرصة في الورشة",
+      "action": "refer_youssef",
+      "encounter": "social_refer_youssef"
+    },
+    "consent_farid": {
+      "actor": "farid",
+      "label": "تحب أخليه يتواصل معاك؟",
+      "action": "consent_farid",
+      "encounter": "social_consent_farid"
+    },
+    "consent_youssef": {
+      "actor": "youssef",
+      "label": "تحب تتواصل مع فريد وتجربوا؟",
+      "action": "consent_youssef",
+      "encounter": "social_consent_youssef"
+    },
+    "appointment_farid": {
+      "actor": "farid",
+      "label": "اتواصلتوا وظبطتوا الميعاد؟",
+      "action": "appointment_farid",
+      "encounter": "social_appointment_farid"
+    },
+    "appointment_youssef": {
+      "actor": "youssef",
+      "label": "ظبطتوا ميعاد التجربة؟",
+      "action": "appointment_youssef",
+      "encounter": "social_appointment_youssef"
+    },
+    "hear_farid": {
+      "actor": "farid",
+      "label": "أخبار الورشة إيه؟",
+      "action": "hear_farid",
+      "encounter": "social_hear_farid"
+    },
+    "hear_youssef": {
+      "actor": "youssef",
+      "label": "الدراسة والدنيا عاملين إيه؟",
+      "action": "hear_youssef",
+      "encounter": "social_hear_youssef"
+    },
+    "meet_farid": {
+      "actor": "farid",
+      "label": "نتعرف ونقعد شوية",
+      "action": "meet_farid",
+      "encounter": "social_meet_farid"
+    },
+    "meet_youssef": {
+      "actor": "youssef",
+      "label": "نتعرف ونقعد شوية",
+      "action": "meet_youssef",
+      "encounter": "social_meet_youssef"
+    },
+    "pending_farid": {
+      "actor": "farid",
+      "label": "لسه بتظبطوا الميعاد؟",
+      "action": "",
+      "encounter": "social_pending_farid"
+    },
+    "pending_youssef": {
+      "actor": "youssef",
+      "label": "لسه بتظبطوا الميعاد؟",
+      "action": "",
+      "encounter": "social_pending_youssef"
+    }
+  }
+}
