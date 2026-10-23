@@ -240,3 +240,7 @@ A browser/profile/origin change uses a separate browser save store.
 
 Current implementation and manual evidence/limits are in
 [the living-spaces notes](docs/notes/2026-10-22-living-spaces-d.md).
+
+Building/roof corrections, contextual item actions and save revision5 are documented in
+[the building preview notes](docs/notes/2026-10-23-buildings-and-placement.md).
+In arrangement, click a piece then its destination; **R** rotates, **Enter** confirms, **Esc** exits. Placement policy is defined per item in JSON.

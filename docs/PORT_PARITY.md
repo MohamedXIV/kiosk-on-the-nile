@@ -124,3 +124,7 @@ Continue/reply. The continued manual cycle also covered real cold preparation, a
 partial batch Continue, same-ID surface transfers, assembly and paid shawarma
 service, interrupted cleaning Continue/resume and dirty-bed recovery. Interactive
 editor authoring and adversarial geometry/default multi-day acceptance remain open. See [the evidence and limits](notes/2026-10-22-living-spaces-d.md).
+
+## Building corrections preview (2026-10-23)
+
+Room right-hand door and walkable rooftop, player-derived roofs, full-footprint environment policies, contextual item panels and schema4/revision5 migration are implemented. [Evidence and remaining acceptance](notes/2026-10-23-buildings-and-placement.md) distinguish observed UI behavior from unexercised cases. This does not change the quiet slice-of-life vision or establish acceptance of inherited visitor behavior.
