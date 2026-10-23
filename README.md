@@ -244,3 +244,6 @@ Current implementation and manual evidence/limits are in
 Building/roof corrections, contextual item actions and save revision5 are documented in
 [the building preview notes](docs/notes/2026-10-23-buildings-and-placement.md).
 In arrangement, click a piece then its destination; **R** rotates, **Enter** confirms, **Esc** exits. Placement policy is defined per item in JSON.
+
+Independent corniche visits, pending-order icons and Ink order recall (save revision6)
+are documented in [the visitors/order preview notes](docs/notes/2026-10-23-independent-visits-and-orders.md).

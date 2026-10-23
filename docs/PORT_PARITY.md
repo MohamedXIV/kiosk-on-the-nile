@@ -128,3 +128,7 @@ editor authoring and adversarial geometry/default multi-day acceptance remain op
 ## Building corrections preview (2026-10-23)
 
 Room right-hand door and walkable rooftop, player-derived roofs, full-footprint environment policies, contextual item panels and schema4/revision5 migration are implemented. [Evidence and remaining acceptance](notes/2026-10-23-buildings-and-placement.md) distinguish observed UI behavior from unexercised cases. This does not change the quiet slice-of-life vision or establish acceptance of inherited visitor behavior.
+
+## Independent visits and orders (2026-10-23)
+
+Open-gated/forced arrivals were replaced by independent weighted visits and delayed optional purchases. Actual-order Ink announcements/recall and nearby icon/name badges now share ServiceSystem state. Saves upgrade to revision6. [Evidence and limitations](notes/2026-10-23-independent-visits-and-orders.md) separate default-content observations from externally tuned manual scenarios.
