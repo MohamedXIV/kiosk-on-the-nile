@@ -26,7 +26,7 @@ func _available(id: String, state: Dictionary) -> bool:
  return action.phases.is_empty() or state.activity.phase in action.phases
 func topic_available(id: String) -> bool:
  var topic: Dictionary=_data.topics.get(id,{})
- if topic.is_empty():return false
+ if topic.is_empty() or (not topic.phases.is_empty() and not _state.activity.phase in topic.phases):return false
  return available(str(topic.action)) if topic.get("action","")!="" else int(_state.topic_history.get(id,0))!=_session.clock.day and done("consent_farid") and done("consent_youssef") and _state.activity.phase=="coordinating"
 func apply(id: String, source: String, speaker: String = "", internal: bool = false) -> ActionResult:
  if not _data.actions.has(id) or (id=="trial_complete" and not internal):return _fail("unknown_social_action")

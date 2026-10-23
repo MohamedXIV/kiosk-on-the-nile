@@ -317,126 +317,152 @@
       "label": "عملتوا إيه في تجربة الشغل؟",
       "action": "result_farid",
       "encounter": "social_result_farid",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "result_youssef": {
       "actor": "youssef",
       "label": "أول يوم في الورشة كان عامل إيه؟",
       "action": "result_youssef",
       "encounter": "social_result_youssef",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "continuation_farid": {
       "actor": "farid",
       "label": "الأيام نفعت مع دراسة يوسف؟",
       "action": "continuation_farid",
       "encounter": "social_continuation_farid",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "continuation_youssef": {
       "actor": "youssef",
       "label": "عرفت توفق الأيام مع الدراسة؟",
       "action": "continuation_youssef",
       "encounter": "social_continuation_youssef",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "days_farid": {
       "actor": "farid",
       "label": "يوسف متاح يومين بس مع الدراسة",
       "action": "days_farid",
       "encounter": "social_days_farid",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "days_youssef": {
       "actor": "youssef",
       "label": "فريد موافق على يومين؛ يناسبك؟",
       "action": "days_youssef",
       "encounter": "social_days_youssef",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "refer_farid": {
       "actor": "farid",
       "label": "أحكيلك عن يوسف اللي بيدور على شغل",
       "action": "refer_farid",
       "encounter": "social_refer_farid",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "refer_youssef": {
       "actor": "youssef",
       "label": "فريد حكى لي عن فرصة في الورشة",
       "action": "refer_youssef",
       "encounter": "social_refer_youssef",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "consent_farid": {
       "actor": "farid",
       "label": "تحب أخليه يتواصل معاك؟",
       "action": "consent_farid",
       "encounter": "social_consent_farid",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "consent_youssef": {
       "actor": "youssef",
       "label": "تحب تتواصل مع فريد وتجربوا؟",
       "action": "consent_youssef",
       "encounter": "social_consent_youssef",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "appointment_farid": {
       "actor": "farid",
       "label": "اتواصلتوا وظبطتوا الميعاد؟",
       "action": "appointment_farid",
       "encounter": "social_appointment_farid",
-      "automatic": true
+      "automatic": true,
+      "phases": [
+        "scheduled",
+        "waiting",
+        "active"
+      ]
     },
     "appointment_youssef": {
       "actor": "youssef",
       "label": "ظبطتوا ميعاد التجربة؟",
       "action": "appointment_youssef",
       "encounter": "social_appointment_youssef",
-      "automatic": true
+      "automatic": true,
+      "phases": [
+        "scheduled",
+        "waiting",
+        "active"
+      ]
     },
     "hear_farid": {
       "actor": "farid",
       "label": "أخبار الورشة إيه؟",
       "action": "hear_farid",
       "encounter": "social_hear_farid",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "hear_youssef": {
       "actor": "youssef",
       "label": "الدراسة والدنيا عاملين إيه؟",
       "action": "hear_youssef",
       "encounter": "social_hear_youssef",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "meet_farid": {
       "actor": "farid",
       "label": "نتعرف ونقعد شوية",
       "action": "meet_farid",
       "encounter": "social_meet_farid",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "meet_youssef": {
       "actor": "youssef",
       "label": "نتعرف ونقعد شوية",
       "action": "meet_youssef",
       "encounter": "social_meet_youssef",
-      "automatic": true
+      "automatic": true,
+      "phases": []
     },
     "pending_farid": {
       "actor": "farid",
       "label": "لسه بتظبطوا الميعاد؟",
       "action": "",
       "encounter": "social_pending_farid",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     },
     "pending_youssef": {
       "actor": "youssef",
       "label": "لسه بتظبطوا الميعاد؟",
       "action": "",
       "encounter": "social_pending_youssef",
-      "automatic": false
+      "automatic": false,
+      "phases": []
     }
   }
 }

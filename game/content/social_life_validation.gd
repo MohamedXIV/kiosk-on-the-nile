@@ -38,5 +38,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not data.actions.has(required):return ContentValidation.fail("social_life.required_action")
  for id in data.topics:
   var topic: Variant=data.topics[id]
-  if not topic is Dictionary or not topic.get("actor") in data.companionship.actors or not topic.get("automatic") is bool or not topic.get("label") is String or not topic.get("action") in data.actions.keys()+[""] or not topic.get("encounter") is String or not bundle.get("encounters",{}).has(topic.encounter):return ContentValidation.fail("social_life.topic")
+  if not topic is Dictionary or not topic.get("actor") in data.companionship.actors or not topic.get("phases") is Array or not topic.get("automatic") is bool or not topic.get("label") is String or not topic.get("action") in data.actions.keys()+[""] or not topic.get("encounter") is String or not bundle.get("encounters",{}).has(topic.encounter):return ContentValidation.fail("social_life.topic")
+  for phase in topic.phases:
+   if not phase in ["idle","coordinating","scheduled","waiting","active","completed"]:return ContentValidation.fail("social_life.topic.phase")
  return ActionResult.success()
