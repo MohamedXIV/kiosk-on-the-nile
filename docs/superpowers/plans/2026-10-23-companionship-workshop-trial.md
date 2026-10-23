@@ -44,7 +44,7 @@
 
 **Files:** notebook/main/probe, evidence notes and delivery docs.
 
-- [ ] Show heard people, affinity and authored stages; expose only learned connection evidence.
-- [ ] Review both story orders, refusal/silence, coordination, trial/result/late days, saved choices and legacy migration via actual UI; record exact coverage and limitations.
-- [ ] One fresh whole-branch reviewer; address material findings, rebuild and commit exact product.
-- [ ] Publish preview source and downloadable artifact on GitHub with source SHA and checked ZIP digest.
+- [x] Show heard people, affinity and authored stages; expose only learned connection evidence.
+- [x] Review both story orders, refusal/silence, coordination, trial/result/late days, saved choices and legacy migration via actual UI; record exact coverage and limitations.
+- [x] One fresh whole-branch reviewer; address material findings, rebuild and commit exact product.
+- [x] Publish preview source and downloadable artifact on GitHub with source SHA and checked ZIP digest.
