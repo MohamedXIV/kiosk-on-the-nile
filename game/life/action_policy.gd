@@ -64,7 +64,7 @@ func restore(data: Dictionary) -> ActionResult:
   var a: Variant=data.attempts[id]
   if not id is String or id.is_empty() or not a is Dictionary or not _data.classes.has(a.get("action")) or not a.get("refused") is bool or not ContentValidation.bounded(a.get("at"),0,_session.clock.world_minutes) or not ContentValidation.integer(a.get("day")) or a.day!=floori(float(a.at)/1440.0)+1:return _deny("invalid_action_attempt")
   if a.refused:
-   counts[str(a.day)]=int(counts.get(str(a.day),0))+1
+   counts[str(int(a.day))]=int(counts.get(str(int(a.day)),0))+1
    last=maxf(last,float(a.at))
  if StableJson.stringify(counts)!=StableJson.stringify(data.daily) or absf(last-float(data.last_refusal))>0.001:return _deny("invalid_refusal_provenance")
  for id in data.effort:
