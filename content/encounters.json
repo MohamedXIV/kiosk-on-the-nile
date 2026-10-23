@@ -384,5 +384,20 @@
         }
       }
     ]
+  },
+  "orders": {
+    "story": "orders",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "choice_conditions": {}
   }
 }

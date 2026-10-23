@@ -31,7 +31,7 @@ func nearest() -> InteractionTarget:
    var character := _session.visitors.character(visit.character_id)
    var item := _session.cooking.held_item()
    var order := _session.service.pending_for(visit.id)
-   if not (item and order and order.food_id==item.food_id) and not _session.narrative.can_talk(visit.id): continue
+   if not (item and order and order.food_id==item.food_id) and order==null and not _session.narrative.can_talk(visit.id): continue
    target.primary = _text.text("serve",{"item":_session.cooking.item_label(item),"name":character.name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":character.name})
    targets.append(target)
  var selected := InteractionSelector.nearest(_session.player_ground,targets)
@@ -50,7 +50,7 @@ func execute(secondary: bool) -> ActionResult:
  var target := nearest()
  if secondary and target!=null and not target.secondary_visit_id.is_empty():
   _session.hygiene.interrupt_clean()
-  return await _session.talk(target.secondary_visit_id)
+  return await _session.person_interaction(target.secondary_visit_id)
  if secondary and _session.cooking.held_item() and (target==null or target.secondary.is_empty()): return _session.life.consume_held()
  if target==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_target")
  if not target.visit_id.is_empty():
@@ -58,7 +58,7 @@ func execute(secondary: bool) -> ActionResult:
   var item := _session.cooking.held_item()
   var order := _session.service.pending_for(target.visit_id)
   if item and order and item.food_id==order.food_id: return _session.service.deliver(order.id)
-  return await _session.talk(target.visit_id)
+  return await _session.person_interaction(target.visit_id)
  var record: Dictionary = {}
  for data in _room.definition.data.interactions:
   if data.id==str(target.id): record=data;break

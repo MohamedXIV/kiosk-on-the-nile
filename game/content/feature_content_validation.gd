@@ -23,15 +23,11 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if bundle.has("visitors"):
   var data: Variant = bundle.visitors
   if not data is Dictionary or not data.get("characters") is Dictionary or data.characters.is_empty(): return ContentValidation.fail("visitors.characters")
-  for field in ["seed","ambient_capacity","regular_capacity","football_capacity_before_pair"]:
-   if not ContentValidation.integer(data.get(field)) or data[field]<0: return ContentValidation.fail("visitors."+field)
-  for field in ["initial_cooldown","football_minutes","arrival_radius","interaction_radius","waiting_reminder_seconds","max_wait_seconds"]:
-   if not ContentValidation.number(data.get(field)) or data[field]<=0: return ContentValidation.fail("visitors."+field)
-  for field in ["ambient_delay","ambient_remark_delay"]:
-   if not ContentValidation.vector(data.get(field),2): return ContentValidation.fail("visitors."+field)
-  if data.ambient_remark_delay[0]<=0 or data.ambient_remark_delay[0]>data.ambient_remark_delay[1]: return ContentValidation.fail("visitors.ambient_remark_delay")
-  if data.ambient_delay[0]<=0 or data.ambient_delay[0]>data.ambient_delay[1]: return ContentValidation.fail("visitors.ambient_delay")
-  if not data.get("quiet") is Dictionary or not ContentValidation.integer(data.quiet.get("day")) or data.quiet.day<1 or not ContentValidation.bounded(data.quiet.get("start"),0,1440) or not ContentValidation.bounded(data.quiet.get("end"),data.quiet.start,1440): return ContentValidation.fail("visitors.quiet")
+  if not ContentValidation.integer(data.get("seed")) or not ContentValidation.integer(data.get("capacity")) or data.capacity<1 or data.capacity>4:return ContentValidation.fail("visitors.capacity")
+  for field in ["arrival_radius","interaction_radius","waiting_reminder_seconds","max_wait_seconds"]:
+   if not ContentValidation.number(data.get(field)) or data[field]<=0:return ContentValidation.fail("visitors."+field)
+  for field in ["initial_delay","arrival_delay","purchase_delay","purchase_retry_delay","stay_multiplier","ambient_remark_delay"]:
+   if not ContentValidation.vector(data.get(field),2) or data[field][0]<=0 or data[field][0]>data[field][1]:return ContentValidation.fail("visitors."+field)
   for id in ["amgad","mahmoud","samir"]:
    if not data.characters.has(id): return ContentValidation.fail("visitors.required_character")
   var markers: Dictionary = bundle.get("locations",{}).get("kiosk",{}).get("markers",{})
@@ -42,6 +38,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   for id in data.characters:
    var character: Variant = data.characters[id]
    if not character is Dictionary or not character.get("name") is String or not character.get("color") is String or not Color.html_is_valid(character.color) or not character.get("marker") is String or not markers.has(character.marker) or (character.get("food_id")!="" and not bundle.get("foods",{}).has(str(character.get("food_id","")))) or not ContentValidation.number(character.get("stay_seconds")) or character.stay_seconds<=0 or not character.get("ambient") is bool: return ContentValidation.fail("visitors.characters."+id)
+   if not markers.has(str(character.get("leisure_marker",""))) or not ContentValidation.bounded(character.get("arrival_weight"),0.01,100) or not ContentValidation.bounded(character.get("purchase_chance"),0,1):return ContentValidation.fail("visitors.leisure_policy")
    if character.has("food_preferences"):
     if not character.food_preferences is Dictionary:return ContentValidation.fail("visitors.food_preferences")
     for food_id in character.food_preferences:

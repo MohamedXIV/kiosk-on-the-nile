@@ -241,5 +241,8 @@
   "building_migration": "اتظبط المكان: نُقلت {moved} قطعة، واتخزنت {stored} قطعة بأمان",
   "item_actions_title": "{item} — الاستخدام والعناية",
   "recipe_wrong_location": "الوصفة دي مش متاحة في المكان ده",
-  "recipe_station_mismatch": "ابدأ من محطة مناسبة للخطوة الأولى"
+  "recipe_station_mismatch": "ابدأ من محطة مناسبة للخطوة الأولى",
+  "recall_order": "كنت طالب إيه؟",
+  "personal_talk": "نتكلم شوية",
+  "visitor_actions": "كلّم {name}"
 }

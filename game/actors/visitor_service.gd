@@ -14,6 +14,7 @@ var _clock: GameClock
 var _orders: ServiceSystem
 var _open: Callable
 var _rng := RandomNumberGenerator.new()
+var _was_open: bool
 var _cooldown: float
 var _next: int = 1
 var _other_visit_counts: Dictionary = {}
@@ -25,8 +26,10 @@ func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: 
  _clock = clock
  _orders = orders
  _open = open
- _rng.seed = int(data.seed)
- _cooldown = float(data.initial_cooldown)
+ if int(data.seed)==0:_rng.randomize()
+ else:_rng.seed = int(data.seed)
+ _cooldown = _delay("initial_delay")
+ sync_open_state()
 func character(id: StringName) -> Dictionary:
  return _data.characters.get(str(id),{}).duplicate(true)
 func spawn(character_id: StringName) -> VisitState:
@@ -37,70 +40,111 @@ func spawn(character_id: StringName) -> VisitState:
  visit.id = StringName("visit_%d" % _next)
  _next += 1
  visit.character_id = character_id
- visit.food_id=StringName(str(food_selector.call(character_id))) if food_selector.is_valid() else StringName(definition.food_id)
- visit.stay_seconds = float(definition.stay_seconds)
+ visit.decision_remaining=_delay("purchase_delay")
+ visit.stay_seconds = float(definition.stay_seconds)*_delay("stay_multiplier")
  visit.pose.location_id = &"kiosk"
  var spawn_position: Array = _markers[_data.spawn_markers[_rng.randi_range(0,_data.spawn_markers.size()-1)]]
  visit.pose.ground = Vector2(spawn_position[0],spawn_position[1])
- var marker: Array = _markers[definition.marker]
+ var marker: Array = _markers[definition.leisure_marker]
  visit.destination = Vector2(marker[0],marker[1])
  visits[str(visit.id)] = visit
  return visit
 func tick(delta: float) -> void:
+ var opened := bool(_open.call())
+ if opened and not _was_open:
+  for visit in visits.values():
+   if visit.shopping_state==&"undecided":visit.decision_remaining=maxf(visit.decision_remaining,_delay("purchase_delay"))
+ _was_open=opened
  for id in visits.keys():
   var visit: VisitState = visits[id]
   if visit.phase == &"arriving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): _arrived(visit)
   elif visit.phase == &"staying":
    visit.elapsed += delta
+   _consider_purchase(visit,delta)
    _remarks(visit,delta)
    if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=float(_data.max_wait_seconds):
     visit.phase = &"leaving"
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
     visit.destination = Vector2(exit_position[0],exit_position[1])
     _orders.cancel_visit(visit.id)
+    visit.shopping_state=&"declined"
     departed.emit(visit.id)
   elif visit.phase == &"leaving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): visits.erase(id)
- if not _open.call(): return
- if not _flags.get("amgad",false) and visits.size()<int(_data.regular_capacity) and _eligible("amgad"):
-  _flags.amgad = true
-  spawn(&"amgad")
-  return
- if not _flags.get("football",false) and _clock.minutes>=float(_data.football_minutes) and visits.size()<=int(_data.football_capacity_before_pair) and _eligible("mahmoud") and _eligible("samir"):
-  _flags.football = true
-  spawn(&"mahmoud")
-  spawn(&"samir")
-  return
- var quiet: Dictionary = _data.quiet
- if _clock.day==int(quiet.day) and _clock.minutes>=float(quiet.start) and _clock.minutes<=float(quiet.end): return
- _cooldown -= delta
- if _cooldown<=0 and visits.size()<int(_data.ambient_capacity):
-  _cooldown = _rng.randf_range(float(_data.ambient_delay[0]),float(_data.ambient_delay[1]))/(maxf(0.01,float(demand_provider.call())) if demand_provider.is_valid() else 1.0)
-  var pool: Array = []
-  for id in _data.characters:
-   if _data.characters[id].ambient and _eligible(id): pool.append(id)
-  if not pool.is_empty():
-   var oldest := INF
-   for id in pool: oldest=minf(oldest,history.last_visit(id))
-   var candidates: Array = pool.filter(func(id):return history.last_visit(id)==oldest)
-   spawn(StringName(candidates[_rng.randi_range(0,candidates.size()-1)]))
+ _cooldown=maxf(0,_cooldown-delta)
+ if _cooldown<=0:
+  _cooldown=_delay("arrival_delay")
+  if visits.size()<int(_data.capacity):
+   var pool: Array[String]=[]
+   var weights: Array[float]=[]
+   var total := 0.0
+   for id in _data.characters:
+    if not _eligible(id):continue
+    var previous := history.last_visit(id)
+    var freshness := 1.0 if previous<0 else clampf((_clock.world_minutes-previous)/1440.0,0.25,1.0)
+    var weight := float(_data.characters[id].arrival_weight)*freshness
+    pool.append(id);weights.append(weight);total+=weight
+   if total>0:
+    var roll := _rng.randf()*total
+    for i in range(pool.size()):
+     roll-=weights[i]
+     if roll<=0:spawn(StringName(pool[i]));break
 func _arrived(visit: VisitState) -> void:
  visit.phase = &"staying"
  visit.elapsed = 0
  visit.remark_remaining = float(_data.waiting_reminder_seconds)
- var definition := character(visit.character_id)
- if not visit.food_id.is_empty():
+ if visit.shopping_state==&"approaching":
+  if not _open.call():
+   visit.shopping_state=&"declined"
+   visit.food_id=&""
+   _return_to_leisure(visit)
+   return
   var order := _orders.place_order(visit.id,visit.food_id)
-  if order: visit.order_id = order.id
+  if order:
+   visit.order_id=order.id
+   visit.shopping_state=&"pending"
+   encounter_requested.emit(&"order",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
+  else:
+   visit.food_id=&""
+   visit.shopping_state=&"declined"
+   _return_to_leisure(visit)
+  return
  if visit.character_id == &"amgad": memory.amgad_visits += 1
  else: _other_visit_counts[str(visit.character_id)] = visit_count(visit.character_id)+1
+ encounter_requested.emit(&"arrival",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
+ # A conversation may happen when friends happen to meet; no scheduled pair spawn.
  if visit.character_id in [&"samir",&"mahmoud"] and not _flags.get("football_started",false):
   var pair := PackedStringArray()
   for other in visits.values():
-   if other.character_id in [&"mahmoud",&"samir"] and other.phase == &"staying": pair.append(str(other.id))
+   if other.character_id in [&"mahmoud",&"samir"] and other.phase==&"staying":pair.append(str(other.id))
   if pair.size()==2:
-   _flags.football_started = true
+   _flags.football_started=true
    encounter_requested.emit(&"football",pair,{})
- else: encounter_requested.emit(&"arrival",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
+func sync_open_state() -> void:
+ _was_open=bool(_open.call())
+func _delay(key: String) -> float:
+ var interval: Array=_data[key]
+ return _rng.randf_range(float(interval[0]),float(interval[1]))
+func _consider_purchase(visit: VisitState, delta: float) -> void:
+ if visit.shopping_state!=&"undecided":return
+ visit.decision_remaining=maxf(0,visit.decision_remaining-delta)
+ if visit.decision_remaining>0:return
+ visit.decision_remaining=_delay("purchase_retry_delay")
+ if not _open.call():return
+ var definition := character(visit.character_id)
+ if _rng.randf()>=float(definition.purchase_chance):visit.shopping_state=&"declined";return
+ for other in visits.values():
+  if other.id!=visit.id and other.shopping_state in [&"approaching",&"pending"] and character(other.character_id).marker==definition.marker:return
+ var food := StringName(str(food_selector.call(visit.character_id))) if food_selector.is_valid() else StringName(definition.food_id)
+ if food.is_empty():visit.shopping_state=&"declined";return
+ visit.food_id=food
+ visit.shopping_state=&"approaching"
+ visit.phase=&"arriving"
+ var marker: Array=_markers[definition.marker]
+ visit.destination=Vector2(marker[0],marker[1])
+func _return_to_leisure(visit: VisitState) -> void:
+ var marker: Array=_markers[character(visit.character_id).leisure_marker]
+ visit.destination=Vector2(marker[0],marker[1])
+ # Keep staying phase: movement follows destination independently.
 func is_available(visit_id: StringName) -> bool:
  return visits.has(str(visit_id)) and visits[str(visit_id)].phase == &"staying"
 func commit_pose(visit_id: StringName, pose: ActorPose) -> void:
@@ -110,6 +154,7 @@ func record_service(_order_id: StringName, visit_id: StringName, item: PreparedI
  var visit: VisitState = visits[str(visit_id)]
  history.served(str(visit.character_id),_order_id,visit_id,item)
  visit.served = true
+ visit.shopping_state=&"served"
  visit.elapsed = 0
  visit.remark_remaining = _rng.randf_range(float(_data.ambient_remark_delay[0]),float(_data.ambient_remark_delay[1]))
  if visit.character_id == &"amgad": memory.last_served_quality = str(item.quality_key)
@@ -121,7 +166,7 @@ func clear_visits() -> void:
  visits.clear()
 func begin_day() -> void:
  _flags.clear()
- _cooldown = float(_data.initial_cooldown)
+ # Do not reset the independent arrival clock at midnight.
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in visits: records[id] = visits[id].snapshot()
@@ -156,6 +201,11 @@ func restore(data: Dictionary) -> ActionResult:
   visit.elapsed = float(record.elapsed)
   visit.remark_remaining = float(record.remark_remaining)
   visit.served = record.served
+  if not record.get("shopping_state") in ["undecided","approaching","pending","declined","served"] or not ContentValidation.bounded(record.get("decision_remaining"),0,86400):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_purchase_decision")
+  if not ContentValidation.integer(record.get("recall_variant")) or record.recall_variant< -1 or record.recall_variant>2:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_recall_variant")
+  visit.recall_variant=int(record.recall_variant)
+  visit.shopping_state=StringName(record.shopping_state)
+  visit.decision_remaining=float(record.decision_remaining)
   visit.order_id = StringName(record.order_id)
   candidate[id] = visit
  for flag in data.flags:
@@ -172,7 +222,7 @@ func restore(data: Dictionary) -> ActionResult:
 
 func _remarks(visit: VisitState, delta: float) -> void:
  var definition := character(visit.character_id)
- var waiting: bool = not visit.served and not visit.food_id.is_empty()
+ var waiting: bool = _orders.pending_for(visit.id)!=null
  if not waiting and not definition.ambient: return
  visit.remark_remaining -= delta
  if visit.remark_remaining>0: return
@@ -193,7 +243,7 @@ func _eligible(id: String) -> bool:
  var window: Array = definition.visit_policy.time_window
  if _clock.minutes<float(window[0]) or _clock.minutes>=float(window[1]): return false
  for visit: VisitState in visits.values():
-  if character(visit.character_id).marker==definition.marker: return false
+  if character(visit.character_id).leisure_marker==definition.leisure_marker: return false
  return true
 
 func update_markers(markers: Dictionary) -> void:
@@ -201,7 +251,8 @@ func update_markers(markers: Dictionary) -> void:
  for visit in visits.values():
   if visit.phase==&"leaving": continue
   var definition := character(visit.character_id)
-  var marker: Array = _markers[definition.marker]
+  var key := str(definition.marker) if visit.shopping_state in [&"approaching",&"pending",&"served"] else str(definition.leisure_marker)
+  var marker: Array = _markers[key]
   var target := Vector2(marker[0],marker[1])
   if visit.destination.distance_to(target)>0.01:
    visit.destination = target

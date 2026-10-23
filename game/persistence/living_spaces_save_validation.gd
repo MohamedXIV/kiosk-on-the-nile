@@ -1,7 +1,7 @@
 class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
- if envelope.get("schema_revision")!=5: return _fail("schema_revision")
+ if envelope.get("schema_revision")!=6: return _fail("schema_revision")
  var items := session.items.snapshot()
  var placements: Dictionary = session.spaces.snapshot().placements
  for id in items.items:
@@ -53,6 +53,11 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
  elif not session.locations.is_physical(session.location_id):return _fail("orphan_virtual_pose")
  for receipt in session.shops.snapshot().receipts.values():
   if session.items.get_container(StringName(receipt.bag_id)).get("kind")!="purchase_bag":return _fail("receipt_bag")
+ for visit in session.visitors.visits.values():
+  var pending := session.service.pending_for(visit.id)
+  if (visit.shopping_state==&"pending")!=(pending!=null):return _fail("visit_pending_order")
+  if pending!=null and (pending.food_id!=visit.food_id or pending.id!=visit.order_id or visit.served):return _fail("visit_order_projection")
+  if visit.shopping_state==&"approaching" and (visit.phase!=&"arriving" or visit.food_id.is_empty()):return _fail("visit_approach")
  var experiences := session.customer_experience.snapshot()
  for id in experiences.active:
   var record: Dictionary=experiences.active[id]

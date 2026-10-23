@@ -1,7 +1,7 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 5
+const SCHEMA_REVISION := 6
 const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","hygiene","customer_experience","scheduler"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
@@ -54,6 +54,7 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_player_position")
  candidate.kiosk_open = restored_data.state.kiosk_open
+ candidate.visitors.sync_open_state()
  for order in candidate.service.snapshot().orders.values():
   if order.status=="pending" and not candidate.visitors.is_available(StringName(order.visit_id)):
    candidate.queue_free()

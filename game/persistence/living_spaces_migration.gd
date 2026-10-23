@@ -36,6 +36,16 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   candidate.state=result.details.state
   candidate.schema_revision=5
   candidate["building_migration_report"]=result.details.report
+ if candidate.schema_revision==5 and target_revision>=6:
+  if not candidate.state.get("visitors") is Dictionary or not candidate.state.visitors.get("visits") is Dictionary:return _fail("visit_decisions")
+  for visit in candidate.state.visitors.visits.values():
+   if not visit is Dictionary:return _fail("visit_decision")
+   visit["decision_remaining"]=0.0
+   visit["recall_variant"]=-1
+   visit["shopping_state"]="served" if visit.get("served",false) else "pending" if visit.get("phase")=="staying" and visit.get("order_id","")!="" else "approaching" if visit.get("phase")=="arriving" and visit.get("food_id","")!="" else "declined"
+   # Leaving orders were cancelled already; they must never be replayed.
+   if visit.get("phase")=="leaving":visit.shopping_state="declined"
+  candidate.schema_revision=6
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

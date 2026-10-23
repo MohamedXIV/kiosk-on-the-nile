@@ -290,6 +290,26 @@
       "spawn_east": [
         14.5,
         3.6
+      ],
+      "stroll_west": [
+        -8,
+        2.8
+      ],
+      "stroll_east": [
+        10.5,
+        2.8
+      ],
+      "bench_east": [
+        7.7,
+        -0.4
+      ],
+      "bench_west": [
+        -5.2,
+        2.7
+      ],
+      "river_middle": [
+        0,
+        -2.9
       ]
     },
     "interactions": [

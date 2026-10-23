@@ -227,14 +227,35 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
    if conversation.elapsed>=conversation.current.duration and conversation.current.choices.is_empty(): continue
    for participant in participants:
     if participant in conversation.participants: return
+ if kind in [&"order",&"reminder"]:
+  if participants.is_empty() or service.pending_for(StringName(participants[0]))==null:return
+  var order_context := extra.duplicate(true)
+  order_context.merge({"mode":5 if kind==&"order" else 7,"line_variant":visitors.random_index(3)},true)
+  await narrative.start(&"orders",participants,order_context)
+  return
  var id: StringName = &"visitors"
  var context_data := extra.duplicate(true)
  if kind==&"football": id=&"football"
- elif extra.get("character_id")=="amgad" and kind in [&"arrival",&"served"]: id=&"amgad_arrival" if kind==&"arrival" else &"amgad_served"
+ elif extra.get("character_id")=="amgad" and kind==&"served":id=&"amgad_served"
  elif kind==&"served": id=&"visitors_served"
- context_data["mode"] = 1 if kind==&"arrival" else 2 if kind==&"served" else 3 if kind==&"reminder" else 4 if kind==&"ambient" else 0
+ context_data["mode"] = 4 if kind==&"arrival" else 2 if kind==&"served" else 3 if kind==&"reminder" else 4 if kind==&"ambient" else 0
  if kind in [&"arrival",&"ambient"] and narrative.has_topics(&"venue_comments",participants,context_data):id=&"venue_comments"
  await narrative.start(id,participants,context_data)
+func person_interaction(visit_id: StringName) -> ActionResult:
+ if not visitors.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ if service.pending_for(visit_id)!=null:return ActionResult.success({"show_visitor":str(visit_id)})
+ return await talk(visit_id)
+func recall_order(visit_id: StringName) -> ActionResult:
+ if not visitors.is_available(visit_id) or service.pending_for(visit_id)==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
+ var visit: VisitState=visitors.visits[str(visit_id)]
+ if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("visitors").interaction_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ for conversation: ConversationSession in narrative.sessions.values():
+  if not conversation.finished and conversation.encounter_id==&"orders" and str(visit_id) in conversation.participants and conversation.elapsed<conversation.current.duration:return ActionResult.success()
+ var next := visitors.random_index(3 if visit.recall_variant<0 else 2)
+ if visit.recall_variant>=0 and next>=visit.recall_variant:next+=1
+ var result := await narrative.start(&"orders",PackedStringArray([str(visit_id)]),{"mode":6,"line_variant":next})
+ if result.ok:visit.recall_variant=next
+ return result
 func talk(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState = visitors.visits[str(visit_id)]

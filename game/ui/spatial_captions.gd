@@ -1,8 +1,10 @@
 class_name SpatialCaptions
 extends Control
 var _labels: Dictionary = {}
+var _orders: Dictionary = {}
 var top_inset: float = 12
 func present(session: GameSession, room: LocationView, camera: Camera2D) -> void:
+ _present_orders(session,room,camera)
  var active: Dictionary = {}
  var focused := session.narrative.focused_session()
  if session.location_id==&"kiosk":
@@ -29,10 +31,30 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
     var label: Label = _labels[id]
     label.text = conversation.current.text
     label.size.x = 300
-    var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,92)
+    var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,113)
     var screen: Vector2 = camera.get_canvas_transform()*canvas
     label.position = Vector2(clampf(screen.x-150,8,get_viewport_rect().size.x-308),clampf(screen.y-label.size.y,top_inset,get_viewport_rect().size.y-180))
  for id in _labels.keys():
   if not active.has(id):
    _labels[id].queue_free()
    _labels.erase(id)
+
+func _present_orders(session: GameSession, room: LocationView, camera: Camera2D) -> void:
+ var active: Dictionary={}
+ if session.location_id==&"kiosk":
+  for visit: VisitState in session.visitors.visits.values():
+   var order := session.service.pending_for(visit.id)
+   if order==null or not session.visitors.is_available(visit.id) or visit.pose.ground.distance_to(session.player_ground)>float(session.config.section("social").hearing_radius):continue
+   var key := str(visit.id)+":"+str(order.id)
+   active[key]=true
+   if not _orders.has(key):
+    var badge := OrderBadge.new()
+    badge.configure(UiText.new(session.config.section("ui")),session.foods.definition(order.food_id))
+    add_child(badge)
+    _orders[key]=badge
+   var badge: OrderBadge=_orders[key]
+   var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,57)
+   var screen: Vector2=camera.get_canvas_transform()*canvas
+   badge.position=Vector2(clampf(screen.x-badge.size.x/2,8,get_viewport_rect().size.x-badge.size.x-8),clampf(screen.y-badge.size.y,top_inset,get_viewport_rect().size.y-badge.size.y-145))
+ for key in _orders.keys():
+  if not active.has(key):_orders[key].queue_free();_orders.erase(key)

@@ -30,7 +30,8 @@
       "extra": "زيادة",
       "none": "سادة"
     },
-    "menu_label": "الشاي"
+    "menu_label": "الشاي",
+    "order_icon": "cup"
   },
   "kebda": {
     "label": "سندوتش كبدة إسكندراني",
@@ -58,7 +59,8 @@
       100,
       300
     ],
-    "menu_label": "سندوتش الكبدة"
+    "menu_label": "سندوتش الكبدة",
+    "order_icon": "sandwich"
   },
   "shawarma": {
     "label": "سندوتش شاورما فراخ",
@@ -86,7 +88,8 @@
       100,
       300
     ],
-    "menu_label": "سندوتش الشاورما"
+    "menu_label": "سندوتش الشاورما",
+    "order_icon": "sandwich"
   },
   "potato_fried": {
     "label": "بطاطس مقلية",
@@ -114,7 +117,8 @@
       100,
       300
     ],
-    "menu_label": "البطاطس المقلية"
+    "menu_label": "البطاطس المقلية",
+    "order_icon": "plate"
   },
   "potato_baked": {
     "label": "بطاطس في الفرن",
@@ -142,6 +146,7 @@
       100,
       300
     ],
-    "menu_label": "البطاطس في الفرن"
+    "menu_label": "البطاطس في الفرن",
+    "order_icon": "plate"
   }
 }

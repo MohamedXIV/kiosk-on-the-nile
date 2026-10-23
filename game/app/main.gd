@@ -5,6 +5,7 @@ var _save := SaveCoordinator.new()
 var _config: SessionConfig
 var _text: UiText
 var _session: GameSession
+var _visitor_panel: VisitorPanel
 var _recipe_panel: RecipePanel
 var _shop_panel: ShopPanel
 var _journey_panel: JourneyPanel
@@ -132,7 +133,7 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible)
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.motion_step = _step_motion
  var room: LocationView = _rooms.get(str(_session.location_id))
@@ -151,6 +152,9 @@ func _install(candidate: GameSession) -> void:
  _recipe_panel=RecipePanel.new()
  _hud.add_child(_recipe_panel)
  _recipe_panel.configure(_text,_session)
+ _visitor_panel=VisitorPanel.new()
+ _hud.add_child(_visitor_panel)
+ _visitor_panel.configure(_text,_session)
  _hud.inventory_requested.connect(func():_inventory_panel.open())
  _journey_panel=JourneyPanel.new()
  _hud.add_child(_journey_panel)
@@ -203,6 +207,9 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _visitor_panel.visible:
+  if event.is_action_pressed("cancel"):_visitor_panel.hide()
+  return
  if _recipe_panel.visible:
   if event.is_action_pressed("cancel"):_recipe_panel.hide()
   return
@@ -235,6 +242,10 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   _busy = true
   var result := await _router.execute(event.is_action_pressed("interact_secondary"))
+  if result.ok and result.details.has("show_visitor"):
+   _visitor_panel.present(StringName(result.details.show_visitor))
+   _busy=false
+   return
   if result.ok and result.details.has("show_recipes"):
    _recipe_panel.present(StringName(result.details.show_recipes))
    _busy=false

@@ -41,6 +41,7 @@
     "visitors": "visitors.json",
     "wellbeing": "wellbeing.json",
     "customer_experience": "customer_experience.json",
-    "story_venue_comments": "stories/venue_comments.ink.json"
+    "story_venue_comments": "stories/venue_comments.ink.json",
+    "story_orders": "stories/orders.ink.json"
   }
 }

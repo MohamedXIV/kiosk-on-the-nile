@@ -24,11 +24,13 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  if not participants.is_empty() and _session.visitors.visits.has(participants[0]): character_id = str(_session.visitors.visits[participants[0]].character_id)
  var intended_food := ""
  if not participants.is_empty() and _session.visitors.visits.has(participants[0]): intended_food=str(_session.visitors.visits[participants[0]].food_id)
+ var pending := _session.service.pending_for(StringName(participants[0])) if not participants.is_empty() else null
+ if pending!=null:intended_food=str(pending.food_id)
  var quality: String = _session.visitors.memory.last_served_quality
  var recipe: Dictionary = _session.config.section("recipes").recipes.tea
  for i in range(recipe.quality_keys.size()):
   if recipe.quality_keys[i] == quality: quality = recipe.quality_names[str(i)]
- var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"mode":0,"quality_score":0,"order_label":_session.config.section("recipes").stock_labels.get(intended_food,"")}
+ var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"mode":0,"quality_score":0,"order_label":_session.foods.definition(StringName(intended_food)).get("menu_label","")}
  var visit: VisitState = _session.visitors.visits.get(participants[0]) if not participants.is_empty() else null
  var previous := _session.visitors.history.previous_service(character_id,visit.id) if visit else {}
  data.merge({"topic_id":"","line_variant":0,"hour":int(_session.clock.minutes)/60,"bought_fan":_session.home.has_fan,"visit_count":_session.visitors.visit_count(StringName(character_id)),"previous_quality":int(previous.get("quality",-1)),"previous_food":str(previous.get("food_id",""))},true)
