@@ -10,7 +10,7 @@ func deposit(supplier_id: String, amount_minor: int, request_id: String) -> Acti
  if _session.wallet.balance<amount_minor:return _fail("insufficient_funds")
  var book := _session.accounts.snapshot()
  var receipt := SupplierLedger.receipt(book.supplier,request_id,"deposit",_session.clock.world_minutes,_session.wallet.balance,-amount_minor,amount_minor,{"amount":amount_minor})
- receipt["journal_text"]="دفعت %.2f ج.م رصيدًا مقدمًا لعم فتحي؛ ليس رسم تفعيل أو دينًا." % (float(amount_minor)/100.0)
+ receipt["journal_text"]="دفعت %.2f ج.م رصيدًا مقدمًا إلى %s؛ ليس رسم تفعيل أو دينًا." % [float(amount_minor)/100.0,str(_session.presence.profile(&"fathi").name)]
  return _publish(book,_session.items.candidate(),_session.deliveries.snapshot(),receipt)
 func settle(request_id: String) -> ActionResult:
  if not _session.contact.available():return _fail("supplier_contact_required")
@@ -25,7 +25,7 @@ func settle(request_id: String) -> ActionResult:
   var amount := int(invoice.total)-int(invoice.paid)
   if amount>0:payments[invoice.id]=amount;invoice.paid=int(invoice.total)
  var receipt := SupplierLedger.receipt(book.supplier,request_id,"settlement",_session.clock.world_minutes,_session.wallet.balance,-total,0,{"payments":payments})
- receipt["journal_text"]="سددت أصل حساب عم فتحي: %.2f ج.م؛ من غير زيادة." % (float(total)/100.0)
+ receipt["journal_text"]="سددت أصل حساب %s: %.2f ج.م؛ من غير زيادة." % [str(_session.presence.profile(&"fathi").name),float(total)/100.0]
  return _publish(book,_session.items.candidate(),_session.deliveries.snapshot(),receipt)
 func deliver(occurrence_id: String, confirm_cash: bool = false, sleeping: bool = false) -> ActionResult:
  var occurrence: Dictionary=_session.deliveries.state.occurrences.get(occurrence_id,{})
@@ -91,16 +91,19 @@ func _complete(id: String, terms: Dictionary, items: ItemChangeSet, delivery: Di
  var occurrence: Dictionary=delivery.occurrences[id]
  var grants: Array=[]
  for item in items.state.items.values():
-  if item.attributes.get("supply_occurrence")==id and _session.items.get_item(StringName(item.id)).is_empty():grants.append({"id":str(item.id),"definition_id":str(item.definition_id),"quantity":int(item.quantity)})
+  if item.attributes.get("supply_occurrence")==id and _session.items.get_item(StringName(item.id)).is_empty():
+   item.attributes["supply_grant_id"]=str(item.id)
+   grants.append({"id":str(item.id),"definition_id":str(item.definition_id),"quantity":int(item.quantity)})
  var total := int(terms.total_minor)
  var cash_delta := -total if terms.mode=="cash" else 0
  var pre_delta := -total if terms.mode=="prepaid" else 0
- var at := _session.clock.world_minutes
+ var evaluated := _session.clock.world_minutes
+ var at := evaluated if emergency_food or terms.mode=="cash" else float(occurrence.scheduled_at)
  var detail := {"occurrence":id,"goods_minor":int(terms.goods_minor),"fee_minor":int(terms.fee_minor),"total_minor":total,"mode":str(terms.mode),"name":str(terms.name),"lines":terms.get("lines",[]).duplicate(true),"grants":grants,"emergency":emergency_food}
  var receipt := SupplierLedger.receipt(book.supplier,"delivery:"+id,"delivery",at,_session.wallet.balance,cash_delta,pre_delta,detail)
  if terms.mode=="credit":book.supplier.invoices[id]={"id":id,"name":str(terms.name),"at":at,"due_at":at+float(terms.due_minutes),"total":total,"paid":0,"emergency":emergency_food}
  receipt["journal_text"]="وصلت %s؛ بضاعة %.2f + توصيل %.2f = %.2f ج.م، %s. الإيصال محفوظ." % ["لقمة على الحساب" if emergency_food else "دفعة المورد",float(terms.goods_minor)/100.0,float(terms.fee_minor)/100.0,float(total)/100.0,"على الحساب" if terms.mode=="credit" else "مدفوعة"]
- occurrence.merge({"status":"delivered","reason":"","evaluated_at":at,"receipt":receipt.id,"grants":grants,"stock_units":stock_units.duplicate(true),"cash_waiting":false},true)
+ occurrence.merge({"status":"delivered","reason":"","evaluated_at":evaluated,"receipt":receipt.id,"grants":grants,"stock_units":stock_units.duplicate(true),"cash_waiting":false},true)
  return _publish(book,items,delivery,receipt)
 func _skip(id: String, reason: String) -> ActionResult:
  var delivery := _session.deliveries.snapshot()
@@ -142,7 +145,8 @@ func _repeat(ledger: Dictionary, request: String, kind: String, amount: int) -> 
 func validate_links() -> ActionResult:
  var ledger: Dictionary=_session.accounts.state.supplier
  var used: Dictionary={}
- var grant_ids: Dictionary={}
+ var origins: Dictionary={}
+ var remaining: Dictionary={}
  for receipt in ledger.receipts.values():
   var event: Dictionary={}
   for row in _session.journal.snapshot().events:
@@ -151,26 +155,61 @@ func validate_links() -> ActionResult:
   if receipt.kind!="delivery":continue
   var d: Dictionary=receipt.detail
   var o: Dictionary=_session.deliveries.state.occurrences.get(d.occurrence,{})
-  if o.is_empty() or o.status!="delivered" or o.receipt!=receipt.id or o.evaluated_at!=receipt.at or StableJson.stringify(o.grants)!=StableJson.stringify(d.get("grants")) or not o.get("stock_units") is Dictionary:return _fail("supplier_delivery_mismatch")
+  if o.is_empty() or o.status!="delivered" or o.receipt!=receipt.id or o.emergency!=d.emergency or float(o.evaluated_at)<float(receipt.at)-0.001 or float(receipt.at)<float(o.scheduled_at)-0.001 or StableJson.stringify(o.grants)!=StableJson.stringify(d.get("grants")) or not o.get("stock_units") is Dictionary:return _fail("supplier_delivery_mismatch")
+  var terms_due := 0.0
+  var expected_units: Dictionary={}
+  var expected_grants: Dictionary={}
   if not o.emergency:
    var v: Dictionary=_session.contracts.state.versions[o.version_id]
+   terms_due=float(v.due_minutes)
    for key in ["goods_minor","fee_minor","total_minor","mode","name","lines"]:
     if StableJson.stringify(d.get(key))!=StableJson.stringify(v.get(key)):return _fail("supplier_invoice_terms")
+   for line in v.lines:expected_units[str(line.definition_id)]=int(line.quantity);expected_grants[str(line.definition_id)]=int(line.quantity)
+  else:
+   var chapter := str(o.id).trim_prefix("emergency:").get_slice("/",0)
+   var quote: Dictionary=_session.contracts.state.emergency_quotes.get(chapter,{})
+   if quote.is_empty():return _fail("missing_emergency_quote")
+   terms_due=float(quote.due_minutes)
+   for key in ["goods_minor","fee_minor","total_minor","mode","name"]:
+    if StableJson.stringify(d.get(key))!=StableJson.stringify(quote.get(key)):return _fail("changed_emergency_terms")
+   expected_units={"emergency":1};expected_grants={"prepared_food":1}
+   if o.grants.size()!=1:return _fail("invalid_emergency_grant")
+   var food_id := str(o.grants[0].get("id",""))
+   var food := _session.items.get_item(StringName(food_id))
+   if food.is_empty():food=_session.items.snapshot().consumed.get(food_id,{}).get("item",{})
+   var attributes: Dictionary=food.get("attributes",{})
+   if attributes.get("food_id")!=quote.food_id or attributes.get("recipe_id")!=quote.recipe_id or attributes.get("personal_use")!=true or attributes.get("quality_score")!=2:return _fail("invalid_emergency_food")
+  if d.mode=="credit" and absf(float(ledger.invoices[o.id].due_at)-(float(receipt.at)+terms_due))>0.001:return _fail("supplier_invoice_deadline")
+  if StableJson.stringify(o.stock_units)!=StableJson.stringify(expected_units):return _fail("supplier_stock_mismatch")
   var day := str(floori(float(o.scheduled_at)/1440.0))
   if not used.has(day):used[day]={}
-  for key in o.stock_units:used[day][key]=int(used[day].get(key,0))+int(o.stock_units[key])
+  for key in expected_units:used[day][key]=int(used[day].get(key,0))+int(expected_units[key])
+  var granted: Dictionary={}
   for grant in o.grants:
-   if not grant is Dictionary or grant_ids.has(grant.get("id")) or not grant.get("id") is String or not ContentValidation.integer(grant.get("quantity")) or grant.quantity<1:return _fail("duplicate_supplier_grant")
-   grant_ids[grant.id]=o.id
-   var item := _session.items.get_item(StringName(grant.id))
-   if item.is_empty():item=_session.items.snapshot().consumed.get(grant.id,{}).get("item",{})
-   if not item.is_empty() and (item.definition_id!=grant.definition_id or int(item.quantity)>int(grant.quantity) or item.attributes.get("supply_occurrence")!=o.id):return _fail("supplier_item_source")
- for item in _session.items.snapshot().items.values():
-  if item.attributes.has("supply_occurrence") and grant_ids.get(item.id)!=item.attributes.supply_occurrence:return _fail("orphan_supplier_item")
+   if not grant is Dictionary or origins.has(grant.get("id")) or not grant.get("id") is String or not grant.get("definition_id") is String or not ContentValidation.integer(grant.get("quantity")) or grant.quantity<1:return _fail("duplicate_supplier_grant")
+   origins[grant.id]={"occurrence":o.id,"definition_id":grant.definition_id,"quantity":int(grant.quantity)}
+   granted[grant.definition_id]=int(granted.get(grant.definition_id,0))+int(grant.quantity)
+  if StableJson.stringify(granted)!=StableJson.stringify(expected_grants):return _fail("supplier_grant_quantity")
+ var all_items: Array=_session.items.snapshot().items.values()
+ for consumption in _session.items.snapshot().consumed.values():all_items.append(consumption.item)
+ for item in all_items:
+  if not item.attributes.has("supply_occurrence"):continue
+  var origin_id := str(item.attributes.get("supply_grant_id",item.id))
+  var origin: Dictionary=origins.get(origin_id,{})
+  if origin.is_empty() or origin.occurrence!=item.attributes.supply_occurrence or origin.definition_id!=item.definition_id:return _fail("orphan_supplier_item")
+  remaining[origin_id]=int(remaining.get(origin_id,0))+int(item.quantity)
+  if int(remaining[origin_id])>int(origin.quantity):return _fail("supplier_item_source")
+ var persisted_used: Dictionary={}
+ for day in _session.deliveries.state.stock_days:
+  persisted_used[day]={}
+  for key in _session.deliveries.state.stock_days[day]:persisted_used[day][key]=int(_session.deliveries.state.stock_days[day][key].used)
+ if StableJson.stringify(persisted_used)!=StableJson.stringify(used):return _fail("supplier_stock_mismatch")
  for o in _session.deliveries.state.occurrences.values():
   if o.status=="delivered" and not ledger.receipts.has(o.receipt):return _fail("missing_supplier_invoice")
- for day in _session.deliveries.state.stock_days:
-  for key in _session.deliveries.state.stock_days[day]:
-   if int(used.get(day,{}).get(key,0))!=int(_session.deliveries.state.stock_days[day][key].used):return _fail("supplier_stock_mismatch")
+  if o.status=="skipped":
+   var found := false
+   for event in _session.journal.snapshot().events:
+    if event.id=="supply:skip:"+str(o.id) and event.channel=="system" and event.actor=="system" and event.at==o.evaluated_at:found=true
+   if not found:return _fail("missing_skipped_delivery_event")
  return ActionResult.success()
 func _fail(key: String) -> ActionResult:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))

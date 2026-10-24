@@ -182,10 +182,13 @@ func _install(candidate: GameSession) -> void:
  _hud.add_child(_shop_panel)
  _shop_panel.configure(_text,_session)
  _supplier_panel=SupplierPanel.new();_hud.add_child(_supplier_panel);_supplier_panel.configure(_text,_session)
+ _hud.consume_requested.connect(func():_hud.toast.show_message(_text.outcome(_session.life.consume_held())))
  _hud.supplier_requested.connect(func():
   for point in _session.contact.points():
    if _session.contact.near_point(str(point.host_id)):
-    await _session.contact.begin(str(point.host_id));return
+    var call_result := await _session.contact.begin(str(point.host_id))
+    if not call_result.ok:_hud.toast.show_message("المكالمة مش متاحة دلوقتي؛ خلّص القعدة الحالية الأول، وقرب من التليفون.")
+    return
   _hud.toast.show_message("قرب تليفون المكتب فوق أو آخر كونتر في الكشك عشان تتصل."))
  _district_panel=DistrictPanel.new()
  _hud.add_child(_district_panel)

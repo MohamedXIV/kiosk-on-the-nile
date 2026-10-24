@@ -84,6 +84,9 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
   candidate.queue_free()
   return result
  for record in restored_data.state.narrative.get("sessions",{}).values()+restored_data.state.personal.get("paused",{}).values():
+  if record is Dictionary and record.get("encounter_id")=="supplier" and not candidate.contracts.state.emergency_quotes.has(str(record.get("id",""))):
+   candidate.queue_free()
+   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_supplier_chapter")
   if record is Dictionary and record.get("encounter_id")=="landlord" and not candidate.accounts.state.chapters.has(str(record.get("id",""))):
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_financial_chapter")

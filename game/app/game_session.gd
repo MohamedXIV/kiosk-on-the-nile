@@ -528,6 +528,8 @@ func notebook_people() -> Array[Dictionary]:
  return people
 
 func validate_financial_chapters() -> ActionResult:
+ for chapter in contracts.state.emergency_quotes:
+  if not narrative.valid_sequence(str(chapter),"conversation_",int(narrative.snapshot().next_id)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_supplier_chapter")
  for id in accounts.state.chapters:
   var record: Variant=accounts.state.chapters[id]
   if not narrative.valid_sequence(str(id),"conversation_",int(narrative.snapshot().next_id)) or not record is Dictionary or record.get("id")!=id:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
@@ -550,7 +552,13 @@ func supplier_context(chapter: String) -> Dictionary:
   var data := config.section("suppliers")
   var e: Dictionary=data.emergency
   contracts.state.emergency_quotes[chapter]={"name":str(presence.profile(&"fathi").name),"goods_minor":int(e.price_minor),"fee_minor":0,"total_minor":int(e.price_minor),"emergency_cap":int(e.cap_minor),"due_minutes":float(data.invoice_due_minutes),"food_id":str(e.food_id),"recipe_id":str(e.recipe_id),"mode":"credit","lines":[]}
- return {"emergency_label":"%.2f" % (float(contracts.state.emergency_quotes[chapter].total_minor)/100.0)}
+ var quote: Dictionary=contracts.state.emergency_quotes[chapter]
+ var available := inventory.held_id().is_empty() and SupplierLedger.remaining(accounts.state.supplier,true)+int(quote.total_minor)<=int(quote.emergency_cap)
+ var reason := "لسه في ساندوتش على حسابك؛ نخلص حسابه الأول، وبعدها أقدر أوصلك واحد تاني."
+ if not inventory.held_id().is_empty():reason="حط اللي في إيدك في مكان مناسب الأول عشان تستلم الساندوتش."
+ var stock: Dictionary=deliveries.state.stock_days.get(str(floori(clock.world_minutes/1440.0)),{}).get("emergency",{})
+ if not stock.is_empty() and int(stock.used)>=int(stock.capacity):available=false;reason="الساندوتشات الجاهزة خلصت عندي النهارده. أقدر أرتب لك من المتاح بكرة."
+ return {"emergency_label":"%.2f" % (float(quote.total_minor)/100.0),"emergency_available":available,"emergency_reason":reason}
 func supplier_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:
  if not contact.available() or participants.size()!=1 or str(contact.current.id)!=participants[0]:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"supplier_contact_required")
  if action=="manage":contact.panel_requested=true;return ActionResult.success()

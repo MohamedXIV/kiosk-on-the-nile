@@ -100,7 +100,13 @@
     "stale_financial_offer": "العرض قديم أو اتغيّر؛ اتفقوا على عرض جديد.",
     "stale_account_quote": "عرض السعر اتغيّر أو انتهى؛ اطلب عرض جديد.",
     "coverage_overlap": "الفترة دي مغطاة بالفعل؛ مفيش خصم جديد.",
-    "partial_unavailable": "السداد الجزئي مش متاح لهذا العقد."
+    "partial_unavailable": "السداد الجزئي مش متاح لهذا العقد.",
+    "supplier_contact_required": "قرب التليفون وافتح مكالمة المورد الأول.",
+    "emergency_credit_limit": "لسه في لقمة على الحساب؛ سدد ثمنها الأول.",
+    "invalid_supplier_amount": "راجع مبلغ الرصيد المقدم.",
+    "stale_supplier_quote": "العرض انتهى أو اتغير؛ راجع عرضًا جديدًا.",
+    "supplier_contract_exists": "عندك اتفاق دوري شغال؛ عدّله أو أوقفه الأول.",
+    "invalid_supplier_schedule": "اختار أيامًا وميعادًا صالحين للتوريد."
   },
   "theme": {
     "font_size": 19,

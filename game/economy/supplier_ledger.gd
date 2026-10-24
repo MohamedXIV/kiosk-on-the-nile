@@ -35,7 +35,7 @@ static func validate(data: Variant, now: float) -> ActionResult:
    if total!=-int(r.wallet_delta):return _fail()
   else:
    var d: Dictionary=r.detail
-   if not d.get("occurrence") is String or origins.has(d.occurrence) or not d.get("mode") in ["prepaid","credit","cash"] or not d.get("name") is String:return _fail()
+   if not d.get("occurrence") is String or origins.has(d.occurrence) or not d.get("mode") in ["prepaid","credit","cash"] or not d.get("name") is String or not d.get("emergency") is bool:return _fail()
    origins[d.occurrence]=id
    for key in ["goods_minor","fee_minor","total_minor"]:
     if not ContentValidation.integer(d.get(key)) or d[key]<0:return _fail()
@@ -50,7 +50,7 @@ static func validate(data: Variant, now: float) -> ActionResult:
   var bill: Variant=data.invoices[id]
   if not bill is Dictionary or bill.get("id")!=id or not origins.has(id) or not ContentValidation.integer(bill.get("total")) or not ContentValidation.integer(bill.get("paid")) or bill.paid<0 or bill.paid>bill.total or int(paid.get(id,0))!=int(bill.paid) or not bill.get("emergency") is bool or not bill.get("name") is String or not ContentValidation.number(bill.get("due_at")):return _fail()
   var r: Dictionary=data.receipts[origins[id]]
-  if r.detail.mode!="credit" or bill.total!=r.detail.total_minor or bill.name!=r.detail.name or bill.get("at")!=r.at or bill.due_at<=r.at:return _fail()
+  if r.detail.mode!="credit" or bill.emergency!=r.detail.emergency or bill.total!=r.detail.total_minor or bill.name!=r.detail.name or bill.get("at")!=r.at or bill.due_at<=r.at:return _fail()
  for id in paid:
   if not data.invoices.has(id):return _fail()
  return ActionResult.success()

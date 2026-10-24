@@ -16,7 +16,11 @@ func near_point(id: String) -> bool:
  for point in points():
   if point.host_id==id and point.location_id==str(_session.location_id) and point.ground.distance_to(_session.player_ground)<=float(_session.config.section("suppliers").phone_radius):return true
  return false
-func available() -> bool:return current!=null and near_point(host_id)
+func available() -> bool:
+ if current==null or not near_point(host_id):return false
+ for point in points():
+  if point.host_id==host_id:return current.pose.location_id==StringName(point.location_id) and current.pose.ground.distance_to(point.ground)<=0.01
+ return false
 func begin(id: String) -> ActionResult:
  if not near_point(id):return _fail()
  if _session.personal.active() and (current==null or not _session.personal.holds_visit(current.id)):return _fail()

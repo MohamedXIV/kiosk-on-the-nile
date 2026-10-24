@@ -193,6 +193,7 @@ func unpack_purchase_bag(bag_id: StringName, location_id: StringName) -> ActionR
    if fitted==quantity and quantity==int(item.quantity):change.state.items[item.id].container_id=id
    else:
     var copy: Dictionary=item.duplicate(true)
+    if copy.attributes.has("supply_occurrence") and not copy.attributes.has("supply_grant_id"):copy.attributes["supply_grant_id"]=str(item.id)
     var new_id := "item_%d" % int(change.state.next_id)
     change.state.next_id=int(change.state.next_id)+1
     copy.id=new_id

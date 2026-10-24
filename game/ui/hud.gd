@@ -1,5 +1,6 @@
 class_name Hud
 extends Control
+signal consume_requested
 signal supplier_requested
 signal tuning_requested
 signal clean_floor_requested
@@ -48,6 +49,7 @@ func configure(text: UiText) -> void:
   var callback: Callable = entry.action
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
  actions.add_child(UiText.button(text.text("supplier_phone"),func():_menu.hide();supplier_requested.emit()))
+ actions.add_child(UiText.button(text.text("consume"),func():_menu.hide();consume_requested.emit()))
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();travel_requested.emit(route_id)))
