@@ -6,6 +6,12 @@ var tuning: TuningStore
 var alertness: AlertnessService
 var actions: ActionPolicy
 var fatigue: FatigueService
+var presence: ActorPresence
+var residential: ResidentialVisits
+var accounts: AccountBook
+var commitments: CommitmentService
+var finance: AccountTransactions
+var district: DistrictOffice
 var config: SessionConfig
 var clock: GameClock
 var wallet: WalletService
@@ -71,7 +77,7 @@ func configure(source: SessionConfig) -> ActionResult:
  wallet = WalletService.new(int(balance.starting_money))
  needs = NeedsService.new(source.section("needs"))
  tuning=TuningStore.new()
- var tuned := tuning.configure(source.section("tuning"),source.section("visitors").characters.keys()+["player"])
+ var tuned := tuning.configure(source.section("tuning"),source.section("visitors").characters.keys()+source.section("residential_visits").profiles.keys()+["player"])
  if not tuned.ok:return tuned
  tuning.apply_at_boundary(false)
  alertness=AlertnessService.new()
@@ -82,6 +88,12 @@ func configure(source: SessionConfig) -> ActionResult:
  fatigue.configure(self)
  tuning.applied.connect(_apply_tuning)
  _apply_tuning()
+ presence=ActorPresence.new();presence.configure(self)
+ accounts=AccountBook.new();accounts.configure(self)
+ commitments=CommitmentService.new();commitments.configure(self)
+ finance=AccountTransactions.new();finance.configure(self)
+ residential=ResidentialVisits.new();residential.configure(self)
+ actions.business_allowed=accounts.business_allowed
  items = ItemStore.new()
  var item_result := items.configure(source.section("items"),source.section("containers"))
  if not item_result.ok: return item_result
@@ -195,10 +207,11 @@ func configure(source: SessionConfig) -> ActionResult:
  life.sleep_started.connect(hygiene.interrupt_clean)
  life.sleep_started.connect(visitors.clear_visits)
  clock.day_changed.connect(func(_previous,_current):visitors.begin_day())
- var actors: Array = source.section("visitors").characters.keys()
+ var actors: Array = presence.actor_ids()
  actors.append("player")
  journal=InteractionJournal.new()
  journal.configure(actors,clock)
+ journal.append_once({"id":"accounts:activation","chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":"إيجار السكن والحي أسبوعيًا، بمواعيد مستقبلية واضحة في دفتر المستحقات ومن غير خصم تلقائي.","channel":"system","at":clock.world_minutes})
  relationships = RelationshipStore.new(source.section("social"),actors)
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships
@@ -207,6 +220,7 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.availability_provider=func(actor):return not social_life.reserved(actor)
  life.sleep_started.connect(social_life.before_time_jump)
  conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,locations.ids())
+ conditions.presence=presence
  conditions.social_life=social_life
  conditions.social_actions=source.section("social_life").actions.keys()
  conditions.social_topics=source.section("social_life").topics.keys()
@@ -216,6 +230,7 @@ func configure(source: SessionConfig) -> ActionResult:
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
  effects.social_life=social_life
  effects.service_provider=_service_effect
+ effects.finance_provider=financial_effect
  narrative = NarrativeDirector.new()
  add_child(narrative)
  var stories: Dictionary = {}
@@ -243,6 +258,12 @@ func configure(source: SessionConfig) -> ActionResult:
   if destination!=&"kiosk":
    personal.leave()
    narrative.cancel_all())
+ district=DistrictOffice.new();district.configure(self)
+ travel.departed.connect(func():
+  residential.clear()
+  personal.leave()
+  narrative.cancel_all())
+ life.sleep_started.connect(residential.clear)
  scheduler.configure({})
  return rebuild_order()
 func rebuild_order() -> ActionResult:
@@ -250,6 +271,10 @@ func rebuild_order() -> ActionResult:
   cooking.tick(frame.delta)
   workflow.tick(frame),"visitors":func(frame):visitors.tick(frame.delta,frame.world_delta),"narrative":_step_narrative,"motion":func(frame):
   if motion_step.is_valid(): motion_step.call(frame.delta)}
+ handlers["accounts"]=func(frame):
+  accounts.tick(frame)
+  return finance.tick(frame)
+ handlers["residential"]=func(frame):residential.tick(frame)
  handlers["body"]=func(frame):alertness.tick(frame);fatigue.tick(frame)
  handlers["travel"]=func(frame):travel.tick(frame)
  handlers["shops"]=func(frame):shops.tick(frame)
@@ -303,7 +328,7 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
  if kind in [&"arrival",&"ambient"] and narrative.has_topics(&"venue_comments",participants,context_data):id=&"venue_comments"
  await narrative.start(id,participants,context_data)
 func person_interaction(visit_id: StringName) -> ActionResult:
- if not visitors.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ if not presence.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  return await personal.open_for(visit_id)
 func recall_order(visit_id: StringName) -> ActionResult:
  if not visitors.is_available(visit_id) or service.pending_for(visit_id)==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
@@ -335,12 +360,15 @@ func _sleep_elapsed(frame: Dictionary) -> void:
  hygiene.elapse(float(frame.world_delta))
  shops.elapse(float(frame.world_delta))
  hygiene.record_use(StringName("sleep:"+str(clock.tick)),routine.bed_id,&"sleep")
+ accounts.tick(frame)
+ finance.tick(frame)
  scheduler.tick(frame)
  social_life.tick(frame)
  changed.emit()
 
 func _actor_snapshots() -> Array[Dictionary]:
  var result: Array[Dictionary] = [player_pose.snapshot()]
+ if residential!=null and residential.current!=null:result.append(residential.current.pose.snapshot())
  if visitors!=null:
   for visit in visitors.visits.values(): result.append(visit.pose.snapshot())
  return result
@@ -396,6 +424,7 @@ func _step_experiences(_frame: Dictionary) -> ActionResult:
 func request_can_prepare(food_id: StringName) -> bool:
  return str(food_id) in workflow.available_foods(&"kiosk")
 func _service_effect(action: String, participants: PackedStringArray) -> ActionResult:
+ if action=="accept" and not accounts.business_allowed():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  if participants.size()!=1 or not visitors.is_available(StringName(participants[0])):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState=visitors.visits[participants[0]]
  if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("spatial").hearing_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
@@ -406,3 +435,90 @@ func _service_effect(action: String, participants: PackedStringArray) -> ActionR
 func _apply_tuning() -> void:
  clock.set_speed(tuning.value("clock_speed"))
  needs.apply_tuning(tuning)
+
+func financial_context(chapter: String) -> Dictionary:
+ if chapter.is_empty():return {}
+ if not accounts.state.chapters.has(chapter):
+  accounts.tick({})
+  var snapshot_data := {"id":chapter,"pay_quote":"","partial_quote":"","loan_id":str(commitments.active_loan().get("id",""))}
+  for offer_id in ["settle","partial"]:
+   var amount := 0
+   if offer_id=="partial":
+    var remaining := 0
+    for bill in accounts.outstanding("abdul_karim"):remaining+=accounts.remaining(bill.id)
+    amount=mini(remaining,int(config.section("accounts").partial_minor))
+   var quote := accounts.quote("housing_lease",offer_id,clock.world_minutes,amount)
+   if quote.ok:
+    var id := str(quote.details.quote.id)
+    accounts.state.quotes[id]["chapter"]=chapter
+    snapshot_data["pay_quote" if offer_id=="settle" else "partial_quote"]=id
+  accounts.state.chapters[chapter]=snapshot_data
+ var saved: Dictionary=accounts.state.chapters[chapter]
+ var due: Dictionary=accounts.state.quotes.get(saved.pay_quote,{})
+ var partial: Dictionary=accounts.state.quotes.get(saved.partial_quote,{})
+ var loan: Dictionary=commitments.state.loans.get(saved.loan_id,{})
+ var loan_remaining := int(loan.get("principal",0))-int(loan.get("paid",0))
+ var pending := pending_financial_offer(chapter)
+ var now := clock.world_minutes
+ var latest := now
+ for bill in accounts.outstanding("abdul_karim"):latest=maxf(latest,float(bill.due_at))
+ var context_data := {"has_housing_due":not due.is_empty(),"housing_due_label":"%.2f" % (float(due.get("net",0))/100.0),"partial_label":"%.2f" % (float(partial.get("net",0))/100.0),"can_pay_housing":not due.is_empty() and wallet.balance>=int(due.net),"can_partial_housing":not partial.is_empty() and wallet.balance>=int(partial.net),"extend_1":commitments.eligible(1),"extend_3":commitments.eligible(3),"extend_7":commitments.eligible(7),"extension_1_date":AccountText.date(latest+1440),"extension_3_date":AccountText.date(latest+4320),"extension_7_date":AccountText.date(latest+10080),"agreed_date":AccountText.date(float(pending.get("deadline",now))),"has_loan":loan_remaining>0,"loan_remaining_label":"%.2f" % (float(loan_remaining)/100.0),"can_repay_loan":loan_remaining>0 and wallet.balance>=loan_remaining,"can_loan":commitments.eligible(),"about_today":commitments.state.moments.has("about:%d" % clock.day),"can_focus":actions.preview(&"personal_focus").ok,"known_abdul_family":knowledge.has(&"KNOWN_ABDUL_FAMILY"),"can_repair":false,"loan_duration_label":"%.1f يوم" % (float(config.section("accounts").loan.duration_minutes)/1440.0)}
+ for promise in commitments.state.promises.values():
+  if promise.status=="broken" and not promise.repaired:context_data.can_repair=true
+ for loan_record in commitments.state.loans.values():
+  if loan_record.get("status")=="broken" and not loan_record.get("repaired",false):context_data.can_repair=true
+ var amounts: Array=config.section("accounts").loan.amounts
+ for index in range(3):
+  var amount := int(amounts[index]) if index<amounts.size() else 0
+  context_data["loan_%d" % index]=amount>0 and amount<=int(commitments.state.budget_minor)
+  context_data["loan_%d_label" % index]="%.2f" % (float(amount)/100.0)
+ return context_data
+func pending_financial_offer(chapter: String) -> Dictionary:
+ var found: Dictionary={}
+ for offer in commitments.state.offers.values():
+  if offer.get("chapter","")==chapter and not offer.get("declined",false) and (found.is_empty() or float(offer.at)>=float(found.at)):found=offer
+ return found.duplicate(true)
+func financial_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:
+ if participants.size()!=1:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"creditor_not_present")
+ var actor: Variant=presence.record(participants[0])
+ if actor==null or actor.character_id!=&"abdul_karim" or not presence.near_actor(&"abdul_karim"):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"creditor_not_present")
+ var chapter := source.get_slice("/",0)
+ var saved: Dictionary=accounts.state.chapters.get(chapter,{})
+ if saved.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"stale_financial_offer")
+ if action in ["pay_housing","pay_partial"]:return finance.pay(str(saved["pay_quote" if action=="pay_housing" else "partial_quote"]),"ink:"+source)
+ if action=="repay_loan":return finance.pay_loan(str(saved.loan_id),"ink:"+source)
+ if action=="personal":return finance.personal_moment(source)
+ if action=="repair":return finance.personal_moment(source,true)
+ if action=="accept_offer":
+  var offer := pending_financial_offer(chapter)
+  return finance.accept_offer(str(offer.get("id","")),"ink:"+source)
+ if action=="decline_offer":
+  var offer := pending_financial_offer(chapter)
+  if not offer.is_empty():commitments.state.offers[offer.id]["declined"]=true
+  return ActionResult.success()
+ var offered := ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_financial_action")
+ if action.begins_with("offer_day_"):offered=commitments.offer("extension",int(action.trim_prefix("offer_day_")))
+ elif action.begins_with("offer_loan_"):
+  var index := int(action.trim_prefix("offer_loan_"))
+  var amounts: Array=config.section("accounts").loan.amounts
+  if index>=0 and index<amounts.size():offered=commitments.offer("loan",int(amounts[index]))
+ if offered.ok:commitments.state.offers[offered.details.offer.id]["chapter"]=chapter
+ return offered
+func notebook_people() -> Array[Dictionary]:
+ var people := social_life.people()
+ if not journal.entries({"actor":"abdul_karim"}).is_empty():people.append({"name":presence.profile(&"abdul_karim").name,"score":relationships.value(&"player",&"abdul_karim",&"familiarity"),"stage":"صاحب السكن — معرفة وعلاقة مستقلة عن الحساب","connection":""})
+ return people
+
+func validate_financial_chapters() -> ActionResult:
+ for id in accounts.state.chapters:
+  var record: Variant=accounts.state.chapters[id]
+  if not narrative.valid_sequence(str(id),"conversation_",int(narrative.snapshot().next_id)) or not record is Dictionary or record.get("id")!=id:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
+  for key in ["pay_quote","partial_quote"]:
+   if not record.get(key) is String:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
+   if record[key].is_empty():continue
+   var quote: Dictionary=accounts.state.quotes.get(record[key],{})
+   if quote.is_empty() or quote.lease!="housing_lease" or quote.get("chapter")!=id:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
+  if not record.get("loan_id") is String or (not record.loan_id.is_empty() and not commitments.state.loans.has(record.loan_id)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
+ for offer in commitments.state.offers.values():
+  if not offer.get("chapter") is String or not accounts.state.chapters.has(offer.chapter):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_offer_source")
+ return ActionResult.success()

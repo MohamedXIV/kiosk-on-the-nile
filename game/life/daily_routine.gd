@@ -7,6 +7,7 @@ var clock: GameClock
 var wallet: WalletService
 var needs: NeedsService
 var home: HomeService
+var rent_enabled: bool=false
 var rent: int
 var policy: MoodPolicy
 var _last_rent_day: int
@@ -40,10 +41,12 @@ func _day_changed(_previous: int, current: int) -> void:
  # Each calendar day is assessed once, even across a long sleep. No arrears.
  while _last_rent_day<current:
   _last_rent_day += 1
-  if wallet.balance>=rent: wallet.try_spend(rent)
+  if rent_enabled and wallet.balance>=rent: wallet.try_spend(rent)
 func snapshot() -> Dictionary:
- return {"last_rent_day":_last_rent_day}
+ return {"last_rent_day":_last_rent_day,"rent_enabled":rent_enabled}
 func restore(data: Dictionary) -> ActionResult:
  if not ContentValidation.integer(data.get("last_rent_day")) or int(data.last_rent_day)!=clock.day: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_rent_day")
+ if data.get("rent_enabled")!=false:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"legacy_rent_active")
+ rent_enabled=false
  _last_rent_day = int(data.last_rent_day)
  return ActionResult.success()

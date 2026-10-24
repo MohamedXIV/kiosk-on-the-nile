@@ -71,6 +71,7 @@ func present(session: GameSession) -> void:
  _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
  _money.text = _text.text("money",{"amount":"%.2f" % (session.wallet.balance/100.0)})
  _state.text = _text.text("open") if session.kiosk_open else _text.text("closed")
+ if not session.accounts.business_allowed():_state.text+=" · النشاط موقوف للحي"
  if not session.actions.preview(&"personal_focus").ok:_state.text+=" · محتاج نوم"
  elif session.needs.rest<session.tuning.value("fatigue_warning"):_state.text+=" · مرهق"
  _state.tooltip_text="راحة حقيقية %.1f — تركيز فعّال %.1f" % [session.needs.rest,session.alertness.effective_focus()]

@@ -124,6 +124,7 @@ func _available(shop_id: String, offer: Dictionary) -> int:
  for part in offer.contents:value=mini(value,int(_stock[shop_id][part.definition_id])/int(part.quantity))
  return value
 func _return_purchases(journey_id: StringName, bag_id: StringName, location_id: StringName) -> void:
+ if bag_id.is_empty():return
  if _delivered.has(str(journey_id)):return
  var change := _items.candidate()
  var store_id := str(location_id)+"_furniture"

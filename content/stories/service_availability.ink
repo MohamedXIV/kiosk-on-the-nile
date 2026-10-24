@@ -2,6 +2,7 @@ VAR character_id = "farid"
 VAR order_label = ""
 VAR kiosk_open = false
 VAR request_can_prepare = true
+VAR business_allowed = true
 VAR line_variant = 0
 {kiosk_open:
  {line_variant:
@@ -16,12 +17,16 @@ VAR line_variant = 0
  - else: مش عايز أقطع راحتك.. لو متاح تعمل {order_label} أستناك براحة. # speaker:{character_id} # duration:8
  }
 }
-* {request_can_prepare} [طبعًا، أعمله لك.]
+* {request_can_prepare && business_allowed} [طبعًا، أعمله لك.]
  تسلم يا صاحبي، وأنا هنا على مهلي. # speaker:{character_id} # duration:6 # effect:service\|accept
  -> END
 * [كنت بروّق دماغي شوية، معلش نخليها بعدين.]
  ولا يهمك، خد راحتك. القعدة حلوة حتى من غير طلب. # speaker:{character_id} # duration:6 # effect:service\|decline
  -> END
-* {not request_can_prepare} [محتاج أجيب طلبات الأول، المكونات ناقصة.]
+* {not request_can_prepare && business_allowed} [محتاج أجيب طلبات الأول، المكونات ناقصة.]
  ربنا يعينك، نبقى نشوفها لما تجيب اللي ناقصك. # speaker:{character_id} # duration:6 # effect:service\|decline
+ -> END
+
+* {not business_allowed} [الحي موقف النشاط لحد ما أسوّي المستحق، لكن تقدر تقعد معانا. ]
+ ولا يهمك. خلّص ورقك على مهلك، والقعدة موجودة. # speaker:{character_id} # duration:7 # effect:service\|decline
  -> END

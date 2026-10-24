@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 9
-const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
+const SCHEMA_REVISION := 10
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -75,11 +75,23 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
  if not result.ok:
   candidate.queue_free()
   return result
+ result=candidate.finance.validate_links()
+ if not result.ok:
+  candidate.queue_free()
+  return result
+ for record in restored_data.state.narrative.get("sessions",{}).values()+restored_data.state.personal.get("paused",{}).values():
+  if record is Dictionary and record.get("encounter_id")=="landlord" and not candidate.accounts.state.chapters.has(str(record.get("id",""))):
+   candidate.queue_free()
+   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_financial_chapter")
  result = await candidate.narrative.restore(restored_data.state.narrative)
  if not result.ok:
   candidate.queue_free()
   return result
  result = await candidate.personal.validate_links()
+ if not result.ok:
+  candidate.queue_free()
+  return result
+ result=candidate.validate_financial_chapters()
  if not result.ok:
   candidate.queue_free()
   return result

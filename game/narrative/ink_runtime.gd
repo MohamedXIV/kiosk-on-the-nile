@@ -71,6 +71,8 @@ func advance() -> NarrativeTypes.Frame:
      var fields := value.split("|")
      if fields.size() == 2 and fields[0] == "mood" and fields[1].is_valid_float():
       _frame.effects.append({"kind":"mood","amount":fields[1].to_float()})
+     elif fields.size()==2 and fields[0]=="finance":
+      _frame.effects.append({"kind":"finance","action_id":fields[1]})
      elif fields.size()==2 and fields[0]=="service":
       _frame.effects.append({"kind":"service","action_id":fields[1]})
      elif fields.size()==2 and fields[0]=="social":

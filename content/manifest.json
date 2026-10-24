@@ -49,6 +49,10 @@
     "story_inner_monologue": "stories/inner_monologue.ink.json",
     "story_service_availability": "stories/service_availability.ink.json",
     "tuning": "tuning.json",
-    "action_policy": "action_policy.json"
+    "action_policy": "action_policy.json",
+    "accounts": "accounts.json",
+    "residential_visits": "residential_visits.json",
+    "story_landlord": "stories/landlord.ink.json",
+    "archive_service_availability_94e60e8397f7": "archive/service_availability-94e60e8397f7.ink.json"
   }
 }

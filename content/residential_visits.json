@@ -1,0 +1,27 @@
+{
+  "profiles": {
+    "abdul_karim": {
+      "name": "عم عبد الكريم",
+      "color": "#90735b"
+    }
+  },
+  "window": [
+    1140,
+    1320
+  ],
+  "arrival_delay_minutes": [
+    10,
+    30
+  ],
+  "stay_minutes": 90,
+  "return_minutes": 180,
+  "entrance": [
+    4.5,
+    4.0
+  ],
+  "standing": [
+    3.7,
+    1.0
+  ],
+  "speed": 2.1
+}

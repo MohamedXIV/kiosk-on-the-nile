@@ -59,6 +59,17 @@
       ],
       "outbound_minutes": 10,
       "return_minutes": 10
+    },
+    "district": {
+      "kind": "office",
+      "label": "الحي — سداد إيجار الكشك",
+      "destination": "district",
+      "from_locations": [
+        "kiosk",
+        "rooftop"
+      ],
+      "outbound_minutes": 10,
+      "return_minutes": 10
     }
   },
   "bag_capacity": 240

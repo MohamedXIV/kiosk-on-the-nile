@@ -10,6 +10,7 @@ var _fatigue_overlay: FatigueOverlay
 var _fatigue_layer: CanvasLayer
 var _visitor_panel: VisitorPanel
 var _recipe_panel: RecipePanel
+var _district_panel: DistrictPanel
 var _shop_panel: ShopPanel
 var _journey_panel: JourneyPanel
 var _inventory_panel: InventoryPanel
@@ -179,6 +180,9 @@ func _install(candidate: GameSession) -> void:
  _shop_panel=ShopPanel.new()
  _hud.add_child(_shop_panel)
  _shop_panel.configure(_text,_session)
+ _district_panel=DistrictPanel.new()
+ _hud.add_child(_district_panel)
+ _district_panel.configure(_text,_session)
  _session.travel.changed.connect(_travel_changed)
  _hud.travel_requested.connect(func(route_id):
   if _session.build.active or _hud.sleep_panel.visible:return
@@ -218,9 +222,13 @@ func _physics_process(delta: float) -> void:
  _camera.global_position = _motor.global_position
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
  _hud.present(_router.nearest())
+ if _hud.notebook.visible and _session.clock.tick%15==0:_hud.notebook.present_accounts(AccountText.ledger(_session))
  _captions.top_inset = _hud.top_occupied_height()
  _journey_panel.present()
  _shop_panel.present()
+ _district_panel.present()
+ if _hud.notebook.visible:_district_panel.hide()
+ if _district_panel.visible:_journey_panel.hide()
  if _shop_panel.visible:_journey_panel.hide()
  _captions.visible=_session.locations.is_physical(_session.location_id)
  if _captions.visible:_captions.present(_session,_rooms[str(_session.location_id)],_camera)
@@ -323,7 +331,8 @@ func _toggle_notebook() -> void:
  else:
   var notes := _session.knowledge.notes()
   notes.append(_text.text("venue_reputation",{"label":_session.customer_experience.reputation(&"kiosk").label}))
-  _hud.notebook.present(notes,_session.social_life.people(),_session.journal.entries(),_config.section("ui"),_session.knowledge.note_sources())
+  _hud.notebook.present(notes,_session.notebook_people(),_session.journal.entries(),_config.section("ui"),_session.knowledge.note_sources())
+  _hud.notebook.present_accounts(AccountText.ledger(_session))
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   _focused = false

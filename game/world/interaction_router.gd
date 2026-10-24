@@ -23,12 +23,12 @@ func nearest() -> InteractionTarget:
    if _session.cooking.job(target.id).stage!=&"EMPTY": target.secondary=""
    elif _session.cooking.job(target.id).recipe.rules_id==&"tea":target.secondary=_text.text("station_options")
   if target.id==&"sign": target.primary=_text.text("close_kiosk") if _session.kiosk_open else _text.text("open_kiosk")
- if _session.location_id==&"kiosk":
-  for visit: VisitState in _session.visitors.visits.values():
-   if not _session.visitors.is_available(visit.id): continue
+ if _session.locations.is_physical(_session.location_id):
+  for visit in _session.presence.at(_session.location_id):
+   if not _session.presence.is_available(visit.id): continue
    var target := InteractionTarget.new(visit.id,visit.pose.ground,float(_session.config.section("visitors").interaction_radius))
    target.visit_id = visit.id
-   var character := _session.visitors.character(visit.character_id)
+   var character := _session.presence.profile(visit.character_id)
    var item := _session.cooking.held_item()
    var order := _session.service.pending_for(visit.id)
    if not (item and order and order.food_id==item.food_id) and order==null and not _session.narrative.can_talk(visit.id) and not _session.personal.can_open(visit.id): continue

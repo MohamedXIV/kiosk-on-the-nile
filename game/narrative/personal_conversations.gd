@@ -13,16 +13,18 @@ func active() -> bool:
 func holds_visit(id: StringName) -> bool:
  return active() and _hub.visit_id==str(id)
 func can_open(id: StringName) -> bool:
- var visit: VisitState=_session.visitors.visits.get(str(id))
+ var visit: Variant=_session.presence.record(str(id))
  return visit!=null and (_paused.has(str(visit.character_id)) or holds_visit(id) or not _session.narrative.manual_topics_for(id).is_empty())
 func open_for(id: StringName) -> ActionResult:
  var eligibility := _session.actions.preview(&"personal_focus")
+ var person: Variant=_session.presence.record(id)
+ if person!=null and person.character_id==&"abdul_karim":eligibility=ActionResult.success()
  if not eligibility.ok and _session.service.pending_for(id)==null:return eligibility
  if _opening or not _near(id):return _fail()
  if holds_visit(id):return ActionResult.success()
  if _session.narrative.speech_active(id):return _fail()
  leave()
- var visit: VisitState=_session.visitors.visits[str(id)]
+ var visit: Variant=_session.presence.record(str(id))
  _hub={"visit_id":str(id),"actor_id":str(visit.character_id),"session_id":""}
  if eligibility.ok and _paused.has(_hub.actor_id):
   _opening=true
@@ -41,13 +43,13 @@ func can_acquire(participants: PackedStringArray, chapter: StringName = &"") -> 
  return true
 func adopt(conversation: ConversationSession) -> bool:
  if not can_acquire(conversation.participants,conversation.id):return false
- var visit: VisitState=_session.visitors.visits.get(conversation.participants[0])
+ var visit: Variant=_session.presence.record(conversation.participants[0])
  if visit==null:return false
  _hub={"visit_id":str(visit.id),"actor_id":str(visit.character_id),"session_id":str(conversation.id)}
  return true
 func select_topic(key: String) -> ActionResult:
  if not active() or _opening or not _near(StringName(_hub.visit_id)) or not _hub.session_id.is_empty():return _fail()
- if key!="order_recall":
+ if key not in ["order_recall","landlord"]:
   var eligibility := _session.actions.preview(&"personal_focus")
   if not eligibility.ok:return eligibility
  _opening=true
@@ -78,14 +80,14 @@ func view() -> Dictionary:
   for event in _session.journal.entries({"chapter":str(conversation.id)}):
    if event.id!="%s/%d/speech" % [conversation.id,conversation.beat]:recent.append(event)
   if recent.size()>2:recent=recent.slice(recent.size()-2)
- return {"recent":recent,"actor_id":_hub.actor_id,"name":_session.visitors.character(StringName(_hub.actor_id)).get("name",""),"conversation":conversation,"topics":_topics() if conversation==null else [],"opening":_opening}
+ return {"recent":recent,"actor_id":_hub.actor_id,"name":_session.presence.profile(StringName(_hub.actor_id)).get("name",""),"conversation":conversation,"topics":_topics() if conversation==null else [],"opening":_opening}
 func _finished(id: StringName, _reason: StringName) -> void:
  if active() and _hub.session_id==str(id):
   _hub.session_id=""
   if not _session.actions.preview(&"personal_focus").ok:_hub={}
 func _near(id: StringName) -> bool:
- if not _session.visitors.is_available(id):return false
- var visit: VisitState=_session.visitors.visits[str(id)]
+ if not _session.presence.is_available(id):return false
+ var visit: Variant=_session.presence.record(str(id))
  return _session.location_id==visit.pose.location_id and _session.player_ground.distance_to(visit.pose.ground)<=float(_session.config.section("spatial").hearing_radius)
 func snapshot() -> Dictionary:
  return {"hub":_hub.duplicate(true),"paused":_paused.duplicate(true)}
@@ -94,11 +96,11 @@ func restore(data: Dictionary) -> ActionResult:
  if not data.hub.is_empty():
   for key in ["actor_id","visit_id","session_id"]:
    if not data.hub.get(key) is String:return _fail()
-  var visit: VisitState=_session.visitors.visits.get(data.hub.visit_id)
+  var visit: Variant=_session.presence.record(data.hub.visit_id)
   if visit==null or str(visit.character_id)!=data.hub.actor_id:return _fail()
  for actor in data.paused:
   var record: Variant=data.paused[actor]
-  if not _session.config.section("visitors").characters.has(actor) or not record is Dictionary or not record.get("runtime") is Dictionary or not record.get("context_extra") is Dictionary or not record.get("id") is String or not record.get("encounter_id") is String or not record.get("participants") is Array or record.participants.size()!=1 or record.encounter_id in ["service_availability","orders"]:return _fail()
+  if not _session.presence.profiles().has(actor) or not record is Dictionary or not record.get("runtime") is Dictionary or not record.get("context_extra") is Dictionary or not record.get("id") is String or not record.get("encounter_id") is String or not record.get("participants") is Array or record.participants.size()!=1 or record.encounter_id in ["service_availability","orders"]:return _fail()
   if record.context_extra.get("character_id",actor)!=actor:return _fail()
   if not record.runtime.get("frame") is Dictionary or record.runtime.frame.get("speaker_id","") not in ["",actor]:return _fail()
  _hub=data.hub.duplicate(true)
@@ -133,5 +135,5 @@ func _fail() -> ActionResult:
 
 func _topics() -> Array[Dictionary]:
  var topics := _session.narrative.manual_topics_for(StringName(_hub.visit_id))
- if not _session.actions.preview(&"personal_focus").ok:topics=topics.filter(func(topic):return topic.key=="order_recall")
+ if not _session.actions.preview(&"personal_focus").ok:topics=topics.filter(func(topic):return topic.key in ["order_recall","landlord"])
  return topics

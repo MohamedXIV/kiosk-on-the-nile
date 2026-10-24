@@ -14,7 +14,7 @@ func configure(routes: Dictionary, clock: GameClock, pose: ActorPose, inventory:
  if not routes.get("routes") is Dictionary or not ContentValidation.integer(routes.get("bag_capacity")) or routes.bag_capacity<1:return ContentValidation.fail("travel")
  for id in routes.routes:
   var route: Variant=routes.routes[id]
-  if not route is Dictionary or not route.get("kind") in ["physical","shop"] or not route.get("from_locations") is Array or route.from_locations.is_empty() or not locations.kind(StringName(str(route.get("destination","")))) in [&"physical",&"shop"]:return ContentValidation.fail("travel.route")
+  if not route is Dictionary or not route.get("kind") in ["physical","shop","office"] or not route.get("from_locations") is Array or route.from_locations.is_empty() or not locations.kind(StringName(str(route.get("destination","")))) in [&"physical",&"shop",&"office"]:return ContentValidation.fail("travel.route")
   for value in ["outbound_minutes","return_minutes"]:
    if not ContentValidation.bounded(route.get(value),0.01,1440):return ContentValidation.fail("travel.duration")
   if route.has("arrival_ground"):
@@ -56,7 +56,7 @@ func begin_return() -> ActionResult:
 func tick(_frame: Dictionary) -> void:
  if not journey.data.get("phase") in ["outbound","returning"] or _clock.world_minutes<float(journey.data.due_at):return
  var route: Dictionary=_config.routes[journey.data.route_id]
- if journey.data.phase=="outbound" and route.kind=="shop":
+ if journey.data.phase=="outbound" and route.kind in ["shop","office"]:
   journey.data.phase="browsing"
   _pose.location_id=StringName(route.destination)
  elif journey.data.phase=="returning":

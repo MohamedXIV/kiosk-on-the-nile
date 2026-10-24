@@ -6,7 +6,7 @@ func configure(locations: Dictionary, routes: Dictionary) -> ActionResult:
  for id in locations:_kinds[id]="physical"
  _kinds["transit"]="transit"
  for route in routes.values():
-  if route.get("kind")=="shop":_kinds[str(route.destination)]="shop"
+  if route.get("kind") in ["shop","office"]:_kinds[str(route.destination)]=str(route.kind)
  return ActionResult.success()
 func kind(id: StringName) -> StringName:
  return StringName(_kinds.get(str(id),""))

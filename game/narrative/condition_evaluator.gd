@@ -1,6 +1,7 @@
 class_name ConditionEvaluator
 extends RefCounted
 ## Finite declarative queries; never invokes content-provided methods.
+var presence: ActorPresence
 var social_life: SocialLife
 var social_actions: Array=[]
 var social_topics: Array=[]
@@ -91,13 +92,13 @@ func permits(rule: Dictionary, participants: PackedStringArray = PackedStringArr
    return minute>=float(value[0]) and minute<=float(value[1])
   "participants_available":
    var available := not participants.is_empty()
-   for id in participants: available = available and _visitors.is_available(StringName(id))
+   for id in participants: available = available and (presence.is_available(StringName(id)) if presence!=null else _visitors.is_available(StringName(id)))
    return available == value
   "distance_at_most":
    if value is Dictionary: return str(_player.location_id)==value.location_id and _player.ground.distance_to(Vector2(value.ground[0],value.ground[1]))<=float(value.value)
    if participants.is_empty(): return false
    for id in participants:
-    var visit: VisitState = _visitors.visits.get(id)
+    var visit: Variant=presence.record(id) if presence!=null else _visitors.visits.get(id)
     if visit == null or visit.pose.location_id!=_player.location_id or visit.pose.ground.distance_to(_player.ground)>float(value): return false
    return true
  return false

@@ -24,19 +24,20 @@ func configure(session: GameSession, definitions: Dictionary, stories: Dictionar
  return ActionResult.success()
 func context(participants: PackedStringArray, extra: Dictionary = {}) -> Dictionary:
  var character_id := "hassan"
- if not participants.is_empty() and _session.visitors.visits.has(participants[0]): character_id = str(_session.visitors.visits[participants[0]].character_id)
+ if not participants.is_empty() and _session.presence.has(participants[0]): character_id = str(_session.presence.record(participants[0]).character_id)
  var intended_food := ""
- if not participants.is_empty() and _session.visitors.visits.has(participants[0]): intended_food=str(_session.visitors.visits[participants[0]].food_id)
+ if not participants.is_empty() and _session.presence.has(participants[0]): intended_food=_session.presence.food_id(StringName(participants[0]))
  var pending := _session.service.pending_for(StringName(participants[0])) if not participants.is_empty() else null
  if pending!=null:intended_food=str(pending.food_id)
  var quality: String = _session.visitors.memory.last_served_quality
  var recipe: Dictionary = _session.config.section("recipes").recipes.tea
  for i in range(recipe.quality_keys.size()):
   if recipe.quality_keys[i] == quality: quality = recipe.quality_names[str(i)]
- var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"kiosk_open":_session.kiosk_open,"request_can_prepare":_session.request_can_prepare(StringName(intended_food)),"mode":0,"quality_score":0,"order_label":_session.foods.definition(StringName(intended_food)).get("menu_label","")}
- var visit: VisitState = _session.visitors.visits.get(participants[0]) if not participants.is_empty() else null
+ var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"kiosk_open":_session.kiosk_open,"business_allowed":_session.accounts.business_allowed(),"request_can_prepare":_session.request_can_prepare(StringName(intended_food)),"mode":0,"quality_score":0,"order_label":_session.foods.definition(StringName(intended_food)).get("menu_label","")}
+ var visit: Variant = _session.presence.record(participants[0]) if not participants.is_empty() else null
  var previous := _session.visitors.history.previous_service(character_id,visit.id) if visit else {}
  data.merge({"topic_id":"","line_variant":0,"hour":int(_session.clock.minutes)/60,"bought_fan":_session.home.has_fan,"visit_count":_session.visitors.visit_count(StringName(character_id)),"previous_quality":int(previous.get("quality",-1)),"previous_food":str(previous.get("food_id",""))},true)
+ if character_id=="abdul_karim":data.merge(_session.financial_context(str(extra.get("chapter_id",""))),true)
  data.merge(extra,true)
  return data
 func start(encounter_id: StringName, participants: PackedStringArray, extra: Dictionary = {}) -> ActionResult:
@@ -49,7 +50,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  var social_topic := str(definition.get("social_topic",""))
  if not social_topic.is_empty():
   if not _session.social_life.topic_available(social_topic) or participants.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
-  var visit: VisitState=_session.visitors.visits.get(participants[0])
+  var visit: Variant=_session.presence.record(participants[0])
   if visit==null or str(visit.character_id)!=_session.social_life.topic_actor(social_topic):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  var key := str(encounter_id)+":"+",".join(participants)
  if _opening.has(key): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_opening")
@@ -126,7 +127,7 @@ func _advance(conversation: ConversationSession) -> ActionResult:
  if not speaker.is_empty():
   var valid_speaker := false
   for id in conversation.participants:
-   if _session.visitors.visits.has(id) and str(_session.visitors.visits[id].character_id)==speaker: valid_speaker=true
+   if _session.presence.has(id) and str(_session.presence.record(id).character_id)==speaker: valid_speaker=true
   if not valid_speaker:
    var rejected := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_story_speaker")
    _report_failure(conversation,rejected)
@@ -232,14 +233,14 @@ func restore(data: Dictionary) -> ActionResult:
  if not data.get("sessions") is Dictionary or not ContentValidation.integer(data.get("next_id")) or data.next_id<1 or not data.get("focus") is String: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_conversations")
  if not data.get("history") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_topic_history")
  var restored_history := ConversationHistory.new()
- var history_result := restored_history.restore(data.history,_definitions,_session.config.section("visitors").characters)
+ var history_result := restored_history.restore(data.history,_definitions,_session.presence.profiles())
  if not history_result.ok: return history_result
  var candidates: Dictionary = {}
  for id in data.sessions:
   var record: Variant = data.sessions[id]
   if not record is Dictionary or record.get("id")!=id or not _definitions.has(record.get("encounter_id")) or not record.get("participants") is Array or not ContentValidation.integer(record.get("beat")) or record.beat<1 or not ContentValidation.number(record.get("elapsed")) or record.elapsed<0 or not ContentValidation.number(record.get("choice_elapsed")) or record.choice_elapsed<0 or not record.get("runtime") is Dictionary: return _reject_candidates(candidates)
   for participant in record.participants:
-   if not participant is String or not _session.visitors.visits.has(participant): return _reject_candidates(candidates)
+   if not participant is String or not _session.presence.has(participant): return _reject_candidates(candidates)
   var conversation := ConversationSession.new()
   conversation.id = StringName(id)
   conversation.encounter_id = StringName(record.encounter_id)
@@ -249,7 +250,7 @@ func restore(data: Dictionary) -> ActionResult:
   if not record.get("topic_selection",{}) is Dictionary: return _reject_candidates(candidates)
   conversation.topic_selection = record.get("topic_selection",{}).duplicate(true)
   if not conversation.topic_selection.is_empty():
-   var selection_validation := ConversationHistory.new().restore({conversation.topic_selection.get("key",""):conversation.topic_selection},_definitions,_session.config.section("visitors").characters)
+   var selection_validation := ConversationHistory.new().restore({conversation.topic_selection.get("key",""):conversation.topic_selection},_definitions,_session.presence.profiles())
    if not selection_validation.ok or conversation.context_extra.get("topic_id")!=conversation.topic_selection.get("topic_id") or conversation.context_extra.get("line_variant")!=conversation.topic_selection.get("variant"): return _reject_candidates(candidates)
   conversation.beat = int(record.beat)
   conversation.elapsed = float(record.elapsed)
@@ -269,7 +270,7 @@ func restore(data: Dictionary) -> ActionResult:
    # An Ink control-only frame can precede the first spoken line. It has not
    # consumed the topic yet, but the saved selection must still be eligible.
    if not conversation.current.text.is_empty() or not conversation.current.effects.is_empty() or conversation.participants.is_empty(): return _reject_candidates(candidates)
-   var selected_visit: VisitState = _session.visitors.visits[conversation.participants[0]]
+   var selected_visit: Variant = _session.presence.record(conversation.participants[0])
    if not ConversationHistory.equivalent_selection(restored_history.select(conversation.encounter_id,_definitions[str(conversation.encounter_id)],selected_visit,_session,int(conversation.context_extra.get("mode",0))),conversation.topic_selection): return _reject_candidates(candidates)
   for effect in conversation.current.effects:
    if not _session.effects.valid(effect): return _reject_candidates(candidates)
@@ -293,7 +294,9 @@ func _report_failure(conversation: ConversationSession, result: ActionResult) ->
  failed.emit(result)
 
 func _context_for(conversation: ConversationSession) -> Dictionary:
- var projected := context(conversation.participants,conversation.context_extra)
+ var inputs := conversation.context_extra.duplicate(true)
+ inputs["chapter_id"]=str(conversation.id)
+ var projected := context(conversation.participants,inputs)
  var social_topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
  if not social_topic.is_empty() and str(conversation.encounter_id).begins_with("social_"):
   projected.merge(_session.social_life.dialogue_context(social_topic),true)
@@ -324,22 +327,24 @@ func speech_active(visit_id: StringName) -> bool:
  return false
 func can_talk(visit_id: StringName) -> bool:
  if speech_active(visit_id):return false
- if not _session.visitors.is_available(visit_id): return false
- var visit: VisitState = _session.visitors.visits[str(visit_id)]
+ if not _session.presence.is_available(visit_id): return false
+ var visit: Variant = _session.presence.record(str(visit_id))
  for conversation: ConversationSession in sessions.values():
   if str(visit_id) in conversation.participants and (conversation.encounter_id==&"football" or int(conversation.context_extra.get("mode",0))==0):return false
  return not talk_encounter(visit_id).is_empty()
 func talk_encounter(visit_id: StringName) -> StringName:
- var visit: VisitState=_session.visitors.visits.get(str(visit_id))
+ var visit: Variant=_session.presence.record(str(visit_id))
  if visit==null:return &""
+ if visit.character_id==&"abdul_karim":return &"landlord"
  var fallback: Array=["amgad"] if visit.character_id==&"amgad" else ["visitors"]
- var encounters: Array=_session.visitors.character(visit.character_id).get("manual_encounters",fallback)
+ var encounters: Array=_session.presence.profile(visit.character_id).get("manual_encounters",fallback)
  for id in encounters:
   if not _select_topic(StringName(id),PackedStringArray([str(visit_id)]),{}).is_empty():return StringName(id)
  return &""
 func _select_topic(encounter: StringName, participants: PackedStringArray, extra: Dictionary) -> Dictionary:
- if participants.is_empty() or not _session.visitors.visits.has(participants[0]): return {}
- return history.select(encounter,_definitions[str(encounter)],_session.visitors.visits[participants[0]],_session,int(extra.get("mode",0)),str(extra.get("requested_topic","")))
+ if encounter==&"landlord":return {}
+ if participants.is_empty() or not _session.presence.has(participants[0]): return {}
+ return history.select(encounter,_definitions[str(encounter)],_session.presence.record(participants[0]),_session,int(extra.get("mode",0)),str(extra.get("requested_topic","")))
 func _saved_story(record: Dictionary) -> StoryDefinition:
  var story: StoryDefinition = _stories[_definitions[record.encounter_id].story]
  if record.runtime.get("story_hash")==story.sha256: return story
@@ -364,7 +369,7 @@ func _can_hear(conversation: ConversationSession) -> bool:
  if not _session.locations.is_physical(_session.location_id):return false
  var radius := float(_session.config.section("spatial").hearing_radius)
  for participant in conversation.participants:
-  var visit: VisitState=_session.visitors.visits.get(str(participant))
+  var visit: Variant=_session.presence.record(str(participant))
   if visit!=null and visit.pose.location_id==_session.location_id and visit.pose.ground.distance_to(_session.player_ground)<=radius:return true
  return false
 
@@ -385,15 +390,16 @@ func advance_manual(id: StringName) -> ActionResult:
 func _journal_line(conversation: ConversationSession) -> void:
  var actor := str(conversation.current.speaker_id)
  if actor.is_empty():return
- _session.journal.append_once({"id":"%s/%d/speech" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":actor,"name":str(_session.visitors.character(StringName(actor)).get("name",actor)),"text":conversation.current.text,"channel":"speech","at":_session.clock.world_minutes})
+ _session.journal.append_once({"id":"%s/%d/speech" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":actor,"name":str(_session.presence.profile(StringName(actor)).get("name",actor)),"text":conversation.current.text,"channel":"speech","at":_session.clock.world_minutes})
 func available_for(conversation: ConversationSession) -> bool:
  return _encounter_available(_definitions[str(conversation.encounter_id)],conversation.participants)
 func manual_topics_for(visit_id: StringName) -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
- var visit: VisitState=_session.visitors.visits.get(str(visit_id))
- if visit==null or not _session.visitors.is_available(visit_id):return result
+ var visit: Variant=_session.presence.record(str(visit_id))
+ if visit==null or not _session.presence.is_available(visit_id):return result
+ if visit.character_id==&"abdul_karim":return [{"key":"landlord","label":"نتكلم على حسابنا وأحوالنا","encounter":"landlord","topic":""}]
  for topic in _session.social_life.topics_for(visit_id):result.append({"key":"social:"+str(topic.id),"label":str(topic.label),"encounter":str(topic.encounter),"topic":""})
- var ids: Array=_session.visitors.character(visit.character_id).get("manual_encounters",["amgad"] if visit.character_id==&"amgad" else ["visitors"])
+ var ids: Array=_session.presence.profile(visit.character_id).get("manual_encounters",["amgad"] if visit.character_id==&"amgad" else ["visitors"])
  for encounter in ids:
   for topic in _definitions[encounter].get("topics",[]):
    var selected := history.select(StringName(encounter),_definitions[encounter],visit,_session,0,str(topic.id))
@@ -411,7 +417,7 @@ func validate_paused(record: Dictionary) -> ActionResult:
  if not _definitions.has(record.get("encounter_id")) or not ContentValidation.integer(record.get("beat")) or record.beat<1 or not ContentValidation.number(record.get("elapsed")) or record.elapsed<0 or not ContentValidation.number(record.get("choice_elapsed")) or record.choice_elapsed<0 or not record.get("topic_selection") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not valid_sequence(str(record.id),"conversation_",_next):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not record.topic_selection.is_empty():
-  var validation := ConversationHistory.new().restore({record.topic_selection.get("key",""):record.topic_selection},_definitions,_session.config.section("visitors").characters)
+  var validation := ConversationHistory.new().restore({record.topic_selection.get("key",""):record.topic_selection},_definitions,_session.presence.profiles())
   if not validation.ok:return validation
  var story := _saved_story(record)
  if story==null:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"incompatible_story")

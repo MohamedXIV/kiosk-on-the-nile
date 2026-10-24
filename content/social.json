@@ -3,7 +3,7 @@
     "START_ROUTINE"
   ],
   "initial_notes": [
-    "اليوم الأول: فتحت الكشك ع النيل. الإيجار اليومي {daily_rent} جنيه، والأهم إن الواحد يعيشها بروقان."
+    "الكشك على النيل، والحياة على رواقة. إيجار السكن لعم عبد الكريم وإيجار الكشك للحي أسبوعيًا؛ التفاصيل والمواعيد في دفتر المستحقات."
   ],
   "facts": [
     "START_ROUTINE",
@@ -14,7 +14,8 @@
     "YOUSSEF_WORK_STUDY",
     "WORK_TRIAL_APPOINTMENT",
     "WORK_TRIAL_RESULT",
-    "WORK_TRIAL_WEEK"
+    "WORK_TRIAL_WEEK",
+    "KNOWN_ABDUL_FAMILY"
   ],
   "relationship_defaults": {
     "familiarity": 0,

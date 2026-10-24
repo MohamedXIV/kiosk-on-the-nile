@@ -1,6 +1,7 @@
 class_name Notebook
 extends PanelContainer
 signal closed
+var _accounts := RichTextLabel.new()
 var _notes: RichTextLabel
 var _people := VBoxContainer.new()
 var _tabs := TabContainer.new()
@@ -47,6 +48,9 @@ func configure(text: UiText) -> void:
  _history.text_direction=Control.TEXT_DIRECTION_RTL
  _history.size_flags_vertical=Control.SIZE_EXPAND_FILL
  journal.add_child(_history)
+ _accounts.name=text.text("accounts_title")
+ _accounts.text_direction=Control.TEXT_DIRECTION_RTL
+ _tabs.add_child(_accounts)
  box.add_child(UiText.button(text.text("close"),func():hide();closed.emit()))
  hide()
 func present(notes: PackedStringArray, people: Array[Dictionary] = [], entries: Array[Dictionary] = [], ui: Dictionary = {}, sources: Array[Dictionary] = []) -> void:
@@ -109,3 +113,6 @@ func _render_history() -> void:
   var name := str(_ui.thought_name) if entry.channel=="thought" else str(entry.name)
   lines.append("اليوم %d · %02d:%02d · %s\n%s" % [entry_day,minute/60,minute%60,name,entry.text])
  _history.text="\n\n".join(lines) if not lines.is_empty() else str(_ui.journal_empty)
+
+func present_accounts(value: String) -> void:
+ if _accounts.text!=value:_accounts.text=value

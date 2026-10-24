@@ -59,7 +59,7 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   var now := float(candidate.state.clock.world_minutes)
   var seconds := float(candidate.state.clock.simulation_seconds)
   var tuning := TuningStore.new()
-  var configured := tuning.configure(config.section("tuning"),config.section("visitors").characters.keys()+["player"])
+  var configured := tuning.configure(config.section("tuning"),config.section("visitors").characters.keys()+config.section("residential_visits").profiles.keys()+["player"])
   if not configured.ok:return configured
   tuning.apply_at_boundary(false)
   candidate.state["tuning"]=tuning.snapshot()
@@ -77,6 +77,15 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
    visit["maximum_wait"]=float(config.section("visitors").max_wait_seconds)*2.5
    for key in ["elapsed","stay_seconds","decision_remaining"]:visit[key]=float(visit.get(key,0))*2.5
   candidate.schema_revision=9
+ if candidate.schema_revision==9 and target_revision>=10:
+  var now := float(candidate.state.clock.world_minutes)
+  candidate.state["accounts"]=AccountBook.initial_state(config.section("accounts"),now)
+  candidate.state["commitments"]=CommitmentService.initial_state(config.section("accounts"))
+  candidate.state["district"]={"journey_id":"","quote_id":"","request_id":"","last_receipt":""}
+  candidate.state["residential"]={"current":{},"next_id":1,"scheduled":-1.0,"retry_at":0.0}
+  candidate.state.routine["rent_enabled"]=false
+  candidate.state.journal.events.append({"id":"accounts:activation","chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":"بدأ حساب إيجار السكن والحي أسبوعيًا من فترة جديدة؛ لا ديون قديمة أُضيفت ولا خصم يومي تلقائي بعد الآن.","channel":"system","at":now})
+  candidate.schema_revision=10
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

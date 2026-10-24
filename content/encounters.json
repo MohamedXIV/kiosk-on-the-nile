@@ -768,5 +768,29 @@
       ]
     },
     "offer_requires": {}
+  },
+  "landlord": {
+    "story": "landlord",
+    "advancement": "manual",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    }
   }
 }

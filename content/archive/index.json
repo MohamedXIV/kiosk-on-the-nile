@@ -13,5 +13,8 @@
   "visitors": {
     "4c5dc78227097ff0fd99b3b7e6f5fb95b71e2a145f8ffe2a8c3e4748a0c048de": "archive_visitors_4c5dc7822709",
     "bba6210004c887421120a05f25f7c2b55c5ef4bf2cf3422c2aab8fac88e729f5": "archive_visitors_bba6210004c8"
+  },
+  "service_availability": {
+    "94e60e8397f77998cdd9dc9bd5683903ad8055ec3a5155ee71e127d784ca6a08": "archive_service_availability_94e60e8397f7"
   }
 }

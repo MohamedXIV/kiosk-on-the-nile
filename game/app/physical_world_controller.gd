@@ -4,6 +4,7 @@ var rooms: Dictionary = {}
 var motor: ActorMotor
 var character: CharacterView
 var camera: Camera2D
+var residential: ResidentialController
 var visitors: VisitorController
 var input_provider: Callable
 var _session: GameSession
@@ -36,6 +37,9 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
  parent.add_child(visitors)
  session.visitors.update_markers(rooms.kiosk.definition.data.markers)
  visitors.configure(session.visitors,rooms.kiosk)
+ residential=ResidentialController.new()
+ parent.add_child(residential)
+ residential.session=session;residential.room=rooms.rooftop
  session.spaces.set_adapter(_refresh)
  return ActionResult.success()
 func step(delta: float) -> void:
@@ -43,6 +47,7 @@ func step(delta: float) -> void:
  if input_provider.is_valid(): direction = input_provider.call()
  if _session.locations.is_physical(_session.location_id):motor.step_input(direction,delta)
  visitors.step(delta)
+ residential.step(delta)
 func set_active_location(id: StringName) -> void:
  if not _session.locations.is_physical(id):return
  var room: LocationView = rooms[str(id)]

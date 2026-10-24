@@ -1,0 +1,128 @@
+class_name AccountTransactions
+extends RefCounted
+signal changed
+var _session: GameSession
+func configure(session: GameSession) -> void:
+ _session=session
+func _channel(creditor: String) -> bool:
+ if not _session.running:return false
+ if creditor=="district":return _session.location_id==&"district" and _session.travel.journey.data.get("route_id")=="district" and _session.travel.journey.data.get("phase")=="browsing"
+ return creditor=="abdul_karim" and _session.presence.near_actor(&"abdul_karim")
+func pay(quote_id: String, request_id: String) -> ActionResult:
+ var prepared := _session.accounts.prepare_payment(quote_id,request_id,_session.wallet.balance)
+ if not prepared.ok or prepared.details.get("duplicate",false):return prepared
+ if not _channel(str(prepared.details.receipt.creditor)):return _fail("creditor_not_present")
+ var receipt: Dictionary=prepared.details.receipt
+ receipt["journal_text"]="دفعت %.2f ج.م إلى %s؛ الإيصال %s." % [float(receipt.net)/100.0,receipt.creditor_name,receipt.id]
+ prepared.details.state.receipts[receipt.id]=receipt
+ var event := _event(receipt)
+ var result := _publish(prepared.details.state,_session.commitments.snapshot(),int(receipt.wallet_after),_session.relationships.snapshot(),[event])
+ return ActionResult.success({"receipt":receipt,"cue":"coin"}) if result.ok else result
+func accept_offer(offer_id: String, request_id: String) -> ActionResult:
+ var prepared := _session.commitments.prepare_accept(offer_id,request_id,_session.wallet.balance)
+ if not prepared.ok or prepared.details.get("duplicate",false):return prepared
+ if not _channel("abdul_karim"):return _fail("creditor_not_present")
+ var receipt: Dictionary=prepared.details.receipt
+ receipt["creditor_name"]=_session.presence.profile(&"abdul_karim").name
+ receipt["journal_text"]=("اتفقنا على سلفة %.2f ج.م من %s، ورد أصلها في الموعد الموضح في الدفتر." % [float(receipt.cash_delta)/100.0,receipt.creditor_name]) if receipt.kind=="loan_accepted" else "اتفقت مع %s على مهلة جديدة؛ أصل المستحق لم يتغير." % receipt.creditor_name
+ prepared.details.state.receipts[receipt.id]=receipt
+ var result := _publish(_session.accounts.snapshot(),prepared.details.state,int(receipt.wallet_after),_session.relationships.snapshot(),[_event(receipt)])
+ return ActionResult.success({"receipt":receipt,"cue":"coin" if receipt.cash_delta>0 else "chime"}) if result.ok else result
+func pay_loan(loan_id: String, request_id: String) -> ActionResult:
+ var prepared := _session.commitments.prepare_repayment(loan_id,request_id,_session.wallet.balance)
+ if not prepared.ok or prepared.details.get("duplicate",false):return prepared
+ if not _channel("abdul_karim"):return _fail("creditor_not_present")
+ var receipt: Dictionary=prepared.details.receipt
+ receipt["creditor_name"]=_session.presence.profile(&"abdul_karim").name
+ receipt["journal_text"]="رددت أصل السلفة %.2f ج.م إلى %s؛ الإيصال %s." % [float(-int(receipt.cash_delta))/100.0,receipt.creditor_name,receipt.id]
+ prepared.details.state.receipts[receipt.id]=receipt
+ var result := _publish(_session.accounts.snapshot(),prepared.details.state,int(receipt.wallet_after),_session.relationships.snapshot(),[_event(receipt)])
+ return ActionResult.success({"receipt":receipt,"cue":"coin"}) if result.ok else result
+func tick(_frame: Dictionary) -> ActionResult:
+ var book := _session.accounts.snapshot()
+ var commitments := _session.commitments.snapshot()
+ var relations := _session.relationships.snapshot()
+ var events: Array[Dictionary]=[]
+ for bill in book.obligations.values():
+  if bill.get("announced",false):continue
+  bill["announced"]=true
+  events.append(_system("bill:"+str(bill.id),"استحق %s: %.2f ج.م. راجع دفتر الأسبوع." % [bill.label,float(int(bill.gross)-int(bill.paid))/100.0]))
+ for promise in commitments.promises.values():
+  if promise.status!="pending":continue
+  var outstanding := 0
+  for target in promise.targets:outstanding+=_session.accounts.remaining(target)
+  var status := "fulfilled" if outstanding==0 else "broken" if _session.clock.world_minutes>=float(promise.deadline) else ""
+  if status.is_empty():continue
+  promise.status=status
+  promise.assessed_at=_session.clock.world_minutes
+  _adjust(relations,_session.config.section("accounts")["promise_fulfilled" if status=="fulfilled" else "promise_broken"])
+  events.append(_system("promise:"+str(promise.id)+":"+status,"وفيت بوعد السداد." if status=="fulfilled" else "فات موعد وعد السداد؛ أصل الدين ما زال مستحقًا، ويمكنك الكلام والاتفاق من جديد."))
+ for loan in commitments.loans.values():
+  if loan.get("status","pending")!="pending":continue
+  var status := "fulfilled" if loan.paid==loan.principal else "broken" if _session.clock.world_minutes>=float(loan.due_at) else ""
+  if status.is_empty():continue
+  loan["status"]=status
+  loan["assessed_at"]=_session.clock.world_minutes
+  _adjust(relations,_session.config.section("accounts")["promise_fulfilled" if status=="fulfilled" else "promise_broken"])
+  events.append(_system("loan:"+str(loan.id)+":"+status,"رددت السلفة كما اتفقت." if status=="fulfilled" else "موعد رد السلفة عدى؛ السداد والاعتذار يفضلوا متاحين."))
+ if events.is_empty():return ActionResult.success()
+ return _publish(book,commitments,_session.wallet.balance,relations,events)
+func personal_moment(source: String, repair: bool = false) -> ActionResult:
+ if not _channel("abdul_karim"):return _fail("creditor_not_present")
+ var candidate := _session.commitments.snapshot()
+ var key := "repair:"+source if repair else "about:%d" % _session.clock.day
+ if candidate.moments.has(key):return ActionResult.success({"duplicate":true})
+ if repair:
+  var found := false
+  for p in candidate.promises.values():
+   if p.status=="broken" and not p.repaired:p.repaired=true;found=true
+  for loan in candidate.loans.values():
+   if loan.get("status")=="broken" and not loan.get("repaired",false):loan.repaired=true;found=true
+  if not found:return _fail("nothing_to_repair")
+ candidate.moments[key]={"at":_session.clock.world_minutes,"source":source,"repair":repair}
+ var relations := _session.relationships.snapshot()
+ _adjust(relations,_session.config.section("accounts").promise_repair if repair else _session.config.section("accounts").personal_moment)
+ return _publish(_session.accounts.snapshot(),candidate,_session.wallet.balance,relations,[])
+func _adjust(relations: Dictionary, delta: Dictionary) -> void:
+ if not relations.values.has("player"):relations.values.player={}
+ if not relations.values.player.has("abdul_karim"):relations.values.player.abdul_karim={}
+ for axis in ["familiarity","trust"]:
+  relations.values.player.abdul_karim[axis]=clampf(float(relations.values.player.abdul_karim.get(axis,0))+float(delta[axis]),0,100)
+func _publish(book: Dictionary, commitments: Dictionary, cash: int, relations: Dictionary, events: Array[Dictionary]) -> ActionResult:
+ var valid := _session.accounts.validate_state(book)
+ if not valid.ok:return valid
+ valid=_session.commitments.validate_state(commitments)
+ if not valid.ok:return valid
+ var wallet := WalletService.new()
+ valid=wallet.restore({"balance":cash})
+ if not valid.ok:return valid
+ var relationships := RelationshipStore.new(_session.config.section("social"),_session.presence.actor_ids()+["player"])
+ valid=relationships.restore(relations)
+ if not valid.ok:return valid
+ var journal := InteractionJournal.new()
+ journal.configure(_session.presence.actor_ids(),_session.clock)
+ valid=journal.restore(_session.journal.snapshot())
+ if not valid.ok:return valid
+ for event in events:
+  valid=journal.append_once(event)
+  if not valid.ok:return valid
+ # Every owner above is validated; observers run only after all publish.
+ _session.accounts.state=book.duplicate(true)
+ _session.commitments.state=commitments.duplicate(true)
+ _session.wallet.balance=cash
+ _session.relationships.restore(relations)
+ _session.journal.restore(journal.snapshot())
+ changed.emit()
+ return ActionResult.success()
+func _event(receipt: Dictionary) -> Dictionary:
+ return {"id":"finance:"+str(receipt.id),"chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":str(receipt.journal_text),"channel":"system","at":float(receipt.at)}
+func _system(id: String, value: String) -> Dictionary:
+ return {"id":"finance:"+id,"chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":value,"channel":"system","at":_session.clock.world_minutes}
+func validate_links() -> ActionResult:
+ for receipt in _session.accounts.state.receipts.values()+_session.commitments.state.receipts.values():
+  if not receipt.get("journal_text") is String:return _fail("missing_financial_journal")
+  var event := _session.journal.event("finance:"+str(receipt.id))
+  if event.is_empty() or StableJson.stringify(event)!=StableJson.stringify(_event(receipt)):return _fail("invalid_financial_journal")
+ return ActionResult.success()
+func _fail(key: String) -> ActionResult:
+ return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
