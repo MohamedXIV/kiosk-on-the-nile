@@ -101,7 +101,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not data.light.get("color") is String or not Color.html_is_valid(data.light.color) or not ContentValidation.bounded(data.light.get("radius"),1,1000) or not ContentValidation.bounded(data.light.get("energy"),0,5): return ContentValidation.fail("atmosphere.light")
  if bundle.has("encounters"):
   if not bundle.encounters is Dictionary or not bundle.has("social") or not bundle.has("visitors"): return ContentValidation.fail("encounters")
-  var actors: Array = bundle.visitors.characters.keys()+bundle.get("residential_visits",{}).get("profiles",{}).keys()
+  var actors: Array = bundle.visitors.characters.keys()+bundle.get("residential_visits",{}).get("profiles",{}).keys()+bundle.get("suppliers",{}).get("profiles",{}).keys()
   actors.append("player")
   var relationship_validation := RelationshipStore.new(bundle.social,actors).restore({"values":bundle.social.get("initial_relationships",{})})
   if not relationship_validation.ok: return ContentValidation.fail("social.initial_relationships")

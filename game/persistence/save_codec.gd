@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 10
-const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
+const SCHEMA_REVISION := 11
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -72,6 +72,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_service_memory")
  result = LivingSpacesSaveValidation.validate(candidate,restored_data)
+ if not result.ok:
+  candidate.queue_free()
+  return result
+ result=candidate.supply_transactions.validate_links()
  if not result.ok:
   candidate.queue_free()
   return result

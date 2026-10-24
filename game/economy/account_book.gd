@@ -9,7 +9,7 @@ func configure(session: GameSession) -> void:
  _data=session.config.section("accounts")
  state=initial_state(_data,session.clock.world_minutes)
 static func initial_state(data: Dictionary, now: float) -> Dictionary:
- var result := {"activated_at":now,"chapters":{},"leases":{},"obligations":{},"coverage":{},"receipts":{},"requests":{},"quotes":{},"next_quote":1,"next_receipt":1}
+ var result := {"supplier":SupplierLedger.initial_state(),"activated_at":now,"chapters":{},"leases":{},"obligations":{},"coverage":{},"receipts":{},"requests":{},"quotes":{},"next_quote":1,"next_receipt":1}
  for id in data.leases:
   var lease: Dictionary=data.leases[id].duplicate(true)
   lease["creditor_name"]=str(data.creditors[lease.creditor].name)
@@ -129,6 +129,8 @@ func restore(data: Dictionary) -> ActionResult:
  if result.ok:state=data.duplicate(true)
  return result
 func validate_state(data: Dictionary) -> ActionResult:
+ var supplier_valid := SupplierLedger.validate(data.get("supplier"),_session.clock.world_minutes)
+ if not supplier_valid.ok:return supplier_valid
  for key in ["chapters","leases","obligations","coverage","receipts","requests","quotes"]:
   if not data.get(key) is Dictionary:return _fail("invalid_account_state")
  for key in ["next_quote","next_receipt"]:

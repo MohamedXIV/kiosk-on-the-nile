@@ -22,4 +22,5 @@ static func ledger(session: GameSession) -> String:
   lines.append("%s · %s · %s\nالإجمالي %.2f ج.م" % [receipt.id,receipt.creditor_name,date(float(receipt.at)),float(receipt.net)/100.0])
   for line in receipt.lines:lines.append("من %s إلى %s · أساسي %.2f − خصم %.2f = %.2f ج.م" % [date(float(line.start)),date(float(line.end)),float(line.gross)/100.0,float(line.discount)/100.0,float(line.net)/100.0])
  for receipt in session.commitments.state.receipts.values():lines.append("%s · %s · %s" % [receipt.id,date(float(receipt.at)),receipt.get("journal_text","")])
+ if session.contracts!=null:lines.append(SupplierText.summary(session))
  return "\n\n".join(lines)

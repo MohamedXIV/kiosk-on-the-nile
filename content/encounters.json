@@ -792,5 +792,15 @@
         }
       ]
     }
+  },
+  "supplier": {
+    "story": "supplier",
+    "advancement": "manual",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {
+      "participants_available": true
+    }
   }
 }

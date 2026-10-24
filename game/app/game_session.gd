@@ -11,6 +11,10 @@ var residential: ResidentialVisits
 var accounts: AccountBook
 var commitments: CommitmentService
 var finance: AccountTransactions
+var contact: SupplierContact
+var contracts: SupplierContracts
+var deliveries: DeliveryService
+var supply_transactions: SupplyTransactions
 var district: DistrictOffice
 var config: SessionConfig
 var clock: GameClock
@@ -77,7 +81,7 @@ func configure(source: SessionConfig) -> ActionResult:
  wallet = WalletService.new(int(balance.starting_money))
  needs = NeedsService.new(source.section("needs"))
  tuning=TuningStore.new()
- var tuned := tuning.configure(source.section("tuning"),source.section("visitors").characters.keys()+source.section("residential_visits").profiles.keys()+["player"])
+ var tuned := tuning.configure(source.section("tuning"),source.section("visitors").characters.keys()+source.section("residential_visits").profiles.keys()+source.section("suppliers").profiles.keys()+["player"])
  if not tuned.ok:return tuned
  tuning.apply_at_boundary(false)
  alertness=AlertnessService.new()
@@ -258,12 +262,19 @@ func configure(source: SessionConfig) -> ActionResult:
   if destination!=&"kiosk":
    personal.leave()
    narrative.cancel_all())
+ contact=SupplierContact.new();contact.configure(self)
+ contracts=SupplierContracts.new();contracts.configure(self)
+ deliveries=DeliveryService.new();deliveries.configure(self)
+ supply_transactions=SupplyTransactions.new();supply_transactions.configure(self)
+ effects.supply_provider=supplier_effect
  district=DistrictOffice.new();district.configure(self)
  travel.departed.connect(func():
   residential.clear()
+  contact.close()
   personal.leave()
   narrative.cancel_all())
  life.sleep_started.connect(residential.clear)
+ life.sleep_started.connect(contact.close)
  scheduler.configure({})
  return rebuild_order()
 func rebuild_order() -> ActionResult:
@@ -274,6 +285,9 @@ func rebuild_order() -> ActionResult:
  handlers["accounts"]=func(frame):
   accounts.tick(frame)
   return finance.tick(frame)
+ handlers["deliveries"]=func(frame):
+  contact.tick(frame)
+  return deliveries.tick(frame)
  handlers["residential"]=func(frame):residential.tick(frame)
  handlers["body"]=func(frame):alertness.tick(frame);fatigue.tick(frame)
  handlers["travel"]=func(frame):travel.tick(frame)
@@ -362,6 +376,8 @@ func _sleep_elapsed(frame: Dictionary) -> void:
  hygiene.record_use(StringName("sleep:"+str(clock.tick)),routine.bed_id,&"sleep")
  accounts.tick(frame)
  finance.tick(frame)
+ var delivery_frame := frame.duplicate(true);delivery_frame["sleeping"]=true
+ deliveries.tick(delivery_frame)
  scheduler.tick(frame)
  social_life.tick(frame)
  changed.emit()
@@ -528,3 +544,15 @@ func validate_financial_chapters() -> ActionResult:
  for offer in commitments.state.offers.values():
   if not offer.get("chapter") is String or not accounts.state.chapters.has(offer.chapter):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_offer_source")
  return ActionResult.success()
+
+func supplier_context(chapter: String) -> Dictionary:
+ if not contracts.state.emergency_quotes.has(chapter):
+  var data := config.section("suppliers")
+  var e: Dictionary=data.emergency
+  contracts.state.emergency_quotes[chapter]={"name":str(presence.profile(&"fathi").name),"goods_minor":int(e.price_minor),"fee_minor":0,"total_minor":int(e.price_minor),"emergency_cap":int(e.cap_minor),"due_minutes":float(data.invoice_due_minutes),"food_id":str(e.food_id),"recipe_id":str(e.recipe_id),"mode":"credit","lines":[]}
+ return {"emergency_label":"%.2f" % (float(contracts.state.emergency_quotes[chapter].total_minor)/100.0)}
+func supplier_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:
+ if not contact.available() or participants.size()!=1 or str(contact.current.id)!=participants[0]:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"supplier_contact_required")
+ if action=="manage":contact.panel_requested=true;return ActionResult.success()
+ if action=="emergency":return supply_transactions.emergency(source)
+ return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_supplier_action")

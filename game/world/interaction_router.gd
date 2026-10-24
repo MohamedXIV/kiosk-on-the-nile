@@ -34,6 +34,11 @@ func nearest() -> InteractionTarget:
    if not (item and order and order.food_id==item.food_id) and order==null and not _session.narrative.can_talk(visit.id) and not _session.personal.can_open(visit.id): continue
    target.primary = _text.text("serve",{"item":_session.cooking.item_label(item),"name":character.name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":character.name})
    targets.append(target)
+ for point in _session.contact.points():
+  if point.location_id!=str(_session.location_id):continue
+  var phone := InteractionTarget.new(StringName("phone:"+str(point.host_id)),point.ground,float(_session.config.section("suppliers").phone_radius))
+  phone.primary=_text.text("supplier_phone")
+  targets.append(phone)
  var selected := InteractionSelector.nearest(_session.player_ground,targets)
  var people: Array[InteractionTarget]=[]
  for target in targets:
@@ -53,6 +58,7 @@ func execute(secondary: bool) -> ActionResult:
   return await _session.person_interaction(target.secondary_visit_id)
  if secondary and _session.cooking.held_item() and (target==null or target.secondary.is_empty()): return _session.life.consume_held()
  if target==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_target")
+ if str(target.id).begins_with("phone:") and not secondary:return await _session.contact.begin(str(target.id).trim_prefix("phone:"))
  if not target.visit_id.is_empty():
   if secondary: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_secondary")
   var item := _session.cooking.held_item()

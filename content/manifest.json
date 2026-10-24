@@ -53,6 +53,8 @@
     "accounts": "accounts.json",
     "residential_visits": "residential_visits.json",
     "story_landlord": "stories/landlord.ink.json",
-    "archive_service_availability_94e60e8397f7": "archive/service_availability-94e60e8397f7.ink.json"
+    "archive_service_availability_94e60e8397f7": "archive/service_availability-94e60e8397f7.ink.json",
+    "suppliers": "suppliers.json",
+    "story_supplier": "stories/supplier.ink.json"
   }
 }

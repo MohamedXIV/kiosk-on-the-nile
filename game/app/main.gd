@@ -10,6 +10,7 @@ var _fatigue_overlay: FatigueOverlay
 var _fatigue_layer: CanvasLayer
 var _visitor_panel: VisitorPanel
 var _recipe_panel: RecipePanel
+var _supplier_panel: SupplierPanel
 var _district_panel: DistrictPanel
 var _shop_panel: ShopPanel
 var _journey_panel: JourneyPanel
@@ -145,10 +146,10 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible)
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible) or (_supplier_panel!=null and _supplier_panel.visible)
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.social_life.participation_blocked=func():
-  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible) or not _session.travel.snapshot().journey.is_empty()
+  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible) or (_supplier_panel!=null and _supplier_panel.visible) or not _session.travel.snapshot().journey.is_empty()
  _session.motion_step = _step_motion
  var room: LocationView = _rooms.get(str(_session.location_id))
  _router = InteractionRouter.new(_session,room,_text)
@@ -180,6 +181,12 @@ func _install(candidate: GameSession) -> void:
  _shop_panel=ShopPanel.new()
  _hud.add_child(_shop_panel)
  _shop_panel.configure(_text,_session)
+ _supplier_panel=SupplierPanel.new();_hud.add_child(_supplier_panel);_supplier_panel.configure(_text,_session)
+ _hud.supplier_requested.connect(func():
+  for point in _session.contact.points():
+   if _session.contact.near_point(str(point.host_id)):
+    await _session.contact.begin(str(point.host_id));return
+  _hud.toast.show_message("قرب تليفون المكتب فوق أو آخر كونتر في الكشك عشان تتصل."))
  _district_panel=DistrictPanel.new()
  _hud.add_child(_district_panel)
  _district_panel.configure(_text,_session)
@@ -226,6 +233,7 @@ func _physics_process(delta: float) -> void:
  _captions.top_inset = _hud.top_occupied_height()
  _journey_panel.present()
  _shop_panel.present()
+ _supplier_panel.present()
  _district_panel.present()
  if _hud.notebook.visible:_district_panel.hide()
  if _district_panel.visible:_journey_panel.hide()
@@ -237,6 +245,9 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _supplier_panel!=null and _supplier_panel.visible:
+  if event.is_action_pressed("cancel"):_session.contact.panel_requested=false;_supplier_panel.hide()
+  return
  if _tuning_panel!=null and _tuning_panel.visible:
   if event.is_action_pressed("cancel"):_tuning_panel.hide()
   return

@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("suppliers"):
+  var supplier_result := SupplierValidation.validate(bundle)
+  if not supplier_result.ok:return supplier_result
  if bundle.has("accounts"):
   var account_result := AccountValidation.validate(bundle)
   if not account_result.ok:return account_result
@@ -52,6 +55,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
   for id in ["needs","cooking","motion","visitors","narrative","scheduler"]: handlers[id]=func(_frame):return ActionResult.success()
   if bundle.has("accounts"):
    handlers["accounts"]=func(_frame):return ActionResult.success()
+   handlers["deliveries"]=func(_frame):return ActionResult.success()
    handlers["residential"]=func(_frame):return ActionResult.success()
   if bundle.has("tuning"):handlers["body"]=func(_frame):return ActionResult.success()
   if bundle.has("travel"):handlers["travel"]=func(_frame):return ActionResult.success()

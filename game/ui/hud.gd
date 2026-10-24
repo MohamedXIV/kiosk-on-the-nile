@@ -1,5 +1,6 @@
 class_name Hud
 extends Control
+signal supplier_requested
 signal tuning_requested
 signal clean_floor_requested
 signal travel_requested(route_id: StringName)
@@ -46,6 +47,7 @@ func configure(text: UiText) -> void:
  for entry in [{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
+ actions.add_child(UiText.button(text.text("supplier_phone"),func():_menu.hide();supplier_requested.emit()))
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();travel_requested.emit(route_id)))

@@ -45,6 +45,9 @@
       "shops"
     ],
     "residential": [
+      "deliveries"
+    ],
+    "deliveries": [
       "accounts"
     ]
   }

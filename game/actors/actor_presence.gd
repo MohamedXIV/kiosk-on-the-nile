@@ -9,16 +9,19 @@ func actor_ids() -> Array:
 func profiles() -> Dictionary:
  var result: Dictionary=_session.config.section("visitors").characters
  result.merge(_session.config.section("residential_visits").profiles)
+ result.merge(_session.config.section("suppliers").profiles)
  return result
 func profile(id: StringName) -> Dictionary:
  var data: Dictionary=profiles().get(str(id),{}).duplicate(true)
  if not data.is_empty() and _session.tuning!=null:data.name=_session.tuning.display_name(str(id),str(data.name))
  return data
 func record(id: Variant) -> Variant:
+ if _session.contact!=null and _session.contact.current!=null and str(_session.contact.current.id)==str(id):return _session.contact.current
  if _session.visitors!=null and _session.visitors.visits.has(str(id)):return _session.visitors.visits[str(id)]
  if _session.residential!=null and _session.residential.current!=null and _session.residential.current.id==id:return _session.residential.current
  return null
 func is_available(id: StringName) -> bool:
+ if _session.contact!=null and _session.contact.current!=null and _session.contact.current.id==id:return _session.contact.available()
  if _session.visitors!=null and _session.visitors.visits.has(str(id)):return _session.visitors.is_available(id)
  var visit: Variant=record(id)
  return visit!=null and visit.phase==&"staying"

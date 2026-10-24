@@ -18,7 +18,7 @@ func can_open(id: StringName) -> bool:
 func open_for(id: StringName) -> ActionResult:
  var eligibility := _session.actions.preview(&"personal_focus")
  var person: Variant=_session.presence.record(id)
- if person!=null and person.character_id==&"abdul_karim":eligibility=ActionResult.success()
+ if person!=null and person.character_id in [&"abdul_karim",&"fathi"]:eligibility=ActionResult.success()
  if not eligibility.ok and _session.service.pending_for(id)==null:return eligibility
  if _opening or not _near(id):return _fail()
  if holds_visit(id):return ActionResult.success()
@@ -49,7 +49,7 @@ func adopt(conversation: ConversationSession) -> bool:
  return true
 func select_topic(key: String) -> ActionResult:
  if not active() or _opening or not _near(StringName(_hub.visit_id)) or not _hub.session_id.is_empty():return _fail()
- if key not in ["order_recall","landlord"]:
+ if key not in ["order_recall","landlord","supplier"]:
   var eligibility := _session.actions.preview(&"personal_focus")
   if not eligibility.ok:return eligibility
  _opening=true
@@ -135,7 +135,7 @@ func _fail() -> ActionResult:
 
 func _topics() -> Array[Dictionary]:
  var topics := _session.narrative.manual_topics_for(StringName(_hub.visit_id))
- if not _session.actions.preview(&"personal_focus").ok:topics=topics.filter(func(topic):return topic.key in ["order_recall","landlord"])
+ if not _session.actions.preview(&"personal_focus").ok:topics=topics.filter(func(topic):return topic.key in ["order_recall","landlord","supplier"])
  return topics
 
 func is_ready() -> bool:

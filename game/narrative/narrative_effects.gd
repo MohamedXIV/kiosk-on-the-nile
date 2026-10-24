@@ -1,5 +1,6 @@
 class_name NarrativeEffects
 extends RefCounted
+var supply_provider: Callable
 var finance_provider: Callable
 var service_provider: Callable
 var social_life: SocialLife
@@ -13,6 +14,7 @@ func _init(knowledge: KnowledgeBook, needs: NeedsService, facts: Array) -> void:
  _facts = facts.duplicate()
 func valid(effect: Dictionary) -> bool:
  match effect.get("kind"):
+  "supply":return supply_provider.is_valid() and effect.get("action_id") in ["manage","emergency"]
   "finance":return finance_provider.is_valid() and effect.get("action_id") in ["pay_housing","pay_partial","repay_loan","personal","repair","accept_offer","decline_offer","offer_day_1","offer_day_3","offer_day_7","offer_loan_0","offer_loan_1","offer_loan_2"]
   "service":return service_provider.is_valid() and effect.get("action_id") in ["accept","decline"]
   "social":return social_life!=null and effect.get("action_id") is String and social_life.action_known(effect.action_id)
@@ -23,6 +25,9 @@ func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "", 
  if not valid(effect): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect")
  if _applied.has(str(occurrence_id)): return ActionResult.success({"duplicate":true})
  match effect.kind:
+  "supply":
+   var result: ActionResult=supply_provider.call(effect.action_id,str(occurrence_id),participants)
+   if not result.ok:return result
   "finance":
    var result: ActionResult=finance_provider.call(effect.action_id,str(occurrence_id),participants)
    if not result.ok:return result

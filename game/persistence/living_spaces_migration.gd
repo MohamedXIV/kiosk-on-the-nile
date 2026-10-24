@@ -59,7 +59,7 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   var now := float(candidate.state.clock.world_minutes)
   var seconds := float(candidate.state.clock.simulation_seconds)
   var tuning := TuningStore.new()
-  var configured := tuning.configure(config.section("tuning"),config.section("visitors").characters.keys()+config.section("residential_visits").profiles.keys()+["player"])
+  var configured := tuning.configure(config.section("tuning"),config.section("visitors").characters.keys()+config.section("residential_visits").profiles.keys()+config.section("suppliers").profiles.keys()+["player"])
   if not configured.ok:return configured
   tuning.apply_at_boundary(false)
   candidate.state["tuning"]=tuning.snapshot()
@@ -86,6 +86,12 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   candidate.state.routine["rent_enabled"]=false
   candidate.state.journal.events.append({"id":"accounts:activation","chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":"بدأ حساب إيجار السكن والحي أسبوعيًا من فترة جديدة؛ لا ديون قديمة أُضيفت ولا خصم يومي تلقائي بعد الآن.","channel":"system","at":now})
   candidate.schema_revision=10
+ if candidate.schema_revision==10 and target_revision>=11:
+  candidate.state.accounts["supplier"]=SupplierLedger.initial_state()
+  candidate.state["contracts"]=SupplierContracts.initial_state()
+  candidate.state["deliveries"]=DeliveryService.initial_state()
+  candidate.state["contact"]={"current":{},"host_id":"","next_id":1,"panel_requested":false}
+  candidate.schema_revision=11
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

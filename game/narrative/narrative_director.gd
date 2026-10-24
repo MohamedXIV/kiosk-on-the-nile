@@ -37,6 +37,7 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  var visit: Variant = _session.presence.record(participants[0]) if not participants.is_empty() else null
  var previous := _session.visitors.history.previous_service(character_id,visit.id) if visit else {}
  data.merge({"topic_id":"","line_variant":0,"hour":int(_session.clock.minutes)/60,"bought_fan":_session.home.has_fan,"visit_count":_session.visitors.visit_count(StringName(character_id)),"previous_quality":int(previous.get("quality",-1)),"previous_food":str(previous.get("food_id",""))},true)
+ if character_id=="fathi":data.merge(_session.supplier_context(str(extra.get("chapter_id",""))),true)
  if character_id=="abdul_karim":data.merge(_session.financial_context(str(extra.get("chapter_id",""))),true)
  data.merge(extra,true)
  return data
@@ -336,6 +337,7 @@ func can_talk(visit_id: StringName) -> bool:
 func talk_encounter(visit_id: StringName) -> StringName:
  var visit: Variant=_session.presence.record(str(visit_id))
  if visit==null:return &""
+ if visit.character_id==&"fathi":return &"supplier"
  if visit.character_id==&"abdul_karim":return &"landlord"
  var fallback: Array=["amgad"] if visit.character_id==&"amgad" else ["visitors"]
  var encounters: Array=_session.presence.profile(visit.character_id).get("manual_encounters",fallback)
@@ -343,7 +345,7 @@ func talk_encounter(visit_id: StringName) -> StringName:
   if not _select_topic(StringName(id),PackedStringArray([str(visit_id)]),{}).is_empty():return StringName(id)
  return &""
 func _select_topic(encounter: StringName, participants: PackedStringArray, extra: Dictionary) -> Dictionary:
- if encounter==&"landlord":return {}
+ if encounter in [&"landlord",&"supplier"]:return {}
  if participants.is_empty() or not _session.presence.has(participants[0]): return {}
  return history.select(encounter,_definitions[str(encounter)],_session.presence.record(participants[0]),_session,int(extra.get("mode",0)),str(extra.get("requested_topic","")))
 func _saved_story(record: Dictionary) -> StoryDefinition:
@@ -398,6 +400,7 @@ func manual_topics_for(visit_id: StringName) -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
  var visit: Variant=_session.presence.record(str(visit_id))
  if visit==null or not _session.presence.is_available(visit_id):return result
+ if visit.character_id==&"fathi":return [{"key":"supplier","label":"نتكلم عن التوريد والحساب","encounter":"supplier","topic":""}]
  if visit.character_id==&"abdul_karim":return [{"key":"landlord","label":"نتكلم على حسابنا وأحوالنا","encounter":"landlord","topic":""}]
  for topic in _session.social_life.topics_for(visit_id):result.append({"key":"social:"+str(topic.id),"label":str(topic.label),"encounter":str(topic.encounter),"topic":""})
  var ids: Array=_session.presence.profile(visit.character_id).get("manual_encounters",["amgad"] if visit.character_id==&"amgad" else ["visitors"])
