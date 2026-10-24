@@ -38,17 +38,28 @@ Record product commit and fresh verification for each increment before the next 
 
 ## Execution rules
 
-- [ ] Read each plan/spec; pre-flight its consumed interfaces against the preceding delivered implementation. Ledger any necessary ruling before editing.
-- [ ] Implement each plan natively, commit coherent tasks, record actual commands/UI observations and unreviewed cases.
-- [ ] One fresh most-capable whole-increment reviewer at completion, not reviewer/implementer pairs for every task. Explicitly authorized by executing-plans; no other delegation needed.
-- [ ] Fix material findings, compile/export exact product, manually boot release, publish authorized preview source/artifact branches and prerelease, download ZIP and compare digest.
-- [ ] Keep overview status honest: checked means delivered, not merely written or compiled.
+- [x] Read each plan/spec; pre-flight its consumed interfaces against the preceding delivered implementation. Ledger any necessary ruling before editing.
+- [x] Implement each plan natively, commit coherent tasks, record actual commands/UI observations and unreviewed cases.
+- [x] One fresh most-capable whole-increment reviewer at completion, not reviewer/implementer pairs for every task. Explicitly authorized by executing-plans; no other delegation needed.
+- [x] Fix material findings, compile/export exact product, manually boot release, publish authorized preview source/artifact branches and prerelease, download ZIP and compare digest.
+- [x] Keep overview status honest: checked means delivered, not merely written or compiled.
 
 ## Status
 
-- [ ] Increment1 delivered.
-- [ ] Increment2 delivered.
-- [ ] Increment3 delivered.
-- [ ] Increment4 delivered.
+- [x] Increment1 delivered.
+- [x] Increment2 delivered.
+- [x] Increment3 delivered.
+- [x] Increment4 delivered.
 
-Planning is complete for the approved scope; implementation starts at increment1. Implementation quantities marked as author defaults in the individual plans are adjustable JSON, not newly asserted user requirements.
+All four approved playable increments are delivered; per-increment notes retain their explicit verification gaps. Implementation quantities marked as author defaults in the individual plans are adjustable JSON, not newly asserted user requirements.
+
+## Product record
+
+| Increment | Product | Delivery evidence |
+|---|---|---|
+| 1 |7e3818d|[Dialogue/journal](../../notes/2026-10-24-continuous-dialogue-and-journal.md)|
+| 2 |2fd6048|[Body/clock/tuning](../../notes/2026-10-24-body-clock-and-tweaks.md)|
+| 3 |930c928|[Accounts/landlord/district](../../notes/2026-10-24-accounts-landlord-and-district.md)|
+| 4 |38396bb|[Supplier/deliveries](../../notes/2026-10-24-supplier-contracts-and-deliveries.md)|
+
+Preview source/artifact branches and prereleases only; main not merged. Checked delivery status does not mean every suggested manual scenario or native platform was reviewed.
