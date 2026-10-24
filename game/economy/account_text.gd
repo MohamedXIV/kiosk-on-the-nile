@@ -14,12 +14,12 @@ static func ledger(session: GameSession) -> String:
   lines.append("%s — %s\n%s · المتبقي %.2f ج.م · %s" % [row.label,row.creditor_name,status,float(remaining)/100.0,date(float(row.due_at))])
   if row.creditor=="district" and remaining>0:lines.append("آخر موعد قبل الإيقاف: "+date(float(row.enforce_at)))
  for promise in session.commitments.state.promises.values():
-  lines.append("وعد السكن: %s · %s" % [promise.status,date(float(promise.deadline))])
+  lines.append("وعد السكن: %s · %s" % [session.config.section("ui").finance_statuses.get(promise.status,promise.status),date(float(promise.deadline))])
  for loan in session.commitments.state.loans.values():
-  lines.append("سلفة من %s: الأصل %.2f · المتبقي %.2f ج.م · %s" % [session.presence.profile(&"abdul_karim").name,float(loan.principal)/100.0,float(int(loan.principal)-int(loan.paid))/100.0,date(float(loan.due_at))])
+  lines.append("سلفة من %s: الأصل %.2f · المتبقي %.2f ج.م · %s" % [str(loan.creditor_name),float(loan.principal)/100.0,float(int(loan.principal)-int(loan.paid))/100.0,date(float(loan.due_at))])
  lines.append("الإيصالات:")
  for receipt in session.accounts.state.receipts.values():
   lines.append("%s · %s · %s\nالإجمالي %.2f ج.م" % [receipt.id,receipt.creditor_name,date(float(receipt.at)),float(receipt.net)/100.0])
-  for line in receipt.lines:lines.append("%s → %s · أساسي %.2f − خصم %.2f = %.2f ج.م" % [date(float(line.start)),date(float(line.end)),float(line.gross)/100.0,float(line.discount)/100.0,float(line.net)/100.0])
+  for line in receipt.lines:lines.append("من %s إلى %s · أساسي %.2f − خصم %.2f = %.2f ج.م" % [date(float(line.start)),date(float(line.end)),float(line.gross)/100.0,float(line.discount)/100.0,float(line.net)/100.0])
  for receipt in session.commitments.state.receipts.values():lines.append("%s · %s · %s" % [receipt.id,date(float(receipt.at)),receipt.get("journal_text","")])
  return "\n\n".join(lines)

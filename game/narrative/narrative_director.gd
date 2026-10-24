@@ -267,9 +267,10 @@ func restore(data: Dictionary) -> ActionResult:
   if not result.ok: return _reject_candidates(candidates)
   conversation.current = conversation.runtime.frame()
   if not conversation.topic_selection.is_empty() and not restored_history.contains(conversation.topic_selection):
-   # An Ink control-only frame can precede the first spoken line. It has not
-   # consumed the topic yet, but the saved selection must still be eligible.
-   if not conversation.current.text.is_empty() or not conversation.current.effects.is_empty() or conversation.participants.is_empty(): return _reject_candidates(candidates)
+   # Control-only frames and speech outside hearing range do not consume a
+   # topic. Preserve their cursor without inventing heard speech or effects;
+   # the unconsumed selection must still be canonically eligible.
+   if conversation.participants.is_empty(): return _reject_candidates(candidates)
    var selected_visit: Variant = _session.presence.record(conversation.participants[0])
    if not ConversationHistory.equivalent_selection(restored_history.select(conversation.encounter_id,_definitions[str(conversation.encounter_id)],selected_visit,_session,int(conversation.context_extra.get("mode",0))),conversation.topic_selection): return _reject_candidates(candidates)
   for effect in conversation.current.effects:

@@ -44,7 +44,10 @@ func outstanding(creditor: String) -> Array[Dictionary]:
  return result
 func remaining(id: String) -> int:
  var bill: Dictionary=state.obligations.get(id,{})
- return int(bill.gross)-int(bill.paid) if not bill.is_empty() else 0
+ if not bill.is_empty():return int(bill.gross)-int(bill.paid)
+ var p := resolve_period(id)
+ if p.is_empty() or state.coverage.has(id):return 0
+ return int(state.leases[p.lease].nominal_minor)
 func quote(lease_id: String, offer_id: String, at: float, amount: int = 0) -> ActionResult:
  tick({})
  if not state.leases.has(lease_id) or absf(at-_session.clock.world_minutes)>0.01:return _fail("account_unavailable")
@@ -162,6 +165,17 @@ func validate_state(data: Dictionary) -> ActionResult:
    seen[line.id]=true
    total+=int(line.net)
   if not ContentValidation.integer(q.get("net")) or total!=int(q.net):return _fail("invalid_account_total")
+ for id in data.chapters:
+  var chapter: Variant=data.chapters[id]
+  if not id is String or not str(id).begins_with("conversation_") or not str(id).trim_prefix("conversation_").is_valid_int() or not chapter is Dictionary or chapter.get("id")!=id or not chapter.get("extension_targets") is Array:return _fail("invalid_financial_chapter")
+  for key in ["pay_quote","partial_quote","loan_id"]:
+   if not chapter.get(key) is String:return _fail("invalid_financial_chapter")
+  for key in ["pay_quote","partial_quote"]:
+   if chapter[key].is_empty():continue
+   var q: Dictionary=data.quotes.get(chapter[key],{})
+   if q.is_empty() or q.lease!="housing_lease" or q.get("chapter")!=id:return _fail("invalid_financial_chapter")
+  for target in chapter.extension_targets:
+   if not target is String or not target.begins_with("housing_lease/") or not target.get_slice("/",1).is_valid_int():return _fail("invalid_financial_target")
  for id in data.receipts:
   var receipt: Variant=data.receipts[id]
   if not _sequence(id,"account_receipt_",int(data.next_receipt)) or not receipt is Dictionary or receipt.get("id")!=id or not data.quotes.has(receipt.get("quote_id")) or not receipt.get("request_id") is String or data.requests.get(receipt.request_id)!=id:return _fail("invalid_account_receipt")
@@ -197,3 +211,17 @@ func _sequence(id: String, prefix: String, limit: int) -> bool:
  return id.begins_with(prefix) and suffix.is_valid_int() and int(suffix)>0 and suffix==str(int(suffix)) and int(suffix)<limit
 func _fail(key: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,StringName(key))
+
+func resolve_period(id: String) -> Dictionary:
+ var parts := id.split("/")
+ if parts.size()!=2 or not state.leases.has(parts[0]) or not parts[1].is_valid_int() or int(parts[1])<0 or parts[1]!=str(int(parts[1])):return {}
+ return period(parts[0],int(parts[1]))
+func housing_targets() -> Array:
+ var targets: Array=[]
+ for bill in outstanding("abdul_karim"):targets.append(str(bill.id))
+ if not targets.is_empty():return targets
+ var lease: Dictionary=state.leases.housing_lease
+ var index := maxi(0,floori((_session.clock.world_minutes-float(lease.first_start))/float(lease.period_minutes)))
+ var p := period("housing_lease",index)
+ if remaining(p.id)>0:targets.append(p.id)
+ return targets

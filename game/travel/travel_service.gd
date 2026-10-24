@@ -88,7 +88,7 @@ func _safe_return_pose() -> void:
 func can_shop(shop_id: StringName) -> bool:
  if journey.data.get("phase")!="browsing":return false
  var route: Dictionary=_config.routes[journey.data.route_id]
- return str(route.get("shop_id",""))==str(shop_id) and _pose.location_id==StringName(route.destination)
+ return route.kind=="shop" and str(route.get("shop_id",""))==str(shop_id) and _pose.location_id==StringName(route.destination)
 func active() -> bool:
  return journey.data.get("phase","") in ["outbound","browsing","returning"]
 func route() -> Dictionary:

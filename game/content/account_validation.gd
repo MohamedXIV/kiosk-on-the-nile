@@ -28,8 +28,8 @@ static func validate(bundle: Dictionary) -> ActionResult:
    if not ContentValidation.bounded(data[key].get(axis),-10,10):return fail()
  var visits: Variant=bundle.get("residential_visits")
  if not visits is Dictionary or not visits.get("profiles") is Dictionary or not visits.profiles.has("abdul_karim") or not ContentValidation.vector(visits.get("window"),2) or visits.window[0]<0 or visits.window[0]>=visits.window[1] or visits.window[1]>1440 or not ContentValidation.vector(visits.get("arrival_delay_minutes"),2) or visits.arrival_delay_minutes[0]<=0 or visits.arrival_delay_minutes[0]>visits.arrival_delay_minutes[1] or not ContentValidation.vector(visits.get("entrance"),2) or not ContentValidation.vector(visits.get("standing"),2):return fail()
- for key in ["stay_minutes","return_minutes","speed"]:
-  if not ContentValidation.bounded(visits.get(key),0.1,1440):return fail()
+ for key in ["stay_minutes","return_minutes","speed","pre_due_minutes","greet_delay_minutes"]:
+  if not ContentValidation.bounded(visits.get(key),0.1,10080):return fail()
  for profile in visits.profiles.values():
   if not profile is Dictionary or not profile.get("name") is String or not profile.get("color") is String or not Color.html_is_valid(profile.color):return fail()
  return ActionResult.success()

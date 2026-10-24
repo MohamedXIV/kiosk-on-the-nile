@@ -1,5 +1,6 @@
 VAR character_id = "abdul_karim"
 VAR has_housing_due = false
+VAR can_negotiate = false
 VAR housing_due_label = "0.00"
 VAR partial_label = "10.00"
 VAR can_pay_housing = false
@@ -34,7 +35,7 @@ VAR agreed_date = ""
 * {has_housing_due && can_partial_housing} [أقدر أدفع {partial_label} جنيه دلوقتي، والباقي نتفاهم عليه.]
  موافق. أسجل اللي وصلني بس، والباقي لسه علينا نتفق عليه. # speaker:{character_id} # duration:7 # effect:finance\|pay_partial
  -> END
-* {has_housing_due} [ممكن تستنى عليّ شوية؟ مرتب أولوياتي ومحتاج مهلة.]
+* {can_negotiate} [ممكن نتفق على مهلة للإيجار؟ مرتب أولوياتي ومحتاج أوضح الميعاد.]
  خلّينا نتفق على موعد نقدر نلتزم بيه، مش مجرد كلام. # speaker:{character_id} # duration:6
  ** {extend_1} [ممكن يوم واحد؟]
   -> extension_one

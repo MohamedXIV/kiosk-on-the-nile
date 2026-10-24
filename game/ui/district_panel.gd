@@ -23,7 +23,7 @@ func configure(text: UiText, session: GameSession) -> void:
  _pay=UiText.button("ادفع العرض المعروض",func():
   var result := session.district.pay()
   _feedback.text="تم السداد والإيصال محفوظ في الكشكول." if result.ok else text.outcome(result)
-  if result.ok:_pay.disabled=true)
+  if result.ok:_pay.disabled=true;_refresh())
  box.add_child(_pay)
  _feedback.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_feedback)
  box.add_child(UiText.button(text.text("journey_return"),func():session.travel.begin_return()))
@@ -34,10 +34,11 @@ func _quote(id: String) -> void:
  _quote_id=""
  _refresh()
 func present() -> void:
+ var was_visible := visible
  visible=_session.district.available()
  if not visible:return
  _session.district.open()
- if str(_session.district.state.quote_id)!=_quote_id:_refresh()
+ if not was_visible or str(_session.district.state.quote_id)!=_quote_id:_refresh()
 func _refresh() -> void:
  _quote_id=str(_session.district.state.quote_id)
  var q: Dictionary=_session.accounts.state.quotes.get(_quote_id,{})
@@ -45,7 +46,13 @@ func _refresh() -> void:
  if q.is_empty():
   _details.text=AccountText.ledger(_session)
   return
- var lines := PackedStringArray(["%s · الإجمالي %.2f ج.م\nالعرض صالح حتى %s" % [q.creditor_name,float(q.net)/100.0,AccountText.date(float(q.expires))]])
- for line in q.lines:lines.append("%s → %s\nأساسي %.2f − خصم %.2f = %.2f ج.م" % [AccountText.date(float(line.start)),AccountText.date(float(line.end)),float(line.gross)/100.0,float(line.discount)/100.0,float(line.net)/100.0])
+ var paid_id := str(_session.accounts.state.requests.get(str(_session.district.state.request_id),""))
+ var receipt: Dictionary=_session.accounts.state.receipts.get(paid_id,{})
+ var heading := "%s · الإجمالي %.2f ج.م" % [q.creditor_name,float(q.net)/100.0]
+ heading+="\nإيصال سداد رقم %s · %s" % [paid_id.trim_prefix("account_receipt_"),AccountText.date(float(receipt.at))] if not receipt.is_empty() else "\nالعرض صالح حتى "+AccountText.date(float(q.expires))
+ var lines := PackedStringArray([heading])
+ for line in q.lines:lines.append("من %s\nإلى %s\nأساسي %.2f − خصم %.2f = %.2f ج.م" % [AccountText.date(float(line.start)),AccountText.date(float(line.end)),float(line.gross)/100.0,float(line.discount)/100.0,float(line.net)/100.0])
  _details.text="\n\n".join(lines)
- if _session.accounts.state.requests.has(str(_session.district.state.request_id)):_pay.disabled=true
+ if not receipt.is_empty():
+  _pay.disabled=true
+  _feedback.text="السداد محفوظ بالفعل؛ مفيش خصم جديد عند الاستكمال."

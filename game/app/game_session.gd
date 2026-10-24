@@ -440,7 +440,7 @@ func financial_context(chapter: String) -> Dictionary:
  if chapter.is_empty():return {}
  if not accounts.state.chapters.has(chapter):
   accounts.tick({})
-  var snapshot_data := {"id":chapter,"pay_quote":"","partial_quote":"","loan_id":str(commitments.active_loan().get("id",""))}
+  var snapshot_data := {"extension_targets":accounts.housing_targets(),"id":chapter,"pay_quote":"","partial_quote":"","loan_id":str(commitments.active_loan().get("id",""))}
   for offer_id in ["settle","partial"]:
    var amount := 0
    if offer_id=="partial":
@@ -461,8 +461,10 @@ func financial_context(chapter: String) -> Dictionary:
  var pending := pending_financial_offer(chapter)
  var now := clock.world_minutes
  var latest := now
- for bill in accounts.outstanding("abdul_karim"):latest=maxf(latest,float(bill.due_at))
- var context_data := {"has_housing_due":not due.is_empty(),"housing_due_label":"%.2f" % (float(due.get("net",0))/100.0),"partial_label":"%.2f" % (float(partial.get("net",0))/100.0),"can_pay_housing":not due.is_empty() and wallet.balance>=int(due.net),"can_partial_housing":not partial.is_empty() and wallet.balance>=int(partial.net),"extend_1":commitments.eligible(1),"extend_3":commitments.eligible(3),"extend_7":commitments.eligible(7),"extension_1_date":AccountText.date(latest+1440),"extension_3_date":AccountText.date(latest+4320),"extension_7_date":AccountText.date(latest+10080),"agreed_date":AccountText.date(float(pending.get("deadline",now))),"has_loan":loan_remaining>0,"loan_remaining_label":"%.2f" % (float(loan_remaining)/100.0),"can_repay_loan":loan_remaining>0 and wallet.balance>=loan_remaining,"can_loan":commitments.eligible(),"about_today":commitments.state.moments.has("about:%d" % clock.day),"can_focus":actions.preview(&"personal_focus").ok,"known_abdul_family":knowledge.has(&"KNOWN_ABDUL_FAMILY"),"can_repair":false,"loan_duration_label":"%.1f يوم" % (float(config.section("accounts").loan.duration_minutes)/1440.0)}
+ for target in saved.extension_targets:
+  var p := accounts.resolve_period(str(target))
+  if not p.is_empty():latest=maxf(latest,float(p.end))
+ var context_data := {"has_housing_due":not due.is_empty(),"can_negotiate":not saved.extension_targets.is_empty(),"housing_due_label":"%.2f" % (float(due.get("net",0))/100.0),"partial_label":"%.2f" % (float(partial.get("net",0))/100.0),"can_pay_housing":not due.is_empty() and wallet.balance>=int(due.net),"can_partial_housing":not partial.is_empty() and wallet.balance>=int(partial.net),"extend_1":commitments.eligible(1),"extend_3":commitments.eligible(3),"extend_7":commitments.eligible(7),"extension_1_date":AccountText.date(latest+1440),"extension_3_date":AccountText.date(latest+4320),"extension_7_date":AccountText.date(latest+10080),"agreed_date":AccountText.date(float(pending.get("deadline",now))),"has_loan":loan_remaining>0,"loan_remaining_label":"%.2f" % (float(loan_remaining)/100.0),"can_repay_loan":loan_remaining>0 and wallet.balance>=loan_remaining,"can_loan":commitments.eligible(),"about_today":commitments.state.moments.has("about:%d" % clock.day),"can_focus":actions.preview(&"personal_focus").ok,"known_abdul_family":knowledge.has(&"KNOWN_ABDUL_FAMILY"),"can_repair":false,"loan_duration_label":"%.1f يوم" % (float(config.section("accounts").loan.duration_minutes)/1440.0)}
  for promise in commitments.state.promises.values():
   if promise.status=="broken" and not promise.repaired:context_data.can_repair=true
  for loan_record in commitments.state.loans.values():
@@ -497,7 +499,7 @@ func financial_effect(action: String, source: String, participants: PackedString
   if not offer.is_empty():commitments.state.offers[offer.id]["declined"]=true
   return ActionResult.success()
  var offered := ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_financial_action")
- if action.begins_with("offer_day_"):offered=commitments.offer("extension",int(action.trim_prefix("offer_day_")))
+ if action.begins_with("offer_day_"):offered=commitments.offer("extension",int(action.trim_prefix("offer_day_")),saved.extension_targets)
  elif action.begins_with("offer_loan_"):
   var index := int(action.trim_prefix("offer_loan_"))
   var amounts: Array=config.section("accounts").loan.amounts
@@ -513,6 +515,10 @@ func validate_financial_chapters() -> ActionResult:
  for id in accounts.state.chapters:
   var record: Variant=accounts.state.chapters[id]
   if not narrative.valid_sequence(str(id),"conversation_",int(narrative.snapshot().next_id)) or not record is Dictionary or record.get("id")!=id:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
+  if not record.get("extension_targets") is Array:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_targets")
+  for target in record.extension_targets:
+   var p := accounts.resolve_period(str(target))
+   if p.is_empty() or p.lease!="housing_lease":return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_targets")
   for key in ["pay_quote","partial_quote"]:
    if not record.get(key) is String:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_chapter")
    if record[key].is_empty():continue

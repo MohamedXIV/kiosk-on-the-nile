@@ -8,14 +8,14 @@ var _pending: bool = false
 func _ready() -> void:
  add_child(codec)
 func save_at_boundary(session: GameSession) -> ActionResult:
- if transition_active or (not session.narrative.is_ready() or not session.tuning.ready()):
+ if transition_active or (not session.narrative.is_ready() or not session.personal.is_ready() or not session.tuning.ready()):
   _pending = true
   return ActionResult.success({"deferred":true})
  var result := store.write(codec.encode(session))
  completed.emit(result)
  return result
 func boundary(session: GameSession) -> void:
- if _pending and not transition_active and session.narrative.is_ready() and session.tuning.ready():
+ if _pending and not transition_active and session.narrative.is_ready() and session.personal.is_ready() and session.tuning.ready():
   _pending = false
   save_at_boundary(session)
 func load_candidate(config: SessionConfig) -> ActionResult:

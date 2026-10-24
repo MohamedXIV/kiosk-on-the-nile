@@ -23,6 +23,7 @@ func tick(_frame: Dictionary) -> void:
  if current!=null:
   if current.phase==&"arriving" and current.pose.ground.distance_to(current.destination)<0.15:
    current.phase=&"staying";current.arrived_at=now
+  if current.phase==&"staying" and not current.greeted and now-current.arrived_at>=float(_data.greet_delay_minutes) and _session.presence.near_actor(&"abdul_karim") and not _session.personal.active() and _session.narrative.focused_session()==null and not (_session.social_life.participation_blocked.is_valid() and _session.social_life.participation_blocked.call()):_greet(current)
   if current.phase==&"staying" and not _session.narrative.speech_active(current.id) and (now-current.arrived_at>=float(_data.stay_minutes) or _session.clock.minutes>float(_data.window[1])):
    current.phase=&"leaving";current.destination=Vector2(_data.entrance[0],_data.entrance[1])
   if current.phase==&"leaving" and current.pose.ground.distance_to(current.destination)<0.15:
@@ -49,11 +50,17 @@ func restore(data: Dictionary) -> ActionResult:
  if not data.current.is_empty():
   var record: Dictionary=data.current
   var suffix := str(record.get("id","")).trim_prefix("residential_")
-  if _session.location_id!=&"rooftop" or not str(record.get("id","")).begins_with("residential_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id) or record.get("character_id")!="abdul_karim" or not record.get("phase") in ["arriving","staying","leaving"] or not record.get("pose") is Dictionary or not ContentValidation.vector(record.get("destination"),2) or not ContentValidation.bounded(record.get("arrived_at"),-1,_session.clock.world_minutes):return _fail()
+  if not record.get("greeted") is bool or _session.location_id!=&"rooftop" or not str(record.get("id","")).begins_with("residential_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id) or record.get("character_id")!="abdul_karim" or not record.get("phase") in ["arriving","staying","leaving"] or not record.get("pose") is Dictionary or not ContentValidation.vector(record.get("destination"),2) or not ContentValidation.bounded(record.get("arrived_at"),-1,_session.clock.world_minutes):return _fail()
   candidate=ResidentialRecord.new()
   if not candidate.pose.restore(record.pose).ok or candidate.pose.location_id!=&"rooftop" or FootprintGeometry.blocked(candidate.pose.ground,_session.spaces.solids(&"rooftop"),0.05):return _fail()
-  candidate.id=StringName(record.id);candidate.phase=StringName(record.phase);candidate.destination=Vector2(record.destination[0],record.destination[1]);candidate.arrived_at=float(record.arrived_at)
+  candidate.id=StringName(record.id);candidate.phase=StringName(record.phase);candidate.destination=Vector2(record.destination[0],record.destination[1]);candidate.arrived_at=float(record.arrived_at);candidate.greeted=bool(record.greeted)
  current=candidate;_next=int(data.next_id);_scheduled=float(data.scheduled);_retry_at=float(data.retry_at)
  return ActionResult.success()
 func _fail() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_residential_presence")
+
+func _greet(record: ResidentialRecord) -> void:
+ record.greeted=true
+ var result := await _session.personal.open_for(record.id)
+ if result.ok and _session.personal.holds_visit(record.id) and _session.personal.view().get("conversation")==null:result=await _session.personal.select_topic("landlord")
+ if not result.ok and current==record:record.greeted=false

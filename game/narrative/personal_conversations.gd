@@ -137,3 +137,6 @@ func _topics() -> Array[Dictionary]:
  var topics := _session.narrative.manual_topics_for(StringName(_hub.visit_id))
  if not _session.actions.preview(&"personal_focus").ok:topics=topics.filter(func(topic):return topic.key in ["order_recall","landlord"])
  return topics
+
+func is_ready() -> bool:
+ return not _opening
