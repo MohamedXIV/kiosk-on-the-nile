@@ -7,6 +7,10 @@
 **Tech Stack:** Godot4.7.2/GDScript/JSON/Ink; revision9 after dialogue/journal revision8.
 **Spec:** `docs/superpowers/specs/2026-10-23-everyday-life-dialogue-and-obligations-design.md`, sections4–5,9–12. Prerequisite: increment1 delivered.
 
+## Delivery status
+
+Implemented as preview `body-clock-2fd6048`. See [evidence, execution decisions and remaining manual acceptance](../../notes/2026-10-24-body-clock-and-tweaks.md). The original checklist below records intended gates; uncovered cases are listed explicitly in that delivery record.
+
 ## Global Constraints
 
 - No automated tests; build and actual UI evidence. No local replacement timers or reset clock on tuning/load.
