@@ -5,7 +5,10 @@ var current: ResidentialRecord
 var host_id: String=""
 var next_id: int=1
 var panel_requested: bool=false
-func configure(session: GameSession) -> void:_session=session
+func configure(session: GameSession) -> void:
+ _session=session
+ session.spaces.changed.connect(func(_location,_revision):tick())
+ session.items.changed.connect(func(_revision):tick())
 func points() -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
  for id in _session.config.section("suppliers").phone_hosts:
