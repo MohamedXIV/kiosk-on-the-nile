@@ -141,12 +141,12 @@ func validate_state(data: Dictionary) -> ActionResult:
     var p := _session.accounts.resolve_period(str(target))
     if p.is_empty() or p.lease!="housing_lease" or seen.has(target):return _fail("invalid_extension_target")
     seen[target]=true;latest=maxf(latest,float(p.end))
-   if offer_data.deadline!=latest+int(offer_data.days)*1440.0:return _fail("invalid_extension_deadline")
+   if absf(float(offer_data.deadline)-(latest+int(offer_data.days)*1440.0))>0.001:return _fail("invalid_extension_deadline")
  for id in data.loans:
   var loan: Variant=data.loans[id]
   if not _sequence(id,"loan_",data.next_loan) or not loan is Dictionary or loan.get("id")!=id or loan.get("lender")!="abdul_karim" or not data.offers.has(loan.get("offer_id")) or not ContentValidation.integer(loan.get("principal")) or not ContentValidation.integer(loan.get("paid")) or loan.paid<0 or loan.paid>loan.principal:return _fail("invalid_loan")
   var offer_data: Dictionary=data.offers[loan.offer_id]
-  if offer_data.kind!="loan" or loan.principal!=offer_data.principal or not ContentValidation.bounded(loan.get("accepted_at"),offer_data.at,minf(_session.clock.world_minutes+0.001,float(offer_data.expires))) or loan.get("due_at")!=float(loan.accepted_at)+float(offer_data.duration):return _fail("invalid_loan_terms")
+  if offer_data.kind!="loan" or loan.principal!=offer_data.principal or not ContentValidation.bounded(loan.get("accepted_at"),offer_data.at,minf(_session.clock.world_minutes+0.001,float(offer_data.expires))) or not ContentValidation.number(loan.get("due_at")) or absf(float(loan.due_at)-(float(loan.accepted_at)+float(offer_data.duration)))>0.001:return _fail("invalid_loan_terms")
   if not loan.get("repaired") is bool or not loan.get("status") in ["pending","fulfilled","broken"] or not ContentValidation.bounded(loan.get("assessed_at"),-1,_session.clock.world_minutes+0.001):return _fail("invalid_loan_assessment")
   if loan.status=="pending" and loan.assessed_at!=-1 or loan.status=="fulfilled" and (loan.paid!=loan.principal or loan.assessed_at<loan.accepted_at) or loan.status=="broken" and loan.assessed_at<loan.due_at:return _fail("invalid_loan_assessment")
   outstanding+=int(loan.principal)-int(loan.paid)
