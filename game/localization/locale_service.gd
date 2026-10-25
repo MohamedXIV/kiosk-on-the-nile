@@ -51,6 +51,13 @@ func rtl() -> bool:return locale=="ar_EG"
 func source_text(id: String, source: String) -> String:
  # A stable identity plus an exact source guard; custom/historic wording survives.
  return text(id,{},source) if _catalogs.get("ar_EG",{}).get(id)!=null and _catalogs.ar_EG[id]==source else source
+func source_variants(id: String, source: String) -> PackedStringArray:
+ var values := PackedStringArray([source])
+ if _catalogs.get("ar_EG",{}).get(id)!=source:return values
+ for supported in ["ar_EG","en"]:
+  var value := str(_catalogs.get(supported,{}).get(id,source))
+  if not value in values:values.append(value)
+ return values
 func picker() -> OptionButton:
  var select := OptionButton.new()
  select.add_item("العربية");select.add_item("English")

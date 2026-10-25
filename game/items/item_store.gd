@@ -30,6 +30,9 @@ func instances(definition_id: StringName) -> Array[Dictionary]:
  return result
 func snapshot() -> Dictionary:
  return _state.duplicate(true)
+func storage_view() -> Dictionary:
+ # Current storage only; UI has no use for the unbounded consumption history.
+ return {"items":_state.items.duplicate(true),"containers":_state.containers.duplicate(true),"reservations":_state.reservations.duplicate(true)}
 func candidate() -> ItemChangeSet:
  return ItemChangeSet.new(revision,_state)
 func prepare_moves(moves: Array[Dictionary]) -> ActionResult:

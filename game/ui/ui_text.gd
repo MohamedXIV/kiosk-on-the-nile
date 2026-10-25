@@ -10,7 +10,8 @@ func text(key: String, values: Dictionary = {}) -> String:
  return localized("ui."+key,context,str(data.get(key,key)).format(context))
 func outcome(result: ActionResult) -> String:
  if result.ok: return text("saved") if result.details.get("saved",false) else text("success")
- return str(data.get("errors",{}).get(str(result.message_key),text("save_failed") if result.code==ActionResult.Code.IO_ERROR else text("action_unavailable")))
+ var source := str(data.get("errors",{}).get(str(result.message_key),text("save_failed") if result.code==ActionResult.Code.IO_ERROR else text("action_unavailable")))
+ return LocaleService.current.source_text("ui.error."+str(result.message_key),source) if LocaleService.current else source
 func make_theme() -> Theme:
  var theme := Theme.new()
  theme.default_font = load("res://assets/fonts/Cairo.ttf")

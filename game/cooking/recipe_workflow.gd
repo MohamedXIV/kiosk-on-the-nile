@@ -141,6 +141,14 @@ func tick(frame: Dictionary) -> void:
   elif step.kind in ["heat","brew","wait"] or _near(StringName(job.devices[step.capability]),StringName(job.location_id)):job.elapsed=float(job.elapsed)+delta
 func job(id: StringName) -> Dictionary:
  return _jobs.get(str(id),{}).duplicate(true)
+func progress_view(id: StringName) -> Dictionary:
+ # Narrow observation for UI; frozen definitions and command state stay owned here.
+ var record: Dictionary=_jobs.get(str(id),{})
+ if record.is_empty() or record.status!="active":return {}
+ var step: Dictionary=record.definition.steps[int(record.step_index)]
+ var portions := 0
+ if step.kind=="batch_heat":portions=int(_inventory.items.get_item(StringName(str(record.get("bowl_id","")))).get("attributes",{}).get("portions_remaining",0))
+ return {"step_id":str(step.id),"kind":str(step.kind),"elapsed":float(record.elapsed),"duration":float(step.duration),"portions":portions,"heat_on":bool(record.get("heat_on",true)),"slicing":record.has("pending_slice")}
 func active_at(instance_id: StringName) -> Dictionary:
  for record in _jobs.values():
   if record.status=="active" and str(record.devices[record.definition.steps[int(record.step_index)].capability])==str(instance_id):return record.duplicate(true)
