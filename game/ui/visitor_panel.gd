@@ -17,8 +17,8 @@ func configure(text: UiText, session: GameSession) -> void:
  SheetControls.header(box,_heading,text,hide)
  box.add_child(_order)
  var scroll := SheetControls.scroll(_topics);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
- _recall=text.key_button("recall_order",_recall_order);_recall.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_recall)
- _talk=text.key_button("personal_talk",_personal_talk);_talk.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_talk)
+ _recall=SheetControls.key_button(text,"recall_order",_recall_order);_recall.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_recall)
+ _talk=SheetControls.key_button(text,"personal_talk",_personal_talk);_talk.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_talk)
  LocaleService.current.changed.connect(func():_topic_key="";if visible:_refresh())
  hide()
 func present(visit_id: StringName) -> void:

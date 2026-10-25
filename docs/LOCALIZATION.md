@@ -2,7 +2,7 @@
 
 All catalogs, Ink JSON and fonts ship with the game. No translation API or language download is used. The Web package still needs a local HTTP server as before; it does not require Internet. Hosted PWA/installable offline caching is a separate deployment feature.
 
-Choose العربية/English on the title or in the game menu. Current bilingual slice: title/menu actions, Fathi's new connected calls and supplier sheet/terms. Other characters, some HUD/system labels and old recorded history retain their original text. This is not a fully English game yet.
+Choose العربية/English on the title or in the game menu. Current bilingual coverage includes title/menu actions, notebook/history/accounts, inventory/care/preparation, shopping/travel/visitor action sheets, and Fathi's new connected calls and supplier sheet/terms. Other characters, some HUD/system labels and old recorded history retain their original text. This is not a fully English game yet.
 
 ## Writing and translating
 
@@ -46,3 +46,9 @@ Item, food, recipe and step catalogs use stable existing IDs (`item.<id>`, `food
 Inventory reads current storage without consumption history. Job progress uses a narrow scalar projection; structural changes coalesce and visible progress updates periodically, while the world continues. This is an ownership/allocation improvement, not a real-device FPS claim. Shop/travel/visitor UI and broader character/HUD translation still have work remaining.
 
 Older active jobs owned by the retained legacy adapter keep their original primary station controls; they are not presented as empty workflow progress cards. The new inspection shortcut applies to workflow-backed jobs without changing save data.
+
+## Shopping, travel and visitor actions
+
+Shopping offers/descriptions, travel phases/destinations and visitor action/topic/order headings have bundled Arabic/English presentation. `shop.<shop_id>.offer.<offer_id>.*`, `route.<route_id>`, `topic.<topic_id>` and `food.<food_id>.menu` use stable identities with exact authored-source guards. External custom wording stays truthful as source text. Topic headings are UI labels; most resulting character Ink conversations still use their authored Arabic. No Ink branches or historical speech are translated by this sheet rollout.
+
+The shop has cross-language offer search, selected product contents/size/capabilities, quantity, explicit reviewed total and separate confirmation. Locale switches preserve reviewed quote identity and amounts. Product/quantity/stock changes invalidate review; editing a quantity draft does so immediately. Search is presentation only. Stock prices/availability and grants stay owned by ShopService. Travel and cooking continue while browsing. Return takes the existing configured journey time; purchased ingredients remain in the purchase bag until unpacked, while equipment/furniture use existing return storage rules.

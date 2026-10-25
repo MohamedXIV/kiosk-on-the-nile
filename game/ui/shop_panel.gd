@@ -39,11 +39,13 @@ func configure(text: UiText, session: GameSession) -> void:
  _quantity.min_value=1;_quantity.max_value=1;_quantity.step=1;_quantity.value=1
  _quantity.value_changed.connect(func(_value):
   if not _updating:_invalidate();_update_details())
+ _quantity.get_line_edit().text_changed.connect(func(_value):
+  if not _updating:_invalidate();_feedback.text="")
  detail_column.add_child(_quantity)
- detail_column.add_child(text.key_button("shop_review",_review))
- _confirm=text.key_button("shop_confirm",_purchase);_confirm.disabled=true;detail_column.add_child(_confirm)
+ detail_column.add_child(SheetControls.key_button(text,"shop_review",_review))
+ _confirm=SheetControls.key_button(text,"shop_confirm",_purchase);_confirm.disabled=true;detail_column.add_child(_confirm)
  detail_column.add_child(_feedback)
- column.add_child(text.key_button("journey_return",_return))
+ column.add_child(SheetControls.key_button(text,"journey_return",_return))
  hide()
 func present() -> void:
  var route := _session.travel.route()
@@ -72,7 +74,7 @@ func _render_cards() -> void:
  for value in _offers:
   var original := str(value.label)
   var names := LocaleService.current.source_variants("shop."+str(_shop_id)+".offer."+str(value.id)+".label",original)
-  if not _search.text.strip_edges().to_lower() in "\n".join(names).to_lower():continue
+  if not _search.text.strip_edges().is_empty() and not _search.text.strip_edges().to_lower() in "\n".join(names).to_lower():continue
   count+=1
   var card := ProductCard.new();_cards.add_child(card)
   card.configure(value,_session.items.definition(StringName(value.contents[0].definition_id)),_text,_shop_id)
@@ -101,12 +103,14 @@ func _update_details() -> void:
  _updating=true;_quantity.max_value=maxi(1,int(_selected.available));_quantity.editable=int(_selected.available)>0;_updating=false
  _feedback.text= _text.text("shop_total",{"price":"%.2f" % (_quote.total_minor/100.0)}) if _quote!=null else _text.text("shop_bought") if _bought else _text.outcome(_last_result) if _last_result!=null else ""
 func _review() -> void:
+ _quantity.apply()
  if _selected.is_empty():return
  _invalidate()
  _last_result=_session.shops.quote(_shop_id,[{"offer_id":_selected.id,"quantity":int(_quantity.value)}])
  if _last_result.ok:_quote=_last_result.details.quote;_request_id=StringName("purchase:"+_quote.id)
  _update_details()
 func _purchase() -> void:
+ _quantity.apply()
  if _quote==null:return
  _confirm.disabled=true
  var result := _session.shops.purchase(_quote,_request_id)

@@ -34,3 +34,8 @@ static func header(parent: VBoxContainer, heading: Label, text: UiText, close: C
  var close_button := text.key_button("close",close)
  close_button.focus_mode=Control.FOCUS_ALL
  row.add_child(close_button)
+static func key_button(text: UiText, key: String, action: Callable) -> Button:
+ var control := text.key_button(key,action)
+ control.focus_mode=Control.FOCUS_ALL
+ control.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ return control

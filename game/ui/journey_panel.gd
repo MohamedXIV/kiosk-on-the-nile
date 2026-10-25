@@ -10,7 +10,7 @@ func configure(text: UiText, session: GameSession) -> void:
  var box := VBoxContainer.new();add_child(box)
  var scroll := VBoxContainer.new();var viewport := SheetControls.scroll(scroll);viewport.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(viewport)
  scroll.add_child(_label)
- _return=text.key_button("journey_return",func():session.travel.begin_return());box.add_child(_return)
+ _return=SheetControls.key_button(text,"journey_return",func():session.travel.begin_return());box.add_child(_return)
  hide()
 func present() -> void:
  visible=not _session.locations.is_physical(_session.location_id)

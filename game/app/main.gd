@@ -257,6 +257,9 @@ func _physics_process(delta: float) -> void:
   _journey_panel.hide()
  if _district_panel.visible:_journey_panel.hide()
  if _shop_panel.visible:_journey_panel.hide()
+ if not _session.locations.is_physical(_session.location_id):
+  _hud.dialogue.hide()
+  _hud.suppress_prompts()
  _captions.visible=_session.locations.is_physical(_session.location_id)
  if _modals.blocking():
   _hud.dialogue.hide()
