@@ -24,6 +24,7 @@ func configure(data: Dictionary, wallet: WalletService, items: ItemStore, travel
  _next_restock_at=float(clock.day)*1440+float(data.restock_minutes)
  travel.returned.connect(_return_purchases)
  return ActionResult.success()
+func revision() -> int:return _revision
 func offers(shop_id: StringName) -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
  if not _data.shops.has(str(shop_id)):return result
