@@ -33,7 +33,7 @@ Current note summaries use stable fact IDs in `ui.notebook_layout.note_refs`. A 
 
 Relationship stages have explicit `text_ref` values in `social_life.relationships.stages`; keep those identities when adjusting numerical thresholds. Default actor names can translate only when they still match their authored Arabic default; custom names remain intact.
 
-`ui.notebook_layout.history_page_size` sets history/receipt page length (10–100, shipped40). Content validation checks these bindings and stage references against both bundled catalogs. No gameplay/save schema or Ink graph changes are needed for this UI increment. Broader HUD/character/system adaptation is still pending.
+`ui.notebook_layout.history_page_size` sets history/receipt page length (10–100, shipped40). Content validation checks these bindings and stage references against both bundled catalogs. No gameplay/save schema or Ink graph changes are needed for this UI increment. HUD, character dialogue and system adaptation are now covered by the completed rollout below.
 
 ## Storage, care and preparation
 
@@ -43,19 +43,19 @@ Item sheets separate use/care, active preparation and existing eligible recipes.
 
 Item, food, recipe and step catalogs use stable existing IDs (`item.<id>`, `food.<id>.label`, `recipe.<id>`, `recipe.<id>.step.<step-id>`). Frozen active-job labels translate only when the exact authored source still matches. Parameterized food names resolve the guarded source and captured sugar argument together. Unsupported/custom wording remains unchanged; canonical saved definitions, reaction timing, quality evidence and heard history are not rewritten.
 
-Inventory reads current storage without consumption history. Job progress uses a narrow scalar projection; structural changes coalesce and visible progress updates periodically, while the world continues. This is an ownership/allocation improvement, not a real-device FPS claim. Shop/travel/visitor UI and broader character/HUD translation still have work remaining.
+Inventory reads current storage without consumption history. Job progress uses a narrow scalar projection; structural changes coalesce and visible progress updates periodically, while the world continues. This is an ownership/allocation improvement, not a real-device FPS claim. Shop/travel/visitor UI, character dialogue and HUD translation are covered by the later completed rollout.
 
 Older active jobs owned by the retained legacy adapter keep their original primary station controls; they are not presented as empty workflow progress cards. The new inspection shortcut applies to workflow-backed jobs without changing save data.
 
 ## Shopping, travel and visitor actions
 
-Shopping offers/descriptions, travel phases/destinations and visitor action/topic/order headings have bundled Arabic/English presentation. `shop.<shop_id>.offer.<offer_id>.*`, `route.<route_id>`, `topic.<topic_id>` and `food.<food_id>.menu` use stable identities with exact authored-source guards. External custom wording stays truthful as source text. The active personal dialogue hub resolves `manual_topic.<encounter>/<topic>` and stable social-topic keys; it keeps the existing continuous conversation flow and offers focusable choices. The older standalone VisitorPanel is currently unused by the normal interaction route and does not replace the hub. Topic headings are UI labels; most resulting character Ink conversations still use their authored Arabic. No Ink branches or historical speech are translated by this sheet rollout.
+Shopping offers/descriptions, travel phases/destinations and visitor action/topic/order headings have bundled Arabic/English presentation. `shop.<shop_id>.offer.<offer_id>.*`, `route.<route_id>`, `topic.<topic_id>` and `food.<food_id>.menu` use stable identities with exact authored-source guards. External custom wording stays truthful as source text. The active personal dialogue hub resolves `manual_topic.<encounter>/<topic>` and stable social-topic keys; it keeps the existing continuous conversation flow and offers focusable choices. The older standalone VisitorPanel is currently unused by the normal interaction route and does not replace the hub. Topic headings are UI labels. Current character Ink conversations now have their own stable localization tags; the hub never rewrites Ink branches or historical speech.
 
 The shop has cross-language offer search, selected product contents/size/capabilities, quantity, explicit reviewed total and separate confirmation. Locale switches preserve reviewed quote identity and amounts. Product/quantity/stock changes invalidate review; editing a quantity draft does so immediately. Search is presentation only. Stock prices/availability and grants stay owned by ShopService. Travel and cooking continue while browsing. Return takes the existing configured journey time; purchased ingredients remain in the purchase bag until unpacked, while equipment/furniture use existing return storage rules.
 
 ## HUD and arrangement
 
-Status strip time/cash/sign/stock/needs/held names and fatigue tooltips have bundled Arabic/English labels. Held-item names use the same guarded item/prepared-food projection as storage. Sign wording is an indication, not an added business gate. Arrangement controls, policy hints, piece and host names translate; custom item labels retain source fallback. Locale switching rebuilds option captions without selecting/preparing/placing an item; the actual preview request, rotation, coordinates and host stay owned by BuildController. The sheet scrolls inside viewport bounds. Remaining world interaction hints and narrative/system text are not all translated.
+Status strip time/cash/sign/stock/needs/held names and fatigue tooltips have bundled Arabic/English labels. Held-item names use the same guarded item/prepared-food projection as storage. Sign wording is an indication, not an added business gate. Arrangement controls, policy hints, piece and host names translate; custom item labels retain source fallback. Locale switching rebuilds option captions without selecting/preparing/placing an item; the actual preview request, rotation, coordinates and host stay owned by BuildController. The sheet scrolls inside viewport bounds. World hints and current narrative/system text are covered by the completed rollout below.
 
 
 ## Completed authored story coverage

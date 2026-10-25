@@ -1,0 +1,287 @@
+{
+  "social_before": {
+    "activity": {
+      "clear_since": -1,
+      "end_at": -1,
+      "not_before": -1,
+      "outcome": "",
+      "phase": "idle",
+      "start_at": -1
+    },
+    "daily": {
+      "1": {
+        "youssef": 5
+      }
+    },
+    "invitations": {
+      "visit_7": {
+        "elapsed": 0,
+        "offered": false,
+        "wait": 10.254
+      }
+    },
+    "moments": {
+      "meet_youssef": true
+    },
+    "people": {
+      "hassan": true,
+      "youssef": true
+    },
+    "receipts": {
+      "meet_youssef": {
+        "actor": "youssef",
+        "at": 1378.53333333293,
+        "source": "conversation_7/1/0"
+      }
+    },
+    "topic_history": {
+      "meet_youssef": 1
+    }
+  },
+  "social_after_restore": {
+    "activity": {
+      "clear_since": -1,
+      "end_at": -1,
+      "not_before": -1,
+      "outcome": "",
+      "phase": "idle",
+      "start_at": -1
+    },
+    "daily": {
+      "1": {
+        "youssef": 5
+      }
+    },
+    "invitations": {
+      "visit_7": {
+        "elapsed": 0,
+        "offered": false,
+        "wait": 10.254
+      }
+    },
+    "moments": {
+      "meet_youssef": true
+    },
+    "people": {
+      "hassan": true,
+      "youssef": true
+    },
+    "receipts": {
+      "meet_youssef": {
+        "actor": "youssef",
+        "at": 1378.53333333293,
+        "source": "conversation_7/1/0"
+      }
+    },
+    "topic_history": {
+      "meet_youssef": 1
+    }
+  },
+  "social_after_locale": {
+    "activity": {
+      "clear_since": -1,
+      "end_at": -1,
+      "not_before": -1,
+      "outcome": "",
+      "phase": "idle",
+      "start_at": -1
+    },
+    "daily": {
+      "1": {
+        "youssef": 5
+      }
+    },
+    "invitations": {
+      "visit_7": {
+        "elapsed": 0,
+        "offered": false,
+        "wait": 10.254
+      }
+    },
+    "moments": {
+      "meet_youssef": true
+    },
+    "people": {
+      "hassan": true,
+      "youssef": true
+    },
+    "receipts": {
+      "meet_youssef": {
+        "actor": "youssef",
+        "at": 1378.53333333293,
+        "source": "conversation_7/1/0"
+      }
+    },
+    "topic_history": {
+      "meet_youssef": 1
+    }
+  },
+  "unchanged_social": true,
+  "canonical_runtime_before": {
+    "frame": {
+      "choices": [],
+      "duration": 8,
+      "effects": [
+        {
+          "action_id": "meet_youssef",
+          "kind": "social"
+        }
+      ],
+      "ended": false,
+      "loc_args": {
+        "amgad_visits": 1,
+        "appointment_label": {
+          "parameters": {
+            "day": 0,
+            "hour": "23",
+            "minute": "59"
+          },
+          "text_ref": "narrative.date"
+        },
+        "bought_fan": false,
+        "business_allowed": true,
+        "chapter_id": "conversation_7",
+        "character_id": "youssef",
+        "day": 1,
+        "familiar": false,
+        "familiarity": 0,
+        "fan_price_label": "35.0",
+        "hour": 22,
+        "kiosk_open": true,
+        "known_cheap_fan": false,
+        "last_served_quality": "مظبوط",
+        "line_variant": 0,
+        "manual_read": true,
+        "mode": 0,
+        "order_label": "",
+        "previous_food": "",
+        "previous_quality": -1,
+        "quality_score": 0,
+        "request_can_prepare": false,
+        "requested_topic": "",
+        "topic_id": "meet_youssef",
+        "trial_week": false,
+        "visit_count": 1
+      },
+      "loc_id": "story.companionship.010",
+      "speaker_id": "youssef",
+      "text": "يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة."
+    },
+    "ink": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"selected.4.b\",\"idx\":16,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"selected.4.b.15\"}],\"threadCounter\":0},\"outputStream\":[\"^يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة. \",\"#\",\"^speaker:youssef \",\"/#\",\"#\",\"^duration:8 \",\"/#\",\"#\",\"^effect:social|meet_youssef \",\"/#\",\"#\",\"^loc:story.companionship.010\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{\"character_id\":\"^youssef\",\"topic_id\":\"^meet_youssef\",\"appointment_label\":\"^يوم 0 الساعة 23:59\"},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":46,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+    "state_hash": "6fc69da96d2647728ed11dd5a8ea82f586ee5f7ddd8b8d9593f21e0e4000383d",
+    "story_hash": "514a52592fe3b5865f9b2764dab4ed07145d529f1cf2f07cb174c1ac6ed50dd3",
+    "story_id": "companionship"
+  },
+  "canonical_runtime_after_restore": {
+    "frame": {
+      "choices": [],
+      "duration": 8,
+      "effects": [
+        {
+          "action_id": "meet_youssef",
+          "kind": "social"
+        }
+      ],
+      "ended": false,
+      "loc_args": {
+        "amgad_visits": 1,
+        "appointment_label": {
+          "parameters": {
+            "day": 0,
+            "hour": "23",
+            "minute": "59"
+          },
+          "text_ref": "narrative.date"
+        },
+        "bought_fan": false,
+        "business_allowed": true,
+        "chapter_id": "conversation_7",
+        "character_id": "youssef",
+        "day": 1,
+        "familiar": false,
+        "familiarity": 0,
+        "fan_price_label": "35.0",
+        "hour": 22,
+        "kiosk_open": true,
+        "known_cheap_fan": false,
+        "last_served_quality": "مظبوط",
+        "line_variant": 0,
+        "manual_read": true,
+        "mode": 0,
+        "order_label": "",
+        "previous_food": "",
+        "previous_quality": -1,
+        "quality_score": 0,
+        "request_can_prepare": false,
+        "requested_topic": "",
+        "topic_id": "meet_youssef",
+        "trial_week": false,
+        "visit_count": 1
+      },
+      "loc_id": "story.companionship.010",
+      "speaker_id": "youssef",
+      "text": "يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة."
+    },
+    "ink": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"selected.4.b\",\"idx\":16,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"selected.4.b.15\"}],\"threadCounter\":0},\"outputStream\":[\"^يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة. \",\"#\",\"^speaker:youssef \",\"/#\",\"#\",\"^duration:8 \",\"/#\",\"#\",\"^effect:social|meet_youssef \",\"/#\",\"#\",\"^loc:story.companionship.010\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{\"character_id\":\"^youssef\",\"topic_id\":\"^meet_youssef\",\"appointment_label\":\"^يوم 0 الساعة 23:59\"},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":46,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+    "state_hash": "6fc69da96d2647728ed11dd5a8ea82f586ee5f7ddd8b8d9593f21e0e4000383d",
+    "story_hash": "514a52592fe3b5865f9b2764dab4ed07145d529f1cf2f07cb174c1ac6ed50dd3",
+    "story_id": "companionship"
+  },
+  "canonical_runtime_after_locale": {
+    "frame": {
+      "choices": [],
+      "duration": 8,
+      "effects": [
+        {
+          "action_id": "meet_youssef",
+          "kind": "social"
+        }
+      ],
+      "ended": false,
+      "loc_args": {
+        "amgad_visits": 1,
+        "appointment_label": {
+          "parameters": {
+            "day": 0,
+            "hour": "23",
+            "minute": "59"
+          },
+          "text_ref": "narrative.date"
+        },
+        "bought_fan": false,
+        "business_allowed": true,
+        "chapter_id": "conversation_7",
+        "character_id": "youssef",
+        "day": 1,
+        "familiar": false,
+        "familiarity": 0,
+        "fan_price_label": "35.0",
+        "hour": 22,
+        "kiosk_open": true,
+        "known_cheap_fan": false,
+        "last_served_quality": "مظبوط",
+        "line_variant": 0,
+        "manual_read": true,
+        "mode": 0,
+        "order_label": "",
+        "previous_food": "",
+        "previous_quality": -1,
+        "quality_score": 0,
+        "request_can_prepare": false,
+        "requested_topic": "",
+        "topic_id": "meet_youssef",
+        "trial_week": false,
+        "visit_count": 1
+      },
+      "loc_id": "story.companionship.010",
+      "speaker_id": "youssef",
+      "text": "يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة."
+    },
+    "ink": "{\"flows\":{\"DEFAULT_FLOW\":{\"callstack\":{\"threads\":[{\"callstack\":[{\"cPath\":\"selected.4.b\",\"idx\":16,\"exp\":false,\"type\":0}],\"threadIndex\":0,\"previousContentObject\":\"selected.4.b.15\"}],\"threadCounter\":0},\"outputStream\":[\"^يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة. \",\"#\",\"^speaker:youssef \",\"/#\",\"#\",\"^duration:8 \",\"/#\",\"#\",\"^effect:social|meet_youssef \",\"/#\",\"#\",\"^loc:story.companionship.010\",\"/#\",\"\\n\"],\"currentChoices\":[]}},\"currentFlowName\":\"DEFAULT_FLOW\",\"variablesState\":{\"character_id\":\"^youssef\",\"topic_id\":\"^meet_youssef\",\"appointment_label\":\"^يوم 0 الساعة 23:59\"},\"evalStack\":[],\"visitCounts\":{},\"turnIndices\":{},\"turnIdx\":-1,\"storySeed\":46,\"previousRandom\":0,\"inkSaveVersion\":10,\"inkFormatVersion\":21}",
+    "state_hash": "6fc69da96d2647728ed11dd5a8ea82f586ee5f7ddd8b8d9593f21e0e4000383d",
+    "story_hash": "514a52592fe3b5865f9b2764dab4ed07145d529f1cf2f07cb174c1ac6ed50dd3",
+    "story_id": "companionship"
+  },
+  "runtime_exact": true,
+  "note": "Actual UI save10sec flush+reload+Continue, locale switch; read-only Debug observation."
+}

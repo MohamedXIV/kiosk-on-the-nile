@@ -10,6 +10,11 @@ the pace. It records the owner's clarification and the gaps in the current
 preview. The unchanged three-quarter HTML prototype is a historical porting
 reference; its visitor and service behavior does not override that vision.
 
+## Current Web preview
+
+[Offline Arabic / English build](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/localization-0ea4572) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c70f3e585aec4f825b834c01989a4266eed0726d/builds/kiosk-on-the-nile-localization.zip).
+All11 current authored Ink stories and current UI have shipped translations. Historical heard/signed text, custom wording and already-open archived stories retain their original text. Extract the whole ZIP and serve over local HTTP; do not open file:// or mix exports. See [delivery coverage](docs/notes/2026-10-25-complete-localization.md) and [authoring](docs/LOCALIZATION.md).
+
 ## Open and run
 
 Pinned stack: **Godot Standard 4.7.2**, Compatibility renderer, GDScript,
