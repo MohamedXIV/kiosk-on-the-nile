@@ -20,7 +20,7 @@ func configure(text: UiText) -> void:
  box.add_theme_constant_override("separation",2)
  add_child(box)
  var heading := HBoxContainer.new()
- heading.layout_direction = Control.LAYOUT_DIRECTION_RTL
+ heading.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
  heading.add_theme_constant_override("separation",18)
  box.add_child(heading)
  _clock = UiText.label()
@@ -30,7 +30,10 @@ func configure(text: UiText) -> void:
  _state = UiText.label()
  _state.size_flags_horizontal = Control.SIZE_EXPAND_FILL
  heading.add_child(_state)
- var menu := UiText.button(text.text("menu"),func():menu_requested.emit())
+ var menu := text.key_button("menu",func():menu_requested.emit())
+ menu.focus_mode=Control.FOCUS_ALL
+ menu.custom_minimum_size.x=80
+ menu.size_flags_vertical=Control.SIZE_SHRINK_CENTER
  for state in ["normal","hover","pressed"]:
   var button_style: StyleBoxFlat = get_theme_stylebox(state,"Button").duplicate()
   button_style.content_margin_top = 2
@@ -38,15 +41,15 @@ func configure(text: UiText) -> void:
   menu.add_theme_stylebox_override(state,button_style)
  heading.add_child(menu)
  var details := HBoxContainer.new()
- details.layout_direction = Control.LAYOUT_DIRECTION_RTL
+ details.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
  details.add_theme_constant_override("separation",18)
  box.add_child(details)
  _inventory = UiText.label()
  details.add_child(_inventory)
  for key in ["hunger","rest","mood"]:
   var meter := HBoxContainer.new()
-  meter.layout_direction = Control.LAYOUT_DIRECTION_RTL
-  meter.add_child(UiText.label(text.text(key)))
+  meter.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
+  meter.add_child(text.key_label(key))
   var bar := ProgressBar.new()
   bar.custom_minimum_size = Vector2(float(settings.meter_width),8)
   bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -71,15 +74,15 @@ func present(session: GameSession) -> void:
  _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
  _money.text = _text.text("money",{"amount":"%.2f" % (session.wallet.balance/100.0)})
  _state.text = _text.text("open") if session.kiosk_open else _text.text("closed")
- if not session.accounts.business_allowed():_state.text+=" · النشاط موقوف للحي"
- if not session.actions.preview(&"personal_focus").ok:_state.text+=" · محتاج نوم"
- elif session.needs.rest<session.tuning.value("fatigue_warning"):_state.text+=" · مرهق"
- _state.tooltip_text="راحة حقيقية %.1f — تركيز فعّال %.1f" % [session.needs.rest,session.alertness.effective_focus()]
- if session.fatigue.visual_scale<1:_state.tooltip_text+=" · مؤثر الإرهاق البصري %.0f%%" % [session.fatigue.visual_scale*100]
+ if not session.accounts.business_allowed():_state.text+=" · "+_text.text("hud_business_suspended")
+ if not session.actions.preview(&"personal_focus").ok:_state.text+=" · "+_text.text("hud_needs_sleep")
+ elif session.needs.rest<session.tuning.value("fatigue_warning"):_state.text+=" · "+_text.text("hud_tired")
+ _state.tooltip_text=_text.text("hud_focus",{"rest":"%.1f" % session.needs.rest,"focus":"%.1f" % session.alertness.effective_focus()})
+ if session.fatigue.visual_scale<1:_state.tooltip_text+=" · "+_text.text("hud_fatigue_visual",{"percent":"%.0f" % (session.fatigue.visual_scale*100)})
  var stock := session.cooking.inventory_snapshot()
  _inventory.text = _text.text("stock_short",{"tea":int(stock.tea),"kebda":int(stock.kebda)})
- _held.text = _text.text("held",{"item":session.cooking.item_label(session.cooking.held_item())}) if session.cooking.held_item() else _text.text("empty_hands")
- if not session.inventory.held_id().is_empty() and session.cooking.held_item()==null:_held.text=_text.text("held",{"item":session.items.definition(StringName(session.items.get_item(session.inventory.held_id()).definition_id)).label})
+ var held := session.items.get_item(session.inventory.held_id())
+ _held.text = _text.text("held",{"item":ItemText.instance(session,held)}) if not held.is_empty() else _text.text("empty_hands")
  _held.tooltip_text = _held.text
  for key in _bars:
   _bars[key].value = session.needs.get(key)

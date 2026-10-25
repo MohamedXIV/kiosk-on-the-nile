@@ -14,20 +14,21 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
  _controller=controller
  _text=text
  theme=text.make_theme()
- layout_direction=Control.LAYOUT_DIRECTION_LTR
+ layout_direction=Control.LAYOUT_DIRECTION_INHERITED
  grow_vertical=Control.GROW_DIRECTION_BEGIN
  custom_minimum_size.x=330
  anchor_left=1
  anchor_right=1
- anchor_top=1
- anchor_bottom=1
+ anchor_top=0.16
+ anchor_bottom=0.96
  offset_left=-355
  offset_right=-18
- offset_top=-330
- offset_bottom=-95
+ offset_top=0
+ offset_bottom=0
  var box := VBoxContainer.new()
- add_child(box)
- box.add_child(UiText.label(text.text("arrange_title")))
+ var scroll := SheetControls.scroll(box)
+ add_child(scroll)
+ box.add_child(text.key_label("arrange_title"))
  box.add_child(_choices)
  _choices.item_selected.connect(func(index):_select(StringName(_choices.get_item_metadata(index))))
  var coordinates := HBoxContainer.new()
@@ -45,19 +46,22 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
  _host.item_selected.connect(_select_host)
  var actions := HBoxContainer.new()
  box.add_child(actions)
- actions.add_child(UiText.button(text.text("arrange_rotate"),rotate_selection))
- actions.add_child(UiText.button(text.text("arrange_confirm"),func():_controller.confirm()))
- actions.add_child(UiText.button(text.text("arrange_store"),func():_controller.store_selected();_refresh_choices()))
+ actions.add_child(SheetControls.key_button(text,"arrange_rotate",rotate_selection))
+ actions.add_child(SheetControls.key_button(text,"arrange_confirm",func():_controller.confirm()))
+ actions.add_child(SheetControls.key_button(text,"arrange_store",func():_controller.store_selected();_refresh_choices()))
  _status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  box.add_child(_status)
- box.add_child(UiText.button(text.text("arrange_close"),func():_controller.cancel();hide();closed.emit()))
+ box.add_child(SheetControls.key_button(text,"arrange_close",func():_controller.cancel();hide();closed.emit()))
+ LocaleService.current.changed.connect(func():
+  _refresh_choices(true)
+  _present_result())
  _controller.changed.connect(_present_result)
  session.spaces.changed.connect(func(_id,_revision):_refresh_choices())
  hide()
 func open() -> void:
  _refresh_choices()
  show()
-func _refresh_choices() -> void:
+func _refresh_choices(preserve_preview: bool = false) -> void:
  var selected := str(_controller.request.instance_id) if _controller.request!=null else ""
  _updating=true
  _choices.clear()
@@ -65,15 +69,18 @@ func _refresh_choices() -> void:
  _host.add_item(_text.text("arrange_floor"))
  _host.set_item_metadata(0,"")
  for item in _controller.choices():
-  _choices.add_item(str(item.label)+("" if item.placed else " · "+_text.text("arrange_stored")))
+  _choices.add_item(ItemText.source("item."+str(item.definition_id),str(item.label))+("" if item.placed else " · "+_text.text("arrange_stored")))
   _choices.set_item_metadata(_choices.item_count-1,item.id)
   if item.id==selected:_choices.select(_choices.item_count-1)
   var definition := _controller_items_definition(item)
   if item.placed and definition.get("surface",false):
-   _host.add_item(item.label+" · "+item.id)
+   _host.add_item(ItemText.source("item."+str(item.definition_id),str(item.label))+" · "+item.id)
    _host.set_item_metadata(_host.item_count-1,item.id)
  _updating=false
- if selected!="" and _choices.item_count>0:_select(StringName(selected))
+ if selected!="" and _choices.item_count>0 and not preserve_preview:_select(StringName(selected))
+ elif selected!="" and preserve_preview:
+  for index in range(_host.item_count):
+   if str(_host.get_item_metadata(index))==str(_controller.request.host_id):_host.select(index);break
  else:_choices.select(-1)
 func _controller_items_definition(item: Dictionary) -> Dictionary:
  return _controller.definition(StringName(item.definition_id))
