@@ -2,7 +2,7 @@ class_name ItemText
 extends RefCounted
 ## Stable ID + exact source guard. Frozen/custom names remain their own text.
 static func t(key: String, args: Dictionary = {}) -> String:return UiText.localized("items_ui."+key,args,key)
-static func source(key: String, value: String) -> String:return LocaleService.current.source_text(key,value) if LocaleService.current else value
+static func source(key: String, value: String, args: Dictionary = {}) -> String:return LocaleService.current.source_text(key,value,args) if LocaleService.current else value.format(args)
 static func definition(session: GameSession, id: String) -> String:
  return source("item."+id,str(session.items.definition(StringName(id)).get("label",id)))
 static func recipe(id: String, value: String) -> String:return source("recipe."+id,value)
@@ -17,7 +17,7 @@ static func instance(session: GameSession, item: Dictionary) -> String:
   if not food.is_empty():
    var sugar_id := str(attributes.get("sugar_id",""))
    var sugar := source("food."+id+".sugar."+sugar_id,str(food.get("sugars",{}).get(sugar_id,"")))
-   return source("food."+id+".label",str(food.label)).format({"sugar":sugar})
+   return source("food."+id+".label",str(food.label),{"sugar":sugar})
  return definition(session,str(item.definition_id))
 static func search_names(session: GameSession, item: Dictionary) -> String:
  var id := str(item.definition_id)

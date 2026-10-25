@@ -210,7 +210,7 @@
     "ui.inventory_cold": "الثلاجة",
     "ui.inventory_dry": "الخامات الجافة",
     "ui.inventory_furniture": "الأثاث المخزن · انقله بالحقيبة ثم فرغه في المكان الآخر",
-    "ui.inventory_unpack": "فرّغ اللي له مكان",
+    "ui.inventory_unpack": "فرّغ الحقيبة — كل اللي له مكان",
     "ui.inventory_pack": "في الحقيبة",
     "ui.inventory_partial": "اتنقل اللي له مساحة؛ الباقي موجود في الحقيبة",
     "ui.surface_put": "حط اللي في إيدك",
@@ -361,6 +361,8 @@
     "ui.error.recipe_station_mismatch": "ابدأ من محطة مناسبة للخطوة الأولى",
     "ui.error.too_early": "لسه بدري شوية",
     "ui.error.invalid_cooking_stage": "الخطوة دي ما بقتش متاحة؛ راجع التحضير الجاري.",
-    "items_ui.furniture": "الأثاث المخزن"
+    "items_ui.furniture": "الأثاث المخزن",
+    "ui.action_unavailable": "مش متاح دلوقتي",
+    "ui.station_options": "التفاصيل والتحضير والعناية"
   }
 }

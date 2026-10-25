@@ -95,7 +95,9 @@ func _render() -> void:
   for item in entries:
    var row := HBoxContainer.new();row.add_theme_constant_override("separation",8);card.add_child(row)
    var detail := VBoxContainer.new();detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(detail)
-   detail.add_child(SheetControls.label(ItemText.t("quantity",{"name":ItemText.instance(_session,item),"quantity":int(item.quantity)})))
+   var item_label := SheetControls.label(ItemText.t("quantity",{"name":ItemText.instance(_session,item),"quantity":int(item.quantity)}))
+   item_label.custom_minimum_size.y=float(_text.data.theme.font_size)*1.4
+   detail.add_child(item_label)
    var description := ItemText.item_details(_session,item)
    if description!="":detail.add_child(SheetControls.label(description))
    var count := int(reserved.get(item.id,0))
@@ -103,9 +105,11 @@ func _render() -> void:
    var item_id := StringName(str(item.id))
    if item.kind=="batch":
     var take := SheetControls.button(_text.text("recipe_take_bowl"),func():_apply(_session.inventory.pick_up_storage(item_id)))
+    take.custom_minimum_size.x=200
     take.disabled=not held.is_empty();row.add_child(take)
    elif container.kind!="purchase_bag":
     var pack := SheetControls.button(_text.text("inventory_pack"),func():_apply(_session.inventory.pack(item_id)))
+    pack.custom_minimum_size.x=200
     pack.disabled=count>0;row.add_child(pack)
  if shown==0:_rows.add_child(SheetControls.label(ItemText.t("no_items")))
  if _last_result:

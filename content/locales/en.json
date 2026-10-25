@@ -210,7 +210,7 @@
     "ui.inventory_cold": "Fridge",
     "ui.inventory_dry": "Dry ingredients",
     "ui.inventory_furniture": "Stored furniture — pack it to move it between locations",
-    "ui.inventory_unpack": "Unpack what fits",
+    "ui.inventory_unpack": "Unpack bag — everything that fits",
     "ui.inventory_pack": "Pack in the bag",
     "ui.inventory_partial": "Moved what fits. The rest is still in the bag.",
     "ui.surface_put": "Put down what you are holding",
@@ -361,6 +361,8 @@
     "ui.error.recipe_station_mismatch": "Start at an appropriate station for the first step.",
     "ui.error.too_early": "Give it a little more time.",
     "ui.error.invalid_cooking_stage": "That step is no longer available. Check the active preparation.",
-    "items_ui.furniture": "Stored furniture"
+    "items_ui.furniture": "Stored furniture",
+    "ui.action_unavailable": "That action is not available right now.",
+    "ui.station_options": "Details, preparation and care"
   }
 }

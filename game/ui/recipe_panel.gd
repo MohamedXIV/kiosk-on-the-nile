@@ -46,8 +46,8 @@ func present(instance_id: StringName, _unused_recipes: Array[Dictionary] = []) -
   _last_result=null
   for scroll in _scrolls:scroll.get_v_scroll_bar().value=0
  _refresh()
- if changed_target:
-  _tabs.current_tab=1 if not _progress.is_empty() else 2 if _recipes.has_meta("has_recipes") and _recipes.get_meta("has_recipes") else 0
+ if not _progress.is_empty():_tabs.current_tab=1
+ elif changed_target:_tabs.current_tab=2 if _recipes.has_meta("has_recipes") and _recipes.get_meta("has_recipes") else 0
  show()
 func _refresh() -> void:
  _dirty=false
@@ -69,7 +69,7 @@ func _refresh() -> void:
   _render_care(instance)
   _render_jobs()
   _render_recipes()
- if _last_result:_feedback.text=ItemText.missing(_session,_text,_last_result)
+ _feedback.text=ItemText.missing(_session,_text,_last_result) if _last_result else ""
  _feedback.visible=not _feedback.text.is_empty()
  for i in range(_scrolls.size()):_scrolls[i].get_v_scroll_bar().set_deferred("value",offsets[i])
  _update_progress()
@@ -123,12 +123,15 @@ func _render_recipes() -> void:
   var id := StringName(str(recipe.id))
   var actions := HFlowContainer.new();card.add_child(actions)
   var start := SheetControls.button(_text.text("recipe_start"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]))))
+  start.custom_minimum_size.x=240
   start.disabled=not recipe.available;actions.add_child(start)
   var personal := SheetControls.button(_text.text("self_cooking"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]),true)))
+  personal.custom_minimum_size.x=440
   personal.disabled=not recipe.available;actions.add_child(personal)
  if available.is_empty():_recipes.add_child(SheetControls.label(ItemText.t("recipes_empty")))
 func _apply(result: ActionResult) -> void:
  _last_result=result;_dirty=true
+ if result.ok and result.details.has("job_id"):_tabs.current_tab=1
 func _process(delta: float) -> void:
  if not visible:return
  if _dirty:_refresh()

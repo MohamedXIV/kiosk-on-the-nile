@@ -11,6 +11,8 @@ static func button(value: String, action: Callable) -> Button:
  var control := UiText.button(value,action)
  control.focus_mode=Control.FOCUS_ALL
  control.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ control.custom_minimum_size.x=180
+ control.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
  return control
 static func clear(parent: Control) -> void:
  for child in parent.get_children():parent.remove_child(child);child.queue_free()
