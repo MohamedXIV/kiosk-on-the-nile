@@ -28,32 +28,36 @@
 **Files:** InteractionJournal, SupplierLedger, SupplyTransactions, SaveCodec/LivingSpacesMigration, SessionAdvance new time service, GameSession/LifeActions/Main, DeliveryService/AccountBook/AccountTransactions, ActorPresence.
 **Interfaces:** `SessionAdvance.catch_up(frame)->ActionResult`; supplier receipt adds recorded_at, journal uses at=recorded_at and occurred_at=receipt.at; array position/unique event ID remain append sequence. Due cursors are derived caches, rebuilt on restore/contract revision, not new financial truth.
 
-- [ ] Migrate11→12 by locating original supply journal events, retain their at/text, attach receipt.recorded_at and event.occurred_at. Validate domains/recorded bounds and linkage. New supply transactions record observed time explicitly; preserve due dates.
-- [ ] Replace handwritten sleep orchestration with outcome-collecting SessionAdvance; surface failures without claiming time rolled back. Isolate unrelated motion/needs from supply failures in dependency graph, report new system failure signatures once.
-- [ ] Derive lease next-period and supplier next-due caches from validated history; invalidate contracts on sign/pause/restore, retain pending cash retries. Avoid financial candidate copying on no-event ticks. Cache merged actor definitions at configuration while preserving defensive copies and tuning labels.
-- [ ] Build `/tmp/kiosk-stability-core`; repeat audit collision through UI and save/Continue. Expected first and second deliveries each once, rent events plus supply event append cleanly, motion/needs continue, receipt due time unchanged. Commit.
+- [x] Migrate11→12 by locating original supply journal events, retain their at/text, attach receipt.recorded_at and event.occurred_at. Validate domains/recorded bounds and linkage. New supply transactions record observed time explicitly; preserve due dates.
+- [x] Replace handwritten sleep orchestration with outcome-collecting SessionAdvance; surface failures without claiming time rolled back. Isolate unrelated motion/needs from supply failures in dependency graph, report new system failure signatures once.
+- [x] Derive lease next-period and supplier next-due caches from validated history; invalidate contracts on sign/pause/restore, retain pending cash retries. Avoid financial candidate copying on no-event ticks. Cache merged actor definitions at configuration while preserving defensive copies and tuning labels.
+- [x] Build `/tmp/kiosk-stability-core`; repeat audit collision through UI and save/Continue. Expected first and second deliveries each once, rent events plus supply event append cleanly, motion/needs continue, receipt due time unchanged. Commit.
 
 ### Task2: Clarify composition and modal ownership
 
 **Files:** FinancialDialogue new narrative adapter; GameSession/NarrativeDirector, ModalCoordinator new UI service, Main/Hud/panels, SupplierPanel defaults.
 **Interfaces:** `FinancialDialogue.prepare(chapter,actor)` mutates only on explicit chapter start; `context(chapter,actor)` pure view; effect delegates validated commands. `ModalCoordinator.activate(id)`, `close_active()`, `blocking()`, registered panel visibility/close callback.
 
-- [ ] Extract financial/supplier chapter preparation/context/effects, leaving session wrappers for existing consumers. Restore never prepares new quotes.
-- [ ] One blocking modal visible; hide dialogue/thought/interaction behind it, use common motion/participation/back policy. Supplier closure restores same call. Common UI theme/spacing remains Godot-native; fix supplier defaults/limits from content.
-- [ ] Build/UI overlay and Escape/focus checks at960×540/1280×720; clock continues. Commit.
+- [x] Extract financial/supplier chapter preparation/context/effects, leaving session wrappers for existing consumers. Restore never prepares new quotes.
+- [x] One blocking modal visible; hide dialogue/thought/interaction behind it, use common motion/participation/back policy. Supplier closure restores same call. Common UI theme/spacing remains Godot-native; fix supplier defaults/limits from content.
+- [x] Build/UI overlay and Escape/focus checks at960×540/1280×720; clock continues. Commit.
 
 ### Task3: Bundled localization and canonical Ink presentation
 
 **Files:** LocaleService/LocalizedNarrative new, locale JSON+manifest, supplier Ink archive/tags, InkRuntime/Frame, UiText/Title/Hud/SupplierPanel, NarrativeDirector journal metadata, settings preference.
 **Interfaces:** `LocaleService.text(id,args,fallback)`, `set_locale(id)`, `changed`; canonical frames add optional loc_id/loc_args and per-choice loc_id, never translated text. LocalizedNarrative renders a copy for UI; journal stores actual shown snapshot with canonical text/ref/locale metadata when known.
 
-- [ ] Ship two validated offline catalogs; Godot TranslationServer integration with Arabic fallback and per-locale direction. Preserve setting in user preferences; Cairo font already shipped for both pilot locales.
-- [ ] Archive current supplier story using engine-normalized hash before tags. Add stable line/choice IDs and named captured amount/refusal reason parameters; English is authored adaptation. Choice tags remain presentation metadata; finite allowed tags stay validated.
-- [ ] Localize title/settings language selector, supplier sheet/terms/actions and live Fathi dialogue. Locale changes rebuild labels/view signatures only, preserve edited basket/quote/canonical Ink and signed terms. Older stories/history remain original-language fallback, explicitly not full English release.
-- [ ] Build/UI switch active choice ar→en→ar, accept exactly one real effect, save/Continue, fallback/RTL/LTR, no runtime translation service. Commit.
+- [x] Ship two validated offline catalogs; Godot TranslationServer integration with Arabic fallback and per-locale direction. Preserve setting in user preferences; Cairo font already shipped for both pilot locales.
+- [x] Archive current supplier story using engine-normalized hash before tags. Add stable line/choice IDs and named captured amount/refusal reason parameters; English is authored adaptation. Choice tags remain presentation metadata; finite allowed tags stay validated.
+- [x] Localize title/settings language selector, supplier sheet/terms/actions and live Fathi dialogue. Locale changes rebuild labels/view signatures only, preserve edited basket/quote/canonical Ink and signed terms. Older stories/history remain original-language fallback, explicitly not full English release.
+- [x] Build/UI switch active choice ar→en→ar, accept exactly one real effect, save/Continue, fallback/RTL/LTR, no runtime translation service. Commit.
 
 ### Task4: Review, exact artifact and evidence
 
-- [ ] One fresh read-only whole-increment review; regrade/material fix pass only, no second review.
-- [ ] Exact debug/release export and actual release boot/Continue. Repeat the audit's release-browser samples with same limitations; no unmeasured speed claims.
-- [ ] Publish authorized preview source/artifact/prerelease, download ZIP and verify digest. Record delivered slice/coverage limits and unresolved broader translation separately. No main merge.
+- [x] One fresh read-only whole-increment review; regrade/material fix pass only, no second review.
+- [x] Exact debug/release export and actual release boot/Continue. Repeat the audit's release-browser samples with same limitations; no unmeasured speed claims.
+- [x] Publish authorized preview source/artifact/prerelease, download ZIP and verify digest. Record delivered slice/coverage limits and unresolved broader translation separately. No main merge.
+
+## Execution result
+
+Completed as the bilingual pilot at product e9b816d. Single review/material fix pass; exact Debug/Release exports and GitHub digest verification recorded in [delivery note](../../notes/2026-10-25-stabilization-and-localization.md). Checked items record implementation plus the explicitly documented manual coverage, not exhaustive case verification. No automated tests or real-GPU/native profiling; full English and visual redesign remain subsequent work.
