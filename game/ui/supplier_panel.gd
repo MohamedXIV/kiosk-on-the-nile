@@ -48,7 +48,7 @@ func configure(text: UiText, session: GameSession) -> void:
  for label in ["رصيد مقدم","آجل — وافق فتحي على سقف الحساب","نقدي — حضور وتأكيد عند الموعد"]:_mode.add_item(label)
  box.add_child(_mode)
  _leave.text="أسمح بترك الدفعة في التخزين المحدد أثناء غيابي";_leave.button_pressed=true;UiText.bind_control(_leave,"supply.leave");box.add_child(_leave)
- _once.text="طلب إضافي مرة واحدة — بعد %g دقيقة بدل الجدول الدوري" % float(session.config.section("suppliers").extra_delay_minutes);UiText.bind_control(_once,"supply.once",{"minutes":float(session.config.section("suppliers").extra_delay_minutes)});box.add_child(_once)
+ _once.text="طلب إضافي مرة واحدة — بعد %s دقيقة بدل الجدول الدوري" % str(float(session.config.section("suppliers").extra_delay_minutes));UiText.bind_control(_once,"supply.once",{"minutes":float(session.config.section("suppliers").extra_delay_minutes)});box.add_child(_once)
  box.add_child(_button("quote",_quote))
  _preview.custom_minimum_size.y=160;_preview.text_direction=Control.TEXT_DIRECTION_RTL;box.add_child(_preview)
  _accept=_button("accept",_sign);_accept.disabled=true;box.add_child(_accept)

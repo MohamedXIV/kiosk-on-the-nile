@@ -48,7 +48,7 @@ func _advance_cursor(version: String) -> void:
   var o: Dictionary=state.occurrences.get(identity(version,at),{})
   if o.is_empty() or o.status=="scheduled":
    _next[version]=at
-   _checks[version]=_session.clock.world_minutes+1.0 if o.get("cash_waiting",false) else at
+   _checks[version]=minf(_session.clock.world_minutes+1.0,at+float(v.cash_wait)+0.001) if o.get("cash_waiting",false) else at
    return
   if v.once:at=INF
   else:at=SupplierContracts.next_time(v,at)

@@ -5,6 +5,7 @@ var _session: GameSession
 var _data: Dictionary
 var state: Dictionary={}
 var _next_period: Dictionary={}
+var revision: int=0
 func configure(session: GameSession) -> void:
  _session=session
  _data=session.config.section("accounts")
@@ -32,6 +33,7 @@ func tick(_frame: Dictionary) -> ActionResult:
    if state.obligations.has(p.id):continue
    p.merge({"creditor":lease.creditor,"creditor_name":lease.creditor_name,"label":lease.label,"gross":int(lease.nominal_minor),"paid":int(lease.nominal_minor) if state.coverage.has(p.id) else 0,"due_at":p.end,"enforce_at":float(p.end)+float(lease.grace_minutes)})
    state.obligations[p.id]=p
+   revision+=1
   _next_period[id]=count
  return ActionResult.success()
 func business_allowed() -> bool:
@@ -130,6 +132,7 @@ func restore(data: Dictionary) -> ActionResult:
  var result := validate_state(data)
  if result.ok:
   state=data.duplicate(true)
+  revision+=1
   _next_period.clear()
   for id in state.leases:_next_period[id]=maxi(0,floori((_session.clock.world_minutes-float(state.leases[id].first_start))/float(state.leases[id].period_minutes)))
  return result

@@ -2,8 +2,12 @@ class_name AccountTransactions
 extends RefCounted
 signal changed
 var _session: GameSession
+var _dirty: bool=true
+var _seen_account_revision: int=-1
+var _next_check: float=-1
 func configure(session: GameSession) -> void:
  _session=session
+ changed.connect(func():_dirty=true)
 func _channel(creditor: String) -> bool:
  if not _session.running:return false
  if creditor=="district":return _session.location_id==&"district" and _session.travel.journey.data.get("route_id")=="district" and _session.travel.journey.data.get("phase")=="browsing"
@@ -39,6 +43,7 @@ func pay_loan(loan_id: String, request_id: String) -> ActionResult:
  var result := _publish(_session.accounts.snapshot(),prepared.details.state,int(receipt.wallet_after),_session.relationships.snapshot(),[_event(receipt)])
  return ActionResult.success({"receipt":receipt,"cue":"coin"}) if result.ok else result
 func tick(_frame: Dictionary) -> ActionResult:
+ if not _dirty and _seen_account_revision==_session.accounts.revision and _session.clock.world_minutes<_next_check:return ActionResult.success()
  var due := false
  for bill in _session.accounts.state.obligations.values():
   if not bill.get("announced",false):due=true;break
@@ -52,7 +57,13 @@ func tick(_frame: Dictionary) -> ActionResult:
  if not due:
   for loan in _session.commitments.state.loans.values():
    if loan.status=="pending" and (loan.paid==loan.principal or _session.clock.world_minutes>=float(loan.due_at)):due=true;break
- if not due:return ActionResult.success()
+ if not due:
+  _dirty=false;_seen_account_revision=_session.accounts.revision;_next_check=INF
+  for promise in _session.commitments.state.promises.values():
+   if promise.status=="pending":_next_check=minf(_next_check,float(promise.deadline))
+  for loan in _session.commitments.state.loans.values():
+   if loan.status=="pending":_next_check=minf(_next_check,float(loan.due_at))
+  return ActionResult.success()
  var book := _session.accounts.snapshot()
  var commitments := _session.commitments.snapshot()
  var relations := _session.relationships.snapshot()

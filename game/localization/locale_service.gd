@@ -39,7 +39,10 @@ func text(id: String, args: Dictionary = {}, fallback: String = "") -> String:
  var parameters := args.duplicate(true)
  for key in parameters:
   var parameter: Variant=parameters[key]
-  if parameter is Dictionary and parameter.get("text_ref") is String:parameters[key]=str(_catalogs.get(locale,{}).get(parameter.text_ref,_catalogs.get("ar_EG",{}).get(parameter.text_ref,"")))
+  if parameter is Dictionary and parameter.get("text_ref") is String:
+   var nested := str(_catalogs.get(locale,{}).get(parameter.text_ref,_catalogs.get("ar_EG",{}).get(parameter.text_ref,"")))
+   if nested=="":return fallback
+   parameters[key]=nested
  var expression := RegEx.new();expression.compile("\\{([A-Za-z_][A-Za-z0-9_]*)\\}")
  for match_value in expression.search_all(value):
   if not parameters.has(match_value.get_string(1)):return fallback

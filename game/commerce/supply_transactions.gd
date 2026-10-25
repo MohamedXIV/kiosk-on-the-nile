@@ -38,6 +38,7 @@ func deliver(occurrence_id: String, confirm_cash: bool = false, sleeping: bool =
  if not _session.contracts.basket_fits(terms.lines,terms.destination):return _skip(occurrence_id,"storage_full")
  if not local and not terms.leave_goods:return _skip(occurrence_id,"permission_required")
  if terms.mode=="cash":
+  if _session.clock.world_minutes>float(occurrence.scheduled_at)+float(terms.cash_wait):return _skip(occurrence_id,"cash_confirmation_expired")
   if not local:return _skip(occurrence_id,"cash_presence_required")
   if not confirm_cash:
    if _session.clock.world_minutes>float(occurrence.scheduled_at)+float(terms.cash_wait):return _skip(occurrence_id,"cash_confirmation_expired")

@@ -23,6 +23,7 @@ func configure(text: UiText, can_continue: bool) -> void:
  heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
  box.add_child(heading)
  var subtitle := text.key_label("subtitle")
+ subtitle.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
  box.add_child(subtitle)
  box.add_child(text.key_button("new_game",func():new_requested.emit()))

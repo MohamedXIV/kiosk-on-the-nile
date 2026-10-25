@@ -168,7 +168,10 @@ func choices(conversation: ConversationSession) -> Array[Dictionary]:
  if conversation == null or conversation.finished or not _can_offer(conversation): return offered
  var rules: Dictionary = _definitions[str(conversation.encounter_id)].get("choice_conditions",{})
  for choice in conversation.current.choices:
-  if _session.conditions.permits(rules.get(str(choice.id),{}),conversation.participants): offered.append({"id":str(conversation.choice_id(choice)),"text":choice.text,"index":choice.index})
+  if _session.conditions.permits(rules.get(str(choice.id),{}),conversation.participants):
+   var projected: Dictionary=choice.duplicate(true)
+   projected.id=str(conversation.choice_id(choice))
+   offered.append(projected)
  return offered
 func choose(session_id: StringName, choice_id: StringName, automatic: bool = false) -> ActionResult:
  var conversation: ConversationSession = sessions.get(str(session_id))

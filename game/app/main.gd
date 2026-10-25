@@ -203,6 +203,7 @@ func _install(candidate: GameSession) -> void:
  _district_panel.configure(_text,_session)
  _modals=ModalCoordinator.new()
  for entry in [["inventory",_inventory_panel],["recipes",_recipe_panel],["visitor",_visitor_panel],["tuning",_tuning_panel],["notebook",_hud.notebook],["sleep",_hud.sleep_panel]]:_modals.register(str(entry[0]),entry[1])
+ _modals.register("build",_build_panel,_end_arrange)
  _modals.register("supplier",_supplier_panel,func():_session.contact.panel_requested=false;_supplier_panel.hide())
 
  _session.travel.changed.connect(_travel_changed)
@@ -436,3 +437,9 @@ func _travel_changed() -> void:
   _build_panel.hide()
  _inventory_panel.hide()
  _recipe_panel.hide()
+
+func _end_arrange() -> void:
+ _session.build.cancel()
+ _build_panel.hide()
+ if is_instance_valid(_placement_preview):_placement_preview.queue_free()
+ _placement_preview=null
