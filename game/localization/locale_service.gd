@@ -48,6 +48,9 @@ func text(id: String, args: Dictionary = {}, fallback: String = "") -> String:
   if not parameters.has(match_value.get_string(1)):return fallback
  return value.format(parameters)
 func rtl() -> bool:return locale=="ar_EG"
+func source_text(id: String, source: String) -> String:
+ # A stable identity plus an exact source guard; custom/historic wording survives.
+ return text(id,{},source) if _catalogs.get("ar_EG",{}).get(id)!=null and _catalogs.ar_EG[id]==source else source
 func picker() -> OptionButton:
  var select := OptionButton.new()
  select.add_item("العربية");select.add_item("English")

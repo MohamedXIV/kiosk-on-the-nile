@@ -245,7 +245,7 @@ func _physics_process(delta: float) -> void:
  _camera.global_position = _motor.global_position
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
  _hud.present(_router.nearest())
- if _hud.notebook.visible and _session.clock.tick%15==0:_hud.notebook.present_accounts(AccountText.ledger(_session))
+ if _hud.notebook.visible and _session.clock.tick%60==0:_hud.notebook.refresh()
  _captions.top_inset = _hud.top_occupied_height()
  _journey_panel.present()
  _shop_panel.present()
@@ -364,11 +364,7 @@ func _toggle_notebook() -> void:
  if _hud.sleep_panel.visible or _transition.active: return
  _session.hygiene.interrupt_clean()
  if _hud.notebook.visible: _hud.notebook.hide()
- else:
-  var notes := _session.knowledge.notes()
-  notes.append(_text.text("venue_reputation",{"label":_session.customer_experience.reputation(&"kiosk").label}))
-  _hud.notebook.present(notes,_session.notebook_people(),_session.journal.entries(),_config.section("ui"),_session.knowledge.note_sources())
-  _hud.notebook.present_accounts(AccountText.ledger(_session))
+ else:_hud.notebook.open()
 func _notification(what: int) -> void:
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   _focused = false

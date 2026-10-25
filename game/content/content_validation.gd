@@ -2,6 +2,8 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ var notebook_result := NotebookView.validate_layout(bundle)
+ if not notebook_result.ok:return notebook_result
  if bundle.has("locale_ar") or bundle.has("locale_en"):
   var localized := LocaleService.validate_bundle(bundle)
   if not localized.ok:return localized

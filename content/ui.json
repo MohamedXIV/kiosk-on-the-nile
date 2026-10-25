@@ -297,5 +297,19 @@
     "broken": "موعد الوعد فات"
   },
   "supplier_phone": "اتصل بعم فتحي — مورد الطلبات",
-  "supplier_title": "اتفاق التوريد — عم فتحي"
+  "supplier_title": "اتفاق التوريد — عم فتحي",
+  "notebook_layout": {
+    "history_page_size": 40,
+    "note_refs": {
+      "START_ROUTINE": "notebook.note.START_ROUTINE",
+      "WORKSHOP_OPPORTUNITY": "notebook.note.WORKSHOP_OPPORTUNITY",
+      "YOUSSEF_WORK_STUDY": "notebook.note.YOUSSEF_WORK_STUDY",
+      "WORK_TRIAL_APPOINTMENT": "notebook.note.WORK_TRIAL_APPOINTMENT",
+      "WORK_TRIAL_RESULT": "notebook.note.WORK_TRIAL_RESULT",
+      "WORK_TRIAL_WEEK": "notebook.note.WORK_TRIAL_WEEK",
+      "KNOWN_CHEAP_FAN": "notebook.note.KNOWN_CHEAP_FAN",
+      "KNOWN_ABDUL_FAMILY": "notebook.note.KNOWN_ABDUL_FAMILY",
+      "KNOWN_SHAWARMA_BASICS": "notebook.note.KNOWN_SHAWARMA_BASICS"
+    }
+  }
 }

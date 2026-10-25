@@ -115,6 +115,7 @@ func configure(text: UiText) -> void:
 func bind(session: GameSession) -> void:
  _menu.find_child("TuningButton",true,false).visible=session.config.section("tuning").dev_panel_enabled
  _session = session
+ notebook.bind_session(session)
  _thought=UiText.label("")
  _thought.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  _thought.anchor_left=0.05;_thought.anchor_right=0.48;_thought.anchor_top=0.65;_thought.anchor_bottom=0.8

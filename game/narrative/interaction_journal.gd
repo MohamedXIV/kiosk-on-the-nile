@@ -5,6 +5,7 @@ var _events: Array[Dictionary]=[]
 var _ids: Dictionary={}
 var _actors: Array=[]
 var _clock: GameClock
+var revision: int=0
 func configure(actors: Array, clock: GameClock) -> void:
  _actors=actors.duplicate()+["player","system"]
  _clock=clock
@@ -15,6 +16,7 @@ func append_once(event: Dictionary) -> ActionResult:
  if not _events.is_empty() and float(event.at)<float(_events.back().at)-0.001:return _fail()
  _ids[event.id]=_events.size()
  _events.append(event.duplicate(true))
+ revision+=1
  return ActionResult.success()
 func entries(filters: Dictionary = {}) -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
@@ -39,6 +41,7 @@ func restore(data: Dictionary) -> ActionResult:
   if not result.ok:return result
  _events=candidate._events
  _ids=candidate._ids
+ revision+=1
  return ActionResult.success()
 func _valid(e: Dictionary) -> bool:
  if e.has("text_ref") and (not e.text_ref is String or not e.get("parameters") is Dictionary or not e.get("canonical_text") is String or not e.get("locale") in ["ar_EG","en"]):return false

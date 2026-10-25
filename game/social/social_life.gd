@@ -114,7 +114,7 @@ func people() -> Array[Dictionary]:
    if score>=float(stage.at):label=stage.label
   var connection := ""
   if actor in _data.trial.actors and (_session.knowledge.has(&"WORK_TRIAL_APPOINTMENT") or _session.knowledge.has(&"WORK_TRIAL_RESULT")):connection=("جرّب الشغل مع يوسف" if actor=="farid" else "جرّب الشغل مع فريد") if _session.knowledge.has(&"WORK_TRIAL_RESULT") else ("تواصل مع يوسف لترتيب تجربة" if actor=="farid" else "تواصل مع فريد لترتيب تجربة")
-  result.append({"name":_session.visitors.character(StringName(actor)).name,"score":score,"stage":label,"connection":connection})
+  result.append({"actor_id":str(actor),"name":_session.visitors.character(StringName(actor)).name,"score":score,"stage":label,"connection":connection})
  return result
 func heard(actor: String) -> void:
  if _session.config.section("visitors").characters.has(actor):_state.people[actor]=true

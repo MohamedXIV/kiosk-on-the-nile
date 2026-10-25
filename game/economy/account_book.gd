@@ -112,7 +112,7 @@ func prepare_payment(quote_id: String, request_id: String, wallet_before: int) -
  candidate.requests[request_id]=receipt_id
  candidate.next_receipt=int(candidate.next_receipt)+1
  return ActionResult.success({"state":candidate,"receipt":receipt})
-func summary(from_at: float, to_at: float) -> Dictionary:
+func summary(from_at: float, to_at: float, include_receipts: bool=true) -> Dictionary:
  var rows: Array=[]
  for bill in state.obligations.values():
   if remaining(bill.id)>0:rows.append(bill.duplicate(true))
@@ -125,7 +125,7 @@ func summary(from_at: float, to_at: float) -> Dictionary:
    p.merge({"creditor":lease.creditor,"creditor_name":lease.creditor_name,"label":lease.label,"gross":int(lease.nominal_minor),"paid":int(lease.nominal_minor) if state.coverage.has(p.id) else 0,"due_at":p.end,"enforce_at":float(p.end)+float(lease.grace_minutes)})
    rows.append(p)
  rows.sort_custom(func(a,b):return float(a.due_at)<float(b.due_at))
- return {"rows":rows,"receipts":state.receipts.values().duplicate(true),"business_allowed":business_allowed()}
+ return {"rows":rows,"receipts":state.receipts.values().duplicate(true) if include_receipts else [],"business_allowed":business_allowed()}
 func snapshot() -> Dictionary:
  return state.duplicate(true)
 func restore(data: Dictionary) -> ActionResult:
