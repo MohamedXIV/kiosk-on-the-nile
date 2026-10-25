@@ -49,6 +49,8 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
  actions.add_child(SheetControls.key_button(text,"arrange_rotate",rotate_selection))
  actions.add_child(SheetControls.key_button(text,"arrange_confirm",func():_controller.confirm()))
  actions.add_child(SheetControls.key_button(text,"arrange_store",func():_controller.store_selected();_refresh_choices()))
+ for button in actions.get_children():
+  button.custom_minimum_size=Vector2(90,44)
  _status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  box.add_child(_status)
  box.add_child(SheetControls.key_button(text,"arrange_close",func():_controller.cancel();hide();closed.emit()))
