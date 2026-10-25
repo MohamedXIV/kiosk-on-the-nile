@@ -21,7 +21,7 @@ func configure(text: UiText) -> void:
  box.add_theme_constant_override("separation",10)
  add_child(box)
  var header := HBoxContainer.new();box.add_child(header)
- var title := text.key_label("notebook");title.size_flags_horizontal=Control.SIZE_EXPAND_FILL;header.add_child(title)
+ var title := text.key_label("notebook");title.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT;title.size_flags_horizontal=Control.SIZE_EXPAND_FILL;header.add_child(title)
  var close := text.key_button("close",func():hide();closed.emit());close.focus_mode=Control.FOCUS_ALL;header.add_child(close)
  _subtitle.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_subtitle)
  _tabs.size_flags_vertical=Control.SIZE_EXPAND_FILL
@@ -67,6 +67,7 @@ func _clear(box: VBoxContainer) -> void:
  for child in box.get_children():child.free()
 func _label(value: String) -> Label:
  var label := UiText.label(value)
+ label.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT
  label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  return label

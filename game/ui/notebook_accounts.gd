@@ -12,6 +12,7 @@ var _next: Button
 var _page: int=0
 var _page_size: int=40
 var _receipt_key: String=""
+var _display_text: String=""
 var _receipts: Array[Dictionary]=[]
 func configure(page_size: int) -> void:
  _page_size=page_size
@@ -32,7 +33,7 @@ func bind_session(session: GameSession) -> void:_session=session
 func refresh_language() -> void:
  _mode.set_item_text(0,NotebookView.t("accounts_summary"));_mode.set_item_text(1,NotebookView.t("accounts_receipts"))
  _previous.text=NotebookView.t("previous");_next.text=NotebookView.t("next")
- _receipt_key=""
+ _receipt_key="";_display_text=""
  if _session:refresh()
 func refresh(reset_scroll: bool=false) -> void:
  if _session==null:return
@@ -42,7 +43,7 @@ func refresh(reset_scroll: bool=false) -> void:
  _paging.visible=_mode.selected==1
  if _mode.selected==0:
   var display := NotebookView.accounts(_session)
-  if _body.text!=display:_body.text=display
+  _show_text(display)
  else:
   var key := str([_session.accounts.state.receipts.size(),_session.commitments.state.receipts.size(),_session.accounts.state.supplier.receipts.size(),LocaleService.current.revision])
   if key!=_receipt_key:_receipts=NotebookView.receipts(_session);_receipt_key=key
@@ -50,7 +51,12 @@ func refresh(reset_scroll: bool=false) -> void:
   var start := _page*_page_size;var end := mini(start+_page_size,_receipts.size())
   var lines := PackedStringArray()
   for receipt in _receipts.slice(start,end):lines.append(str(receipt.text))
-  _body.text="\n\n".join(lines) if not lines.is_empty() else NotebookView.t("receipts_empty")
+  _show_text("\n\n".join(lines) if not lines.is_empty() else NotebookView.t("receipts_empty"))
   _count.text=NotebookView.t("page",{"start":start+1 if end>0 else 0,"end":end,"total":_receipts.size()})
   _previous.disabled=_page==0;_next.disabled=end>=_receipts.size()
  _body.get_v_scroll_bar().set_deferred("value",0.0 if reset_scroll else scroll)
+
+func _show_text(value: String) -> void:
+ if value==_display_text:return
+ _display_text=value
+ NotebookView.readable_text(_body,value)

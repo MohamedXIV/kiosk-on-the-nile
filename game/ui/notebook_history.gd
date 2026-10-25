@@ -145,11 +145,15 @@ func _render(reset_scroll: bool) -> void:
  _page=clampi(_page,0,maxi(0,ceili(float(_filtered.size())/_page_size)-1))
  var start := _page*_page_size
  var end := mini(start+_page_size,_filtered.size())
- var lines := PackedStringArray()
+ _body.clear()
  for event in _filtered.slice(start,end):
   var minute := int(fposmod(float(event.at),1440))
-  lines.append(NotebookView.t("entry",{"day":floori(float(event.at)/1440)+1,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60),"name":str(event.name),"body":str(event.text)}))
- _body.text="\n\n".join(lines) if not lines.is_empty() else NotebookView.t("history_empty" if _entries.is_empty() else "history_no_match")
+  var header := NotebookView.t("entry",{"day":floori(float(event.at)/1440)+1,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60),"name":str(event.name),"body":""}).strip_edges()
+  NotebookView.paragraph(_body,header,1 if LocaleService.current.rtl() else 0)
+  var direction := 1 if event.get("locale")=="ar_EG" else 0 if event.get("locale")=="en" else -1
+  NotebookView.paragraph(_body,str(event.text),direction)
+  _body.add_text("\n")
+ if end==0:NotebookView.paragraph(_body,NotebookView.t("history_empty" if _entries.is_empty() else "history_no_match"))
  _count.text=NotebookView.t("page",{"start":start+1 if end>0 else 0,"end":end,"total":_filtered.size()})
  _previous.disabled=_page==0;_next.disabled=end>=_filtered.size()
  _body.get_v_scroll_bar().set_deferred("value",0.0 if reset_scroll else scroll)

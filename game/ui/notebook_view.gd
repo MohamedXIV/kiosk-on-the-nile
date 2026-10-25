@@ -43,6 +43,21 @@ static func reputation(session: GameSession) -> String:
  var data := session.config.section("customer_experience")
  var category := "unrated" if not rep.rated else "good" if float(rep.score)>=float(data.good_above) else "poor" if float(rep.score)<float(data.poor_below) else "okay"
  return t("reputation",{"label":t("rep."+category)})
+static func paragraph(label: RichTextLabel, value: String, direction: int=-1) -> void:
+ # Paragraph formatting is native, not parsed BBCode: heard brackets stay literal.
+ var rtl := direction==1
+ if direction<0:
+  rtl=LocaleService.current.rtl()
+  for i in range(value.length()):
+   var code := value.unicode_at(i)
+   if code>=0x0590 and code<=0x08ff:rtl=true;break
+   if (code>=65 and code<=90) or (code>=97 and code<=122):rtl=false;break
+ label.push_paragraph(HORIZONTAL_ALIGNMENT_LEFT,Control.TEXT_DIRECTION_RTL if rtl else Control.TEXT_DIRECTION_LTR)
+ label.add_text(value+"\n")
+ label.pop()
+static func readable_text(label: RichTextLabel, value: String) -> void:
+ label.clear()
+ for line in value.split("\n"):paragraph(label,line)
 static func money(minor: int) -> String:return "%.2f" % (float(minor)/100.0)
 static func accounts(session: GameSession) -> String:
  var now := session.clock.world_minutes
