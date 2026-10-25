@@ -21,7 +21,7 @@ func nearest() -> InteractionTarget:
   var station := _session.cooking.job(target.id)
   if station!=null:
    target.primary = StationController.new(_session.cooking,str(_text.data.input.interact_primary[0])).status_label(target.id)
-   if station.stage!=&"EMPTY": target.secondary=_text.text("station_options")
+   if station.stage!=&"EMPTY": target.secondary="" if _session.cooking.legacy_busy(target.id) else _text.text("station_options")
    elif station.recipe.rules_id==&"tea":target.secondary=_text.text("station_options")
   if target.id==&"sign": target.primary=_text.text("close_kiosk") if _session.kiosk_open else _text.text("open_kiosk")
  if _session.locations.is_physical(_session.location_id):
@@ -60,7 +60,7 @@ func execute(secondary: bool) -> ActionResult:
  if secondary and _session.cooking.held_item() and (target==null or target.secondary.is_empty()): return _session.life.consume_held()
  if target==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_target")
  var station := _session.cooking.job(target.id)
- if secondary and station!=null and station.stage!=&"EMPTY":return ActionResult.success({"show_recipes":str(target.id)})
+ if secondary and station!=null and station.stage!=&"EMPTY" and not _session.cooking.legacy_busy(target.id):return ActionResult.success({"show_recipes":str(target.id)})
  if str(target.id).begins_with("phone:") and not secondary:return await _session.contact.begin(str(target.id).trim_prefix("phone:"))
  if not target.visit_id.is_empty():
   if secondary: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_secondary")
