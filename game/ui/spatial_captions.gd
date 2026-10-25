@@ -30,7 +30,7 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
      add_child(label)
      _labels[id] = label
     var label: Label = _labels[id]
-    label.text = conversation.current.text
+    label.text = LocalizedNarrative.line(conversation.current)
     label.size.x = 300
     var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,113)
     var screen: Vector2 = camera.get_canvas_transform()*canvas
@@ -71,6 +71,7 @@ func _present_orders(session: GameSession, room: LocationView, camera: Camera2D)
     add_child(badge)
     _orders[key]=badge
    var badge: OrderBadge=_orders[key]
+   badge.present(session,order.food_id)
    badge.reset_size()
    var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,57)
    var screen: Vector2=camera.get_canvas_transform()*canvas

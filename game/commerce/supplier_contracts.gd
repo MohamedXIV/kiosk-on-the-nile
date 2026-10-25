@@ -80,7 +80,7 @@ func _sign(quote_id: String, request_id: String, existing: String) -> ActionResu
  var valid := validate_state(candidate)
  if not valid.ok:return valid
  state=candidate;revision+=1
- _session.journal.append_once({"id":"supply:agreement:"+request_id,"chapter":"supply","actor":"system","name":"دفتر التوريد","text":"وافقت على اتفاق توريد مع %s؛ أول موعد %s. السلة %.2f + توصيل %.2f ج.م." % [q.name,AccountText.date(float(signed.first_at)),float(q.goods_minor)/100,float(q.fee_minor)/100],"channel":"system","at":now})
+ _session.journal.append_once({"id":"supply:agreement:"+request_id,"chapter":"supply","actor":"system","name":UiText.localized("records.supply.name",{},"دفتر التوريد".format({})),"text":UiText.localized("records.supply.agreement",{"creditor":q.name,"date":SupplierText.date(float(signed.first_at)),"goods":"%.2f" % (float(q.goods_minor)/100),"fee":"%.2f" % (float(q.fee_minor)/100)},"وافقت على اتفاق توريد مع {creditor}؛ أول موعد {date}. السلة {goods} + توصيل {fee} ج.م.".format({"creditor":q.name,"date":SupplierText.date(float(signed.first_at)),"goods":"%.2f" % (float(q.goods_minor)/100),"fee":"%.2f" % (float(q.fee_minor)/100)})),"channel":"system","at":now})
  return ActionResult.success({"version":signed.duplicate(true)})
 func pause(contract_id: String, request_id: String) -> ActionResult:
  if state.requests.has(request_id):return ActionResult.success({"duplicate":true}) if state.requests[request_id].source==contract_id else _fail("stale_supplier_quote")
@@ -91,7 +91,7 @@ func pause(contract_id: String, request_id: String) -> ActionResult:
  revision+=1
  state.versions[id].closed_at=_session.clock.world_minutes;state.active=""
  state.requests[request_id]={"source":contract_id,"version_id":id,"at":_session.clock.world_minutes,"kind":"pause"}
- _session.journal.append_once({"id":"supply:agreement:"+request_id,"chapter":"supply","actor":"system","name":"دفتر التوريد","text":"أوقفت الاتفاق للمواعيد التالية؛ الرصيد المقدم والإيصالات محفوظة.","channel":"system","at":_session.clock.world_minutes})
+ _session.journal.append_once({"id":"supply:agreement:"+request_id,"chapter":"supply","actor":"system","name":UiText.localized("records.supply.name",{},"دفتر التوريد".format({})),"text":UiText.localized("records.supply.paused",{},"أوقفت الاتفاق للمواعيد التالية؛ الرصيد المقدم والإيصالات محفوظة.".format({})),"channel":"system","at":_session.clock.world_minutes})
  return ActionResult.success()
 static func next_time(terms: Dictionary, after: float) -> float:
  var day := floori(after/1440.0)

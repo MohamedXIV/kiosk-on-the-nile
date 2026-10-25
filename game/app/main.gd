@@ -195,9 +195,9 @@ func _install(candidate: GameSession) -> void:
   for point in _session.contact.points():
    if _session.contact.near_point(str(point.host_id)):
     var call_result := await _session.contact.begin(str(point.host_id))
-    if not call_result.ok:_hud.toast.show_message("المكالمة مش متاحة دلوقتي؛ خلّص القعدة الحالية الأول، وقرب من التليفون.")
+    if not call_result.ok:_hud.toast.show_message(_text.text("phone_busy"))
     return
-  _hud.toast.show_message("قرب تليفون المكتب فوق أو آخر كونتر في الكشك عشان تتصل."))
+  _hud.toast.show_message(_text.text("phone_near")))
  _district_panel=DistrictPanel.new()
  _hud.add_child(_district_panel)
  _district_panel.configure(_text,_session)

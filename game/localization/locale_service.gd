@@ -34,6 +34,9 @@ func set_locale(value: String) -> ActionResult:
  changed.emit()
  return ActionResult.success()
 func text(id: String, args: Dictionary = {}, fallback: String = "") -> String:
+ return _resolve(id,args,fallback,0)
+func _resolve(id: String, args: Dictionary, fallback: String, depth: int) -> String:
+ if depth>8:return fallback
  var value := str(_catalogs.get(locale,{}).get(id,_catalogs.get("ar_EG",{}).get(id,fallback)))
  if value=="":return fallback
  var parameters := args.duplicate(true)
@@ -42,7 +45,7 @@ func text(id: String, args: Dictionary = {}, fallback: String = "") -> String:
   if parameter is Dictionary and parameter.get("text_ref") is String:
    var nested := str(_catalogs.get(locale,{}).get(parameter.text_ref,_catalogs.get("ar_EG",{}).get(parameter.text_ref,"")))
    if nested=="":return fallback
-   parameters[key]=nested
+   parameters[key]=_resolve(str(parameter.text_ref),parameter.get("parameters",{}),nested,depth+1)
  var expression := RegEx.new();expression.compile("\\{([A-Za-z_][A-Za-z0-9_]*)\\}")
  for match_value in expression.search_all(value):
   if not parameters.has(match_value.get_string(1)):return fallback
@@ -82,3 +85,6 @@ static func validate_bundle(bundle: Dictionary) -> ActionResult:
   if names!=other:return _fail()
  return ActionResult.success()
 static func _fail() -> ActionResult:return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_locale_catalog")
+
+func captured_reference(id: String, source: String) -> Variant:
+ return {"text_ref":id} if _catalogs.get("ar_EG",{}).get(id)==source else source

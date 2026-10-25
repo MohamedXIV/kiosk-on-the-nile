@@ -16,7 +16,7 @@ func configure(data: Dictionary, _mapping: SpatialMapping) -> void:
  present(false)
 func present(is_open: bool) -> void:
  _open = is_open
- if _label: _label.text = _data.open_text if is_open else _data.closed_text
+ if _label: _label.text = ItemText.source("location.kiosk.sign."+("open_text" if is_open else "closed_text"),str(_data.open_text if is_open else _data.closed_text))
  queue_redraw()
 func _draw() -> void:
  if _data.is_empty(): return

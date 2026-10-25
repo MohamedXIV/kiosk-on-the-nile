@@ -40,6 +40,7 @@ static func location(source: Dictionary, location_id: StringName, spaces: SpaceS
   for target in source.interactions:
    if target.get("instance_id")==id or (target.get("instance_id")=="legacy_fan" and item.definition_id=="fan"):
     var moved: Dictionary = target.duplicate(true)
+    moved["source_interaction_id"]=target.id
     moved.ground = [ground.x,ground.y]
     moved.instance_id=id
     if definition.get("behavior")=="toggle_equipment":

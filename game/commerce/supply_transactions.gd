@@ -10,7 +10,8 @@ func deposit(supplier_id: String, amount_minor: int, request_id: String) -> Acti
  if _session.wallet.balance<amount_minor:return _fail("insufficient_funds")
  var book := _session.accounts.snapshot()
  var receipt := SupplierLedger.receipt(book.supplier,request_id,"deposit",_session.clock.world_minutes,_session.wallet.balance,-amount_minor,amount_minor,{"amount":amount_minor})
- receipt["journal_text"]="دفعت %.2f ج.م رصيدًا مقدمًا إلى %s؛ ليس رسم تفعيل أو دينًا." % [float(amount_minor)/100.0,str(_session.presence.profile(&"fathi").name)]
+ receipt["journal_name"]=UiText.localized("records.supply.name",{},"دفتر التوريد".format({}))
+ receipt["journal_text"]=UiText.localized("records.supply.deposit",{"amount":"%.2f" % (float(amount_minor)/100.0),"creditor":str(_session.presence.profile(&"fathi").name)},"دفعت {amount} ج.م رصيدًا مقدمًا إلى {creditor}؛ ليس رسم تفعيل أو دينًا.".format({"amount":"%.2f" % (float(amount_minor)/100.0),"creditor":str(_session.presence.profile(&"fathi").name)}))
  return _publish(book,_session.items.candidate(),_session.deliveries.snapshot(),receipt)
 func settle(request_id: String) -> ActionResult:
  if not _session.contact.available():return _fail("supplier_contact_required")
@@ -25,7 +26,8 @@ func settle(request_id: String) -> ActionResult:
   var amount := int(invoice.total)-int(invoice.paid)
   if amount>0:payments[invoice.id]=amount;invoice.paid=int(invoice.total)
  var receipt := SupplierLedger.receipt(book.supplier,request_id,"settlement",_session.clock.world_minutes,_session.wallet.balance,-total,0,{"payments":payments})
- receipt["journal_text"]="سددت أصل حساب %s: %.2f ج.م؛ من غير زيادة." % [str(_session.presence.profile(&"fathi").name),float(total)/100.0]
+ receipt["journal_name"]=UiText.localized("records.supply.name",{},"دفتر التوريد".format({}))
+ receipt["journal_text"]=UiText.localized("records.supply.settlement",{"creditor":str(_session.presence.profile(&"fathi").name),"amount":"%.2f" % (float(total)/100.0)},"سددت أصل حساب {creditor}: {amount} ج.م؛ من غير زيادة.".format({"creditor":str(_session.presence.profile(&"fathi").name),"amount":"%.2f" % (float(total)/100.0)}))
  return _publish(book,_session.items.candidate(),_session.deliveries.snapshot(),receipt)
 func deliver(occurrence_id: String, confirm_cash: bool = false, sleeping: bool = false) -> ActionResult:
  var occurrence: Dictionary=_session.deliveries.state.occurrences.get(occurrence_id,{})
@@ -104,14 +106,15 @@ func _complete(id: String, terms: Dictionary, items: ItemChangeSet, delivery: Di
  var receipt := SupplierLedger.receipt(book.supplier,"delivery:"+id,"delivery",at,_session.wallet.balance,cash_delta,pre_delta,detail)
  receipt.recorded_at=evaluated
  if terms.mode=="credit":book.supplier.invoices[id]={"id":id,"name":str(terms.name),"at":at,"due_at":at+float(terms.due_minutes),"total":total,"paid":0,"emergency":emergency_food}
- receipt["journal_text"]="وصلت %s؛ بضاعة %.2f + توصيل %.2f = %.2f ج.م، %s. الإيصال محفوظ." % ["لقمة على الحساب" if emergency_food else "دفعة المورد",float(terms.goods_minor)/100.0,float(terms.fee_minor)/100.0,float(total)/100.0,"على الحساب" if terms.mode=="credit" else "مدفوعة"]
+ receipt["journal_name"]=UiText.localized("records.supply.name",{},"دفتر التوريد".format({}))
+ receipt["journal_text"]=UiText.localized("records.supply.delivery",{"delivery":UiText.localized("records.supply.emergency_food",{},"لقمة على الحساب".format({})) if emergency_food else UiText.localized("records.supply.shipment",{},"دفعة المورد".format({})),"goods":"%.2f" % (float(terms.goods_minor)/100.0),"fee":"%.2f" % (float(terms.fee_minor)/100.0),"total":"%.2f" % (float(total)/100.0),"payment":UiText.localized("records.supply.on_credit",{},"على الحساب".format({})) if terms.mode=="credit" else UiText.localized("records.supply.paid",{},"مدفوعة".format({}))},"وصلت {delivery}؛ بضاعة {goods} + توصيل {fee} = {total} ج.م، {payment}. الإيصال محفوظ.".format({"delivery":UiText.localized("records.supply.emergency_food",{},"لقمة على الحساب".format({})) if emergency_food else UiText.localized("records.supply.shipment",{},"دفعة المورد".format({})),"goods":"%.2f" % (float(terms.goods_minor)/100.0),"fee":"%.2f" % (float(terms.fee_minor)/100.0),"total":"%.2f" % (float(total)/100.0),"payment":UiText.localized("records.supply.on_credit",{},"على الحساب".format({})) if terms.mode=="credit" else UiText.localized("records.supply.paid",{},"مدفوعة".format({}))}))
  occurrence.merge({"status":"delivered","reason":"","evaluated_at":evaluated,"receipt":receipt.id,"grants":grants,"stock_units":stock_units.duplicate(true),"cash_waiting":false},true)
  return _publish(book,items,delivery,receipt)
 func _skip(id: String, reason: String) -> ActionResult:
  var delivery := _session.deliveries.snapshot()
  var occurrence: Dictionary=delivery.occurrences[id]
  occurrence.merge({"status":"skipped","reason":reason,"evaluated_at":_session.clock.world_minutes,"cash_waiting":false},true)
- var event := {"id":"supply:skip:"+id,"chapter":"supply","actor":"system","name":"دفتر التوريد","text":"لم تصل دفعة المورد: "+SupplierText.reason(reason)+". لا بضاعة ولا خصم أو توصيل مدفوع لهذا الموعد.","channel":"system","at":_session.clock.world_minutes}
+ var event := {"id":"supply:skip:"+id,"chapter":"supply","actor":"system","name":UiText.localized("records.supply.name",{},"دفتر التوريد".format({})),"text":UiText.localized("records.supply.skipped",{"reason":SupplierText.reason(reason)},"لم تصل دفعة المورد: {reason}. لا بضاعة ولا خصم أو توصيل مدفوع لهذا الموعد.".format({"reason":SupplierText.reason(reason)})),"channel":"system","at":_session.clock.world_minutes}
  var result := _session.deliveries.validate_state(delivery)
  if not result.ok:return result
  var journal := InteractionJournal.new();journal.configure(_session.presence.actor_ids(),_session.clock)
@@ -140,7 +143,7 @@ func _publish(book: Dictionary, items: ItemChangeSet, delivery: Dictionary, rece
  _session.accounts.state=book;_session.deliveries.state=delivery;_session.wallet.balance=int(receipt.wallet_after);_session.journal.restore(journal.snapshot())
  _session.items.changed.emit(_session.items.revision);_session.finance.changed.emit()
  return ActionResult.success({"receipt":receipt.duplicate(true)})
-func _event(receipt: Dictionary) -> Dictionary:return {"id":"supply:receipt:"+str(receipt.id),"chapter":"supply","actor":"system","name":"دفتر التوريد","text":receipt.journal_text,"channel":"system","at":receipt.recorded_at,"occurred_at":receipt.at}
+func _event(receipt: Dictionary) -> Dictionary:return {"id":"supply:receipt:"+str(receipt.id),"chapter":"supply","actor":"system","name":str(receipt.get("journal_name","دفتر التوريد")),"text":receipt.journal_text,"channel":"system","at":receipt.recorded_at,"occurred_at":receipt.at}
 func _repeat(ledger: Dictionary, request: String, kind: String, amount: int) -> ActionResult:
  var receipt: Dictionary=ledger.receipts[ledger.requests[request]]
  return ActionResult.success({"duplicate":true}) if receipt.kind==kind and receipt.detail.get("amount")==amount else _fail("stale_supplier_quote")

@@ -71,7 +71,9 @@ func restock(tea: int, kebda: int) -> ActionResult:
 func item_label(item: PreparedItem) -> String:
  return foods.label(item) if foods!=null else _legacy.item_label(item)
 func quality_label(item: PreparedItem) -> String:
- return foods.quality_label(item) if foods!=null else _legacy.quality_label(item)
+ if foods==null:return _legacy.quality_label(item)
+ var food := foods.definition(item.food_id)
+ return ItemText.source("food."+str(item.food_id)+".quality."+str(food.quality_keys[item.quality_score]),foods.quality_label(item)) if not food.is_empty() else ""
 func station_ids() -> Array:
  return _legacy.station_ids()
 func set_quality_provider(provider: Callable) -> void:

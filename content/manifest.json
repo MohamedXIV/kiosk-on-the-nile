@@ -58,6 +58,17 @@
     "story_supplier": "stories/supplier.ink.json",
     "archive_supplier_0f13440395e4": "archive/supplier-0f13440395e4.ink.json",
     "locale_ar": "locales/ar_EG.json",
-    "locale_en": "locales/en.json"
+    "locale_en": "locales/en.json",
+    "archive_amgad_096961bbf3fe": "archive/amgad-096961bbf3fe.ink.json",
+    "archive_companionship_0d7655a3bd19": "archive/companionship-0d7655a3bd19.ink.json",
+    "archive_football_5b0b47e6c25d": "archive/football-5b0b47e6c25d.ink.json",
+    "archive_inner_monologue_381b49b91a1f": "archive/inner_monologue-381b49b91a1f.ink.json",
+    "archive_landlord_bb3c57607f94": "archive/landlord-bb3c57607f94.ink.json",
+    "archive_orders_7559b99d359c": "archive/orders-7559b99d359c.ink.json",
+    "archive_service_availability_e8ccc9d7a0ee": "archive/service_availability-e8ccc9d7a0ee.ink.json",
+    "archive_shawarma_learning_eab41b152fbc": "archive/shawarma_learning-eab41b152fbc.ink.json",
+    "archive_supplier_f0cc6fc9d122": "archive/supplier-f0cc6fc9d122.ink.json",
+    "archive_venue_comments_654a9ea66daa": "archive/venue_comments-654a9ea66daa.ink.json",
+    "archive_visitors_ec15550504e6": "archive/visitors-ec15550504e6.ink.json"
   }
 }

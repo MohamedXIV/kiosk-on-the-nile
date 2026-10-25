@@ -16,3 +16,7 @@ func configure(text: UiText, food: Dictionary) -> void:
  _label.mouse_filter=Control.MOUSE_FILTER_IGNORE
  _label.add_theme_font_size_override("font_size",16)
  row.add_child(_label)
+
+func present(session: GameSession, food_id: StringName) -> void:
+ _label.text=OutingText.order(session,food_id)
+ _label.text_direction=Control.TEXT_DIRECTION_RTL if LocaleService.current.rtl() else Control.TEXT_DIRECTION_LTR

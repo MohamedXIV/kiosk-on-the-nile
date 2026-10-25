@@ -1,8 +1,8 @@
-# Offline localization pilot
+# Offline Arabic / English localization
 
 All catalogs, Ink JSON and fonts ship with the game. No translation API or language download is used. The Web package still needs a local HTTP server as before; it does not require Internet. Hosted PWA/installable offline caching is a separate deployment feature.
 
-Choose العربية/English on the title or in the game menu. Current bilingual coverage includes title/menu actions, notebook/history/accounts, inventory/care/preparation, shopping/travel/visitor action sheets, and Fathi's new connected calls and supplier sheet/terms. Other characters, some HUD/system labels and old recorded history retain their original text. This is not a fully English game yet.
+Choose العربية/English on the title or in the game menu. All current authored canonical Ink stories and current player UI have bundled Arabic/English presentation, including world/station hints, thoughts, district/tuning and new system records. English adapts intent and character voice. Previously heard history, signed creditor names/text, custom source labels and already-open archived stories preserve their original wording; they are not retroactively translated.
 
 ## Writing and translating
 
@@ -56,3 +56,14 @@ The shop has cross-language offer search, selected product contents/size/capabil
 ## HUD and arrangement
 
 Status strip time/cash/sign/stock/needs/held names and fatigue tooltips have bundled Arabic/English labels. Held-item names use the same guarded item/prepared-food projection as storage. Sign wording is an indication, not an added business gate. Arrangement controls, policy hints, piece and host names translate; custom item labels retain source fallback. Locale switching rebuilds option captions without selecting/preparing/placing an item; the actual preview request, rotation, coordinates and host stay owned by BuildController. The sheet scrolls inside viewport bounds. Remaining world interaction hints and narrative/system text are not all translated.
+
+
+## Completed authored story coverage
+
+All11 current canonical stories contain311 stable line/choice/alternative localization identities; the paired catalogs currently contain1027 entries per language. IDs assigned to authored units must remain stable: never renumber an existing numeric suffix when inserting lines. The build extraction gate rejects duplicate/missing IDs, mismatched named parameters and untagged authored Arabic prose. Conditions/effects/speaker metadata stay in one canonical Ink graph; catalogs are display text only.
+
+Nested captured text references support dated appointments/financial dates/durations and food labels, with a bounded resolver. Locale changes read those captured arguments; they do not recalculate a quote or replay Ink. Before tags changed any story hash, old compiled stories were archived; the archive index includes Godot-canonical JSON hashes used by save validation. Archived active choices complete on their old graph, while new starts use localized content.
+
+New financial/supply receipts freeze journal_name and journal_text in the chosen language. Old receipts lacking journal_name reconstruct their original Arabic system name for exact event linkage. Existing historical text is never rewritten. New thoughts freeze their heard snapshot plus optional localization metadata; the current thought can change display language without rewriting its history. Optional metadata retains old save compatibility.
+
+Technical configuration keys/units and actor/item IDs remain literal; user-authored/custom text retains guarded source fallback. Offline catalogs/fonts are shipped, with no translation API. The release record documents actual exercised routes separately from static coverage; completeness of authored translations does not imply every gameplay branch has been played in QA.

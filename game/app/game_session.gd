@@ -219,7 +219,7 @@ func configure(source: SessionConfig) -> ActionResult:
  actors.append("player")
  journal=InteractionJournal.new()
  journal.configure(actors,clock)
- journal.append_once({"id":"accounts:activation","chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":"إيجار السكن والحي أسبوعيًا، بمواعيد مستقبلية واضحة في دفتر المستحقات ومن غير خصم تلقائي.","channel":"system","at":clock.world_minutes})
+ journal.append_once({"id":"accounts:activation","chapter":"accounts","actor":"system","name":UiText.localized("records.activation.name"),"text":UiText.localized("records.activation.text"),"channel":"system","at":clock.world_minutes})
  relationships = RelationshipStore.new(source.section("social"),actors)
  var initial_relationships := relationships.restore({"values":source.section("social").get("initial_relationships",{})})
  if not initial_relationships.ok: return initial_relationships

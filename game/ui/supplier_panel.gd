@@ -109,7 +109,7 @@ func _label(key: String) -> Label:
  var label := UiText.label(_t(key));UiText.bind_control(label,"supply."+key)
  return label
 func _item_label(id: String) -> Label:
- var label := UiText.label(str(_session.items.definition(StringName(id)).label));UiText.bind_control(label,"item."+id)
+ var label := UiText.label(ItemText.definition(_session,id));label.set_meta("item_definition",id)
  return label
 func _button(key: String, action: Callable) -> Button:
  var button := UiText.button(_t(key),action);UiText.bind_control(button,"supply."+key)
@@ -117,6 +117,9 @@ func _button(key: String, action: Callable) -> Button:
 func _refresh_language() -> void:
  if _session==null:return
  UiText.refresh_tree(self)
+ for id in _basket:
+  var label: Label=_basket[id].get_parent().get_child(0)
+  label.text=ItemText.definition(_session,str(id))
  _hour.suffix=_t("hour");_minute.suffix=_t("minute");_deposit.suffix=_t("currency")
  var selected := _mode.selected
  _mode.clear()

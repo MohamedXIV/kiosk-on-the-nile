@@ -57,7 +57,7 @@ func configure(text: UiText) -> void:
   if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
   _menu.hide()))
  actions.add_child(LocaleService.current.picker())
- var tuning_button := UiText.button(text.text("tuning"),func():_menu.hide();tuning_requested.emit())
+ var tuning_button := text.key_button("tuning",func():_menu.hide();tuning_requested.emit())
  tuning_button.name="TuningButton"
  actions.add_child(tuning_button)
  var help := text.key_label("help",{"move_keys":" / ".join([text.data.input.move_up[0],text.data.input.move_left[0],text.data.input.move_down[0],text.data.input.move_right[0]]),"primary_key":text.data.input.interact_primary[0],"secondary_key":text.data.input.interact_secondary[0],"notebook_key":text.data.input.notebook[0]})

@@ -11,8 +11,14 @@ var _geometry: Array[Node] = []
 var _surface_foods: Dictionary = {}
 var _item_visuals: Dictionary = {}
 var _buildings: Array[BuildingView]=[]
+var _authored_text: Dictionary={}
+var _action_text: Dictionary={}
+var _surface_text: Dictionary={}
 func configure(data: LocationDefinition, source: GameSession) -> void:
  session = source
+ _authored_text=source.config.section("locations").get(str(data.id),{})
+ _action_text=source.spaces.definitions().labels
+ _surface_text=source.config.section("ui")
  definition = LocationDefinition.new(data.id,SpaceSceneAdapter.location(data.data,data.id,source.spaces,source.items))
  data = definition
  mapping = SpatialMapping.new(source.config.section("spatial"))
@@ -131,11 +137,12 @@ func interaction_targets() -> Array[InteractionTarget]:
  for data in definition.data.interactions:
   if not _permitted(data.get("requires",{})): continue
   var target := InteractionTarget.new(StringName(data.id),Vector2(data.ground[0],data.ground[1]),float(data.radius))
-  target.primary = data.primary
+  target.primary = WorldText.interaction(session,str(definition.id),data,"primary",_authored_text,_action_text)
   if data.get("action")=="surface":
    var slots := session.items.items_in(StringName(data.slot_id))
-   target.primary = str(session.config.section("ui").get("surface_put")) if not session.inventory.held_id().is_empty() else str(session.config.section("ui").get("surface_take")) if not slots.is_empty() else str(session.config.section("ui").get("surface_empty"))
-  if _permitted(data.get("secondary_requires",{})): target.secondary = data.get("secondary","")
+   var key := "surface_put" if not session.inventory.held_id().is_empty() else "surface_take" if not slots.is_empty() else "surface_empty"
+   target.primary = ItemText.source("ui."+key,str(_surface_text.get(key,key)))
+  if _permitted(data.get("secondary_requires",{})): target.secondary = WorldText.interaction(session,str(definition.id),data,"secondary",_authored_text,_action_text)
   targets.append(target)
  return targets
 func _permitted(rule: Dictionary) -> bool:

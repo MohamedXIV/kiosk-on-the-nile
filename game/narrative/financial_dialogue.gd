@@ -53,6 +53,7 @@ func _housing_context(chapter: String) -> Dictionary:
   var amount := int(amounts[index]) if index<amounts.size() else 0
   context_data["loan_%d" % index]=amount>0 and amount<=int(_session.commitments.state.budget_minor)
   context_data["loan_%d_label" % index]="%.2f" % (float(amount)/100.0)
+ context_data["localization_args"]={"extension_1_date":NarrativeLocalization.date(latest+1440),"extension_3_date":NarrativeLocalization.date(latest+4320),"extension_7_date":NarrativeLocalization.date(latest+10080),"agreed_date":NarrativeLocalization.date(float(pending.get("deadline",now))),"loan_duration_label":{"text_ref":"narrative.days","parameters":{"days":"%.1f" % (float(_session.config.section("accounts").loan.duration_minutes)/1440.0)}}}
  return context_data
 func pending_financial_offer(chapter: String) -> Dictionary:
  var found: Dictionary={}

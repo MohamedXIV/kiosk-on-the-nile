@@ -11,7 +11,7 @@ static func reason(key: String) -> String:
 static func terms(session: GameSession, q: Dictionary) -> String:
  var lines := PackedStringArray()
  for line in q.lines:
-  var item := UiText.localized("item."+str(line.definition_id),{},str(session.items.definition(StringName(line.definition_id)).label))
+  var item := ItemText.definition(session,str(line.definition_id))
   lines.append(_t("line",{"item":item,"quantity":int(line.quantity),"price":"%.2f" % (float(line.unit_minor)/100.0)}))
  lines.append(_t("total",{"goods":"%.2f" % (float(q.goods_minor)/100.0),"fee":"%.2f" % (float(q.fee_minor)/100.0),"total":"%.2f" % (float(q.total_minor)/100.0)}))
  var storage := _t(("cold_" if q.destination.kind=="cold" else "dry_")+("kiosk" if q.destination.location_id=="kiosk" else "roof"))

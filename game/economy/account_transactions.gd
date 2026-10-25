@@ -17,7 +17,8 @@ func pay(quote_id: String, request_id: String) -> ActionResult:
  if not prepared.ok or prepared.details.get("duplicate",false):return prepared
  if not _channel(str(prepared.details.receipt.creditor)):return _fail("creditor_not_present")
  var receipt: Dictionary=prepared.details.receipt
- receipt["journal_text"]="دفعت %.2f ج.م إلى %s؛ الإيصال %s." % [float(receipt.net)/100.0,receipt.creditor_name,receipt.id]
+ receipt["journal_name"]=UiText.localized("records.accounts.name",{},"دفتر المستحقات".format({}))
+ receipt["journal_text"]=UiText.localized("records.accounts.payment",{"amount":"%.2f" % (float(receipt.net)/100.0),"creditor":receipt.creditor_name,"receipt":receipt.id},"دفعت {amount} ج.م إلى {creditor}؛ الإيصال {receipt}.".format({"amount":"%.2f" % (float(receipt.net)/100.0),"creditor":receipt.creditor_name,"receipt":receipt.id}))
  prepared.details.state.receipts[receipt.id]=receipt
  var event := _event(receipt)
  var result := _publish(prepared.details.state,_session.commitments.snapshot(),int(receipt.wallet_after),_session.relationships.snapshot(),[event])
@@ -28,7 +29,8 @@ func accept_offer(offer_id: String, request_id: String) -> ActionResult:
  if not _channel("abdul_karim"):return _fail("creditor_not_present")
  var receipt: Dictionary=prepared.details.receipt
  receipt["creditor_name"]=_session.presence.profile(&"abdul_karim").name
- receipt["journal_text"]=("اتفقنا على سلفة %.2f ج.م من %s، ورد أصلها في الموعد الموضح في الدفتر." % [float(receipt.cash_delta)/100.0,receipt.creditor_name]) if receipt.kind=="loan_accepted" else "اتفقت مع %s على مهلة جديدة؛ أصل المستحق لم يتغير." % receipt.creditor_name
+ receipt["journal_name"]=UiText.localized("records.accounts.name",{},"دفتر المستحقات".format({}))
+ receipt["journal_text"]=UiText.localized("records.accounts.loan_accepted",{"amount":"%.2f" % (float(receipt.cash_delta)/100.0),"creditor":receipt.creditor_name},"اتفقنا على سلفة {amount} ج.م من {creditor}، ورد أصلها في الموعد الموضح في الدفتر.".format({"amount":"%.2f" % (float(receipt.cash_delta)/100.0),"creditor":receipt.creditor_name})) if receipt.kind=="loan_accepted" else UiText.localized("records.accounts.extension",{"creditor":receipt.creditor_name},"اتفقت مع {creditor} على مهلة جديدة؛ أصل المستحق لم يتغير.".format({"creditor":receipt.creditor_name}))
  prepared.details.state.receipts[receipt.id]=receipt
  var result := _publish(_session.accounts.snapshot(),prepared.details.state,int(receipt.wallet_after),_session.relationships.snapshot(),[_event(receipt)])
  return ActionResult.success({"receipt":receipt,"cue":"coin" if receipt.cash_delta>0 else "chime"}) if result.ok else result
@@ -38,7 +40,8 @@ func pay_loan(loan_id: String, request_id: String) -> ActionResult:
  if not _channel("abdul_karim"):return _fail("creditor_not_present")
  var receipt: Dictionary=prepared.details.receipt
  receipt["creditor_name"]=_session.presence.profile(&"abdul_karim").name
- receipt["journal_text"]="رددت أصل السلفة %.2f ج.م إلى %s؛ الإيصال %s." % [float(-int(receipt.cash_delta))/100.0,receipt.creditor_name,receipt.id]
+ receipt["journal_name"]=UiText.localized("records.accounts.name",{},"دفتر المستحقات".format({}))
+ receipt["journal_text"]=UiText.localized("records.accounts.loan_repaid",{"amount":"%.2f" % (float(-int(receipt.cash_delta))/100.0),"creditor":receipt.creditor_name,"receipt":receipt.id},"رددت أصل السلفة {amount} ج.م إلى {creditor}؛ الإيصال {receipt}.".format({"amount":"%.2f" % (float(-int(receipt.cash_delta))/100.0),"creditor":receipt.creditor_name,"receipt":receipt.id}))
  prepared.details.state.receipts[receipt.id]=receipt
  var result := _publish(_session.accounts.snapshot(),prepared.details.state,int(receipt.wallet_after),_session.relationships.snapshot(),[_event(receipt)])
  return ActionResult.success({"receipt":receipt,"cue":"coin"}) if result.ok else result
@@ -71,7 +74,7 @@ func tick(_frame: Dictionary) -> ActionResult:
  for bill in book.obligations.values():
   if bill.get("announced",false):continue
   bill["announced"]=true
-  events.append(_system("bill:"+str(bill.id),"استحق %s: %.2f ج.م. راجع دفتر الأسبوع." % [bill.label,float(int(bill.gross)-int(bill.paid))/100.0]))
+  events.append(_system("bill:"+str(bill.id),UiText.localized("records.accounts.bill_due",{"label":ItemText.source("notebook.lease."+str(bill.lease),str(bill.label)),"amount":"%.2f" % (float(int(bill.gross)-int(bill.paid))/100.0)},"استحق {label}: {amount} ج.م. راجع دفتر الأسبوع.".format({"label":ItemText.source("notebook.lease."+str(bill.lease),str(bill.label)),"amount":"%.2f" % (float(int(bill.gross)-int(bill.paid))/100.0)}))))
  for promise in commitments.promises.values():
   if promise.status!="pending":continue
   var outstanding := 0
@@ -81,7 +84,7 @@ func tick(_frame: Dictionary) -> ActionResult:
   promise.status=status
   promise.assessed_at=_session.clock.world_minutes
   _adjust(relations,_session.config.section("accounts")["promise_fulfilled" if status=="fulfilled" else "promise_broken"])
-  events.append(_system("promise:"+str(promise.id)+":"+status,"وفيت بوعد السداد." if status=="fulfilled" else "فات موعد وعد السداد؛ أصل الدين ما زال مستحقًا، ويمكنك الكلام والاتفاق من جديد."))
+  events.append(_system("promise:"+str(promise.id)+":"+status,UiText.localized("records.accounts.promise_fulfilled",{},"وفيت بوعد السداد.".format({})) if status=="fulfilled" else UiText.localized("records.accounts.promise_broken",{},"فات موعد وعد السداد؛ أصل الدين ما زال مستحقًا، ويمكنك الكلام والاتفاق من جديد.".format({}))))
  for loan in commitments.loans.values():
   if loan.get("status","pending")!="pending":continue
   var status := "fulfilled" if loan.paid==loan.principal else "broken" if _session.clock.world_minutes>=float(loan.due_at) else ""
@@ -89,7 +92,7 @@ func tick(_frame: Dictionary) -> ActionResult:
   loan["status"]=status
   loan["assessed_at"]=_session.clock.world_minutes
   _adjust(relations,_session.config.section("accounts")["promise_fulfilled" if status=="fulfilled" else "promise_broken"])
-  events.append(_system("loan:"+str(loan.id)+":"+status,"رددت السلفة كما اتفقت." if status=="fulfilled" else "موعد رد السلفة عدى؛ السداد والاعتذار يفضلوا متاحين."))
+  events.append(_system("loan:"+str(loan.id)+":"+status,UiText.localized("records.accounts.loan_fulfilled",{},"رددت السلفة كما اتفقت.".format({})) if status=="fulfilled" else UiText.localized("records.accounts.loan_broken",{},"موعد رد السلفة عدى؛ السداد والاعتذار يفضلوا متاحين.".format({}))))
  if events.is_empty():return ActionResult.success()
  return _publish(book,commitments,_session.wallet.balance,relations,events)
 func personal_moment(source: String, repair: bool = false) -> ActionResult:
@@ -140,9 +143,9 @@ func _publish(book: Dictionary, commitments: Dictionary, cash: int, relations: D
  changed.emit()
  return ActionResult.success()
 func _event(receipt: Dictionary) -> Dictionary:
- return {"id":"finance:"+str(receipt.id),"chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":str(receipt.journal_text),"channel":"system","at":float(receipt.at)}
+ return {"id":"finance:"+str(receipt.id),"chapter":"accounts","actor":"system","name":str(receipt.get("journal_name","دفتر المستحقات")),"text":str(receipt.journal_text),"channel":"system","at":float(receipt.at)}
 func _system(id: String, value: String) -> Dictionary:
- return {"id":"finance:"+id,"chapter":"accounts","actor":"system","name":"دفتر المستحقات","text":value,"channel":"system","at":_session.clock.world_minutes}
+ return {"id":"finance:"+id,"chapter":"accounts","actor":"system","name":UiText.localized("records.accounts.name",{},"دفتر المستحقات".format({})),"text":value,"channel":"system","at":_session.clock.world_minutes}
 func validate_links() -> ActionResult:
  for receipt in _session.accounts.state.receipts.values()+_session.commitments.state.receipts.values():
   if not receipt.get("journal_text") is String:return _fail("missing_financial_journal")

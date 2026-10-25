@@ -20,6 +20,6 @@ func status_label(station_id: StringName, compact: bool = false) -> String:
  var label: String = labels.get(stage,"")
  var sugar := ""
  for option in recipe.data.get("sugars",[]):
-  if option.id == str(current.sugar_id): sugar = option.label
+  if option.id == str(current.sugar_id): sugar = ItemText.source("station."+str(recipe.rules_id)+".sugar."+str(option.id),str(option.label))
  var progress := mini(100,floori(current.heat_elapsed/float(recipe.data.timing.get("boil_seconds",1))*100))
- return label.format({"sugar":sugar,"progress":progress,"key":_primary_key})
+ return ItemText.source("station."+str(recipe.rules_id)+(".compact." if compact else ".status.")+stage,label,{"sugar":sugar,"progress":progress,"key":_primary_key})

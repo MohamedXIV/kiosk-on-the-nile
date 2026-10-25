@@ -236,7 +236,7 @@ func dialogue_context(id: String) -> Dictionary:
  var activity: Dictionary=_state.activity
  var appointment := float(activity.not_before)
  var minute := fposmod(appointment,1440.0)
- return {"topic_id":id,"trial_week":activity.outcome=="week_trial","appointment_label":"يوم %d الساعة %02d:%02d" % [floori(appointment/1440.0)+1,int(minute)/60,int(minute)%60]}
+ return {"topic_id":id,"trial_week":activity.outcome=="week_trial","appointment_label":"يوم %d الساعة %02d:%02d" % [floori(appointment/1440.0)+1,int(minute)/60,int(minute)%60],"localization_args":{"appointment_label":NarrativeLocalization.date(appointment)}}
 func heard_topic(id: String) -> void:
  if not _data.topics.has(id):return
  var action := str(_data.topics[id].action)

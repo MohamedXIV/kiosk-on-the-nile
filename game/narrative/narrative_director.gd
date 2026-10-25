@@ -193,7 +193,7 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   var result := conversation.runtime.choose(int(choice.index))
   if not result.ok: return result
   if _can_hear(conversation) and not automatic:
-   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":_session.tuning.display_name("player",str(_session.config.section("ui").get("player_name","أنا"))),"text":LocalizedNarrative.choice(conversation.current.choices[int(choice.index)],conversation.current),"channel":"choice","at":_session.clock.world_minutes}
+   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":LocalizedNarrative.speaker("player",_session.tuning.display_name("player",str(_session.config.section("ui").get("player_name","أنا")))),"text":LocalizedNarrative.choice(conversation.current.choices[int(choice.index)],conversation.current),"channel":"choice","at":_session.clock.world_minutes}
    _pending_choices[str(conversation.id)].merge(LocalizedNarrative.metadata(str(conversation.current.choices[int(choice.index)].get("loc_id","")),conversation.current.loc_args,str(conversation.current.choices[int(choice.index)].text)))
   if conversation.encounter_id==&"social_invitation":
    conversation.optional=false
@@ -320,6 +320,7 @@ func _context_for(conversation: ConversationSession) -> Dictionary:
   projected.merge({"shawarma_attempted":knowledge.attempted,"shawarma_completed":knowledge.completed,"shawarma_quality":int(source.get("quality",knowledge.last_quality))},true)
  for key in _definitions[str(conversation.encounter_id)].get("context_conditions",{}):
   projected[key] = _session.conditions.permits(_definitions[str(conversation.encounter_id)].context_conditions[key],conversation.participants)
+ projected["localization_args"]=NarrativeLocalization.capture(_session,projected)
  return projected
 
 func _encounter_available(definition: Dictionary, participants: PackedStringArray) -> bool:

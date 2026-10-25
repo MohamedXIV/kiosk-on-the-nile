@@ -8,6 +8,7 @@ ar=json.loads((root/'content/locales/ar_EG.json').read_text())['messages'];en=js
 records=[];seen=set()
 for path in sorted((root/'content/stories').glob('*.ink')):
  for number,line in enumerate(path.read_text().splitlines(),1):
+  if re.search("[ء-ي]",line) and not line.lstrip().startswith(("VAR","//")) and "# loc:" not in line:raise SystemExit("Untagged authored Arabic line: "+str(path)+":"+str(number))
   for id in re.findall(r'#\s*loc:([a-zA-Z0-9_.]+)',line):
    if id in seen:raise SystemExit('Duplicate Ink localization ID: '+id)
    seen.add(id)

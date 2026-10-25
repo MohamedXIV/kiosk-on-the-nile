@@ -8,7 +8,7 @@ static func choice(value: Dictionary, frame: NarrativeTypes.Frame) -> String:
 static func resolve(id: String, args: Dictionary, fallback: String) -> String:
  return LocaleService.current.text(id,args,fallback) if id!="" and LocaleService.current!=null else fallback
 static func speaker(actor: String, source_name: String) -> String:
- return resolve("actor.fathi",{},source_name) if actor=="fathi" and source_name=="عم فتحي" else source_name
+ return LocaleService.current.source_text("actor."+actor,source_name) if LocaleService.current else source_name
 static func metadata(id: String, args: Dictionary, canonical: String) -> Dictionary:
  if id=="" or LocaleService.current==null:return {}
  return {"text_ref":id,"parameters":args.duplicate(true),"canonical_text":canonical,"locale":LocaleService.current.locale}

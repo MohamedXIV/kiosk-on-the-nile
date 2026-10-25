@@ -7,6 +7,7 @@ func configure(data: Dictionary, projection: SpatialMapping, font_path: String) 
  _config = data
  _mapping = projection
  _font = load(font_path)
+ if LocaleService.current:LocaleService.current.changed.connect(queue_redraw)
  queue_redraw()
 func _draw() -> void:
  if _mapping == null: return
@@ -24,8 +25,8 @@ func _draw() -> void:
   draw_rect(Rect2(start,end-start),Color("d4a359"),false,2)
   var door := _mapping.to_canvas(Vector2(_config.door[0],_config.door[1]))
   var caption := TextLine.new()
-  caption.direction=TextServer.DIRECTION_RTL
-  caption.add_string(_config.door_label,_font,13)
+  caption.direction=TextServer.DIRECTION_RTL if LocaleService.current.rtl() else TextServer.DIRECTION_LTR
+  caption.add_string(ItemText.source("location.rooftop.door_label",str(_config.door_label)),_font,13)
   var size := caption.get_size()
   draw_rect(Rect2(door-Vector2(size.x/2+8,16),Vector2(size.x+16,25)),Color("8c6239"))
   caption.draw(get_canvas_item(),door-Vector2(size.x/2,12),Color("f3ece1"))
