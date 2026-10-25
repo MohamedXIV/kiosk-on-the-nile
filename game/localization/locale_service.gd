@@ -45,7 +45,9 @@ func _resolve(id: String, args: Dictionary, fallback: String, depth: int) -> Str
   if parameter is Dictionary and parameter.get("text_ref") is String:
    var nested := str(_catalogs.get(locale,{}).get(parameter.text_ref,_catalogs.get("ar_EG",{}).get(parameter.text_ref,"")))
    if nested=="":return fallback
-   parameters[key]=_resolve(str(parameter.text_ref),parameter.get("parameters",{}),nested,depth+1)
+   var nested_args: Variant=parameter.get("parameters",{})
+   if not nested_args is Dictionary:return fallback
+   parameters[key]=_resolve(str(parameter.text_ref),nested_args,nested,depth+1)
  var expression := RegEx.new();expression.compile("\\{([A-Za-z_][A-Za-z0-9_]*)\\}")
  for match_value in expression.search_all(value):
   if not parameters.has(match_value.get_string(1)):return fallback
