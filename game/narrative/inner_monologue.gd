@@ -43,7 +43,7 @@ func _speak(rule: Dictionary) -> void:
    var event := {"id":id,"chapter":id,"actor":"player","name":LocalizedNarrative.speaker("player",_session.tuning.display_name("player",str(_session.config.section("ui").player_name))),"text":LocalizedNarrative.line(output),"channel":"thought","at":_session.clock.world_minutes}
    event.merge(LocalizedNarrative.metadata(output.loc_id,output.loc_args,output.text))
    if _session.journal.append_once(event).ok:
-    _current={"id":id,"rule":str(rule.id),"text":event.text,"remaining":output.duration,"loc_id":output.loc_id,"loc_args":output.loc_args.duplicate(true)}
+    _current={"id":id,"rule":str(rule.id),"text":event.text,"remaining":output.duration,"loc_id":output.loc_id if LocaleService.current else "","loc_args":output.loc_args.duplicate(true) if LocaleService.current else {}}
     _heard[rule.id]=_session.clock.world_minutes
     _next_at=_session.clock.world_minutes+float(_session.config.section("narration").thought_delay_minutes)
  runtime.close()

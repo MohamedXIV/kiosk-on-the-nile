@@ -14,5 +14,5 @@ static func capture(session: GameSession, context: Dictionary) -> Dictionary:
   for id in session.config.section("foods"):
    var food := session.foods.definition(StringName(id))
    if food.get("menu_label")==source:
-    args[key]=LocaleService.current.captured_reference("food."+str(id)+".menu",source);break
+    args[key]=LocaleService.current.captured_reference("food."+str(id)+".menu",source) if LocaleService.current else source;break
  return args
