@@ -157,6 +157,14 @@ class Reader extends InkBase:
 		if !expect("\""):
 			return null
 
+		# Local performance patch: copy a plain string in one native operation.
+		# Keep the upstream decoder for escaped strings (and all numeric typing).
+		var closing_quote: int = _text.find("\"", _offset)
+		var plain: String = _text.substr(_offset, closing_quote - _offset) if closing_quote >= 0 else ""
+		if closing_quote >= 0 and not plain.contains("\\"):
+			_offset = closing_quote + 1
+			return plain
+
 		var sb = ""
 
 		while(_offset < _text.length()):

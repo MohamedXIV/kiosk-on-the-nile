@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+INK_OPEN visitors bytes=24684 {"max_us":252225,"median_us":223417,"min_us":212060}
+INK_OPEN venue_comments bytes=3203 {"max_us":33555,"median_us":29578,"min_us":26121}
+INK_OPEN orders bytes=13243 {"max_us":141796,"median_us":122299,"min_us":116288}
+INK_OPEN inner_monologue bytes=1305 {"max_us":15668,"median_us":12264,"min_us":10534}

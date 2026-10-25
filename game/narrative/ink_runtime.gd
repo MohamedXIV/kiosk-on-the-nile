@@ -10,6 +10,11 @@ var _frame := NarrativeTypes.Frame.new()
 var _error: String = ""
 var _context: Dictionary={}
 func open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
+ var perf := RuntimePerformance.begin()
+ var result := await _open(definition,context)
+ RuntimePerformance.finish("ink_open_wall:"+str(definition.id),perf)
+ return result
+func _open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
  close()
  _definition = definition
  var json := definition.raw_json if not definition.raw_json.is_empty() else FileAccess.get_file_as_string(definition.compiled_path)
@@ -40,6 +45,11 @@ func set_context(context: Dictionary) -> void:
   if _player.get_variable(str(key)) != null:
    _player.set_variable(str(key), context[key])
 func advance() -> NarrativeTypes.Frame:
+ var perf := RuntimePerformance.begin()
+ var output := _advance_frame()
+ RuntimePerformance.finish("ink_advance",perf)
+ return output
+func _advance_frame() -> NarrativeTypes.Frame:
  _frame = NarrativeTypes.Frame.new()
  if _player == null:
   _frame.result = ActionResult.failure(ActionResult.Code.NOT_AVAILABLE, &"story_unavailable")

@@ -18,6 +18,7 @@ func step(delta: float) -> void:
  for id in _service.visits:
   var visit: VisitState = _service.visits[id]
   if not _motors.has(id):
+   var perf := RuntimePerformance.begin()
    var motor := ActorMotor.new()
    _room.add_child(motor)
    motor.pose = visit.pose
@@ -30,10 +31,13 @@ func step(delta: float) -> void:
    visual.configure(spatial.character)
    motor.add_child(visual)
    _motors[id] = motor
+   RuntimePerformance.finish("visitor_node_spawn",perf)
   var motor: ActorMotor = _motors[id]
   if _destinations.get(id) != visit.destination:
    _destinations[id] = visit.destination
+   var perf := RuntimePerformance.begin()
    _paths[id] = _room.navigation.path(visit.pose.ground,visit.destination)
+   RuntimePerformance.finish("visitor_path",perf)
   if visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id):motor.step_input(Vector2.ZERO,delta)
   elif visit.phase in [&"arriving",&"leaving"] or visit.pose.ground.distance_to(visit.destination)>float(_room.session.config.section("visitors").arrival_radius): motor.step_path(_paths[id],delta)
   else: motor.step_input(Vector2.ZERO,delta)

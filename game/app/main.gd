@@ -38,6 +38,7 @@ var _busy: bool = false
 var _sound: Soundscape
 var _atmosphere: Atmosphere
 func _ready() -> void:
+ RuntimePerformance.configure()
  if OS.is_debug_build() and OS.has_feature("web"):
   var qa: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('qa')")
   if qa in ["ink","spatial","kiosk","rooftop"]:
@@ -234,17 +235,28 @@ func _install(candidate: GameSession) -> void:
  _session.start_new()
  _sound.set_muted(false)
  if _probe: _probe.session = _session
+func _process(_delta: float) -> void:
+ RuntimePerformance.frame()
 func _physics_process(delta: float) -> void:
  if _session==null or not _focused: return
+ var perf := RuntimePerformance.begin()
  _session.tick(delta)
+ RuntimePerformance.finish("simulation_tick",perf)
  _fatigue_overlay.present(_session.fatigue.view())
+ perf=RuntimePerformance.begin()
  _sound.present(_session.location_id,_session.cooking,_session.home,_session.items,_session.spaces,_session.workflow)
+ RuntimePerformance.finish("audio_projection",perf)
  _atmosphere.present(_session.clock.minutes,_session.location_id)
  _character.present(_session.player_pose,Color(_config.section("spatial").character.player_color),true)
  _character.get_node("HeldItem").present_record(_session.items.get_item(_session.inventory.held_id()))
  _camera.global_position = _motor.global_position
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
- _hud.present(_router.nearest())
+ perf=RuntimePerformance.begin()
+ var nearest := _router.nearest()
+ RuntimePerformance.finish("interaction_projection",perf)
+ perf=RuntimePerformance.begin()
+ _hud.present(nearest)
+ RuntimePerformance.finish("hud_projection",perf)
  if _hud.notebook.visible and _session.clock.tick%60==0:_hud.notebook.refresh()
  _captions.top_inset = _hud.top_occupied_height()
  _journey_panel.present()
@@ -264,7 +276,9 @@ func _physics_process(delta: float) -> void:
  if _modals.blocking():
   _hud.dialogue.hide()
   _hud.suppress_prompts()
+ perf=RuntimePerformance.begin()
  if _captions.visible:_captions.present(_session,_rooms[str(_session.location_id)],_camera)
+ RuntimePerformance.finish("captions_projection",perf)
  _save.transition_active = _transition.active
  _save.boundary(_session)
 func _unhandled_input(event: InputEvent) -> void:

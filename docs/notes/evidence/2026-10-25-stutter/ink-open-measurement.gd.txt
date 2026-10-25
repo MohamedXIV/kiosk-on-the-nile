@@ -1,0 +1,31 @@
+extends SceneTree
+func _initialize():
+ call_deferred("run")
+func stats(values: Array) -> Dictionary:
+ values.sort()
+ return {"min_us":values[0],"median_us":values[values.size()/2],"max_us":values[-1]}
+func run():
+ var store := ContentStore.new()
+ root.add_child(store)
+ var loaded := store.load_directory("res://content")
+ if not loaded.ok:
+  print(loaded.details);quit(1);return
+ var bundle := store.bundle()
+ for id in ["visitors","venue_comments","orders","inner_monologue"]:
+  var definition := StoryDefinition.new()
+  definition.id=StringName(id)
+  definition.raw_json=JSON.stringify(bundle["story_"+id],"",true)
+  definition.sha256=definition.raw_json.sha256_text()
+  var timings: Array=[]
+  for i in range(20):
+   var runtime := InkRuntime.new()
+   root.add_child(runtime)
+   var started := Time.get_ticks_usec()
+   var result := await runtime.open(definition,{"mode":4,"topic_id":""})
+   timings.append(Time.get_ticks_usec()-started)
+   if not result.ok:print("OPEN FAILED ",result.message_key);quit(1);return
+   await process_frame
+   runtime.close();runtime.queue_free()
+   await process_frame
+  print("INK_OPEN ",id," bytes=",definition.raw_json.length()," ",JSON.stringify(stats(timings)))
+ quit()

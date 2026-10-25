@@ -1,0 +1,36 @@
+extends SceneTree
+const Previous = preload("/tmp/kiosk-old-simple-json.gd")
+func _initialize():
+ call_deferred("compare")
+func compare():
+ var store := ContentStore.new()
+ root.add_child(store)
+ var result := store.load_directory("res://content")
+ if not result.ok:print(result.details);quit(1);return
+ var count := 0
+ for key in store.bundle():
+  if not (str(key).begins_with("story_") or str(key).begins_with("archive_") or str(key).begins_with("legacy_story_")):continue
+  var source := JSON.stringify(store.section(key),"",true)
+  var before: Dictionary=Previous.text_to_dictionary(source)
+  var after := InkSimpleJSON.text_to_dictionary(source)
+  if var_to_bytes(before)!=var_to_bytes(after):
+   print("DIFFERENT VALUES/TYPES: ",key);quit(1);return
+  count+=1
+ print("Identical parsed values/types for ",count," story-related sections")
+ for source in ['{"s":""}', '{"s":"hello\\nworld","n":1,"f":1.0}', '{"s":"say \\"hi\\""}', '{"s":"a\\\\b"}']:
+  if var_to_bytes(Previous.text_to_dictionary(source))!=var_to_bytes(InkSimpleJSON.text_to_dictionary(source)):
+   print("Escape difference");quit(1);return
+ print("Escape/numeric probes identical")
+ for id in ["visitors","orders","venue_comments","inner_monologue"]:
+  var source := JSON.stringify(store.section("story_"+id),"",true)
+  var old_times: Array=[];var new_times: Array=[]
+  for i in range(30):
+   var start := Time.get_ticks_usec()
+   Previous.text_to_dictionary(source)
+   old_times.append(Time.get_ticks_usec()-start)
+   start=Time.get_ticks_usec()
+   InkSimpleJSON.text_to_dictionary(source)
+   new_times.append(Time.get_ticks_usec()-start)
+  old_times.sort();new_times.sort()
+  print("PARSER_PAIRED ",id," old_median_us=",old_times[15]," new_median_us=",new_times[15])
+ quit()
