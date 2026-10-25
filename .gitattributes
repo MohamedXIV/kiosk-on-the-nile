@@ -1,3 +1,0 @@
-# Preserve upstream artifacts verbatim; whitespace checks apply to original game code.
-addons/** -whitespace
-assets/fonts/OFL.txt -whitespace
