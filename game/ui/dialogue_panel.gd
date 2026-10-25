@@ -32,7 +32,7 @@ func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
  var conversation: ConversationSession=view.get("conversation")
  var signature := str(LocaleService.current.revision if LocaleService.current else 0)+JSON.stringify([view.get("actor_id"),str(conversation.id) if conversation else "",conversation.beat if conversation else 0,view.topics,view.opening])
  if _begin(signature):
-  _line(LocalizedNarrative.speaker(str(view.actor_id),str(view.name)))
+  _line(NotebookView.name(str(view.actor_id),str(view.name)))
   if conversation:
    for event in view.get("recent",[]):
     var preceding := UiText.label(str(event.name)+": "+str(event.text))
@@ -45,7 +45,7 @@ func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
    else:_choices(conversation,choices)
   else:
    _line(_text.text("dialogue_topics"))
-   for topic in view.topics:_button(str(topic.label),func():topic_selected.emit(str(topic.key)))
+   for topic in view.topics:_button(OutingText.manual_topic(topic),func():topic_selected.emit(str(topic.key)))
   _button(_text.text("dialogue_leave"),func():leave_requested.emit())
  _fit()
 func _begin(signature: String) -> bool:
@@ -59,7 +59,7 @@ func _line(value: String) -> void:
  label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  _box.add_child(label)
 func _button(value: String, action: Callable) -> void:
- var button := UiText.button(value,action)
+ var button := SheetControls.button(value,action)
  button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  _box.add_child(button)
 func _choices(conversation: ConversationSession, choices: Array[Dictionary]) -> void:

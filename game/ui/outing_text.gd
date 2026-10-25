@@ -11,3 +11,6 @@ static func topic(value: Dictionary) -> String:
 static func order(session: GameSession, id: StringName) -> String:
  var food := session.cooking.foods.definition(id)
  return ItemText.source("food."+str(id)+".menu",str(food.get("menu_label",id)))
+static func manual_topic(value: Dictionary) -> String:
+ var key := str(value.key)
+ return ItemText.source("topic."+key.trim_prefix("social:") if key.begins_with("social:") else "manual_topic."+key,str(value.label))
