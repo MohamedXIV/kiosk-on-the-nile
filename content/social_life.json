@@ -35,19 +35,23 @@
     "stages": [
       {
         "at": 0,
-        "label": "لسه بنتعرف"
+        "label": "لسه بنتعرف",
+        "text_ref": "notebook.stage.acquaintance"
       },
       {
         "at": 12,
-        "label": "وش مألوف"
+        "label": "وش مألوف",
+        "text_ref": "notebook.stage.familiar"
       },
       {
         "at": 30,
-        "label": "بينكم عِشرة"
+        "label": "بينكم عِشرة",
+        "text_ref": "notebook.stage.shared_history"
       },
       {
         "at": 60,
-        "label": "قعدة وونس"
+        "label": "قعدة وونس",
+        "text_ref": "notebook.stage.easy_company"
       }
     ]
   },

@@ -15,26 +15,25 @@ static func notes(session: GameSession) -> Array[Dictionary]:
  for original in state.notes:
   var display := str(original)
   var chapter := ""
+  var candidates: Array[Dictionary]=[]
   for fact in state.facts:
    var record: Dictionary=state.facts[fact]
    var linked: bool=record.get("note","")==original or (fact=="START_ROUTINE" and record.source=="initial" and original in initial)
    if not linked:continue
-   display=source(str(refs.get(fact,"")),display)
-   if str(record.source).begins_with("conversation_"):chapter=str(record.source).get_slice("/",0)
-   break
+   candidates.append({"fact":fact,"source":str(record.source)})
+  # Flat legacy note arrays do not identify their fact. Ambiguity is not provenance.
+  if candidates.size()==1:
+   display=source(str(refs.get(candidates[0].fact,"")),display)
+   if str(candidates[0].source).begins_with("conversation_"):chapter=str(candidates[0].source).get_slice("/",0)
   result.append({"text":display,"chapter":chapter})
  return result
 static func people(session: GameSession) -> Array[Dictionary]:
  var result := session.notebook_people()
- var stages: Array=session.config.section("social_life").relationships.stages
  for person in result:
   var actor := str(person.get("actor_id",""))
   person.name=name(actor,str(person.name))
   if actor=="abdul_karim":person.stage=t("landlord")
-  else:
-   for stage in stages:
-    if person.stage==stage.label:
-     person.stage=source("notebook.stage."+str(int(stage.at)),str(person.stage));break
+  else:person.stage=source(str(person.get("stage_ref","")),str(person.stage))
   if not str(person.connection).is_empty() and actor in ["farid","youssef"]:
    var other := "youssef" if actor=="farid" else "farid"
    person.connection=t("connection.result" if session.knowledge.has(&"WORK_TRIAL_RESULT") else "connection.trial",{"name":name(other,str(session.visitors.character(StringName(other)).name))})
@@ -90,4 +89,10 @@ static func validate_layout(bundle: Dictionary) -> ActionResult:
   if not fact in bundle.get("social",{}).get("facts",[]) or not ref is String:return ContentValidation.fail("ui.notebook_layout.note_refs")
   for catalog in ["locale_ar","locale_en"]:
    if not bundle.get(catalog,{}).get("messages",{}).has(ref):return ContentValidation.fail("ui.notebook_layout.note_refs")
+ for stage in bundle.get("social_life",{}).get("relationships",{}).get("stages",[]):
+  if not stage is Dictionary:return ContentValidation.fail("social_life.relationships.stages")
+  if not stage.has("text_ref"):continue
+  if not stage.text_ref is String:return ContentValidation.fail("social_life.relationships.stages.text_ref")
+  for catalog in ["locale_ar","locale_en"]:
+   if not bundle.get(catalog,{}).get("messages",{}).has(stage.text_ref):return ContentValidation.fail("social_life.relationships.stages.text_ref")
  return ActionResult.success()

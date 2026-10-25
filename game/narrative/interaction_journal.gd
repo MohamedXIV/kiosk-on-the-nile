@@ -3,6 +3,7 @@ extends RefCounted
 ## Append-only heard history. Reading it never replays narrative effects.
 var _events: Array[Dictionary]=[]
 var _ids: Dictionary={}
+var _heard_actors: Dictionary={}
 var _actors: Array=[]
 var _clock: GameClock
 var revision: int=0
@@ -16,6 +17,7 @@ func append_once(event: Dictionary) -> ActionResult:
  if not _events.is_empty() and float(event.at)<float(_events.back().at)-0.001:return _fail()
  _ids[event.id]=_events.size()
  _events.append(event.duplicate(true))
+ _heard_actors[event.actor]=true
  revision+=1
  return ActionResult.success()
 func entries(filters: Dictionary = {}) -> Array[Dictionary]:
@@ -29,6 +31,7 @@ func entries(filters: Dictionary = {}) -> Array[Dictionary]:
  return result
 func event(id: String) -> Dictionary:
  return _events[int(_ids[id])].duplicate(true) if _ids.has(id) else {}
+func has_actor(actor: String) -> bool:return _heard_actors.has(actor)
 func snapshot() -> Dictionary:
  return {"events":_events.duplicate(true)}
 func restore(data: Dictionary) -> ActionResult:
@@ -41,6 +44,7 @@ func restore(data: Dictionary) -> ActionResult:
   if not result.ok:return result
  _events=candidate._events
  _ids=candidate._ids
+ _heard_actors=candidate._heard_actors
  revision+=1
  return ActionResult.success()
 func _valid(e: Dictionary) -> bool:

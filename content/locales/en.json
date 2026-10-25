@@ -129,10 +129,6 @@
     "notebook.landlord": "Your landlord — a person beyond the rent",
     "notebook.connection.trial": "Arranging a work trial with {name}",
     "notebook.connection.result": "Tried working with {name}",
-    "notebook.stage.0": "Getting acquainted",
-    "notebook.stage.12": "A familiar face",
-    "notebook.stage.30": "Some shared history",
-    "notebook.stage.60": "Easy company",
     "notebook.history_hint": "Words stay as you heard them, in their original language. A person filter includes your replies in the same conversation.",
     "notebook.people_all": "Everyone",
     "notebook.days_all": "All days",
@@ -204,6 +200,10 @@
     "notebook.note.WORK_TRIAL_WEEK": "Farid and Youssef agreed on a week’s trial, working two days around his studies.",
     "notebook.note.KNOWN_CHEAP_FAN": "Amgad pointed me to a second-hand standing fan at Uncle Saeed’s. I can order it from the kiosk phone.",
     "notebook.note.KNOWN_ABDUL_FAMILY": "Uncle Abdel Karim visits his mother every day. It matters to him that someone checks in on him too.",
-    "notebook.note.KNOWN_SHAWARMA_BASICS": "Shawarma: prepare on a worktop, marinate in the local fridge, cook on the spit, then slice and assemble with bread and garlic sauce. The equipment and ingredients really are needed."
+    "notebook.note.KNOWN_SHAWARMA_BASICS": "Shawarma: prepare on a worktop, marinate in the local fridge, cook on the spit, then slice and assemble with bread and garlic sauce. The equipment and ingredients really are needed.",
+    "notebook.stage.acquaintance": "Getting acquainted",
+    "notebook.stage.familiar": "A familiar face",
+    "notebook.stage.shared_history": "Some shared history",
+    "notebook.stage.easy_company": "Easy company"
   }
 }

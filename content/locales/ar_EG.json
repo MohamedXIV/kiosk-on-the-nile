@@ -129,10 +129,6 @@
     "notebook.landlord": "صاحب السكن — معرفة وعلاقة مستقلة عن الحساب",
     "notebook.connection.trial": "نسّق تجربة شغل مع {name}",
     "notebook.connection.result": "جرّب الشغل مع {name}",
-    "notebook.stage.0": "لسه بنتعرف",
-    "notebook.stage.12": "وش مألوف",
-    "notebook.stage.30": "بينكم عِشرة",
-    "notebook.stage.60": "قعدة وونس",
     "notebook.history_hint": "الكلام محفوظ زي ما اتسمع وقتها، بلغته الأصلية. اختيار شخص بيشمل ردودك في نفس القعدة.",
     "notebook.people_all": "كل الناس",
     "notebook.days_all": "كل الأيام",
@@ -204,6 +200,10 @@
     "notebook.note.WORK_TRIAL_WEEK": "فريد ويوسف اتفقوا يكملوا أسبوع تجربة شغل يومين، بما يناسب الدراسة.",
     "notebook.note.KNOWN_CHEAP_FAN": "عم أمجد دلّني على مروحة ستاند مستعملة عند عم سعيد؛ أقدر أطلبها من تليفون الكشك.",
     "notebook.note.KNOWN_ABDUL_FAMILY": "عم عبد الكريم بيعدّي على والدته كل يوم ويهتم إن حد يسأل عليه.",
-    "notebook.note.KNOWN_SHAWARMA_BASICS": "الشاورما: تجهيز على سطح، تتبيل في ثلاجة المكان، شوي على السيخ، ثم تقطيع وتجميع بالعيش والثومية. المعدات والخامات مطلوبة فعلًا."
+    "notebook.note.KNOWN_SHAWARMA_BASICS": "الشاورما: تجهيز على سطح، تتبيل في ثلاجة المكان، شوي على السيخ، ثم تقطيع وتجميع بالعيش والثومية. المعدات والخامات مطلوبة فعلًا.",
+    "notebook.stage.acquaintance": "لسه بنتعرف",
+    "notebook.stage.familiar": "وش مألوف",
+    "notebook.stage.shared_history": "بينكم عِشرة",
+    "notebook.stage.easy_company": "قعدة وونس"
   }
 }

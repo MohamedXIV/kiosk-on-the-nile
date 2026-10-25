@@ -36,6 +36,7 @@ func refresh_language() -> void:
  if _session:refresh()
 func refresh(reset_scroll: bool=false) -> void:
  if _session==null:return
+ _body.text_direction=Control.TEXT_DIRECTION_AUTO
  _hint.text=NotebookView.t("accounts_hint" if _mode.selected==0 else "signed_hint")
  var scroll := _body.get_v_scroll_bar().value
  _paging.visible=_mode.selected==1

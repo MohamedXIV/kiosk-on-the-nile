@@ -140,6 +140,7 @@ func _apply_filters(reset_page: bool=true) -> void:
  if _metadata(_order,"newest")=="newest":_filtered.reverse()
  _render(reset_page)
 func _render(reset_scroll: bool) -> void:
+ _body.text_direction=Control.TEXT_DIRECTION_AUTO
  var scroll := _body.get_v_scroll_bar().value
  _page=clampi(_page,0,maxi(0,ceili(float(_filtered.size())/_page_size)-1))
  var start := _page*_page_size
