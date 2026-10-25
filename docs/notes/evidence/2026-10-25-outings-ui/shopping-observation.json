@@ -1,0 +1,180 @@
+{
+  "before": {
+    "delivered": {},
+    "next_quote": 2,
+    "next_receipt": 1,
+    "next_restock_at": 1980,
+    "receipts": {},
+    "revision": 1,
+    "stock": {
+      "appliances": {
+        "fan": 1,
+        "fridge": 4,
+        "fryer": 4,
+        "oven": 4,
+        "rotisserie": 4
+      },
+      "homewares": {
+        "bed": 4,
+        "chair": 4,
+        "counter": 4,
+        "fan": 4,
+        "radio": 4,
+        "table": 4
+      },
+      "market": {
+        "bread": 20,
+        "chicken": 20,
+        "garlic_sauce": 20,
+        "kebda_portion": 20,
+        "marinade": 20,
+        "oil": 20,
+        "potato": 20,
+        "tea_portion": 20
+      }
+    }
+  },
+  "after_locale": {
+    "delivered": {},
+    "next_quote": 2,
+    "next_receipt": 1,
+    "next_restock_at": 1980,
+    "receipts": {},
+    "revision": 1,
+    "stock": {
+      "appliances": {
+        "fan": 1,
+        "fridge": 4,
+        "fryer": 4,
+        "oven": 4,
+        "rotisserie": 4
+      },
+      "homewares": {
+        "bed": 4,
+        "chair": 4,
+        "counter": 4,
+        "fan": 4,
+        "radio": 4,
+        "table": 4
+      },
+      "market": {
+        "bread": 20,
+        "chicken": 20,
+        "garlic_sauce": 20,
+        "kebda_portion": 20,
+        "marinade": 20,
+        "oil": 20,
+        "potato": 20,
+        "tea_portion": 20
+      }
+    }
+  },
+  "after_draft": {
+    "delivered": {},
+    "next_quote": 2,
+    "next_receipt": 1,
+    "next_restock_at": 3420,
+    "receipts": {},
+    "revision": 2,
+    "stock": {
+      "appliances": {
+        "fan": 1,
+        "fridge": 4,
+        "fryer": 4,
+        "oven": 4,
+        "rotisserie": 4
+      },
+      "homewares": {
+        "bed": 4,
+        "chair": 4,
+        "counter": 4,
+        "fan": 4,
+        "radio": 4,
+        "table": 4
+      },
+      "market": {
+        "bread": 20,
+        "chicken": 20,
+        "garlic_sauce": 20,
+        "kebda_portion": 20,
+        "marinade": 20,
+        "oil": 20,
+        "potato": 20,
+        "tea_portion": 20
+      }
+    }
+  },
+  "after_purchase": {
+    "delivered": {},
+    "next_quote": 4,
+    "next_receipt": 2,
+    "next_restock_at": 3420,
+    "receipts": {
+      "purchase:quote_2": {
+        "at": 1989.58333333237,
+        "bag_id": "journey_2:bag",
+        "granted": [
+          {
+            "definition_id": "tea_portion",
+            "item_id": "item_18",
+            "quantity": 2
+          }
+        ],
+        "grants_known": true,
+        "id": "receipt_1",
+        "journey_id": "journey_2",
+        "quote": {
+          "id": "quote_2",
+          "lines": [
+            {
+              "definition_id": "tea_portion",
+              "offer_id": "tea_portion",
+              "quantity": 2,
+              "unit_price_minor": 100
+            }
+          ],
+          "offer_revision": 2,
+          "shop_id": "market",
+          "total_minor": 200
+        },
+        "request_id": "purchase:quote_2",
+        "total_minor": 200
+      }
+    },
+    "revision": 3,
+    "stock": {
+      "appliances": {
+        "fan": 1,
+        "fridge": 4,
+        "fryer": 4,
+        "oven": 4,
+        "rotisserie": 4
+      },
+      "homewares": {
+        "bed": 4,
+        "chair": 4,
+        "counter": 4,
+        "fan": 4,
+        "radio": 4,
+        "table": 4
+      },
+      "market": {
+        "bread": 20,
+        "chicken": 20,
+        "garlic_sauce": 20,
+        "kebda_portion": 20,
+        "marinade": 20,
+        "oil": 20,
+        "potato": 20,
+        "tea_portion": 18
+      }
+    }
+  },
+  "wallet_before": {
+    "balance": 4500
+  },
+  "wallet_after": {
+    "balance": 4300
+  },
+  "observations": "Actual mouse/keyboard; locale did not change shop state, review counter or stock. Draft observation crossed scheduled restock, so alone does not isolate draft invalidation. Explicit new reviewed quote bought exactly tea2 for200minor and one receipt."
+}

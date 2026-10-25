@@ -16,11 +16,15 @@ Established user authorization: continue rollout and publish preview without mai
 Locale switching must preserve reviewed quote/quantity without issuing a quote or purchase. Stock changes invalidate review. Search and current selection must not purchase. Disabled recall/talk remain bound to actual owner eligibility; visitor departure closes sheet. Guarded data labels use actual stable IDs; custom definitions retain source. Panels wrap/scroll at both target viewports.
 
 ### Task1: Projections and shopping
-- [ ] Add OutingText guarded offer/route/topic projections and paired catalogs; scalar shop revision query.
-- [ ] Rework shopping list/search/details with explicit review/confirm and locale-safe quote state; native wrapping product cards.
+- [x] Add OutingText guarded offer/route/topic projections and paired catalogs; scalar shop revision query.
+- [x] Rework shopping list/search/details with explicit review/confirm and locale-safe quote state; native wrapping product cards.
 ### Task2: Travel and visitor sheets
-- [ ] Localize journey/menu actions and visitor topic/order presentation; bounded polling, retained owner commands and modal contracts.
-- [ ] Compile/import, Debug and Release export; actual browser actions and read-only observations, record gaps.
+- [x] Localize journey/menu actions and visitor topic/order presentation, including the actual personal conversation hub; bounded polling, retained owner commands and modal contracts.
+- [x] Compile/import, Debug and Release export; actual browser actions and read-only observations, record gaps.
 ### Task3: Review and delivery
-- [ ] Fresh read-only whole-change reviewer, one material fix pass; exact exports/Release boot.
-- [ ] Stock offline ZIP and verified GitHub source/artifact/prerelease; delivery record with evidence/limits.
+- [x] Fresh read-only whole-change reviewer, one material fix pass; exact exports/Release boot.
+- [x] Stock offline ZIP and verified GitHub source/artifact/prerelease; delivery record with evidence/limits.
+
+## Execution record
+
+Product07bb9a1, one reviewer and one material fix pass including root active-hub integration correction. See [delivery coverage and limits](../../notes/2026-10-25-outings-ui.md). Checked items mean documented observed coverage, not an exhaustive case matrix. No automated tests or main merge.
