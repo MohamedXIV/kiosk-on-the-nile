@@ -1,9 +1,0 @@
-# Inventory and preparation UI
-
-Continue the approved UI/localization rollout after notebook. Keep quiet world pace, existing item ownership, reservations, preparation steps, care, knowledge gates and canonical saved definitions unchanged. This increment organizes/translates the existing inventory and item-use/recipe sheets; it does not add cooking gameplay or translate all stories.
-
-Use existing Godot containers and current modal coordinator. Inventory gets search and storage-kind filters, container cards/capacity/empty states, held-item context, reservation information, the same pack/unpack/bowl commands. Preserve query/filter/scroll across locale/content refresh and reopening within a session. Search source-matched names in both bundled languages so switching locale does not invalidate a normal query.
-
-Item actions separate use/care, active preparations and available recipes. Show existing eligible recipes only, their ingredient amounts, equipment capabilities and action steps; frozen active-job labels use stable recipe/step IDs plus exact source guard. Unknown/custom wording stays original. No revealing unknown recipes, no changed learning/equipment gates, no automatic progress/action, no implicit cancellation or cleanup on closing. Job/care progress keeps updating while menus stay open. No unconditional per-frame full-job deep copies or wholesale UI reconstruction.
-
-All language catalogs/fonts ship offline. Labels/reasons resolve locally. Data/saves/Ink text, recipe timing/quality, payments and provenance do not change. Errors retain meaningful source fallback. Existing work checkout and authorized preview publication retained; no main merge. No automated tests added/run; compilation/import/export and actual browser interactions/read-only QA evidence, with gaps documented. Inline implementation and one fresh final review.
