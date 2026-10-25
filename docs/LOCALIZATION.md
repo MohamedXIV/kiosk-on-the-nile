@@ -34,3 +34,15 @@ Current note summaries use stable fact IDs in `ui.notebook_layout.note_refs`. A 
 Relationship stages have explicit `text_ref` values in `social_life.relationships.stages`; keep those identities when adjusting numerical thresholds. Default actor names can translate only when they still match their authored Arabic default; custom names remain intact.
 
 `ui.notebook_layout.history_page_size` sets history/receipt page length (10–100, shipped40). Content validation checks these bindings and stage references against both bundled catalogs. No gameplay/save schema or Ink graph changes are needed for this UI increment. Broader HUD/character/system adaptation is still pending.
+
+## Storage, care and preparation
+
+Inventory now has bilingual search/storage-kind filters, container capacity, held-item context and reserved-ingredient indicators. A bag's Unpack action applies to the whole bag, including items hidden by a search, and moves only what the existing storage rules accept. Search uses exact-source-guarded names from both bundled languages; custom names retain their source text. Locale/filter refresh never transfers items.
+
+Item sheets separate use/care, active preparation and existing eligible recipes. Starting a preparation selects its progress tab. Active kettle/griddle workflow F options reopen that read-only sheet; primary cooking actions remain unchanged. Closing a sheet does not cancel work. Requirements and disabled controls explain existing eligibility; they do not unlock recipes or bypass equipment, ingredients, knowledge or action-policy checks.
+
+Item, food, recipe and step catalogs use stable existing IDs (`item.<id>`, `food.<id>.label`, `recipe.<id>`, `recipe.<id>.step.<step-id>`). Frozen active-job labels translate only when the exact authored source still matches. Parameterized food names resolve the guarded source and captured sugar argument together. Unsupported/custom wording remains unchanged; canonical saved definitions, reaction timing, quality evidence and heard history are not rewritten.
+
+Inventory reads current storage without consumption history. Job progress uses a narrow scalar projection; structural changes coalesce and visible progress updates periodically, while the world continues. This is an ownership/allocation improvement, not a real-device FPS claim. Shop/travel/visitor UI and broader character/HUD translation still have work remaining.
+
+Older active jobs owned by the retained legacy adapter keep their original primary station controls; they are not presented as empty workflow progress cards. The new inspection shortcut applies to workflow-backed jobs without changing save data.

@@ -36,6 +36,9 @@ New Game starts on the rooftop at 15:30. Use WASD/arrows to move, **E** to inter
 **F** for the nearby secondary action or personal consumption, and **N** for the
 notebook. Conversation choices use the mouse and leave the world running.
 The title screen has New/Continue. The compact HUD menu contains Save, inventory, arrangement, cleaning, notebook and shopping journeys.
+Inventory supports bilingual search, storage filters and reservation indicators.
+Item sheets separate use/care, active preparations and eligible recipes. Active
+kettle/griddle F options reopen details; closing a sheet leaves the world running.
 
 The notebook has notes, familiar people, searchable heard conversations and weekly
 accounts with a separate receipt view. Filters and tabs stay selected while reopening

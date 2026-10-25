@@ -24,17 +24,21 @@
 ### Task1: Presentation catalog and shared read helpers
 
 Files: locales, LocaleService guarded search variants, UiText translated errors, new ItemText/SheetControls; RecipeWorkflow progress view.
-- [ ] Add paired IDs for items/foods/recipes/stable steps/capabilities/care/actions/errors, with source guards for authored labels.
-- [ ] Pure item name/details/requirements/missing-reason helpers, cross-language guarded search variants. Narrow job progress query returns copies of scalar fields only; no save/schema change.
+- [x] Add paired IDs for items/foods/recipes/stable steps/capabilities/care/actions/errors, with source guards for authored labels.
+- [x] Pure item name/details/requirements/missing-reason helpers, cross-language guarded search variants. Narrow job progress query returns copies of scalar fields only; no save/schema change.
 
 ### Task2: Native inventory and preparation sheets
 
 Files: InventoryPanel/RecipePanel, existing command connections retained.
-- [ ] Inventory search/storage-kind selection, container cards/capacity/empty states and reserved indicators. Stable callbacks, dirty refresh only on item/location/locale changes, retained scroll/filter/query.
-- [ ] Separate care, active job and eligible-recipe cards; ingredient/capability details, localized frozen labels and progress. Dirty structural refresh coalesced; bounded progress updates. No changed preparation/learning behavior.
-- [ ] Compile/import/Web export; actual UI on genuine save plus stock new session, Arabic/English,960×540/1280×720, pack/unpack, empty/non-recipe desk, active preparation if reachable. Record gaps.
+- [x] Inventory search/storage-kind selection, container cards/capacity/empty states and reserved indicators. Stable callbacks, dirty refresh only on item/location/locale changes, retained scroll/filter/query.
+- [x] Separate care, active job and eligible-recipe cards; ingredient/capability details, localized frozen labels and progress. Dirty structural refresh coalesced; bounded progress updates. No changed preparation/learning behavior.
+- [x] Compile/import/Web export; actual UI on genuine save plus stock new session, Arabic/English,960×540/1280×720, pack/unpack, empty/non-recipe desk, active preparation if reachable. Record gaps.
 
 ### Task3: Review and delivery
 
-- [ ] One fresh read-only review, one material fix pass; no re-review. Exact Debug/Release exports and actual Release boot/Continue.
-- [ ] Full stock offline ZIP/licenses/run guide; publish preview source/artifact/prerelease, download verify SHA/BUILD. Record coverage/limits and no main merge.
+- [x] One fresh read-only review, one material fix pass; no re-review. Exact Debug/Release exports and actual Release boot/Continue.
+- [x] Full stock offline ZIP/licenses/run guide; publish preview source/artifact/prerelease, download verify SHA/BUILD. Record coverage/limits and no main merge.
+
+## Execution result
+
+Implemented at producta07aedb with one fresh review and one material fix pass. [Delivery notes](../../notes/2026-10-25-inventory-preparation-ui.md) contain actual UI/build coverage, genuine active-save observations and explicit remaining cases. Checked items represent recorded coverage, not an exhaustive matrix; no automated tests or main merge.
