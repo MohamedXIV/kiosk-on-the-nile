@@ -1,6 +1,7 @@
 class_name GameSession
 extends Node
 signal _encounter_ready(kind: StringName, participants: PackedStringArray, extra: Dictionary)
+signal system_failed(result: ActionResult)
 signal changed
 var tuning: TuningStore
 var alertness: AlertnessService
@@ -16,6 +17,9 @@ var contracts: SupplierContracts
 var deliveries: DeliveryService
 var supply_transactions: SupplyTransactions
 var district: DistrictOffice
+var account_dialogue: FinancialDialogue
+var advance: SessionAdvance
+var _failure_signature: String=""
 var config: SessionConfig
 var clock: GameClock
 var wallet: WalletService
@@ -257,6 +261,7 @@ func configure(source: SessionConfig) -> ActionResult:
  _encounter_ready.connect(_start_encounter)
  life.sleep_started.connect(personal.leave)
  life.sleep_started.connect(narrative.cancel_all)
+ advance=SessionAdvance.new();advance.configure(self)
  routine.slept.connect(_sleep_elapsed)
  life.travelled.connect(func(destination):
   if destination!=&"kiosk":
@@ -266,6 +271,7 @@ func configure(source: SessionConfig) -> ActionResult:
  contracts=SupplierContracts.new();contracts.configure(self)
  deliveries=DeliveryService.new();deliveries.configure(self)
  supply_transactions=SupplyTransactions.new();supply_transactions.configure(self)
+ account_dialogue=FinancialDialogue.new();account_dialogue.configure(self)
  effects.supply_provider=supplier_effect
  district=DistrictOffice.new();district.configure(self)
  travel.departed.connect(func():
@@ -303,6 +309,9 @@ func tick(delta: float) -> void:
  var tuned := tuning.apply_at_boundary()
  if not tuned.ok:last_result=tuned;return
  last_result = coordinator.step(delta)
+ var signature := "" if last_result.ok else JSON.stringify(last_result.details)
+ if signature!="" and signature!=_failure_signature:system_failed.emit(last_result)
+ _failure_signature=signature
  changed.emit()
 
 func _encounter_requested(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
@@ -365,21 +374,8 @@ func _legacy_talk(visit_id: StringName) -> ActionResult:
  return await narrative.start(encounter,PackedStringArray([str(visit_id)]))
 
 func _sleep_elapsed(frame: Dictionary) -> void:
- alertness.recover_sleep(float(frame.get("sleep_hours",0)))
- fatigue.recover_sleep()
- # Sleep skips travel/social scenes, while unattended stations and due jobs
- # consume the same elapsed clock frame. Recovery has already been applied.
- cooking.tick(float(frame.delta))
- workflow.tick(frame)
- hygiene.elapse(float(frame.world_delta))
- shops.elapse(float(frame.world_delta))
- hygiene.record_use(StringName("sleep:"+str(clock.tick)),routine.bed_id,&"sleep")
- accounts.tick(frame)
- finance.tick(frame)
- var delivery_frame := frame.duplicate(true);delivery_frame["sleeping"]=true
- deliveries.tick(delivery_frame)
- scheduler.tick(frame)
- social_life.tick(frame)
+ last_result=advance.catch_up(frame)
+ if not last_result.ok:system_failed.emit(last_result)
  changed.emit()
 
 func _actor_snapshots() -> Array[Dictionary]:
@@ -452,76 +448,9 @@ func _apply_tuning() -> void:
  clock.set_speed(tuning.value("clock_speed"))
  needs.apply_tuning(tuning)
 
-func financial_context(chapter: String) -> Dictionary:
- if chapter.is_empty():return {}
- if not accounts.state.chapters.has(chapter):
-  accounts.tick({})
-  var snapshot_data := {"extension_targets":accounts.housing_targets(),"id":chapter,"pay_quote":"","partial_quote":"","loan_id":str(commitments.active_loan().get("id",""))}
-  for offer_id in ["settle","partial"]:
-   var amount := 0
-   if offer_id=="partial":
-    var remaining := 0
-    for bill in accounts.outstanding("abdul_karim"):remaining+=accounts.remaining(bill.id)
-    amount=mini(remaining,int(config.section("accounts").partial_minor))
-   var quote := accounts.quote("housing_lease",offer_id,clock.world_minutes,amount)
-   if quote.ok:
-    var id := str(quote.details.quote.id)
-    accounts.state.quotes[id]["chapter"]=chapter
-    snapshot_data["pay_quote" if offer_id=="settle" else "partial_quote"]=id
-  accounts.state.chapters[chapter]=snapshot_data
- var saved: Dictionary=accounts.state.chapters[chapter]
- var due: Dictionary=accounts.state.quotes.get(saved.pay_quote,{})
- var partial: Dictionary=accounts.state.quotes.get(saved.partial_quote,{})
- var loan: Dictionary=commitments.state.loans.get(saved.loan_id,{})
- var loan_remaining := int(loan.get("principal",0))-int(loan.get("paid",0))
- var pending := pending_financial_offer(chapter)
- var now := clock.world_minutes
- var latest := now
- for target in saved.extension_targets:
-  var p := accounts.resolve_period(str(target))
-  if not p.is_empty():latest=maxf(latest,float(p.end))
- var context_data := {"has_housing_due":not due.is_empty(),"can_negotiate":not saved.extension_targets.is_empty(),"housing_due_label":"%.2f" % (float(due.get("net",0))/100.0),"partial_label":"%.2f" % (float(partial.get("net",0))/100.0),"can_pay_housing":not due.is_empty() and wallet.balance>=int(due.net),"can_partial_housing":not partial.is_empty() and wallet.balance>=int(partial.net),"extend_1":commitments.eligible(1),"extend_3":commitments.eligible(3),"extend_7":commitments.eligible(7),"extension_1_date":AccountText.date(latest+1440),"extension_3_date":AccountText.date(latest+4320),"extension_7_date":AccountText.date(latest+10080),"agreed_date":AccountText.date(float(pending.get("deadline",now))),"has_loan":loan_remaining>0,"loan_remaining_label":"%.2f" % (float(loan_remaining)/100.0),"can_repay_loan":loan_remaining>0 and wallet.balance>=loan_remaining,"can_loan":commitments.eligible(),"about_today":commitments.state.moments.has("about:%d" % clock.day),"can_focus":actions.preview(&"personal_focus").ok,"known_abdul_family":knowledge.has(&"KNOWN_ABDUL_FAMILY"),"can_repair":false,"loan_duration_label":"%.1f يوم" % (float(config.section("accounts").loan.duration_minutes)/1440.0)}
- for promise in commitments.state.promises.values():
-  if promise.status=="broken" and not promise.repaired:context_data.can_repair=true
- for loan_record in commitments.state.loans.values():
-  if loan_record.get("status")=="broken" and not loan_record.get("repaired",false):context_data.can_repair=true
- var amounts: Array=config.section("accounts").loan.amounts
- for index in range(3):
-  var amount := int(amounts[index]) if index<amounts.size() else 0
-  context_data["loan_%d" % index]=amount>0 and amount<=int(commitments.state.budget_minor)
-  context_data["loan_%d_label" % index]="%.2f" % (float(amount)/100.0)
- return context_data
-func pending_financial_offer(chapter: String) -> Dictionary:
- var found: Dictionary={}
- for offer in commitments.state.offers.values():
-  if offer.get("chapter","")==chapter and not offer.get("declined",false) and (found.is_empty() or float(offer.at)>=float(found.at)):found=offer
- return found.duplicate(true)
-func financial_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:
- if participants.size()!=1:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"creditor_not_present")
- var actor: Variant=presence.record(participants[0])
- if actor==null or actor.character_id!=&"abdul_karim" or not presence.near_actor(&"abdul_karim"):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"creditor_not_present")
- var chapter := source.get_slice("/",0)
- var saved: Dictionary=accounts.state.chapters.get(chapter,{})
- if saved.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"stale_financial_offer")
- if action in ["pay_housing","pay_partial"]:return finance.pay(str(saved["pay_quote" if action=="pay_housing" else "partial_quote"]),"ink:"+source)
- if action=="repay_loan":return finance.pay_loan(str(saved.loan_id),"ink:"+source)
- if action=="personal":return finance.personal_moment(source)
- if action=="repair":return finance.personal_moment(source,true)
- if action=="accept_offer":
-  var offer := pending_financial_offer(chapter)
-  return finance.accept_offer(str(offer.get("id","")),"ink:"+source)
- if action=="decline_offer":
-  var offer := pending_financial_offer(chapter)
-  if not offer.is_empty():commitments.state.offers[offer.id]["declined"]=true
-  return ActionResult.success()
- var offered := ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_financial_action")
- if action.begins_with("offer_day_"):offered=commitments.offer("extension",int(action.trim_prefix("offer_day_")),saved.extension_targets)
- elif action.begins_with("offer_loan_"):
-  var index := int(action.trim_prefix("offer_loan_"))
-  var amounts: Array=config.section("accounts").loan.amounts
-  if index>=0 and index<amounts.size():offered=commitments.offer("loan",int(amounts[index]))
- if offered.ok:commitments.state.offers[offered.details.offer.id]["chapter"]=chapter
- return offered
+func financial_context(chapter: String) -> Dictionary:return account_dialogue.context(chapter,"abdul_karim")
+func pending_financial_offer(chapter: String) -> Dictionary:return account_dialogue.pending_financial_offer(chapter)
+func financial_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:return account_dialogue.financial_effect(action,source,participants)
 func notebook_people() -> Array[Dictionary]:
  var people := social_life.people()
  if not journal.entries({"actor":"abdul_karim"}).is_empty():people.append({"name":presence.profile(&"abdul_karim").name,"score":relationships.value(&"player",&"abdul_karim",&"familiarity"),"stage":"صاحب السكن — معرفة وعلاقة مستقلة عن الحساب","connection":""})
@@ -547,20 +476,5 @@ func validate_financial_chapters() -> ActionResult:
   if not offer.get("chapter") is String or not accounts.state.chapters.has(offer.chapter):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_financial_offer_source")
  return ActionResult.success()
 
-func supplier_context(chapter: String) -> Dictionary:
- if not contracts.state.emergency_quotes.has(chapter):
-  var data := config.section("suppliers")
-  var e: Dictionary=data.emergency
-  contracts.state.emergency_quotes[chapter]={"name":str(presence.profile(&"fathi").name),"goods_minor":int(e.price_minor),"fee_minor":0,"total_minor":int(e.price_minor),"emergency_cap":int(e.cap_minor),"due_minutes":float(data.invoice_due_minutes),"food_id":str(e.food_id),"recipe_id":str(e.recipe_id),"mode":"credit","lines":[]}
- var quote: Dictionary=contracts.state.emergency_quotes[chapter]
- var available := inventory.held_id().is_empty() and SupplierLedger.remaining(accounts.state.supplier,true)+int(quote.total_minor)<=int(quote.emergency_cap)
- var reason := "لسه في ساندوتش على حسابك؛ نخلص حسابه الأول، وبعدها أقدر أوصلك واحد تاني."
- if not inventory.held_id().is_empty():reason="حط اللي في إيدك في مكان مناسب الأول عشان تستلم الساندوتش."
- var stock: Dictionary=deliveries.state.stock_days.get(str(floori(clock.world_minutes/1440.0)),{}).get("emergency",{})
- if not stock.is_empty() and int(stock.used)>=int(stock.capacity):available=false;reason="الساندوتشات الجاهزة خلصت عندي النهارده. أقدر أرتب لك من المتاح بكرة."
- return {"emergency_label":"%.2f" % (float(quote.total_minor)/100.0),"emergency_available":available,"emergency_reason":reason}
-func supplier_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:
- if not contact.available() or participants.size()!=1 or str(contact.current.id)!=participants[0]:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"supplier_contact_required")
- if action=="manage":contact.panel_requested=true;return ActionResult.success()
- if action=="emergency":return supply_transactions.emergency(source)
- return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"invalid_supplier_action")
+func supplier_context(chapter: String) -> Dictionary:return account_dialogue.context(chapter,"fathi")
+func supplier_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:return account_dialogue.supplier_effect(action,source,participants)

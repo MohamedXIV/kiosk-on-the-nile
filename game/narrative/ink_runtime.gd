@@ -8,6 +8,7 @@ var _player: Node
 var _definition: StoryDefinition
 var _frame := NarrativeTypes.Frame.new()
 var _error: String = ""
+var _context: Dictionary={}
 func open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
  close()
  _definition = definition
@@ -33,6 +34,7 @@ func open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
  set_context(context)
  return ActionResult.success()
 func set_context(context: Dictionary) -> void:
+ _context=context.duplicate(true)
  if _player == null: return
  for key in context:
   if _player.get_variable(str(key)) != null:
@@ -53,7 +55,7 @@ func advance() -> NarrativeTypes.Frame:
     return _frame
   for tag in _player.current_tags:
    var parts: PackedStringArray = str(tag).split(":", true, 1)
-   if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join"]:
+   if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join", "loc"]:
     _frame.result = ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"unknown_story_metadata")
     _frame.effects.clear()
     _frame.ended = true
@@ -61,6 +63,9 @@ func advance() -> NarrativeTypes.Frame:
    var key := parts[0].strip_edges()
    var value := parts[1].strip_edges()
    match key:
+    "loc":
+     _frame.loc_id=value
+     _frame.loc_args=_context.get("localization_args",{}).duplicate(true)
     "speaker": _frame.speaker_id = StringName(value)
     "duration":
      if not value.is_valid_float() or not is_finite(value.to_float()) or value.to_float() <= 0:
@@ -86,7 +91,12 @@ func advance() -> NarrativeTypes.Frame:
       _frame.effects.clear()
       return _frame
  for choice in _player.current_choices:
-  _frame.choices.append({"id":str(choice.index),"index":choice.index,"text":choice.text.strip_edges()})
+  var record := {"id":str(choice.index),"index":choice.index,"text":choice.text.strip_edges()}
+  if choice.tags is Array:
+   for tag in choice.tags:
+    if str(tag).begins_with("loc:"):record["loc_id"]=str(tag).trim_prefix("loc:").strip_edges()
+  _frame.choices.append(record)
+ if not _frame.choices.is_empty():_frame.loc_args=_context.get("localization_args",{}).duplicate(true)
  _frame.ended = not _player.can_continue and _frame.choices.is_empty()
  return _frame
 func frame() -> NarrativeTypes.Frame:
@@ -109,6 +119,7 @@ func restore(data: Dictionary) -> ActionResult:
  for flow in state.flows.values():
   if not flow is Dictionary or not flow.get("callstack") is Dictionary or not flow.get("outputStream") is Array or not flow.get("currentChoices") is Array: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_flow")
  var displayed: Dictionary = data.frame
+ if displayed.has("loc_id") and (not displayed.loc_id is String or not displayed.get("loc_args") is Dictionary):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_localized_frame")
  if not displayed.get("text") is String or not displayed.get("speaker_id") is String or not ContentValidation.number(displayed.get("duration")) or displayed.duration<=0 or not displayed.get("choices") is Array or not displayed.get("effects") is Array or not displayed.get("ended") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_frame")
  for choice in displayed.choices:
   if not choice is Dictionary or not choice.get("id") is String or not choice.get("text") is String or not ContentValidation.integer(choice.get("index")): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_choice")

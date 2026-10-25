@@ -32,6 +32,7 @@ func sleep(hours: int) -> ActionResult:
  _session.kiosk_open = false
  var spawn: Array = _session.config.section("locations").rooftop.spawn
  _session.player_ground = Vector2(spawn[0],spawn[1])
+ if not _session.advance.last_result.ok:return _session.advance.last_result
  return result
 func travel(destination: StringName) -> ActionResult:
  var result := _session.travel.depart(&"to_kiosk" if destination==&"kiosk" else &"to_rooftop")

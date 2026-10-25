@@ -77,6 +77,9 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
   conversation.context_extra["experience_context"]=_session.customer_experience.context(StringName(participants[0]))
  conversation.runtime = InkRuntime.new()
  add_child(conversation.runtime)
+ if not participants.is_empty():
+  var actor: Variant=_session.presence.record(participants[0])
+  if actor!=null:_session.account_dialogue.prepare(str(conversation.id),str(actor.character_id))
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation))
  _opening.erase(key)
  if wants_manual:_manual_opening=false
@@ -187,7 +190,8 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   var result := conversation.runtime.choose(int(choice.index))
   if not result.ok: return result
   if _can_hear(conversation) and not automatic:
-   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":_session.tuning.display_name("player",str(_session.config.section("ui").get("player_name","أنا"))),"text":str(conversation.current.choices[int(choice.index)].text),"channel":"choice","at":_session.clock.world_minutes}
+   _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":_session.tuning.display_name("player",str(_session.config.section("ui").get("player_name","أنا"))),"text":LocalizedNarrative.choice(conversation.current.choices[int(choice.index)],conversation.current),"channel":"choice","at":_session.clock.world_minutes}
+   _pending_choices[str(conversation.id)].merge(LocalizedNarrative.metadata(str(conversation.current.choices[int(choice.index)].get("loc_id","")),conversation.current.loc_args,str(conversation.current.choices[int(choice.index)].text)))
   if conversation.encounter_id==&"social_invitation":
    conversation.optional=false
    conversation.context_extra["invitation_answered"]=true
@@ -393,7 +397,9 @@ func advance_manual(id: StringName) -> ActionResult:
 func _journal_line(conversation: ConversationSession) -> void:
  var actor := str(conversation.current.speaker_id)
  if actor.is_empty():return
- _session.journal.append_once({"id":"%s/%d/speech" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":actor,"name":str(_session.presence.profile(StringName(actor)).get("name",actor)),"text":conversation.current.text,"channel":"speech","at":_session.clock.world_minutes})
+ var event := {"id":"%s/%d/speech" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":actor,"name":LocalizedNarrative.speaker(actor,str(_session.presence.profile(StringName(actor)).get("name",actor))),"text":LocalizedNarrative.line(conversation.current),"channel":"speech","at":_session.clock.world_minutes}
+ event.merge(LocalizedNarrative.metadata(conversation.current.loc_id,conversation.current.loc_args,conversation.current.text))
+ _session.journal.append_once(event)
 func available_for(conversation: ConversationSession) -> bool:
  return _encounter_available(_definitions[str(conversation.encounter_id)],conversation.participants)
 func manual_topics_for(visit_id: StringName) -> Array[Dictionary]:

@@ -106,7 +106,9 @@
     "invalid_supplier_amount": "راجع مبلغ الرصيد المقدم.",
     "stale_supplier_quote": "العرض انتهى أو اتغير؛ راجع عرضًا جديدًا.",
     "supplier_contract_exists": "عندك اتفاق دوري شغال؛ عدّله أو أوقفه الأول.",
-    "invalid_supplier_schedule": "اختار أيامًا وميعادًا صالحين للتوريد."
+    "invalid_supplier_schedule": "اختار أيامًا وميعادًا صالحين للتوريد.",
+    "sleep_system_failed": "صحيت، لكن بعض أحداث العالم لم تكتمل. راجع فحص الأنظمة؛ لم نرجع الوقت للخلف.",
+    "system_blocked": "تعذر تحديث أحد الأنظمة؛ التفاصيل في فحص الأنظمة."
   },
   "theme": {
     "font_size": 19,

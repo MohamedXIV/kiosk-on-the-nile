@@ -63,7 +63,7 @@ func recover_sleep(hours: float) -> void:
 func snapshot() -> Dictionary:
  return {"doses":_doses.duplicate(true),"exemption_used":_exemption_used,"last_world":_last_world,"cycle_start":_cycle_start}
 func restore(data: Dictionary) -> ActionResult:
- if not data.get("doses") is Dictionary or not ContentValidation.bounded(data.get("exemption_used"),0,_data.maximum_exemption_minutes) or not ContentValidation.bounded(data.get("last_world"),0,_session.clock.world_minutes+0.001) or absf(float(data.last_world)-_session.clock.world_minutes)>0.001 or not ContentValidation.bounded(data.get("cycle_start"),0,data.last_world):return _fail()
+ if not data.get("doses") is Dictionary or not ContentValidation.bounded(data.get("exemption_used"),0,_data.maximum_exemption_minutes) or not ContentValidation.bounded(data.get("last_world"),0,_session.clock.world_minutes+0.001) or not ContentValidation.bounded(data.get("cycle_start"),0,data.last_world):return _fail()
  for id in data.doses:
   if not data.doses[id] is Dictionary or not ContentValidation.number(data.doses[id].get("at")):return _fail()
  var ordered: Array=data.doses.values()
@@ -89,6 +89,9 @@ func restore(data: Dictionary) -> ActionResult:
  _doses=verified.duplicate(true)
  _exemption_used=float(data.exemption_used)
  _last_world=float(data.last_world)
+ # Validate the saved analytical state first, then catch up a clock gap left by
+ # older dependency-blocked sessions. No doses or consumption receipts are invented.
+ _account_to(_session.clock.world_minutes)
  return ActionResult.success()
 func _fail() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_alertness")

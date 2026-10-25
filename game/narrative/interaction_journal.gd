@@ -41,6 +41,8 @@ func restore(data: Dictionary) -> ActionResult:
  _ids=candidate._ids
  return ActionResult.success()
 func _valid(e: Dictionary) -> bool:
+ if e.has("text_ref") and (not e.text_ref is String or not e.get("parameters") is Dictionary or not e.get("canonical_text") is String or not e.get("locale") in ["ar_EG","en"]):return false
+ if e.has("occurred_at") and not ContentValidation.bounded(e.occurred_at,0,float(e.get("at",-1))+0.001):return false
  return e.get("id") is String and not e.id.is_empty() and e.get("chapter") is String and e.get("actor") in _actors and e.get("name") is String and e.get("text") is String and not e.text.is_empty() and e.get("channel") in ["speech","choice","thought","system"] and ContentValidation.bounded(e.get("at"),0,_clock.world_minutes+0.001)
 func _fail() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_interaction_journal")

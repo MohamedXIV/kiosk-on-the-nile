@@ -2,6 +2,7 @@ class_name SupplierContracts
 extends RefCounted
 var _session: GameSession
 var state: Dictionary={}
+var revision: int=0
 static func initial_state() -> Dictionary:return {"emergency_quotes":{},"quotes":{},"versions":{},"requests":{},"active":"","next_quote":1,"next_contract":1}
 func configure(session: GameSession) -> void:_session=session;state=initial_state()
 func quote(terms: Dictionary) -> ActionResult:
@@ -78,7 +79,7 @@ func _sign(quote_id: String, request_id: String, existing: String) -> ActionResu
  candidate.requests[request_id]={"source":quote_id,"version_id":id,"at":now,"kind":"sign"}
  var valid := validate_state(candidate)
  if not valid.ok:return valid
- state=candidate
+ state=candidate;revision+=1
  _session.journal.append_once({"id":"supply:agreement:"+request_id,"chapter":"supply","actor":"system","name":"دفتر التوريد","text":"وافقت على اتفاق توريد مع %s؛ أول موعد %s. السلة %.2f + توصيل %.2f ج.م." % [q.name,AccountText.date(float(signed.first_at)),float(q.goods_minor)/100,float(q.fee_minor)/100],"channel":"system","at":now})
  return ActionResult.success({"version":signed.duplicate(true)})
 func pause(contract_id: String, request_id: String) -> ActionResult:
@@ -87,6 +88,7 @@ func pause(contract_id: String, request_id: String) -> ActionResult:
  var result := _session.deliveries.tick({})
  if not result.ok:return result
  var id := str(state.active)
+ revision+=1
  state.versions[id].closed_at=_session.clock.world_minutes;state.active=""
  state.requests[request_id]={"source":contract_id,"version_id":id,"at":_session.clock.world_minutes,"kind":"pause"}
  _session.journal.append_once({"id":"supply:agreement:"+request_id,"chapter":"supply","actor":"system","name":"دفتر التوريد","text":"أوقفت الاتفاق للمواعيد التالية؛ الرصيد المقدم والإيصالات محفوظة.","channel":"system","at":_session.clock.world_minutes})
@@ -101,7 +103,7 @@ static func next_time(terms: Dictionary, after: float) -> float:
 func snapshot() -> Dictionary:return state.duplicate(true)
 func restore(data: Dictionary) -> ActionResult:
  var result := validate_state(data)
- if result.ok:state=data.duplicate(true)
+ if result.ok:state=data.duplicate(true);revision+=1
  return result
 func validate_state(data: Dictionary) -> ActionResult:
  for key in ["quotes","versions","requests","emergency_quotes"]:

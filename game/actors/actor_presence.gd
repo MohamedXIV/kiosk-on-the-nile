@@ -2,17 +2,18 @@ class_name ActorPresence
 extends RefCounted
 ## Adapter over distinct visit owners; household actors never enter kiosk rules.
 var _session: GameSession
+var _profiles: Dictionary={}
 func configure(session: GameSession) -> void:
  _session=session
+ _profiles=session.config.section("visitors").characters
+ _profiles.merge(session.config.section("residential_visits").profiles)
+ _profiles.merge(session.config.section("suppliers").profiles)
 func actor_ids() -> Array:
- return profiles().keys()
+ return _profiles.keys()
 func profiles() -> Dictionary:
- var result: Dictionary=_session.config.section("visitors").characters
- result.merge(_session.config.section("residential_visits").profiles)
- result.merge(_session.config.section("suppliers").profiles)
- return result
+ return _profiles.duplicate(true)
 func profile(id: StringName) -> Dictionary:
- var data: Dictionary=profiles().get(str(id),{}).duplicate(true)
+ var data: Dictionary=_profiles.get(str(id),{}).duplicate(true)
  if not data.is_empty() and _session.tuning!=null:data.name=_session.tuning.display_name(str(id),str(data.name))
  return data
 func record(id: Variant) -> Variant:

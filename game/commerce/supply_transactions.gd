@@ -101,6 +101,7 @@ func _complete(id: String, terms: Dictionary, items: ItemChangeSet, delivery: Di
  var at := evaluated if emergency_food or terms.mode=="cash" else float(occurrence.scheduled_at)
  var detail := {"occurrence":id,"goods_minor":int(terms.goods_minor),"fee_minor":int(terms.fee_minor),"total_minor":total,"mode":str(terms.mode),"name":str(terms.name),"lines":terms.get("lines",[]).duplicate(true),"grants":grants,"emergency":emergency_food}
  var receipt := SupplierLedger.receipt(book.supplier,"delivery:"+id,"delivery",at,_session.wallet.balance,cash_delta,pre_delta,detail)
+ receipt.recorded_at=evaluated
  if terms.mode=="credit":book.supplier.invoices[id]={"id":id,"name":str(terms.name),"at":at,"due_at":at+float(terms.due_minutes),"total":total,"paid":0,"emergency":emergency_food}
  receipt["journal_text"]="وصلت %s؛ بضاعة %.2f + توصيل %.2f = %.2f ج.م، %s. الإيصال محفوظ." % ["لقمة على الحساب" if emergency_food else "دفعة المورد",float(terms.goods_minor)/100.0,float(terms.fee_minor)/100.0,float(total)/100.0,"على الحساب" if terms.mode=="credit" else "مدفوعة"]
  occurrence.merge({"status":"delivered","reason":"","evaluated_at":evaluated,"receipt":receipt.id,"grants":grants,"stock_units":stock_units.duplicate(true),"cash_waiting":false},true)
@@ -138,7 +139,7 @@ func _publish(book: Dictionary, items: ItemChangeSet, delivery: Dictionary, rece
  _session.accounts.state=book;_session.deliveries.state=delivery;_session.wallet.balance=int(receipt.wallet_after);_session.journal.restore(journal.snapshot())
  _session.items.changed.emit(_session.items.revision);_session.finance.changed.emit()
  return ActionResult.success({"receipt":receipt.duplicate(true)})
-func _event(receipt: Dictionary) -> Dictionary:return {"id":"supply:receipt:"+str(receipt.id),"chapter":"supply","actor":"system","name":"دفتر التوريد","text":receipt.journal_text,"channel":"system","at":receipt.at}
+func _event(receipt: Dictionary) -> Dictionary:return {"id":"supply:receipt:"+str(receipt.id),"chapter":"supply","actor":"system","name":"دفتر التوريد","text":receipt.journal_text,"channel":"system","at":receipt.recorded_at,"occurred_at":receipt.at}
 func _repeat(ledger: Dictionary, request: String, kind: String, amount: int) -> ActionResult:
  var receipt: Dictionary=ledger.receipts[ledger.requests[request]]
  return ActionResult.success({"duplicate":true}) if receipt.kind==kind and receipt.detail.get("amount")==amount else _fail("stale_supplier_quote")

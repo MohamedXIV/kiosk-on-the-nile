@@ -8,7 +8,7 @@ static func remaining(data: Dictionary, emergency_only: bool = false) -> int:
  return total
 static func receipt(data: Dictionary, request: String, kind: String, at: float, wallet: int, delta: int, prepaid_delta: int, detail: Dictionary) -> Dictionary:
  var id := "supply_receipt_%d" % int(data.next_receipt);data.next_receipt=int(data.next_receipt)+1
- var r := {"id":id,"request":request,"kind":kind,"at":at,"wallet_before":wallet,"wallet_after":wallet+delta,"wallet_delta":delta,"prepaid_delta":prepaid_delta,"detail":detail.duplicate(true)}
+ var r := {"id":id,"request":request,"kind":kind,"at":at,"recorded_at":at,"wallet_before":wallet,"wallet_after":wallet+delta,"wallet_delta":delta,"prepaid_delta":prepaid_delta,"detail":detail.duplicate(true)}
  data.prepaid=int(data.prepaid)+prepaid_delta;data.receipts[id]=r;data.requests[request]=id
  return r
 static func validate(data: Variant, now: float) -> ActionResult:
@@ -19,6 +19,7 @@ static func validate(data: Variant, now: float) -> ActionResult:
  for id in data.receipts:
   var r: Variant=data.receipts[id]
   if not r is Dictionary or r.get("id")!=id or not str(id).begins_with("supply_receipt_") or not str(id).trim_prefix("supply_receipt_").is_valid_int() or int(str(id).trim_prefix("supply_receipt_"))>=data.next_receipt or not r.get("request") is String or data.requests.get(r.request)!=id or not r.get("kind") in ["deposit","settlement","delivery"] or not ContentValidation.bounded(r.get("at"),0,now+0.001) or not r.get("detail") is Dictionary or not r.get("journal_text") is String:return _fail()
+  if not ContentValidation.bounded(r.get("recorded_at"),float(r.at),now+0.001):return _fail()
   for key in ["wallet_before","wallet_after","wallet_delta","prepaid_delta"]:
    if not ContentValidation.integer(r.get(key)):return _fail()
   if r.wallet_before<0 or r.wallet_after<0 or r.wallet_after-r.wallet_before!=r.wallet_delta:return _fail()

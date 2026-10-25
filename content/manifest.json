@@ -55,6 +55,9 @@
     "story_landlord": "stories/landlord.ink.json",
     "archive_service_availability_94e60e8397f7": "archive/service_availability-94e60e8397f7.ink.json",
     "suppliers": "suppliers.json",
-    "story_supplier": "stories/supplier.ink.json"
+    "story_supplier": "stories/supplier.ink.json",
+    "archive_supplier_0f13440395e4": "archive/supplier-0f13440395e4.ink.json",
+    "locale_ar": "locales/ar_EG.json",
+    "locale_en": "locales/en.json"
   }
 }

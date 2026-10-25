@@ -47,15 +47,16 @@ func configure(text: UiText) -> void:
  menu_scroll.add_child(actions)
  for entry in [{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
-  actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();callback.call()))
- actions.add_child(UiText.button(text.text("supplier_phone"),func():_menu.hide();supplier_requested.emit()))
- actions.add_child(UiText.button(text.text("consume"),func():_menu.hide();consume_requested.emit()))
+  actions.add_child(text.key_button(entry.key,func():_menu.hide();callback.call()))
+ actions.add_child(text.key_button("supplier_phone",func():_menu.hide();supplier_requested.emit()))
+ actions.add_child(text.key_button("consume",func():_menu.hide();consume_requested.emit()))
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
   actions.add_child(UiText.button(text.text(entry.key),func():_menu.hide();travel_requested.emit(route_id)))
  actions.add_child(UiText.button(text.text("fatigue_accessibility"),func():
   if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
   _menu.hide()))
+ actions.add_child(LocaleService.current.picker())
  var tuning_button := UiText.button(text.text("tuning"),func():_menu.hide();tuning_requested.emit())
  tuning_button.name="TuningButton"
  actions.add_child(tuning_button)
@@ -155,3 +156,7 @@ func _open_menu() -> void:
 
 func top_occupied_height() -> float:
  return _strip.position.y+_strip.size.y+float(_text.data.hud.margin)
+
+func suppress_prompts() -> void:
+ _prompt_panel.hide()
+ _thought.hide()

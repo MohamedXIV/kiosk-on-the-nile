@@ -6,7 +6,7 @@
   "system_dependencies": {
     "clock": [],
     "needs": [
-      "residential"
+      "clock"
     ],
     "scheduler": [
       "narrative"
@@ -45,7 +45,7 @@
       "shops"
     ],
     "residential": [
-      "deliveries"
+      "accounts"
     ],
     "deliveries": [
       "accounts"

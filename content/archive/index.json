@@ -16,5 +16,8 @@
   },
   "service_availability": {
     "94e60e8397f77998cdd9dc9bd5683903ad8055ec3a5155ee71e127d784ca6a08": "archive_service_availability_94e60e8397f7"
+  },
+  "supplier": {
+    "0f13440395e46c140a97878239803ea0d74d1ffacf79562b91db3d946a929a99": "archive_supplier_0f13440395e4"
   }
 }

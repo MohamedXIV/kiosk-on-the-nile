@@ -39,6 +39,20 @@ func pay_loan(loan_id: String, request_id: String) -> ActionResult:
  var result := _publish(_session.accounts.snapshot(),prepared.details.state,int(receipt.wallet_after),_session.relationships.snapshot(),[_event(receipt)])
  return ActionResult.success({"receipt":receipt,"cue":"coin"}) if result.ok else result
 func tick(_frame: Dictionary) -> ActionResult:
+ var due := false
+ for bill in _session.accounts.state.obligations.values():
+  if not bill.get("announced",false):due=true;break
+ if not due:
+  for promise in _session.commitments.state.promises.values():
+   if promise.status!="pending":continue
+   if _session.clock.world_minutes>=float(promise.deadline):due=true;break
+   var outstanding := 0
+   for target in promise.targets:outstanding+=_session.accounts.remaining(target)
+   if outstanding==0:due=true;break
+ if not due:
+  for loan in _session.commitments.state.loans.values():
+   if loan.status=="pending" and (loan.paid==loan.principal or _session.clock.world_minutes>=float(loan.due_at)):due=true;break
+ if not due:return ActionResult.success()
  var book := _session.accounts.snapshot()
  var commitments := _session.commitments.snapshot()
  var relations := _session.relationships.snapshot()

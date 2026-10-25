@@ -3,6 +3,7 @@ extends Node2D
 var _content := ContentStore.new()
 var _save := SaveCoordinator.new()
 var _config: SessionConfig
+var _locale := LocaleService.new()
 var _text: UiText
 var _session: GameSession
 var _tuning_panel: TuningPanel
@@ -10,6 +11,7 @@ var _fatigue_overlay: FatigueOverlay
 var _fatigue_layer: CanvasLayer
 var _visitor_panel: VisitorPanel
 var _recipe_panel: RecipePanel
+var _modals := ModalCoordinator.new()
 var _supplier_panel: SupplierPanel
 var _district_panel: DistrictPanel
 var _shop_panel: ShopPanel
@@ -60,7 +62,10 @@ func _ready() -> void:
   add_child(error)
   return
  _config = SessionConfig.new(_content.bundle(),_content.fingerprint,_content.source_root)
+ var localized := _locale.configure(_content.bundle())
+ if not localized.ok:push_error("Invalid locale catalogs");return
  _text = UiText.new(_content.section("ui"))
+ _locale.changed.connect(func():UiText.refresh_tree(self))
  Engine.physics_ticks_per_second = roundi(1.0/float(_config.section("time").fixed_step))
  _configure_input()
  _sound = Soundscape.new()
@@ -81,6 +86,7 @@ func _ready() -> void:
  _title = TitleScreen.new()
  _ui_layer.add_child(_title)
  _title.configure(_text,_save.store.has_save())
+ UiText.refresh_tree(_title)
  _title.new_requested.connect(begin_new_game)
  _title.continue_requested.connect(continue_game)
  if OS.is_debug_build():
@@ -146,10 +152,10 @@ func _install(candidate: GameSession) -> void:
  _camera = _physical.camera
  _visitors = _physical.visitors
  _physical.input_provider = func():
-  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible) or (_supplier_panel!=null and _supplier_panel.visible)
+  var locked := _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or _modals.blocking()
   return Vector2.ZERO if locked else Input.get_vector("move_left","move_right","move_up","move_down")
  _session.social_life.participation_blocked=func():
-  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or (_inventory_panel!=null and _inventory_panel.visible) or (_recipe_panel!=null and _recipe_panel.visible) or (_visitor_panel!=null and _visitor_panel.visible) or (_tuning_panel!=null and _tuning_panel.visible) or (_supplier_panel!=null and _supplier_panel.visible) or not _session.travel.snapshot().journey.is_empty()
+  return _transition.active or _hud==null or _hud.notebook.visible or _hud.sleep_panel.visible or _session.build.active or _modals.blocking() or not _session.travel.snapshot().journey.is_empty()
  _session.motion_step = _step_motion
  var room: LocationView = _rooms.get(str(_session.location_id))
  _router = InteractionRouter.new(_session,room,_text)
@@ -157,7 +163,9 @@ func _install(candidate: GameSession) -> void:
  _hud = Hud.new()
  _ui_layer.add_child(_hud)
  _hud.configure(_text)
+ UiText.refresh_tree(_hud)
  _hud.bind(_session)
+ _session.system_failed.connect(func(result):_hud.toast.show_message(_text.outcome(result)))
  _tuning_panel=TuningPanel.new()
  _hud.add_child(_tuning_panel)
  _tuning_panel.configure(_session)
@@ -193,6 +201,10 @@ func _install(candidate: GameSession) -> void:
  _district_panel=DistrictPanel.new()
  _hud.add_child(_district_panel)
  _district_panel.configure(_text,_session)
+ _modals=ModalCoordinator.new()
+ for entry in [["inventory",_inventory_panel],["recipes",_recipe_panel],["visitor",_visitor_panel],["tuning",_tuning_panel],["notebook",_hud.notebook],["sleep",_hud.sleep_panel]]:_modals.register(str(entry[0]),entry[1])
+ _modals.register("supplier",_supplier_panel,func():_session.contact.panel_requested=false;_supplier_panel.hide())
+
  _session.travel.changed.connect(_travel_changed)
  _hud.travel_requested.connect(func(route_id):
   if _session.build.active or _hud.sleep_panel.visible:return
@@ -238,16 +250,25 @@ func _physics_process(delta: float) -> void:
  _shop_panel.present()
  _supplier_panel.present()
  _district_panel.present()
- if _hud.notebook.visible:_district_panel.hide()
+ if _modals.blocking():
+  _district_panel.hide()
+  _shop_panel.hide()
+  _journey_panel.hide()
  if _district_panel.visible:_journey_panel.hide()
  if _shop_panel.visible:_journey_panel.hide()
  _captions.visible=_session.locations.is_physical(_session.location_id)
+ if _modals.blocking():
+  _hud.dialogue.hide()
+  _hud.suppress_prompts()
  if _captions.visible:_captions.present(_session,_rooms[str(_session.location_id)],_camera)
  _save.transition_active = _transition.active
  _save.boundary(_session)
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return
+ if _modals.blocking() and event.is_action_pressed("cancel"):
+  _modals.close_active()
+  return
  if _supplier_panel!=null and _supplier_panel.visible:
   if event.is_action_pressed("cancel"):_session.contact.panel_requested=false;_supplier_panel.hide()
   return

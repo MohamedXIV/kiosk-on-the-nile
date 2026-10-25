@@ -23,23 +23,23 @@ func configure(text: UiText) -> void:
  _maximum_height_ratio=float(text.data.hud.dialogue_max_height_ratio)
 func present(conversation: ConversationSession, choices: Array[Dictionary]) -> void:
  if conversation==null or choices.is_empty():hide();_signature="";return
- var signature := str(conversation.id)+":"+str(conversation.beat)+JSON.stringify(choices)
+ var signature := str(LocaleService.current.revision if LocaleService.current else 0)+str(conversation.id)+":"+str(conversation.beat)+JSON.stringify(choices)
  if _begin(signature):
-  _line(conversation.current.text)
+  _line(LocalizedNarrative.line(conversation.current))
   _choices(conversation,choices)
  _fit()
 func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
  var conversation: ConversationSession=view.get("conversation")
- var signature := JSON.stringify([view.get("actor_id"),str(conversation.id) if conversation else "",conversation.beat if conversation else 0,view.topics,view.opening])
+ var signature := str(LocaleService.current.revision if LocaleService.current else 0)+JSON.stringify([view.get("actor_id"),str(conversation.id) if conversation else "",conversation.beat if conversation else 0,view.topics,view.opening])
  if _begin(signature):
-  _line(str(view.name))
+  _line(LocalizedNarrative.speaker(str(view.actor_id),str(view.name)))
   if conversation:
    for event in view.get("recent",[]):
     var preceding := UiText.label(str(event.name)+": "+str(event.text))
     preceding.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
     preceding.modulate.a=0.65
     _box.add_child(preceding)
-   _line(conversation.current.text)
+   _line(LocalizedNarrative.line(conversation.current))
    var choices := director.choices(conversation)
    if choices.is_empty():_button(_text.text("dialogue_continue"),func():advance_requested.emit())
    else:_choices(conversation,choices)
@@ -64,7 +64,7 @@ func _button(value: String, action: Callable) -> void:
  _box.add_child(button)
 func _choices(conversation: ConversationSession, choices: Array[Dictionary]) -> void:
  for choice in choices:
-  _button(str(choice.text),func():choice_selected.emit(conversation.id,StringName(choice.id)))
+  _button(LocalizedNarrative.choice(choice,conversation.current),func():choice_selected.emit(conversation.id,StringName(choice.id)))
 func _fit() -> void:
  var style := get_theme_stylebox("panel")
  var desired := _box.get_combined_minimum_size().y+style.get_minimum_size().y

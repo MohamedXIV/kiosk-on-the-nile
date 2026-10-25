@@ -92,6 +92,17 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   candidate.state["deliveries"]=DeliveryService.initial_state()
   candidate.state["contact"]={"current":{},"host_id":"","next_id":1,"panel_requested":false}
   candidate.schema_revision=11
+ if candidate.schema_revision==11 and target_revision>=12:
+  for receipt in candidate.state.accounts.supplier.receipts.values():
+   var found := false
+   for event in candidate.state.journal.events:
+    if event.id=="supply:receipt:"+str(receipt.id):
+     receipt["recorded_at"]=float(event.at)
+     event["occurred_at"]=float(receipt.at)
+     found=true
+     break
+   if not found:return _fail("missing_supply_observation")
+  candidate.schema_revision=12
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})
