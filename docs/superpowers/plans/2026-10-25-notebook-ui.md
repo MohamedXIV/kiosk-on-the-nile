@@ -24,19 +24,23 @@
 ### Task1: Pure localized notebook views
 
 Files: new `game/ui/notebook_view.gd`; locales ar_EG/en, ui notebook_layout; LocaleService source-matched resolver; InteractionJournal derived revision.
-- [ ] Add validated layout/page-size/reference bindings to content; paired semantic catalogs for notes, names, stages, empty states, history and financial wrappers.
-- [ ] Project learned notes/source links/known people and financial summary/receipts without mutating owners. Preserve AccountText.date used in canonical Ink; never localize it globally.
-- [ ] Build import/export; inspect errors, fix and commit with Task2 if shared UI interfaces require it.
+- [x] Add validated layout/page-size/reference bindings to content; paired semantic catalogs for notes, names, stages, empty states, history and financial wrappers.
+- [x] Project learned notes/source links/known people and financial summary/receipts without mutating owners. Preserve AccountText.date used in canonical Ink; never localize it globally.
+- [x] Build import/export; inspect errors, fix and commit with Task2 if shared UI interfaces require it.
 
 ### Task2: Focused notebook components
 
 Files: new NotebookHistory/NotebookAccounts, rewrite Notebook, Hud/Main binding.
-- [ ] History participant/day/channel/search/order filters and bounded pages; stable metadata and original heard text. Source links select real chapter.
-- [ ] Native four-tab sheet, fact/people cards and summary/receipt selector. Explicit empty states, focusable local controls and locale-aware directions.
-- [ ] Bind once per session; refresh visible notebook, retain filters/tab, copy journal only when changed. Remove old frequent AccountText ledger rendering.
-- [ ] Build and actual UI: Arabic/English, empty/new session and real saved dialogue/effect history, filter/search/reset, source navigation if available, reopen, changing world time, summary/receipts,960×540/1280×720. Record unsupported cases.
+- [x] History participant/day/channel/search/order filters and bounded pages; stable metadata and original heard text. Source links select real chapter.
+- [x] Native four-tab sheet, fact/people cards and summary/receipt selector. Explicit empty states, focusable local controls and locale-aware directions.
+- [x] Bind once per session; refresh visible notebook, retain filters/tab, copy journal only when changed. Remove old frequent AccountText ledger rendering.
+- [x] Build and actual UI: Arabic/English, empty/new session and real saved dialogue/effect history, filter/search/reset, source navigation if available, reopen, changing world time, summary/receipts,960×540/1280×720. Record unsupported cases.
 
 ### Task3: Review and delivery
 
-- [ ] One fresh review, one material fix pass; no re-review. Exact Debug/Release export and actual Release boot/Continue.
-- [ ] Commit product; package full stock external content/offline catalogs/licenses/run guide, publish authorized preview source/artifact/prerelease, download verify SHA/source. Record evidence/limits. No main merge.
+- [x] One fresh review, one material fix pass; no re-review. Exact Debug/Release export and actual Release boot/Continue.
+- [x] Commit product; package full stock external content/offline catalogs/licenses/run guide, publish authorized preview source/artifact/prerelease, download verify SHA/source. Record evidence/limits. No main merge.
+
+## Execution result
+
+Implemented inline with one fresh review and one material fix pass. Exact product source420cfe0; [delivery notes](../../notes/2026-10-25-notebook-ui.md) record actual UI/build coverage and the unexercised cases. No automated tests, main merge or full-game English claim. Completion checks represent the recorded coverage, not an exhaustive UI/state matrix.

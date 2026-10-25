@@ -37,6 +37,11 @@ New Game starts on the rooftop at 15:30. Use WASD/arrows to move, **E** to inter
 notebook. Conversation choices use the mouse and leave the world running.
 The title screen has New/Continue. The compact HUD menu contains Save, inventory, arrangement, cleaning, notebook and shopping journeys.
 
+The notebook has notes, familiar people, searchable heard conversations and weekly
+accounts with a separate receipt view. Filters and tabs stay selected while reopening
+in the same session. Arabic/English notebook UI is bundled offline; heard dialogue
+and signed receipt wording stay as recorded. See [localization coverage and authoring](docs/LOCALIZATION.md).
+
 ## Change gameplay without rebuilding the engine project
 
 `content/manifest.json` identifies a complete external JSON bundle. It contains
@@ -93,7 +98,7 @@ rather than a blanket rejection of compatible numeric changes.
 | `game/actors` | Visitor lifecycle/memory and native physical movement adapters |
 | `game/narrative` | Real Ink sessions, facts, directional relationships and finite conditions |
 | `game/persistence` | Versioned snapshots, candidate restoration and file replacement |
-| `game/world`, `game/presentation`, `game/ui` | Native rooms, reusable visuals, sound and Arabic controls |
+| `game/world`, `game/presentation`, `game/ui` | Native rooms, reusable visuals, sound and localized controls |
 
 The declared default simulation order is:
 
