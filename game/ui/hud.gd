@@ -53,14 +53,14 @@ func configure(text: UiText) -> void:
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
   actions.add_child(text.key_button(entry.key,func():_menu.hide();travel_requested.emit(route_id)))
- actions.add_child(UiText.button(text.text("fatigue_accessibility"),func():
+ actions.add_child(text.key_button("fatigue_accessibility",func():
   if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
   _menu.hide()))
  actions.add_child(LocaleService.current.picker())
  var tuning_button := UiText.button(text.text("tuning"),func():_menu.hide();tuning_requested.emit())
  tuning_button.name="TuningButton"
  actions.add_child(tuning_button)
- var help := UiText.label(text.text("help"))
+ var help := text.key_label("help",{"move_keys":" / ".join([text.data.input.move_up[0],text.data.input.move_left[0],text.data.input.move_down[0],text.data.input.move_right[0]]),"primary_key":text.data.input.interact_primary[0],"secondary_key":text.data.input.interact_secondary[0],"notebook_key":text.data.input.notebook[0]})
  help.custom_minimum_size.x = 280
  help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  help.add_theme_font_size_override("font_size",15)

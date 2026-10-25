@@ -30,10 +30,11 @@ func nearest() -> InteractionTarget:
    var target := InteractionTarget.new(visit.id,visit.pose.ground,float(_session.config.section("visitors").interaction_radius))
    target.visit_id = visit.id
    var character := _session.presence.profile(visit.character_id)
+   var display_name := NotebookView.name(str(visit.character_id),str(character.name))
    var item := _session.cooking.held_item()
    var order := _session.service.pending_for(visit.id)
    if not (item and order and order.food_id==item.food_id) and order==null and not _session.narrative.can_talk(visit.id) and not _session.personal.can_open(visit.id): continue
-   target.primary = _text.text("serve",{"item":_session.cooking.item_label(item),"name":character.name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":character.name})
+   target.primary = _text.text("serve",{"item":ItemText.instance(_session,_session.items.get_item(StringName(item.id))),"name":display_name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":display_name})
    targets.append(target)
  for point in _session.contact.points():
   if point.location_id!=str(_session.location_id):continue

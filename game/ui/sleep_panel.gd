@@ -15,21 +15,23 @@ func configure(text: UiText) -> void:
  anchor_bottom = 0.78
  var box := VBoxContainer.new()
  box.add_theme_constant_override("separation",14)
- add_child(box)
- box.add_child(UiText.label(text.text("sleep_title")))
+ var scroll := SheetControls.scroll(box)
+ add_child(scroll)
+ box.add_child(text.key_label("sleep_title"))
  _hours = SpinBox.new()
  _hours.rounded = true
  _hours.update_on_text_changed = true
  _hours.suffix = text.text("sleep_hours_suffix")
+ LocaleService.current.changed.connect(func():_hours.suffix=_text.text("sleep_hours_suffix"))
  box.add_child(_hours)
  _preview = UiText.label()
  _preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
- _preview.custom_minimum_size = Vector2(350,120)
+ _preview.custom_minimum_size = Vector2(280,120)
  _preview.size_flags_vertical = Control.SIZE_EXPAND_FILL
  box.add_child(_preview)
- _confirm = UiText.button(text.text("sleep_confirm"),func():confirmed.emit(int(_hours.value)))
+ _confirm = SheetControls.key_button(text,"sleep_confirm",func():confirmed.emit(int(_hours.value)))
  box.add_child(_confirm)
- box.add_child(UiText.button(text.text("sleep_cancel"),hide))
+ box.add_child(SheetControls.key_button(text,"sleep_cancel",hide))
  hide()
 func present(routine: DailyRoutine) -> void:
  _routine = routine
