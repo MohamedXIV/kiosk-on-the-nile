@@ -4,7 +4,9 @@ var _grid := AStarGrid2D.new()
 var _definition: LocationDefinition
 var _cell: float
 var _clearance: float
+var revision: int=0
 func configure(definition: LocationDefinition, _mapping: SpatialMapping) -> void:
+ revision+=1
  _definition = definition
  _cell = float(definition.data.get("navigation_cell",0.25))
  _clearance = float(definition.data.get("navigation_clearance",0.2))
@@ -39,3 +41,10 @@ func _nearest_cell(point: Vector2) -> Vector2i:
      if value < distance: distance=value;best=id
   if distance < INF: return best
  return Vector2i(-999999,-999999)
+
+func reachable(start: Vector2, goal: Vector2, radius: float = 0.12) -> bool:
+ if blocked(goal):return false
+ var cell := Vector2i(roundi(goal.x/_cell),roundi(goal.y/_cell))
+ if not _grid.region.has_point(cell):return false
+ var route := path(start,goal)
+ return not route.is_empty() and route[route.size()-1].distance_to(goal)<=radius

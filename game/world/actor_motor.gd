@@ -31,21 +31,22 @@ func step_input(direction: Vector2, delta: float) -> void:
  var normalized := direction.limit_length(1.0)
  velocity = _mapping.to_canvas(normalized*_speed)
  var motion := velocity * delta
+ var before := position
  if not motion.is_zero_approx():
   var collision := move_and_collide(motion)
   if collision:
    var remaining := collision.get_remainder().slide(collision.get_normal())
    if not remaining.is_zero_approx(): move_and_collide(remaining)
   pose.facing = normalized
-  pose.walk_phase += delta*10.0
+  pose.walk_phase = pose.walk_phase+delta*10.0 if position.distance_squared_to(before)>0.000001 else 0.0
  else:
   pose.walk_phase = 0
  commit_pose()
-func step_path(path: PackedVector2Array, delta: float) -> void:
+func step_path(path: PackedVector2Array, delta: float, waypoint_radius: float=0.08) -> void:
  if path != _path:
   _path = path
   _path_index = 0
- while _path_index < _path.size() and pose.ground.distance_to(_path[_path_index]) < 0.08:
+ while _path_index < _path.size() and pose.ground.distance_to(_path[_path_index]) < waypoint_radius:
   _path_index += 1
  if _path_index >= _path.size():
   step_input(Vector2.ZERO,delta)
@@ -57,3 +58,10 @@ func commit_pose() -> void:
  if _mapping == null: return
  pose.ground = _mapping.to_ground(position)
  pose_changed.emit(pose)
+func reset_path() -> void:
+ _path=PackedVector2Array()
+ _path_index=0
+func path_cursor() -> int:
+ return _path_index
+func waypoint_distance() -> float:
+ return pose.ground.distance_to(_path[_path_index]) if _path_index<_path.size() else 0.0

@@ -311,5 +311,24 @@
     1.5
   ],
   "personal_space": 0.65,
-  "time_domain": "world_minutes"
+  "time_domain": "world_minutes",
+  "leisure": {
+    "enabled": true,
+    "interval_minutes": [
+      30,
+      65
+    ],
+    "chance": 0.3,
+    "max_moves": 1,
+    "max_distance": 5.5,
+    "markers": [
+      "railing_1",
+      "railing_2",
+      "bench_west",
+      "bench_east",
+      "stroll_west",
+      "stroll_east",
+      "river_middle"
+    ]
+  }
 }

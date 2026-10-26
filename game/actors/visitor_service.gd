@@ -3,6 +3,8 @@ extends RefCounted
 signal encounter_requested(kind: StringName, visit_ids: PackedStringArray, context: Dictionary)
 signal departed(visit_id: StringName)
 var visits: Dictionary = {}
+var leisure := QuietLeisure.new()
+var route_reachable: Callable
 var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
 var service_presence: Callable
@@ -26,6 +28,7 @@ var _flags: Dictionary = {}
 func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: ServiceSystem, open: Callable) -> void:
  if foods!=null:history.food_ids=foods.ids()
  _data = data.duplicate(true)
+ leisure.configure(data.get("leisure",{}))
  _markers = markers.duplicate(true)
  _clock = clock
  _orders = orders
@@ -65,6 +68,8 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     visit.elapsed += elapsed
     _consider_purchase(visit,elapsed)
     _remarks(visit,delta)
+    if visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
+     leisure.step(visit,elapsed,_markers,str(_data.characters[str(visit.character_id)].leisure_marker),_position_available,route_reachable)
    if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
@@ -73,6 +78,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     visit.shopping_state=&"declined"
     departed.emit(visit.id)
   elif visit.phase == &"leaving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): visits.erase(id)
+ leisure.prune(visits.keys())
  _cooldown=maxf(0,_cooldown-elapsed)
  if _cooldown<=0:
   _cooldown=_delay("arrival_delay")
@@ -145,7 +151,7 @@ func _consider_purchase(visit: VisitState, delta: float) -> void:
  var marker: Array=_markers[definition.marker]
  visit.destination=Vector2(marker[0],marker[1])
 func _return_to_leisure(visit: VisitState) -> void:
- var marker: Array=_markers[character(visit.character_id).leisure_marker]
+ var marker: Array=_markers[leisure.marker(visit.id,str(character(visit.character_id).leisure_marker))]
  visit.destination=Vector2(marker[0],marker[1])
  # Keep staying phase: movement follows destination independently.
 func is_available(visit_id: StringName) -> bool:
@@ -167,13 +173,14 @@ func clear_visits() -> void:
   _orders.cancel_visit(visit.id)
   departed.emit(visit.id)
  visits.clear()
+ leisure.clear()
 func begin_day() -> void:
  _flags.clear()
  # Do not reset the independent arrival clock at midnight.
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in visits: records[id] = visits[id].snapshot()
- return {"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
+ return {"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("visit_counts") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_counts")
  for id in data.visit_counts:
@@ -217,6 +224,11 @@ func restore(data: Dictionary) -> ActionResult:
   candidate[id] = visit
  for flag in data.flags:
   if not flag in ["amgad","football","football_started"] or not data.flags[flag] is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_daily_flags")
+ var leisure_candidate := QuietLeisure.new()
+ leisure_candidate.configure(_data.get("leisure",{}))
+ var leisure_result := leisure_candidate.restore(data.get("leisure",{}),candidate,_markers)
+ if not leisure_result.ok:return leisure_result
+ leisure=leisure_candidate
  history = restored_history
  _other_visit_counts = data.visit_counts.duplicate()
  visits = candidate
@@ -258,7 +270,7 @@ func update_markers(markers: Dictionary) -> void:
  for visit in visits.values():
   if visit.phase==&"leaving": continue
   var definition := character(visit.character_id)
-  var key := str(definition.marker) if visit.shopping_state in [&"approaching",&"requesting",&"pending",&"served"] else str(definition.leisure_marker)
+  var key := str(definition.marker) if visit.shopping_state in [&"approaching",&"requesting",&"pending",&"served"] else leisure.marker(visit.id,str(definition.leisure_marker))
   var marker: Array = _markers[key]
   var target := Vector2(marker[0],marker[1])
   if visit.destination.distance_to(target)>0.01:
@@ -297,3 +309,18 @@ func reset_request(id: StringName) -> void:
  visit.shopping_state=&"undecided"
  visit.decision_remaining=_delay("purchase_retry_delay")
  _return_to_leisure(visit)
+
+func navigation_alternative(id: StringName) -> bool:
+ var visit: VisitState=visits.get(str(id))
+ if visit==null or not route_reachable.is_valid() or _orders.pending_for(id)!=null:return false
+ if visit.phase!=&"leaving" and not (visit.phase==&"arriving" or visit.shopping_state in [&"undecided",&"declined",&"approaching"]):return false
+ var names: Array=_data.exit_markers if visit.phase==&"leaving" else leisure.candidates(str(_data.characters[str(visit.character_id)].leisure_marker))
+ for key in names:
+  var point := Vector2(_markers[key][0],_markers[key][1])
+  if point.distance_to(visit.destination)<=float(_data.arrival_radius) or not _position_available(point,id) or not route_reachable.call(visit.pose.ground,point):continue
+  visit.destination=point
+  if visit.phase!=&"leaving":
+   leisure.remember(visit.id,str(key))
+   if visit.shopping_state==&"approaching":visit.shopping_state=&"declined";visit.food_id=&""
+  return true
+ return false

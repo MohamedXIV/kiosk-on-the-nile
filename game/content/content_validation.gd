@@ -138,7 +138,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if bundle.has("recipes"):
   var recipe_result := validate_recipes(bundle.recipes)
   if not recipe_result.ok: return recipe_result
- return FeatureContentValidation.validate(bundle)
+ var features := FeatureContentValidation.validate(bundle)
+ if not features.ok:return features
+ return CharacterMotionValidation.validate(bundle)
 static func vector(value: Variant, count: int) -> bool:
  if not value is Array or value.size()!=count: return false
  for component in value:

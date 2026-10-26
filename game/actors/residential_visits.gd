@@ -64,3 +64,13 @@ func _greet(record: ResidentialRecord) -> void:
  var result := await _session.personal.open_for(record.id)
  if result.ok and _session.personal.holds_visit(record.id) and _session.personal.view().get("conversation")==null:result=await _session.personal.select_topic("landlord")
  if not result.ok and current==record:record.greeted=false
+
+func navigation_alternative(navigation: KioskNavigation) -> bool:
+ if current==null:return false
+ var key := "exit_alternatives" if current.phase==&"leaving" else "standing_alternatives"
+ for point in _data.get(key,[]):
+  var target := Vector2(point[0],point[1])
+  if target.distance_to(current.destination)<=0.15 or not navigation.reachable(current.pose.ground,target,0.12):continue
+  current.destination=target
+  return true
+ return false

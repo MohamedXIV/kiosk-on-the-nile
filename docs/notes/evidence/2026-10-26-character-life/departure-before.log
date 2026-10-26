@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REV12_CONTINUE true 
+REV12 preserved_wallet=true preserved_clock=true preserved_rng=true leisure={  }
+LEISURE destination=(3.5, -2.85) policy_state={ "visit_1": { "remaining": 1.0, "moves": 1, "checks": 1, "marker": "railing_2" } } purchase_rng_unchanged=true
+REV13_CONTINUE true  
+REV13 schedule_equal=true destination_equal=true
+PENDING_ORDER leisure_allowed=false state_unchanged=true
+DEPARTURE visit_count=0 schedule_count=1 restorable=false
+WARNING: 94 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 21 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

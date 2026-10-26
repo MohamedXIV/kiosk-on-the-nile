@@ -19,7 +19,42 @@
     "apron": "#dfd5c6",
     "skin": "#d9a17c",
     "hair": "#2b241f",
-    "player_color": "#3d7a8a"
+    "player_color": "#3d7a8a",
+    "idle": {
+      "enabled": true,
+      "breath_period_seconds": [
+        2.8,
+        4.2
+      ],
+      "breath_pixels": 0.85,
+      "blink_interval_seconds": [
+        3.0,
+        8.0
+      ],
+      "blink_duration_seconds": [
+        0.12,
+        0.18
+      ],
+      "look_interval_seconds": [
+        5.0,
+        12.0
+      ],
+      "look_hold_seconds": [
+        1.0,
+        2.5
+      ],
+      "look_pixels": 1.5,
+      "look_smoothing": 5.0
+    }
   },
-  "hearing_radius": 3.4
+  "hearing_radius": 3.4,
+  "navigation": {
+    "enabled": true,
+    "arrival_radius": 0.12,
+    "progress_distance": 0.04,
+    "stall_seconds": 2.0,
+    "replan_cooldown_seconds": 0.75,
+    "max_replans": 2,
+    "max_fallbacks": 2
+  }
 }
