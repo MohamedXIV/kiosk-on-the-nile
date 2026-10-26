@@ -22,9 +22,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if visitors.has("seating"):
   var policy: Variant=visitors.seating
   if not policy is Dictionary or not policy.get("enabled") is bool or not CharacterMotionValidation._interval(policy.get("delay_seconds"),0.5,60):return ContentValidation.fail("visitors.seating")
-  if not ContentValidation.bounded(policy.get("retry_seconds"),1,120) or not ContentValidation.bounded(policy.get("search_radius"),1,20) or not ContentValidation.bounded(policy.get("arrival_radius"),0.12,0.15):return ContentValidation.fail("visitors.seating.timing")
+  if not ContentValidation.bounded(policy.get("retry_seconds"),1,120) or not ContentValidation.bounded(policy.get("search_radius"),1,20) or not ContentValidation.bounded(policy.get("arrival_radius"),0.005,0.15):return ContentValidation.fail("visitors.seating.timing")
   var stopping_radius := float(bundle.get("spatial",{}).get("navigation",{}).get("arrival_radius",float(visitors.get("arrival_radius",0.15))*0.8))
-  if float(policy.arrival_radius)<stopping_radius:return ContentValidation.fail("visitors.seating.arrival_radius")
+  if float(policy.arrival_radius)<stopping_radius or float(policy.arrival_radius)>float(visitors.get("arrival_radius",0.15)):return ContentValidation.fail("visitors.seating.arrival_radius")
   for key in ["max_searches","max_candidates"]:
    if not ContentValidation.integer(policy.get(key)) or policy[key]<1 or policy[key]>8:return ContentValidation.fail("visitors.seating."+key)
  var style: Dictionary=bundle.get("spatial",{}).get("character",{})
