@@ -107,6 +107,11 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   if not candidate.state.get("visitors") is Dictionary:return _fail("leisure_visitors")
   if not candidate.state.visitors.has("leisure"):candidate.state.visitors["leisure"]={}
   candidate.schema_revision=13
+ if candidate.schema_revision==13 and target_revision>=14:
+  if not candidate.state.get("visitors") is Dictionary:return _fail("awareness_visitors")
+  candidate.state.visitors["awareness"]={}
+  candidate.state.visitors["meetings"]={"active":"","records":{}}
+  candidate.schema_revision=14
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

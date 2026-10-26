@@ -17,6 +17,19 @@ static func validate(bundle: Dictionary) -> ActionResult:
   for key in ["max_replans","max_fallbacks"]:
    if not ContentValidation.integer(nav.get(key)) or nav[key]<0 or nav[key]>5:return _fail("navigation."+key)
  var visitors: Dictionary=bundle.get("visitors",{})
+ if visitors.has("awareness"):
+  var data: Variant=visitors.awareness
+  if not data is Dictionary or not data.get("enabled") is bool:return _fail("visitors.awareness")
+  if not ContentValidation.bounded(data.get("sample_seconds"),0.2,5) or not ContentValidation.bounded(data.get("sight_radius"),1,20) or not ContentValidation.bounded(data.get("memory_seconds"),5,300):return _fail("visitors.awareness.policy")
+ if visitors.has("meetings"):
+  var data: Variant=visitors.meetings
+  if not data is Dictionary or not data.get("enabled") is bool or not data.get("actors") is Array or data.actors.size()>4:return _fail("visitors.meetings")
+  for actor in data.actors:
+   if not actor is String or not visitors.characters.has(actor) or not actor in bundle.get("social_life",{}).get("companionship",{}).get("actors",[]):return _fail("visitors.meetings.actor")
+  if not _interval(data.get("delay_seconds"),5,300) or not ContentValidation.bounded(data.get("chance"),0,1):return _fail("visitors.meetings.schedule")
+  if not ContentValidation.bounded(data.get("retarget_seconds"),0.5,10) or not ContentValidation.bounded(data.get("retarget_distance"),0.25,3) or not ContentValidation.bounded(data.get("max_seconds"),5,120) or not ContentValidation.bounded(data.get("lost_wait_seconds"),1,30):return _fail("visitors.meetings.timing")
+  if not ContentValidation.bounded(data.get("stop_distance"),0.7,2.5) or float(data.stop_distance)+0.15>=float(bundle.get("social_life",{}).get("companionship",{}).get("radius",1.8)):return _fail("visitors.meetings.distance")
+  if data.enabled and not visitors.get("awareness",{}).get("enabled",false):return _fail("visitors.meetings.awareness_required")
  if visitors.has("leisure"):
   var data: Variant=visitors.leisure
   if not data is Dictionary or not data.get("enabled") is bool or not _interval(data.get("interval_minutes"),1,1440):return _fail("visitors.leisure")

@@ -37,6 +37,12 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
  parent.add_child(visitors)
  session.visitors.update_markers(rooms.kiosk.definition.data.markers)
  visitors.configure(session.visitors,rooms.kiosk)
+ session.visitors.observed_actors=func():
+  var actors: Dictionary={}
+  if session.locations.is_physical(session.location_id):actors["player"]=session.player_pose
+  for visit: VisitState in session.visitors.visits.values():actors[str(visit.character_id)]=visit.pose
+  return actors
+ session.visitors.sight_clear=func(from: Vector2,to: Vector2):return rooms.kiosk.navigation.sight_clear(from,to)
  residential=ResidentialController.new()
  parent.add_child(residential)
  residential.session=session;residential.room=rooms.rooftop

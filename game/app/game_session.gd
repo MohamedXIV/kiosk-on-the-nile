@@ -208,6 +208,7 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.service_busy=func():return personal!=null and personal.active() or narrative!=null and narrative.focused_session()!=null
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
  visitors.purchase_blocked=func(id):return narrative!=null and narrative.speech_active(StringName(id))
+ visitors.meeting_available=func(id):return social_life!=null and social_life.can_invite(id)
  visitors.departed.connect(_close_experience)
  service.settled.connect(visitors.record_service)
  service.settled.connect(func(order_id,visit_id,_item,_payment):_sync_experience(visit_id,order_id))

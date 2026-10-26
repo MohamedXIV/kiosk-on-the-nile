@@ -42,8 +42,10 @@ func step(delta: float) -> void:
   var motor: ActorMotor = _motors[id]
   var follower: NpcNavigation=_followers[id]
   var paused := visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id)
-  follower.step(motor,visit.destination,delta,paused)
-  if follower.take_failure() and follower.claim_fallback() and _service.navigation_alternative(visit.id):RuntimePerformance.observe("npc_route_fallback",0)
+  follower.step(motor,_service.meetings.goal(visit),delta,paused)
+  if follower.take_failure():
+   if _service.meetings.active(visit.id):_service.meetings.finish(visit.id)
+   elif follower.claim_fallback() and _service.navigation_alternative(visit.id):RuntimePerformance.observe("npc_route_fallback",0)
   _service.commit_pose(visit.id,motor.pose)
   motor.get_node("Visual").present(motor.pose,Color(_service.character(visit.character_id).color),false)
 

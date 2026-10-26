@@ -220,6 +220,7 @@ func step_companionship(delta: float) -> void:
    _state.invitations[id]={"wait":lerpf(float(config.wait_seconds[0]),float(config.wait_seconds[1]),sample),"elapsed":0.0,"offered":false}
   var invitation: Dictionary=_state.invitations[id]
   var near := visit.phase==&"staying" and _session.location_id==visit.pose.location_id and _session.player_ground.distance_to(visit.pose.ground)<=float(config.radius)
+  if _session.visitors.awareness.enabled():near=near and _session.visitors.awareness.visible(visit.id,"player")
   if not near:invitation.elapsed=0.0;continue
   if invitation.offered or blocked or not _session.narrative.sessions.is_empty():continue
   var topics := topics_for(visit.id).filter(func(topic):return bool(_data.topics[topic.id].automatic))
@@ -228,6 +229,13 @@ func step_companionship(delta: float) -> void:
   if invitation.elapsed<float(invitation.wait):continue
   invitation.offered=true
   _session.narrative.start(&"social_invitation",PackedStringArray([id]),{"topic_id":topics[0].id,"invitation":true})
+func can_invite(visit_id: StringName) -> bool:
+ if _session.narrative==null or not _session.narrative.sessions.is_empty() or (_session.personal!=null and _session.personal.active()):return false
+ if participation_blocked.is_valid() and bool(participation_blocked.call()):return false
+ if bool(_state.invitations.get(str(visit_id),{}).get("offered",false)):return false
+ for topic in topics_for(visit_id):
+  if bool(_data.topics[topic.id].automatic):return true
+ return false
 func action_known(id: String) -> bool:
  return id!="trial_complete" and _data.actions.has(id)
 func topic_actor(id: String) -> String:

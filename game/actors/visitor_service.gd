@@ -4,6 +4,11 @@ signal encounter_requested(kind: StringName, visit_ids: PackedStringArray, conte
 signal departed(visit_id: StringName)
 var visits: Dictionary = {}
 var leisure := QuietLeisure.new()
+var awareness := SpatialAwareness.new()
+var meetings := VisitorMeetings.new()
+var observed_actors: Callable
+var sight_clear: Callable
+var meeting_available: Callable
 var route_reachable: Callable
 var history := VisitorHistory.new()
 var memory: Dictionary = {"amgad_visits":0,"last_served_quality":""}
@@ -29,6 +34,8 @@ func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: 
  if foods!=null:history.food_ids=foods.ids()
  _data = data.duplicate(true)
  leisure.configure(data.get("leisure",{}))
+ awareness.configure(data.get("awareness",{}))
+ meetings.configure(data.get("meetings",{}))
  _markers = markers.duplicate(true)
  _clock = clock
  _orders = orders
@@ -60,18 +67,22 @@ func spawn(character_id: StringName) -> VisitState:
  return visit
 func tick(delta: float, calendar_delta: float = -1) -> void:
  var elapsed := delta if calendar_delta<0 else calendar_delta
+ awareness.step(delta,visits,observed_actors.call() if observed_actors.is_valid() else {},sight_clear)
+ meetings.step(delta,visits,awareness,_can_meet,route_reachable,_position_available)
  for id in visits.keys():
   var visit: VisitState = visits[id]
   if (visit.phase==&"arriving" or visit.shopping_state==&"approaching") and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): _arrived(visit)
   elif visit.phase == &"staying":
    if not busy_in_conversation(visit.id):
     visit.elapsed += elapsed
-    _consider_purchase(visit,elapsed)
-    _remarks(visit,delta)
-    if visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
+    if not meetings.active(visit.id):
+     _consider_purchase(visit,elapsed)
+     _remarks(visit,delta)
+    if not meetings.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
      leisure.step(visit,elapsed,_markers,str(_data.characters[str(visit.character_id)].leisure_marker),_position_available,route_reachable)
    if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
+    meetings.finish(visit.id)
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
     visit.destination = Vector2(exit_position[0],exit_position[1])
     _orders.cancel_visit(visit.id)
@@ -79,6 +90,8 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     departed.emit(visit.id)
   elif visit.phase == &"leaving" and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): visits.erase(id)
  leisure.prune(visits.keys())
+ awareness.prune(visits)
+ meetings.prune(visits)
  _cooldown=maxf(0,_cooldown-elapsed)
  if _cooldown<=0:
   _cooldown=_delay("arrival_delay")
@@ -126,6 +139,8 @@ func _arrived(visit: VisitState) -> void:
    encounter_requested.emit(&"football",pair,{})
 func busy_in_conversation(visit_id: StringName) -> bool:
  return purchase_blocked.is_valid() and purchase_blocked.call(visit_id)
+func _can_meet(visit: VisitState) -> bool:
+ return visit.phase==&"staying" and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and not busy_in_conversation(visit.id) and meeting_available.is_valid() and bool(meeting_available.call(visit.id))
 func _position_available(point: Vector2, except_id: StringName = &"") -> bool:
  for other in visits.values():
   if other.id==except_id:continue
@@ -174,13 +189,15 @@ func clear_visits() -> void:
   departed.emit(visit.id)
  visits.clear()
  leisure.clear()
+ awareness.clear()
+ meetings.clear()
 func begin_day() -> void:
  _flags.clear()
  # Do not reset the independent arrival clock at midnight.
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in visits: records[id] = visits[id].snapshot()
- return {"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
+ return {"awareness":awareness.snapshot(),"meetings":meetings.snapshot(),"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("visit_counts") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_counts")
  for id in data.visit_counts:
@@ -228,6 +245,17 @@ func restore(data: Dictionary) -> ActionResult:
  leisure_candidate.configure(_data.get("leisure",{}))
  var leisure_result := leisure_candidate.restore(data.get("leisure",{}),candidate,_markers)
  if not leisure_result.ok:return leisure_result
+ var awareness_candidate := SpatialAwareness.new()
+ awareness_candidate.configure(_data.get("awareness",{}))
+ var awareness_result := awareness_candidate.restore(data.get("awareness",{}),candidate,_data.characters)
+ if not awareness_result.ok:return awareness_result
+ var meetings_candidate := VisitorMeetings.new()
+ meetings_candidate.configure(_data.get("meetings",{}))
+ var meetings_result := meetings_candidate.restore(data.get("meetings",{"active":"","records":{}}),candidate)
+ if not meetings_result.ok:return meetings_result
+ if not meetings_candidate.snapshot().active.is_empty() and awareness_candidate.recalled(StringName(meetings_candidate.snapshot().active),"player").is_empty():return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"meeting_without_observation")
+ awareness=awareness_candidate
+ meetings=meetings_candidate
  leisure=leisure_candidate
  history = restored_history
  _other_visit_counts = data.visit_counts.duplicate()
