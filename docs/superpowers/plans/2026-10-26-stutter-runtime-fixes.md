@@ -18,8 +18,8 @@
 - [x] Measure cold open versus Ink reset before adding reuse. Native same-process visitors284ms vs reset12.4ms median; orders149ms vs8.1ms; amgad102ms vs7.6ms. Treat as microbenchmark, not Web FPS.
 - [x] Move presentation out of fixed physics tick and prune distant interaction projections; measure the same scene before/after.
 - [x] Add session-owned idle player cache; integrate director/inner opens and close/error paths; measure repeated opens and observe reset, simultaneous borrowers, archive keys and save/restore behavior.
-- [ ] Build Release, exercise actual Web UI/profiling and fresh final code review, address material findings once.
-- [ ] Publish a complete diagnostic Web package on GitHub, pinned ZIP digest and honest measured limits.
+- [x] Build Release, exercise actual Web UI/profiling and fresh final code review, address material findings once.
+- [x] Publish a complete diagnostic Web package on GitHub, pinned ZIP digest and honest measured limits.
 
 ## Rulings
 

@@ -30,15 +30,30 @@ This isolates query cost; it is not a genuine gameplay save, same-machine Web/na
 
 ## State/lifecycle observations and review
 
--11 stories ×6 opens: canonical first-frame values/types and restoration of baseline runtime snapshots had zero observed differences/failures. A day variable was changed before return; reset plus new context gave the same first frame on reuse.
--Two simultaneous borrowers of one graph had distinct players; advancing one left the other serialized state unchanged.
--20 archived graphs requested under the same identity: zero wrong graph observations, idle count remained8 and all leases returned. Unhealthy player was discarded.
--These observations do not cover every branch, variable, random sequence, malformed save, financial action or future external Ink function. No automated gameplay suite was added/run.
--One fresh final reviewer checked lifecycle/hash isolation, render/input and teardown paths. Found one material supplier modulo-tick refresh regression caused by the cadence move; fixed with elapsed-tick tracking in one pass. No other material findings. No re-review.
--Native session benchmark shutdown emitted the same46 ObjectDB/21-resource warnings seen in prior boot observations; this work does not diagnose or claim to fix those warnings.
+- 11 stories ×6 opens: canonical first-frame values/types and restoration of baseline runtime snapshots had zero observed differences/failures. A day variable was changed before return; reset plus new context gave the same first frame on reuse.
+- Two simultaneous borrowers of one graph had distinct players; advancing one left the other serialized state unchanged.
+- 20 archived graphs requested under the same identity: zero wrong graph observations, idle count remained8 and all leases returned. Unhealthy player was discarded.
+- These observations do not cover every branch, variable, random sequence, malformed save, financial action or future external Ink function. No automated gameplay suite was added/run.
+- One fresh final reviewer checked lifecycle/hash isolation, render/input and teardown paths. Found one material supplier modulo-tick refresh regression caused by the cadence move; fixed with elapsed-tick tracking in one pass. No other material findings. No re-review.
+- Native session benchmark shutdown emitted the same46 ObjectDB/21-resource warnings seen in prior boot observations; this work does not diagnose or claim to fix those warnings.
 
 Raw observations: [evidence](evidence/2026-10-26-runtime-fixes/). Current product content, Ink source/compiled graphs, catalog keys and save schema/revision are unchanged.
 
 ## Remaining limits
 
 **First open of a graph, a concurrent cache miss and reopening an evicted graph still perform a cold load.** No hidden warm-up was added during play. Ink continuation itself can still take time; it was instrumented but not rewritten. The cache trades bounded idle graph memory for less repeated construction. Other unmeasured rendering/driver/save costs and historical journal projection work remain candidates. Player-machine confirmation should repeat `?profile=1` capture; new `ink_reset` span identifies reuse. No claim that all stutter is eliminated.
+
+
+## Actual Web interaction
+
+Chromium/SwiftShader at960×540, normal mouse/keyboard only, no state/save/pose injection. New game, movement through the room door/rooftop, offscreen travel to the kiosk and actual menu save were exercised. The server was switched to the exact final f5da764 Release export at the same origin, then actual reload/Continue restored the kiosk position and45.00 wallet; world time and motion continued. The two exports differ only by the supplier refresh fix and build filename; this is a new-save Continue observation, not a prior-binary/full-old-save qualification.
+
+Actual autonomous visitor speech exercised cold and reused Ink: visitors open210.0ms on first use,19.3ms on reuse; reset11.1ms. This is cloud Web evidence, **not the player's GPU or a cross-machine speedup comparison**. Individual continuations remained around22–23ms in that sample. First-use costs remain visible.
+
+In sample low-frame windows, physics527–554calls while HUD71–76calls matched process frames exactly. Confirms presentation no longer repeats for every catch-up physics step. Software renderer cadence itself stayed low; no FPS gain is claimed. Cold boot, ongoing world changes and concurrent build activity make this capture unsuitable as a controlled rendering baseline.
+
+[Web observations](evidence/2026-10-26-runtime-fixes/web-observations.json) · [Arrival](evidence/2026-10-26-runtime-fixes/web-arrived.png) · [Saved](evidence/2026-10-26-runtime-fixes/web-saved.png) · [Final Continue](evidence/2026-10-26-runtime-fixes/web-continued-final.png). No page/script errors were recorded. A favicon request404 is unrelated. Personal dialogue choices, supplier cash confirmations, controller/high-FPS interaction and every financial/save branch were not exercised through Web UI in this pass. Supplier fix has source/build review; no new automated suite was run.
+
+## Delivery
+
+Product/source `f5da7640ef44d9a803feba7c5d3ebdfcfbd3e40f`; later commits contain documentation only. [GitHub prerelease](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/performance-f5da764). [Pinned ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/6b80e0011c506f9f178b20758501b8b2e1fea78b/builds/kiosk-on-the-nile-runtime-fixes.zip),11900530bytes, SHA256 `9352bd38f5a6a03947939595cc53fd66eba62f1e194473560161f5d6af1c6f70`. Independently downloaded the pinned artifact and checked digest, ZIP integrity, source/schema metadata, single WASM/PCK and bundled catalogs. No merge to main.

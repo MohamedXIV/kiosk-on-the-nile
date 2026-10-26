@@ -12,7 +12,8 @@ reference; its visitor and service behavior does not override that vision.
 
 ## Current Web preview
 
-[Offline Arabic / English build](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/localization-0ea4572) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c70f3e585aec4f825b834c01989a4266eed0726d/builds/kiosk-on-the-nile-localization.zip).
+[Runtime performance preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/performance-f5da764) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/6b80e0011c506f9f178b20758501b8b2e1fea78b/builds/kiosk-on-the-nile-runtime-fixes.zip).
+Bounded idle Ink reuse, presentation once per rendered process callback, and nearby interaction queries reduce repeated CPU work. First-use/concurrent cache misses can still pause; no universal FPS guarantee. For a capture append `?profile=1` and copy `KIOSK_PERF` Console reports. Expected files: `kiosk-f5da7640ef44.*`. See [performance evidence and limits](docs/notes/2026-10-26-runtime-fixes.md).
 All11 current authored Ink stories and current UI have shipped translations. Historical heard/signed text, custom wording and already-open archived stories retain their original text. Extract the whole ZIP and serve over local HTTP; do not open file:// or mix exports. See [delivery coverage](docs/notes/2026-10-25-complete-localization.md) and [authoring](docs/LOCALIZATION.md).
 
 ## Open and run
@@ -20,7 +21,7 @@ All11 current authored Ink stories and current UI have shipped translations. His
 Pinned stack: **Godot Standard 4.7.2**, Compatibility renderer, GDScript,
 **inklecate 1.2.1**, and the vendored Godot 4 `inkgd` adapter. Cairo is bundled
 under the SIL Open Font License. Exact upstream revisions and artifact checksums
-are in `tools/dependencies.lock.json`; upstream plugin files are unmodified.
+are in `tools/dependencies.lock.json`; the vendored Ink JSON reader has a documented [local performance patch](addons/inkgd/LOCAL_PATCHES.md).
 
 From the repository root, on Linux x86_64:
 
