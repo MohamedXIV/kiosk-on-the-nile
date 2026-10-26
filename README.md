@@ -12,9 +12,9 @@ reference; its visitor and service behavior does not override that vision.
 
 ## Current Web preview
 
-[Runtime performance preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/performance-f5da764) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/6b80e0011c506f9f178b20758501b8b2e1fea78b/builds/kiosk-on-the-nile-runtime-fixes.zip).
-Bounded idle Ink reuse, presentation once per rendered process callback, and nearby interaction queries reduce repeated CPU work. First-use/concurrent cache misses can still pause; no universal FPS guarantee. For a capture append `?profile=1` and copy `KIOSK_PERF` Console reports. Expected files: `kiosk-f5da7640ef44.*`. See [performance evidence and limits](docs/notes/2026-10-26-runtime-fixes.md).
-All11 current authored Ink stories and current UI have shipped translations. Historical heard/signed text, custom wording and already-open archived stories retain their original text. Extract the whole ZIP and serve over local HTTP; do not open file:// or mix exports. See [delivery coverage](docs/notes/2026-10-25-complete-localization.md) and [authoring](docs/LOCALIZATION.md).
+[Character life preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/character-life-c1c7997) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/2d69935e3ee7a5086e072edc7d2ab96d43cfc36a/builds/kiosk-on-the-nile-character-life.zip).
+Blinking/breathing/idle gaze, bounded NPC route recovery and rare leisure changes are authored through JSON. Save4/revision12 migrates to revision13; preserve backups when returning to older builds. Existing Ink reuse/presentation performance fixes remain included; no universal FPS guarantee. For diagnostics append `?profile=1` and copy `KIOSK_PERF` Console reports. Expected files: `kiosk-c1c799770aa9.*`. See [coverage/configuration/limits](docs/notes/2026-10-26-character-life-navigation.md).
+All 11 current authored Ink stories and current UI have shipped translations. Historical heard/signed text, custom wording and already-open archived stories retain their original text. Extract the whole ZIP and serve over local HTTP; do not open file:// or mix exports. See [delivery coverage](docs/notes/2026-10-25-complete-localization.md) and [authoring](docs/LOCALIZATION.md).
 
 ## Open and run
 

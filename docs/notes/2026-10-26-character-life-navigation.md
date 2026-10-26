@@ -35,3 +35,14 @@ Native headless runtime observations, not an automated gameplay suite:
 ## Diagnostics
 
 Existing `?profile=1` reports now include `npc_path` durations and zero-duration event counters `character_blink`, `npc_route_exhausted`, `npc_route_fallback`. Event counters are counts, not CPU-duration/FPS measurements. Profiling remains off with the ordinary URL. No callable game-state bridge was added.
+
+
+## Actual Web observations and delivery
+
+Final product `c1c799770aa9434c50f3332e95194d7d20b35791`, Godot4.7.2 Release. Chromium/SwiftShader,960×540, persistent dedicated QA profile at the same local origin used by the previous runtime preview. Actual mouse/keyboard Continue restored the genuine previous revision12 save into the new content; player position/wallet remained present and world time resumed. Captured raw browser clips show both open and closed player eyes while standing. Cosmetic blink event counts appeared alongside normal simulation/path observations. Saved through the actual menu, allowed filesystem sync time, reloaded and Continue resumed the revision13 session as well. No game-state/pose injection or callable game command bridge was used.
+
+[Legacy Continue](evidence/2026-10-26-character-life/web-legacy-continue.png) · [Eyes closed](evidence/2026-10-26-character-life/web-blink-closed.png) · [Eyes open](evidence/2026-10-26-character-life/web-blink-open.png) · [Saved13](evidence/2026-10-26-character-life/web-saved13.png) · [Continued13](evidence/2026-10-26-character-life/web-continued13.png) · [Selected counter windows](evidence/2026-10-26-character-life/web-counter-windows.json).
+
+This is visual/state-path coverage, not a controlled GPU benchmark or an FPS improvement claim. The software renderer became slow during the long capture/screenshot burst; one full screenshot exceeded its30second capture timeout and a retry succeeded while simulation continued. No page/script errors or save fallback/rejection warnings were logged. Actual residential fallback, every pending-order/furniture arrangement, default-probability leisure relocation and controller/high-FPS behavior were not exhaustively exercised through browser UI; domain/follower fixtures and fresh code review provide the bounded evidence described above.
+
+[GitHub prerelease](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/character-life-c1c7997) · [Pinned complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/2d69935e3ee7a5086e072edc7d2ab96d43cfc36a/builds/kiosk-on-the-nile-character-life.zip). ZIP11915073bytes, SHA256 `7d7205bf32aa74afa3f5800678ce5ec270419306c43a20a3136d7eeda2474685`. Independently downloaded pinned artifact and checked SHA256, ZIP integrity, source/revision metadata, single WASM/PCK and both locale catalogs. Source preview branch may advance with documentation-only commits; product/export stays c1c7997. No main merge.

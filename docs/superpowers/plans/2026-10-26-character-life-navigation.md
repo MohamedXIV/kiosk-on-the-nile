@@ -16,8 +16,8 @@
 - [x] Implement and validate data-driven character idle presentation.
 - [x] Add cached NPC path following, recovery and domain fallback for visitors/residential actor; invalidate on arrangement changes.
 - [x] Add rare quiet leisure policy and revision12→13 migration preserving existing destinations and existing gameplay RNG.
-- [ ] Inspect runtime observations, import/build, actual Web movement/idle/save/Continue and bounded performance captures. No automated tests/suites without user request.
-- [ ] One fresh final code review and one material fix pass, then publish a complete pinned GitHub Web preview.
+- [x] Inspect runtime observations, import/build, actual Web movement/idle/save/Continue and bounded performance captures. No automated tests/suites without user request.
+- [x] One fresh final code review and one material fix pass, then publish a complete pinned GitHub Web preview.
 
 ## Review focus
 
