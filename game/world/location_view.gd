@@ -132,9 +132,10 @@ func _process(_delta: float) -> void:
  for slot in _surface_foods:
   var contents := session.items.items_in(StringName(slot))
   _surface_foods[slot].present_record(contents[0] if not contents.is_empty() else {})
-func interaction_targets() -> Array[InteractionTarget]:
+func interaction_targets(nearby_only: bool = false) -> Array[InteractionTarget]:
  var targets: Array[InteractionTarget] = []
  for data in definition.data.interactions:
+  if nearby_only and session.player_ground.distance_squared_to(Vector2(data.ground[0],data.ground[1]))>float(data.radius)*float(data.radius):continue
   if not _permitted(data.get("requires",{})): continue
   var target := InteractionTarget.new(StringName(data.id),Vector2(data.ground[0],data.ground[1]),float(data.radius))
   target.primary = WorldText.interaction(session,str(definition.id),data,"primary",_authored_text,_action_text)

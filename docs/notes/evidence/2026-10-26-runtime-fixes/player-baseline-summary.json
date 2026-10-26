@@ -1,0 +1,985 @@
+{
+  "source": "player-provided 1f090e8 capture",
+  "window_seconds_total": 140.515,
+  "windows": [
+    {
+      "window_seconds": 10.0141,
+      "spans": {
+        "frame_interval": {
+          "count": 580,
+          "max_us": 375600,
+          "over_100ms": 1,
+          "over_16ms": 571,
+          "over_250ms": 1,
+          "over_50ms": 1,
+          "total_us": 10001300
+        }
+      }
+    },
+    {
+      "window_seconds": 10.003,
+      "spans": {
+        "audio_projection": {
+          "count": 414,
+          "max_us": 400,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 41400
+        },
+        "captions_projection": {
+          "count": 414,
+          "max_us": 200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 10500
+        },
+        "frame_interval": {
+          "count": 529,
+          "max_us": 1179200,
+          "over_100ms": 1,
+          "over_16ms": 467,
+          "over_250ms": 1,
+          "over_50ms": 1,
+          "total_us": 10003000
+        },
+        "hud_projection": {
+          "count": 414,
+          "max_us": 2300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 427000
+        },
+        "interaction_projection": {
+          "count": 414,
+          "max_us": 2400,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 370900
+        },
+        "simulation_tick": {
+          "count": 414,
+          "max_us": 2000,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 425500
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0028,
+      "spans": {
+        "audio_projection": {
+          "count": 599,
+          "max_us": 400,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 68300
+        },
+        "captions_projection": {
+          "count": 599,
+          "max_us": 200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 17300
+        },
+        "frame_interval": {
+          "count": 599,
+          "max_us": 31900,
+          "over_100ms": 0,
+          "over_16ms": 473,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 10002800
+        },
+        "hud_projection": {
+          "count": 599,
+          "max_us": 3600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 661300
+        },
+        "interaction_projection": {
+          "count": 599,
+          "max_us": 2400,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 578700
+        },
+        "simulation_tick": {
+          "count": 599,
+          "max_us": 3100,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 716700
+        },
+        "visitor_node_spawn": {
+          "count": 1,
+          "max_us": 300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 300
+        },
+        "visitor_path": {
+          "count": 1,
+          "max_us": 900,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 900
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0085,
+      "spans": {
+        "audio_projection": {
+          "count": 558,
+          "max_us": 1400,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 122400
+        },
+        "captions_projection": {
+          "count": 558,
+          "max_us": 300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 23300
+        },
+        "frame_interval": {
+          "count": 452,
+          "max_us": 727700,
+          "over_100ms": 4,
+          "over_16ms": 297,
+          "over_250ms": 2,
+          "over_50ms": 10,
+          "total_us": 10008500
+        },
+        "hud_projection": {
+          "count": 558,
+          "max_us": 6200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1460800
+        },
+        "ink_advance": {
+          "count": 1,
+          "max_us": 65800,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 1,
+          "total_us": 65800
+        },
+        "ink_open_wall:visitors": {
+          "count": 1,
+          "max_us": 624700,
+          "over_100ms": 1,
+          "over_16ms": 1,
+          "over_250ms": 1,
+          "over_50ms": 1,
+          "total_us": 624700
+        },
+        "interaction_projection": {
+          "count": 558,
+          "max_us": 21600,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1219600
+        },
+        "simulation_tick": {
+          "count": 558,
+          "max_us": 164700,
+          "over_100ms": 1,
+          "over_16ms": 3,
+          "over_250ms": 0,
+          "over_50ms": 2,
+          "total_us": 1540900
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0071,
+      "spans": {
+        "audio_projection": {
+          "count": 601,
+          "max_us": 500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 105000
+        },
+        "captions_projection": {
+          "count": 601,
+          "max_us": 200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 12600
+        },
+        "frame_interval": {
+          "count": 574,
+          "max_us": 49400,
+          "over_100ms": 0,
+          "over_16ms": 470,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 10007100
+        },
+        "hud_projection": {
+          "count": 601,
+          "max_us": 4800,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1387500
+        },
+        "interaction_projection": {
+          "count": 601,
+          "max_us": 3600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 606600
+        },
+        "simulation_tick": {
+          "count": 601,
+          "max_us": 10200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1263300
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0064,
+      "spans": {
+        "audio_projection": {
+          "count": 599,
+          "max_us": 500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 98300
+        },
+        "captions_projection": {
+          "count": 599,
+          "max_us": 200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 12000
+        },
+        "frame_interval": {
+          "count": 477,
+          "max_us": 152900,
+          "over_100ms": 1,
+          "over_16ms": 390,
+          "over_250ms": 0,
+          "over_50ms": 7,
+          "total_us": 10006400
+        },
+        "hud_projection": {
+          "count": 599,
+          "max_us": 5800,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1377200
+        },
+        "interaction_projection": {
+          "count": 599,
+          "max_us": 10000,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1281800
+        },
+        "simulation_tick": {
+          "count": 599,
+          "max_us": 7500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1199500
+        },
+        "visitor_node_spawn": {
+          "count": 1,
+          "max_us": 5300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 5300
+        },
+        "visitor_path": {
+          "count": 1,
+          "max_us": 300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 300
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0142,
+      "spans": {
+        "audio_projection": {
+          "count": 569,
+          "max_us": 500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 89100
+        },
+        "captions_projection": {
+          "count": 569,
+          "max_us": 200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 27900
+        },
+        "frame_interval": {
+          "count": 202,
+          "max_us": 636800,
+          "over_100ms": 9,
+          "over_16ms": 202,
+          "over_250ms": 1,
+          "over_50ms": 37,
+          "total_us": 10014200
+        },
+        "hud_projection": {
+          "count": 569,
+          "max_us": 4700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1155000
+        },
+        "ink_advance": {
+          "count": 1,
+          "max_us": 66300,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 1,
+          "total_us": 66300
+        },
+        "ink_open_wall:visitors": {
+          "count": 1,
+          "max_us": 505700,
+          "over_100ms": 1,
+          "over_16ms": 1,
+          "over_250ms": 1,
+          "over_50ms": 1,
+          "total_us": 505700
+        },
+        "interaction_projection": {
+          "count": 569,
+          "max_us": 13700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 3466000
+        },
+        "simulation_tick": {
+          "count": 569,
+          "max_us": 12800,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1148200
+        },
+        "visitor_path": {
+          "count": 1,
+          "max_us": 100,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 100
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0509,
+      "spans": {
+        "audio_projection": {
+          "count": 599,
+          "max_us": 500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 95300
+        },
+        "captions_projection": {
+          "count": 599,
+          "max_us": 22100,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 155800
+        },
+        "frame_interval": {
+          "count": 168,
+          "max_us": 227400,
+          "over_100ms": 19,
+          "over_16ms": 168,
+          "over_250ms": 0,
+          "over_50ms": 65,
+          "total_us": 10050900
+        },
+        "hud_projection": {
+          "count": 599,
+          "max_us": 17200,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1426600
+        },
+        "ink_advance": {
+          "count": 2,
+          "max_us": 41300,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 49000
+        },
+        "ink_open_wall:service_availability": {
+          "count": 1,
+          "max_us": 97300,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 1,
+          "total_us": 97300
+        },
+        "interaction_projection": {
+          "count": 599,
+          "max_us": 15800,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 3594300
+        },
+        "simulation_tick": {
+          "count": 599,
+          "max_us": 10200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1272700
+        },
+        "visitor_path": {
+          "count": 1,
+          "max_us": 300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 300
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0182,
+      "spans": {
+        "audio_projection": {
+          "count": 600,
+          "max_us": 700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 154400
+        },
+        "captions_projection": {
+          "count": 600,
+          "max_us": 600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 138400
+        },
+        "frame_interval": {
+          "count": 157,
+          "max_us": 151100,
+          "over_100ms": 3,
+          "over_16ms": 157,
+          "over_250ms": 0,
+          "over_50ms": 121,
+          "total_us": 10018200
+        },
+        "hud_projection": {
+          "count": 600,
+          "max_us": 6600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1575500
+        },
+        "interaction_projection": {
+          "count": 600,
+          "max_us": 12900,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 3476200
+        },
+        "simulation_tick": {
+          "count": 600,
+          "max_us": 6400,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1350000
+        }
+      }
+    },
+    {
+      "window_seconds": 10.048,
+      "spans": {
+        "audio_projection": {
+          "count": 567,
+          "max_us": 800,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 155200
+        },
+        "captions_projection": {
+          "count": 567,
+          "max_us": 1600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 156900
+        },
+        "frame_interval": {
+          "count": 129,
+          "max_us": 705000,
+          "over_100ms": 13,
+          "over_16ms": 129,
+          "over_250ms": 1,
+          "over_50ms": 124,
+          "total_us": 10048000
+        },
+        "hud_projection": {
+          "count": 567,
+          "max_us": 5500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1385000
+        },
+        "ink_advance": {
+          "count": 1,
+          "max_us": 95500,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 1,
+          "total_us": 95500
+        },
+        "ink_open_wall:visitors": {
+          "count": 1,
+          "max_us": 484400,
+          "over_100ms": 1,
+          "over_16ms": 1,
+          "over_250ms": 1,
+          "over_50ms": 1,
+          "total_us": 484400
+        },
+        "interaction_projection": {
+          "count": 567,
+          "max_us": 14300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 3545100
+        },
+        "simulation_tick": {
+          "count": 567,
+          "max_us": 12100,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1304300
+        },
+        "visitor_node_spawn": {
+          "count": 1,
+          "max_us": 200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 200
+        },
+        "visitor_path": {
+          "count": 1,
+          "max_us": 900,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 900
+        }
+      }
+    },
+    {
+      "window_seconds": 10.1103,
+      "spans": {
+        "audio_projection": {
+          "count": 578,
+          "max_us": 700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 142600
+        },
+        "captions_projection": {
+          "count": 578,
+          "max_us": 1200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 88200
+        },
+        "frame_interval": {
+          "count": 131,
+          "max_us": 594500,
+          "over_100ms": 18,
+          "over_16ms": 131,
+          "over_250ms": 1,
+          "over_50ms": 124,
+          "total_us": 10110300
+        },
+        "hud_projection": {
+          "count": 578,
+          "max_us": 7600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1191700
+        },
+        "ink_advance": {
+          "count": 1,
+          "max_us": 54800,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 1,
+          "total_us": 54800
+        },
+        "ink_open_wall:visitors": {
+          "count": 1,
+          "max_us": 473300,
+          "over_100ms": 1,
+          "over_16ms": 1,
+          "over_250ms": 1,
+          "over_50ms": 1,
+          "total_us": 473300
+        },
+        "interaction_projection": {
+          "count": 578,
+          "max_us": 12000,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 3794500
+        },
+        "simulation_tick": {
+          "count": 578,
+          "max_us": 12200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1471500
+        }
+      }
+    },
+    {
+      "window_seconds": 10.1419,
+      "spans": {
+        "audio_projection": {
+          "count": 581,
+          "max_us": 700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 146300
+        },
+        "captions_projection": {
+          "count": 581,
+          "max_us": 1300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 111100
+        },
+        "frame_interval": {
+          "count": 100,
+          "max_us": 349400,
+          "over_100ms": 33,
+          "over_16ms": 100,
+          "over_250ms": 2,
+          "over_50ms": 100,
+          "total_us": 10141900
+        },
+        "hud_projection": {
+          "count": 581,
+          "max_us": 9600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1469000
+        },
+        "ink_advance": {
+          "count": 3,
+          "max_us": 36900,
+          "over_100ms": 0,
+          "over_16ms": 2,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 79400
+        },
+        "ink_open_wall:amgad": {
+          "count": 2,
+          "max_us": 194900,
+          "over_100ms": 2,
+          "over_16ms": 2,
+          "over_250ms": 0,
+          "over_50ms": 2,
+          "total_us": 387400
+        },
+        "interaction_projection": {
+          "count": 581,
+          "max_us": 13300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 3900700
+        },
+        "simulation_tick": {
+          "count": 581,
+          "max_us": 7300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1533400
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0703,
+      "spans": {
+        "audio_projection": {
+          "count": 606,
+          "max_us": 700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 152300
+        },
+        "captions_projection": {
+          "count": 606,
+          "max_us": 600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 79100
+        },
+        "frame_interval": {
+          "count": 118,
+          "max_us": 145700,
+          "over_100ms": 18,
+          "over_16ms": 118,
+          "over_250ms": 0,
+          "over_50ms": 118,
+          "total_us": 10070300
+        },
+        "hud_projection": {
+          "count": 606,
+          "max_us": 6200,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1252100
+        },
+        "interaction_projection": {
+          "count": 606,
+          "max_us": 15500,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 4189700
+        },
+        "simulation_tick": {
+          "count": 606,
+          "max_us": 8000,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1542400
+        },
+        "visitor_path": {
+          "count": 2,
+          "max_us": 600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 800
+        }
+      }
+    },
+    {
+      "window_seconds": 10.0193,
+      "spans": {
+        "audio_projection": {
+          "count": 604,
+          "max_us": 600,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 153100
+        },
+        "captions_projection": {
+          "count": 604,
+          "max_us": 300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 26800
+        },
+        "frame_interval": {
+          "count": 142,
+          "max_us": 120000,
+          "over_100ms": 4,
+          "over_16ms": 142,
+          "over_250ms": 0,
+          "over_50ms": 140,
+          "total_us": 10019300
+        },
+        "hud_projection": {
+          "count": 604,
+          "max_us": 4700,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1160100
+        },
+        "interaction_projection": {
+          "count": 604,
+          "max_us": 17700,
+          "over_100ms": 0,
+          "over_16ms": 1,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 4331500
+        },
+        "simulation_tick": {
+          "count": 604,
+          "max_us": 8800,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 1449600
+        },
+        "visitor_path": {
+          "count": 1,
+          "max_us": 300,
+          "over_100ms": 0,
+          "over_16ms": 0,
+          "over_250ms": 0,
+          "over_50ms": 0,
+          "total_us": 300
+        }
+      }
+    }
+  ]
+}

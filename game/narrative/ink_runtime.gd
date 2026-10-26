@@ -4,17 +4,19 @@ extends Node
 const Player = preload("res://addons/inkgd/ink_player.gd")
 const InkData = preload("res://addons/inkgd/editor/import_plugins/ink_resource.gd")
 const RuntimeNode = preload("res://addons/inkgd/ink_runtime.gd")
+var _cache: InkPlayerCache
+var _reusable: bool=false
 var _player: Node
 var _definition: StoryDefinition
 var _frame := NarrativeTypes.Frame.new()
 var _error: String = ""
 var _context: Dictionary={}
-func open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
+func open(definition: StoryDefinition, context: Dictionary, cache: InkPlayerCache = null) -> ActionResult:
  var perf := RuntimePerformance.begin()
- var result := await _open(definition,context)
+ var result := await _open(definition,context,cache)
  RuntimePerformance.finish("ink_open_wall:"+str(definition.id),perf)
  return result
-func _open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
+func _open(definition: StoryDefinition, context: Dictionary, cache: InkPlayerCache) -> ActionResult:
  close()
  _definition = definition
  var json := definition.raw_json if not definition.raw_json.is_empty() else FileAccess.get_file_as_string(definition.compiled_path)
@@ -25,19 +27,35 @@ func _open(definition: StoryDefinition, context: Dictionary) -> ActionResult:
   engine_runtime.stop_execution_on_error = false
   engine_runtime.stop_execution_on_exception = false
   get_tree().root.add_child(engine_runtime)
+ _cache=cache
+ var key := str(definition.id)+":"+definition.sha256
+ if is_instance_valid(_cache):_player=_cache.checkout(key)
+ if _player!=null:
+  _player.error_encountered.connect(_on_player_error)
+  var reset_started := RuntimePerformance.begin()
+  _player.reset()
+  RuntimePerformance.finish("ink_reset",reset_started)
+  _reusable=_error.is_empty()
+  if not _reusable:return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"story_load_failed")
+  set_context(context)
+  return ActionResult.success()
  _player = Player.new()
  _player.loads_in_background = false
  var data = InkData.new()
  data.json = json
  _player.ink_file = data
- _player.error_encountered.connect(func(message, _type): _error = str(message))
- add_child(_player)
+ _player.error_encountered.connect(_on_player_error)
+ if is_instance_valid(_cache):_cache.attach(_player,key)
+ else:add_child(_player)
  _player.create_story()
  var loaded: bool = await _player.loaded
  if not loaded or not _error.is_empty():
   return ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"story_load_failed")
+ _reusable=true
  set_context(context)
  return ActionResult.success()
+func _on_player_error(message, _type) -> void:
+ _error=str(message)
 func set_context(context: Dictionary) -> void:
  _context=context.duplicate(true)
  if _player == null: return
@@ -158,10 +176,16 @@ func restore(data: Dictionary) -> ActionResult:
  _frame = NarrativeTypes.Frame.from_dict(data.frame)
  return ActionResult.success()
 func close() -> void:
- if _player != null:
-  _player.destroy()
-  _player.queue_free()
-  _player = null
+ if is_instance_valid(_player):
+  if _player.error_encountered.is_connected(_on_player_error):_player.error_encountered.disconnect(_on_player_error)
+  if is_instance_valid(_cache):_cache.release(_player,_reusable and _error.is_empty())
+  else:
+   _player.destroy()
+   _player.queue_free()
+ _player=null
+ _cache=null
+ _reusable=false
+ _context={}
  _error = ""
  _frame = NarrativeTypes.Frame.new()
 func _exit_tree() -> void:

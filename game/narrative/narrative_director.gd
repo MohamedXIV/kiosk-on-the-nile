@@ -80,7 +80,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  if not participants.is_empty():
   var actor: Variant=_session.presence.record(participants[0])
   if actor!=null:_session.account_dialogue.prepare(str(conversation.id),str(actor.character_id))
- var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation))
+ var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation),_session.ink_players)
  _opening.erase(key)
  if wants_manual:_manual_opening=false
  if not result.ok or not _encounter_available(definition,participants):
@@ -269,7 +269,7 @@ func restore(data: Dictionary) -> ActionResult:
   candidates[id] = conversation
   var story := _saved_story(record)
   if story==null: return _reject_candidates(candidates)
-  var result := await conversation.runtime.open(story,_context_for(conversation))
+  var result := await conversation.runtime.open(story,_context_for(conversation),_session.ink_players)
   if not result.ok: return _reject_candidates(candidates)
   result = conversation.runtime.restore(record.runtime)
   if not result.ok: return _reject_candidates(candidates)
@@ -461,7 +461,7 @@ func resume_record(record: Dictionary, visit_id: StringName) -> ActionResult:
  if not available_for(conversation):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
  conversation.runtime=InkRuntime.new()
  add_child(conversation.runtime)
- result=await conversation.runtime.open(_saved_story(record),_context_for(conversation))
+ result=await conversation.runtime.open(_saved_story(record),_context_for(conversation),_session.ink_players)
  if result.ok:result=conversation.runtime.restore(record.runtime)
  if not result.ok:
   conversation.runtime.queue_free()

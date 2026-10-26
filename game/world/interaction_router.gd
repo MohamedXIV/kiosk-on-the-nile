@@ -9,7 +9,7 @@ func _init(session: GameSession, room: LocationView, text: UiText) -> void:
  _text = text
 func nearest() -> InteractionTarget:
  if _room==null or not _session.locations.is_physical(_session.location_id):return null
- var targets := _room.interaction_targets()
+ var targets := _room.interaction_targets(true)
  var balance: Dictionary = _session.config.section("balance")
  var format: Dictionary = {}
  for key in balance:
@@ -25,9 +25,11 @@ func nearest() -> InteractionTarget:
    elif station.recipe.rules_id==&"tea":target.secondary=_text.text("station_options")
   if target.id==&"sign": target.primary=_text.text("close_kiosk") if _session.kiosk_open else _text.text("open_kiosk")
  if _session.locations.is_physical(_session.location_id):
+  var person_radius := float(_session.config.section("visitors").interaction_radius)
   for visit in _session.presence.at(_session.location_id):
+   if _session.player_ground.distance_squared_to(visit.pose.ground)>person_radius*person_radius:continue
    if not _session.presence.is_available(visit.id): continue
-   var target := InteractionTarget.new(visit.id,visit.pose.ground,float(_session.config.section("visitors").interaction_radius))
+   var target := InteractionTarget.new(visit.id,visit.pose.ground,person_radius)
    target.visit_id = visit.id
    var character := _session.presence.profile(visit.character_id)
    var display_name := NotebookView.name(str(visit.character_id),str(character.name))
@@ -38,6 +40,7 @@ func nearest() -> InteractionTarget:
    targets.append(target)
  for point in _session.contact.points():
   if point.location_id!=str(_session.location_id):continue
+  if _session.player_ground.distance_squared_to(point.ground)>pow(float(_session.config.section("suppliers").phone_radius),2):continue
   var phone := InteractionTarget.new(StringName("phone:"+str(point.host_id)),point.ground,float(_session.config.section("suppliers").phone_radius))
   phone.primary=_text.text("supplier_phone")
   targets.append(phone)

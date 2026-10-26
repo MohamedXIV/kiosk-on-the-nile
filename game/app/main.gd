@@ -35,6 +35,7 @@ var _captions: SpatialCaptions
 var _probe: QaProbe
 var _focused: bool = true
 var _busy: bool = false
+var _notebook_refresh_tick: int=-1
 var _sound: Soundscape
 var _atmosphere: Atmosphere
 func _ready() -> void:
@@ -137,6 +138,7 @@ func _install(candidate: GameSession) -> void:
  if _world: _world.free()
  if _session: _session.queue_free()
  _session = candidate
+ _notebook_refresh_tick=-1
  _fatigue_layer=CanvasLayer.new()
  _fatigue_layer.layer=1
  add_child(_fatigue_layer)
@@ -237,13 +239,18 @@ func _install(candidate: GameSession) -> void:
  if _probe: _probe.session = _session
 func _process(_delta: float) -> void:
  RuntimePerformance.frame()
+ if _session==null or not _focused:return
+ _present()
 func _physics_process(delta: float) -> void:
- if _session==null or not _focused: return
+ if _session==null or not _focused:return
  var perf := RuntimePerformance.begin()
  _session.tick(delta)
  RuntimePerformance.finish("simulation_tick",perf)
+ _save.transition_active = _transition.active
+ _save.boundary(_session)
+func _present() -> void:
  _fatigue_overlay.present(_session.fatigue.view())
- perf=RuntimePerformance.begin()
+ var perf := RuntimePerformance.begin()
  _sound.present(_session.location_id,_session.cooking,_session.home,_session.items,_session.spaces,_session.workflow)
  RuntimePerformance.finish("audio_projection",perf)
  _atmosphere.present(_session.clock.minutes,_session.location_id)
@@ -257,7 +264,10 @@ func _physics_process(delta: float) -> void:
  perf=RuntimePerformance.begin()
  _hud.present(nearest)
  RuntimePerformance.finish("hud_projection",perf)
- if _hud.notebook.visible and _session.clock.tick%60==0:_hud.notebook.refresh()
+ if not _hud.notebook.visible:_notebook_refresh_tick=-1
+ elif _notebook_refresh_tick<0 or _session.clock.tick-_notebook_refresh_tick>=60:
+  _hud.notebook.refresh()
+  _notebook_refresh_tick=_session.clock.tick
  _captions.top_inset = _hud.top_occupied_height()
  _journey_panel.present()
  _shop_panel.present()
@@ -279,8 +289,6 @@ func _physics_process(delta: float) -> void:
  perf=RuntimePerformance.begin()
  if _captions.visible:_captions.present(_session,_rooms[str(_session.location_id)],_camera)
  RuntimePerformance.finish("captions_projection",perf)
- _save.transition_active = _transition.active
- _save.boundary(_session)
 func _unhandled_input(event: InputEvent) -> void:
  if _session==null or not _focused or _busy or _transition.active: return
  if event is InputEventKey and event.echo: return

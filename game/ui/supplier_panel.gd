@@ -16,6 +16,7 @@ var _once := CheckBox.new()
 var _deposit := SpinBox.new()
 var _quote_id: String=""
 var _accept: Button
+var _summary_tick: int=-1
 var _cash := VBoxContainer.new()
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
@@ -66,7 +67,10 @@ func present() -> void:
  if not visible:return
  if not was:
   _feedback.text="";_summary.text=SupplierText.summary(_session);_destinations();_cash_rows()
- elif _session.clock.tick%60==0:_summary.text=SupplierText.summary(_session);_cash_rows()
+  _summary_tick=_session.clock.tick
+ elif _session.clock.tick-_summary_tick>=60:
+  _summary.text=SupplierText.summary(_session);_cash_rows()
+  _summary_tick=_session.clock.tick
 func _destinations() -> void:
  var previous := str(_destination.get_selected_metadata()) if _destination.item_count>0 else ""
  _destination.clear()

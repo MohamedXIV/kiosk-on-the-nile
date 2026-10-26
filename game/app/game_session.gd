@@ -54,6 +54,7 @@ var effects: NarrativeEffects
 var inner: InnerMonologue
 var personal: PersonalConversations
 var journal: InteractionJournal
+var ink_players: InkPlayerCache
 var narrative: NarrativeDirector
 var motion_step: Callable
 var coordinator := SimulationCoordinator.new()
@@ -239,6 +240,8 @@ func configure(source: SessionConfig) -> ActionResult:
  effects.social_life=social_life
  effects.service_provider=_service_effect
  effects.finance_provider=financial_effect
+ ink_players=InkPlayerCache.new()
+ add_child(ink_players)
  narrative = NarrativeDirector.new()
  add_child(narrative)
  var stories: Dictionary = {}

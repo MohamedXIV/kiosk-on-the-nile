@@ -34,7 +34,7 @@ func _speak(rule: Dictionary) -> void:
  story.id=&"inner_monologue"
  story.raw_json=JSON.stringify(_session.config.section("story_inner_monologue"),"",true)
  story.sha256=story.raw_json.sha256_text()
- var result := await runtime.open(story,{"topic_id":str(rule.id)})
+ var result := await runtime.open(story,{"topic_id":str(rule.id)},_session.ink_players)
  if result.ok and not _blocked():
   var output := runtime.advance()
   if output.result.ok and output.ended and output.choices.is_empty() and output.effects.is_empty() and output.speaker_id==&"player" and not output.text.is_empty():
