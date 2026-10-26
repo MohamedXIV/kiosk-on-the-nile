@@ -23,8 +23,8 @@ Keep pathfinding and add domain memory/intent (chosen in conversation); moving t
 - [x] Implement finite geometry sight checks, bounded observer memory, separately owned meeting intent and configuration validation.
 - [x] Integrate physical providers, social topic eligibility, movement overlay and quiet interruption/cleanup paths.
 - [x] Add revision13→14 migration and atomic save validation/restore.
-- [ ] Import/export, observe visible/lost/occluded/other-location/timeout/order/dialogue/save paths and inspect performance counters. No automated suite.
-- [ ] One fresh whole-diff review, one material fix pass, package and publish pinned complete Web preview.
+- [x] Import/export, observe visible/lost/occluded/other-location/timeout/order/dialogue/save paths and inspect performance counters. No automated suite.
+- [x] One fresh whole-diff review, one material fix pass, package and publish pinned complete Web preview.
 
 ## Review focus
 
