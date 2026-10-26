@@ -6,6 +6,9 @@ var visits: Dictionary = {}
 var leisure := QuietLeisure.new()
 var awareness := SpatialAwareness.new()
 var meetings := VisitorMeetings.new()
+var seating := VisitorSeating.new()
+var seat_catalog: SeatCatalog
+var seat_unavailable: Callable
 var observed_actors: Callable
 var sight_clear: Callable
 var meeting_available: Callable
@@ -36,6 +39,9 @@ func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: 
  leisure.configure(data.get("leisure",{}))
  awareness.configure(data.get("awareness",{}))
  meetings.configure(data.get("meetings",{}))
+ seating.configure(data.get("seating",{}),seat_catalog,data.characters)
+ seating.item_busy=seat_unavailable
+ seating.released.connect(_seat_released)
  _markers = markers.duplicate(true)
  _clock = clock
  _orders = orders
@@ -69,6 +75,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
  var elapsed := delta if calendar_delta<0 else calendar_delta
  awareness.step(delta,visits,observed_actors.call() if observed_actors.is_valid() else {},sight_clear)
  meetings.step(delta,visits,awareness,_can_meet,route_reachable,_position_available)
+ seating.step(delta,visits,meetings,busy_in_conversation,_orders.pending_for,route_reachable,_position_available,sight_clear)
  for id in visits.keys():
   var visit: VisitState = visits[id]
   if (visit.phase==&"arriving" or visit.shopping_state==&"approaching") and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): _arrived(visit)
@@ -78,11 +85,12 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     if not meetings.active(visit.id):
      _consider_purchase(visit,elapsed)
      _remarks(visit,delta)
-    if not meetings.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
+    if not seating.reserved(visit.id) and not meetings.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
      leisure.step(visit,elapsed,_markers,str(_data.characters[str(visit.character_id)].leisure_marker),_position_available,route_reachable)
    if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
     meetings.finish(visit.id)
+    seating.release(visit.id)
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
     visit.destination = Vector2(exit_position[0],exit_position[1])
     _orders.cancel_visit(visit.id)
@@ -92,6 +100,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
  leisure.prune(visits.keys())
  awareness.prune(visits)
  meetings.prune(visits)
+ seating.prune(visits)
  _cooldown=maxf(0,_cooldown-elapsed)
  if _cooldown<=0:
   _cooldown=_delay("arrival_delay")
@@ -156,18 +165,31 @@ func _consider_purchase(visit: VisitState, delta: float) -> void:
  visit.decision_remaining=_delay("purchase_retry_delay")
  if not _present() or (service_busy.is_valid() and service_busy.call()):return
  var definition := character(visit.character_id)
- var service_marker: Array=_markers[definition.marker]
- if not _position_available(Vector2(service_marker[0],service_marker[1]),visit.id):return
+ var service_point := _service_point(visit)
+ if not _position_available(service_point,visit.id):return
  if _rng.randf()>=float(definition.purchase_chance):visit.shopping_state=&"declined";return
  var food := StringName(str(food_selector.call(visit.character_id))) if food_selector.is_valid() else StringName(definition.food_id)
  if food.is_empty():visit.shopping_state=&"declined";return
  visit.food_id=food
  visit.shopping_state=&"approaching"
- var marker: Array=_markers[definition.marker]
- visit.destination=Vector2(marker[0],marker[1])
+ visit.destination=service_point
+func _service_point(visit: VisitState) -> Vector2:
+ var slot := seating.slot_for(visit.id)
+ if not slot.is_empty():return slot.access
+ var marker: Array=_markers[character(visit.character_id).marker]
+ return Vector2(marker[0],marker[1])
 func _return_to_leisure(visit: VisitState) -> void:
+ var slot := seating.slot_for(visit.id)
+ if not slot.is_empty():visit.destination=slot.access;return
  var marker: Array=_markers[leisure.marker(visit.id,str(character(visit.character_id).leisure_marker))]
  visit.destination=Vector2(marker[0],marker[1])
+func _seat_released(id: StringName) -> void:
+ var visit: VisitState=visits.get(str(id))
+ if visit==null or visit.phase==&"leaving" or _orders.pending_for(id)!=null:return
+ if visit.shopping_state==&"approaching":visit.destination=_service_point(visit)
+ elif visit.shopping_state in [&"undecided",&"declined",&"served"]:_return_to_leisure(visit)
+func caption_ground(visit: VisitState) -> Vector2:
+ return seating.slot_for(visit.id).anchor if seating.seated(visit.id) else visit.pose.ground
  # Keep staying phase: movement follows destination independently.
 func is_available(visit_id: StringName) -> bool:
  return visits.has(str(visit_id)) and visits[str(visit_id)].phase == &"staying"
@@ -191,13 +213,14 @@ func clear_visits() -> void:
  leisure.clear()
  awareness.clear()
  meetings.clear()
+ seating.clear()
 func begin_day() -> void:
  _flags.clear()
  # Do not reset the independent arrival clock at midnight.
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in visits: records[id] = visits[id].snapshot()
- return {"awareness":awareness.snapshot(),"meetings":meetings.snapshot(),"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
+ return {"seating":seating.snapshot(),"awareness":awareness.snapshot(),"meetings":meetings.snapshot(),"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("visit_counts") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_counts")
  for id in data.visit_counts:
@@ -253,7 +276,16 @@ func restore(data: Dictionary) -> ActionResult:
  meetings_candidate.configure(_data.get("meetings",{}))
  var meetings_result := meetings_candidate.restore(data.get("meetings",{"active":"","records":{}}),candidate)
  if not meetings_result.ok:return meetings_result
+ var seating_candidate := VisitorSeating.new()
+ seating_candidate.configure(_data.get("seating",{}),seat_catalog,_data.characters)
+ seating_candidate.item_busy=seat_unavailable
+ var seating_result := seating_candidate.restore(data.get("seating",{}),candidate)
+ if not seating_result.ok:return seating_result
+ for id in candidate:
+  if meetings_candidate.active(StringName(id)) and seating_candidate.reserved(StringName(id)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"conflicting_visitor_intents")
+ seating_candidate.released.connect(_seat_released)
  if not meetings_candidate.snapshot().active.is_empty() and awareness_candidate.recalled(StringName(meetings_candidate.snapshot().active),"player").is_empty():return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"meeting_without_observation")
+ seating=seating_candidate
  awareness=awareness_candidate
  meetings=meetings_candidate
  leisure=leisure_candidate
@@ -297,6 +329,9 @@ func update_markers(markers: Dictionary) -> void:
  _markers = markers.duplicate(true)
  for visit in visits.values():
   if visit.phase==&"leaving": continue
+  var slot := seating.slot_for(visit.id)
+  if not slot.is_empty():visit.destination=slot.access;continue
+  if _orders.pending_for(visit.id)!=null:continue
   var definition := character(visit.character_id)
   var key := str(definition.marker) if visit.shopping_state in [&"approaching",&"requesting",&"pending",&"served"] else leisure.marker(visit.id,str(definition.leisure_marker))
   var marker: Array = _markers[key]

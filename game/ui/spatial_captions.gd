@@ -32,7 +32,7 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
     var label: Label = _labels[id]
     label.text = LocalizedNarrative.line(conversation.current)
     label.size.x = 300
-    var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,113)
+    var canvas := room.global_position+room.mapping.to_canvas(session.visitors.caption_ground(visit))-Vector2(0,113)
     var screen: Vector2 = camera.get_canvas_transform()*canvas
     var ceiling := screen.y
     for key in _orders:
@@ -73,7 +73,7 @@ func _present_orders(session: GameSession, room: LocationView, camera: Camera2D)
    var badge: OrderBadge=_orders[key]
    badge.present(session,order.food_id)
    badge.reset_size()
-   var canvas := room.global_position+room.mapping.to_canvas(visit.pose.ground)-Vector2(0,57)
+   var canvas := room.global_position+room.mapping.to_canvas(session.visitors.caption_ground(visit))-Vector2(0,57)
    var screen: Vector2=camera.get_canvas_transform()*canvas
    badge.position=Vector2(clampf(screen.x-badge.size.x/2,8,get_viewport_rect().size.x-badge.size.x-8),clampf(screen.y-badge.size.y,top_inset,get_viewport_rect().size.y-badge.size.y-145))
    for attempt in range(8):

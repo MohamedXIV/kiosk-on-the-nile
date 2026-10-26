@@ -45,7 +45,8 @@
       ],
       "look_pixels": 1.5,
       "look_smoothing": 5.0
-    }
+    },
+    "sit_transition_seconds": 0.35
   },
   "hearing_radius": 3.4,
   "navigation": {

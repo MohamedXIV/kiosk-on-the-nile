@@ -177,7 +177,7 @@ func configure(source: SessionConfig) -> ActionResult:
  cooking.foods=foods
  hygiene=HygieneService.new()
  hygiene.policy=actions
- var hygiene_result := hygiene.configure(source.section("hygiene"),items,spaces,clock,func():return player_pose,func(id):return cooking.legacy_busy(id) or equipment.is_busy(id))
+ var hygiene_result := hygiene.configure(source.section("hygiene"),items,spaces,clock,func():return player_pose,func(id):return cooking.legacy_busy(id) or equipment.is_busy(id) or (visitors!=null and visitors.seating.busy_item(id)))
  if not hygiene_result.ok:return hygiene_result
  cooking.set_hygiene_provider(hygiene.food_contact_evidence,func(id):hygiene.record_use(StringName("legacy:"+str(id)),id,&"batch"))
  workflow.hygiene_provider=hygiene.food_contact_evidence
@@ -195,6 +195,9 @@ func configure(source: SessionConfig) -> ActionResult:
  service.policy=actions
  service.personal_item=func(id):return items.get_item(id).get("attributes",{}).get("personal_use",false)
  visitors = VisitorService.new()
+ visitors.seat_catalog=SeatCatalog.new()
+ visitors.seat_catalog.configure(spaces,items)
+ visitors.seat_unavailable=func(id):return hygiene!=null and hygiene.is_cleaning(id)
  visitors.tuning=tuning
  visitors.foods=foods
  visitors.food_selector=_choose_food
@@ -207,7 +210,7 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.service_presence=func():return location_id==&"kiosk"
  visitors.service_busy=func():return personal!=null and personal.active() or narrative!=null and narrative.focused_session()!=null
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
- visitors.purchase_blocked=func(id):return narrative!=null and narrative.speech_active(StringName(id))
+ visitors.purchase_blocked=func(id):return (narrative!=null and narrative.speech_active(StringName(id))) or (personal!=null and personal.holds_visit(StringName(id)))
  visitors.meeting_available=func(id):return social_life!=null and social_life.can_invite(id)
  visitors.departed.connect(_close_experience)
  service.settled.connect(visitors.record_service)
@@ -390,7 +393,7 @@ func _actor_snapshots() -> Array[Dictionary]:
  return result
 
 func _equipment_busy(id: StringName) -> bool:
- return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id))
+ return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id)) or (visitors!=null and visitors.seating.busy_item(id))
 
 func _choose_food(character_id: StringName) -> StringName:
  var character := visitors.character(character_id)

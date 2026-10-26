@@ -41,13 +41,20 @@ func step(delta: float) -> void:
    RuntimePerformance.finish("visitor_node_spawn",perf)
   var motor: ActorMotor = _motors[id]
   var follower: NpcNavigation=_followers[id]
-  var paused := visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id)
+  var sitting := _service.seating.seated(visit.id)
+  var paused := sitting or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id))
   follower.step(motor,_service.meetings.goal(visit),delta,paused)
   if follower.take_failure():
    if _service.meetings.active(visit.id):_service.meetings.finish(visit.id)
+   elif _service.seating.reserved(visit.id):_service.seating.release(visit.id)
    elif follower.claim_fallback() and _service.navigation_alternative(visit.id):RuntimePerformance.observe("npc_route_fallback",0)
   _service.commit_pose(visit.id,motor.pose)
-  motor.get_node("Visual").present(motor.pose,Color(_service.character(visit.character_id).color),false)
+  var visual: CharacterView=motor.get_node("Visual")
+  visual.present(motor.pose,Color(_service.character(visit.character_id).color),false)
+  var slot := _service.seating.slot_for(visit.id) if sitting else {}
+  if sitting:motor.pose.facing=slot.facing
+  var hip_offset := _room.mapping.to_canvas(slot.anchor,float(slot.height))-_room.mapping.to_canvas(motor.pose.ground)+Vector2(0,14) if sitting else Vector2.ZERO
+  visual.present_seat(sitting,hip_offset)
 
 func invalidate_paths() -> void:
  for follower: NpcNavigation in _followers.values():follower.invalidate()

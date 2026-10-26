@@ -234,7 +234,26 @@
     "placement": {
       "environment": "exterior",
       "allowed_locations": []
-    }
+    },
+    "seats": [
+      {
+        "id": "seat",
+        "access": [
+          0,
+          0.6
+        ],
+        "anchor": [
+          0,
+          0
+        ],
+        "facing": [
+          0,
+          1
+        ],
+        "height": 0.45,
+        "table_radius": 2.0
+      }
+    ]
   },
   "table": {
     "label": "طاولة",
@@ -254,7 +273,8 @@
     "placement": {
       "environment": "exterior",
       "allowed_locations": []
-    }
+    },
+    "gathering_surface": true
   },
   "chicken": {
     "kind": "ingredient",

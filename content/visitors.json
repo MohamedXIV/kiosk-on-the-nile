@@ -29,7 +29,8 @@
       ],
       "leisure_marker": "railing_1",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.65
+      "purchase_chance": 0.65,
+      "seating_chance": 0.15
     },
     "mahmoud": {
       "name": "محمود",
@@ -57,7 +58,8 @@
       ],
       "leisure_marker": "table_a",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.45
+      "purchase_chance": 0.45,
+      "seating_chance": 0.8
     },
     "samir": {
       "name": "سمير",
@@ -85,7 +87,8 @@
       ],
       "leisure_marker": "table_b",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.45
+      "purchase_chance": 0.45,
+      "seating_chance": 0.8
     },
     "hassan": {
       "name": "أستاذ حسن",
@@ -113,7 +116,8 @@
       ],
       "leisure_marker": "railing_2",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.45
+      "purchase_chance": 0.45,
+      "seating_chance": 0.65
     },
     "nadia": {
       "name": "مدام نادية",
@@ -141,7 +145,8 @@
       ],
       "leisure_marker": "stroll_west",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.65
+      "purchase_chance": 0.65,
+      "seating_chance": 0.7
     },
     "passer": {
       "name": "شاب ع الكورنيش",
@@ -164,7 +169,8 @@
       ],
       "leisure_marker": "river_middle",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.45
+      "purchase_chance": 0.45,
+      "seating_chance": 0
     },
     "salma": {
       "name": "أبلة سلمى",
@@ -192,7 +198,8 @@
       ],
       "leisure_marker": "bench_east",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.45
+      "purchase_chance": 0.45,
+      "seating_chance": 0.5
     },
     "mona": {
       "name": "منى",
@@ -215,7 +222,8 @@
       ],
       "leisure_marker": "river_middle",
       "arrival_weight": 1.0,
-      "purchase_chance": 0
+      "purchase_chance": 0,
+      "seating_chance": 0.3
     },
     "farid": {
       "name": "عم فريد",
@@ -244,7 +252,8 @@
       },
       "leisure_marker": "stroll_east",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.65
+      "purchase_chance": 0.65,
+      "seating_chance": 0.4
     },
     "youssef": {
       "name": "يوسف",
@@ -272,7 +281,8 @@
       ],
       "leisure_marker": "bench_west",
       "arrival_weight": 1.0,
-      "purchase_chance": 0.45
+      "purchase_chance": 0.45,
+      "seating_chance": 0.55
     }
   },
   "waiting_reminder_seconds": 28,
@@ -352,5 +362,17 @@
     "retarget_distance": 0.65,
     "max_seconds": 35,
     "lost_wait_seconds": 8
+  },
+  "seating": {
+    "enabled": true,
+    "delay_seconds": [
+      2,
+      5
+    ],
+    "retry_seconds": 8,
+    "max_searches": 3,
+    "max_candidates": 8,
+    "search_radius": 12,
+    "arrival_radius": 0.15
   }
 }

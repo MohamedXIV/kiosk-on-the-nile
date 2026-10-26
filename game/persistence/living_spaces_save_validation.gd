@@ -73,6 +73,9 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
  for receipt in session.shops.snapshot().receipts.values():
   if session.items.get_container(StringName(receipt.bag_id)).get("kind")!="purchase_bag":return _fail("receipt_bag")
  for visit in session.visitors.visits.values():
+  if session.visitors.seating.seated(visit.id):
+   var seat := session.visitors.seating.slot_for(visit.id)
+   if visit.destination.distance_to(seat.access)>0.001:return _fail("seat_destination")
   var pending := session.service.pending_for(visit.id)
   if (visit.shopping_state==&"pending")!=(pending!=null):return _fail("visit_pending_order")
   if pending!=null and (pending.food_id!=visit.food_id or pending.id!=visit.order_id or visit.served):return _fail("visit_order_projection")
