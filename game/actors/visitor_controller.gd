@@ -54,7 +54,7 @@ func step(delta: float) -> void:
   var slot := _service.seating.slot_for(visit.id) if sitting else {}
   if sitting:motor.pose.facing=slot.facing
   var hip_offset := _room.mapping.to_canvas(slot.anchor,float(slot.height))-_room.mapping.to_canvas(motor.pose.ground)+Vector2(0,14) if sitting else Vector2.ZERO
-  visual.present_seat(sitting,hip_offset)
+  visual.present_seat(sitting,hip_offset,float(slot.height)*_room.mapping.height_scale if sitting else 0)
 
 func invalidate_paths() -> void:
  for follower: NpcNavigation in _followers.values():follower.invalidate()
