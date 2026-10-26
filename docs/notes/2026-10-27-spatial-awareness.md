@@ -17,7 +17,7 @@ External `content/visitors.json` is bundled and read on content/session load. No
 | Block / key | Default | Meaning |
 |---|---|---|
 | `awareness.enabled` | true | Enable observation memory and LOS gate for automatic companionship |
-| `awareness.sample_seconds` | 0.5 | Real seconds between scans |
+| `awareness.sample_seconds` | 0.5 | Nominal real seconds between each visitor’s scans (staggered across callbacks) |
 | `awareness.sight_radius` | 7 | Ground-space range, 360 degrees |
 | `awareness.memory_seconds` | 45 | Real seconds until last sighting expires |
 | `meetings.enabled` / `actors` | true / `["youssef"]` | Enabled meeting policy and actors |
@@ -27,6 +27,8 @@ External `content/visitors.json` is bundled and read on content/session load. No
 | `meetings.retarget_seconds` / `retarget_distance` | 0.75 / 0.65 | Minimum update interval and observed movement threshold |
 | `meetings.max_seconds` | 35 | Maximum active attempt duration |
 | `meetings.lost_wait_seconds` | 8 | Wait after reaching a lost target's approach point |
+
+Observer scans are staggered: at most one visitor per callback, approximately one full round per `sample_seconds` at normal frame rates. Low frame rates stretch the sampling interval; expired visibility is not treated as current. Finite segment/rectangle clipping avoids building edge arrays per query.
 
 Goal selection considers up to eight nearby approach points, checking personal space and reachability. Path following remains cached AStarGrid2D with the existing bounded recovery. New counters/spans with `?profile=1`: `spatial_observation`, `meeting_goal`, `meeting_started`, `meeting_finished`. No every-frame path requests just because the player is moving.
 
@@ -45,6 +47,7 @@ Evidence lives in `evidence/2026-10-27-spatial-awareness/`. These are bounded na
 - Actual physical providers recorded a player; pending service order interrupted optional approach while preserving the order; conversation guard, timeout and unreachable goal ended intent. Layout refresh retained the navigation object and advanced its revision.
 - Review found an unsupported-actor saved intent could bypass its timeout by being skipped in the actor loop. Before observation: still active after 100 seconds. After fix: safely inactive immediately on restore; runtime guard also precedes the filter. Current policy edits remain loadable rather than rejecting the entire save.
 - In-memory experiments deliberately set chance=1 and short delay to exercise rare paths. Shipping defaults above remain unchanged.
+- A four-visitor native observation initially scanned every observer in one burst: 120 batches, max12.8ms. After staggering and allocation reduction, 120 individual observer scans peaked at3.515ms (22.371ms accumulated inside the scan span); these are different work units, not an FPS comparison or equal-work speedup. Player/browser hardware and simultaneous new Ink work remain unmeasured.
 - Existing short-run teardown warnings (46/94 ObjectDB instances and 21 resources) remain; this work does not diagnose or claim to fix them.
 
 First visibility model is deliberately conservative: all current ground-space solids, including furniture, block sight. No height/window transparency, facing cone, hearing, reported sightings, home pursuit, general NPC-to-NPC meeting decisions, seat discovery/reservation or local avoidance yet. Other visitors' sightings are stored as a foundation only. A nearby automatic companionship invitation now also requires sight when awareness is enabled; manual conversation behavior is unchanged. No new dialogue text/graph/catalog changes.

@@ -25,15 +25,25 @@ func sight_clear(start: Vector2, goal: Vector2) -> bool:
  # Finite ground-space segment; no physics query or path search per observation.
  for solid: Dictionary in _definition.data.solids:
   if solid.kind=="rect":
-   var box: Array=solid.rect
-   var hit: Variant=Geometry2D.segment_intersects_segment(start,goal,Vector2(box[0],box[1]),Vector2(box[2],box[1]))
-   if hit!=null:return false
-   for edge in [[Vector2(box[2],box[1]),Vector2(box[2],box[3])],[Vector2(box[2],box[3]),Vector2(box[0],box[3])],[Vector2(box[0],box[3]),Vector2(box[0],box[1])]]:
-    if Geometry2D.segment_intersects_segment(start,goal,edge[0],edge[1])!=null:return false
-   if FootprintGeometry.blocked(start,[solid]) or FootprintGeometry.blocked(goal,[solid]):return false
+   if _segment_crosses_box(start,goal,solid.rect):return false
   elif solid.kind=="circle":
    var center := Vector2(solid.center[0],solid.center[1])
    if Geometry2D.get_closest_point_to_segment(center,start,goal).distance_to(center)<=float(solid.radius):return false
+ return true
+static func _segment_crosses_box(start: Vector2, goal: Vector2, box: Array) -> bool:
+ # Clip a finite segment against the two slabs, without allocating edge arrays.
+ var direction := goal-start
+ var enter: float=0
+ var leave: float=1
+ for axis in range(2):
+  if direction[axis]==0:
+   if start[axis]<float(box[axis]) or start[axis]>float(box[axis+2]):return false
+   continue
+  var first := (float(box[axis])-start[axis])/direction[axis]
+  var last := (float(box[axis+2])-start[axis])/direction[axis]
+  enter=maxf(enter,minf(first,last))
+  leave=minf(leave,maxf(first,last))
+  if enter>leave:return false
  return true
 func path(start: Vector2, goal: Vector2) -> PackedVector2Array:
  var first := _nearest_cell(start)
