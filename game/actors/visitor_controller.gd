@@ -47,17 +47,18 @@ func step(delta: float) -> void:
   for id in _service.visits:
    var visit: VisitState=_service.visits[id]
    var sitting := _service.seating.seated(visit.id)
-   var stationary := sitting or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id)) or visit.pose.ground.distance_to(_service.meetings.goal(visit))<=float(_spatial.navigation.arrival_radius)
+   var stationary := sitting or _service.peers.paused(visit.id) or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id)) or visit.pose.ground.distance_to(_service.effective_goal(visit))<=float(_spatial.navigation.arrival_radius)
    var point: Vector2=_service.seating.slot_for(visit.id).anchor if sitting else visit.pose.ground
-   avoidance.sync(visit.id,point,stationary,float(_spatial.npc_speed),false,_service.meetings.goal(visit))
+   avoidance.sync(visit.id,point,stationary,float(_spatial.npc_speed),false,_service.effective_goal(visit))
  for id in _service.visits:
   var visit: VisitState=_service.visits[id]
   var motor: ActorMotor = _motors[id]
   var follower: NpcNavigation=_followers[id]
   var sitting := _service.seating.seated(visit.id)
-  var paused := sitting or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id))
-  follower.step(motor,_service.meetings.goal(visit),delta,paused)
+  var paused := sitting or _service.peers.paused(visit.id) or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id))
+  follower.step(motor,_service.effective_goal(visit),delta,paused)
   if follower.take_failure():
+   if _service.peers.active(visit.id):_service.finish_peer()
    if _service.meetings.active(visit.id):_service.meetings.finish(visit.id)
    elif _service.seating.reserved(visit.id):_service.seating.release(visit.id)
    elif follower.claim_fallback() and _service.navigation_alternative(visit.id):RuntimePerformance.observe("npc_route_fallback",0)

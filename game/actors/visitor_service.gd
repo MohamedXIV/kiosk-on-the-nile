@@ -6,6 +6,9 @@ var visits: Dictionary = {}
 var leisure := QuietLeisure.new()
 var awareness := SpatialAwareness.new()
 var meetings := VisitorMeetings.new()
+var peers := PeerEncounters.new()
+var peer_available: Callable
+var peer_cancel: Callable
 var seating := VisitorSeating.new()
 var seat_catalog: SeatCatalog
 var seat_unavailable: Callable
@@ -39,6 +42,7 @@ func configure(data: Dictionary, markers: Dictionary, clock: GameClock, orders: 
  leisure.configure(data.get("leisure",{}))
  awareness.configure(data.get("awareness",{}))
  meetings.configure(data.get("meetings",{}))
+ peers.configure(data.get("peer_encounters",{}))
  seating.configure(data.get("seating",{}),seat_catalog,data.characters)
  seating.item_busy=seat_unavailable
  seating.released.connect(_seat_released)
@@ -74,21 +78,27 @@ func spawn(character_id: StringName) -> VisitState:
 func tick(delta: float, calendar_delta: float = -1) -> void:
  var elapsed := delta if calendar_delta<0 else calendar_delta
  awareness.step(delta,visits,observed_actors.call() if observed_actors.is_valid() else {},sight_clear)
+ var event := peers.step(delta,visits,awareness,_peer_eligible,route_reachable,_position_available)
+ if event.has("cancel") and not str(event.cancel).is_empty() and peer_cancel.is_valid():peer_cancel.call(event.cancel)
+ var peer_initiator := peers.initiator()
+ if peer_initiator!=&"" and not peers.paused(peer_initiator) and seating.reserved(peer_initiator):seating.release(peer_initiator)
+ if event.has("encounter"):encounter_requested.emit(&"peer",event.participants,{"peer_id":event.id,"encounter_id":event.encounter})
  meetings.step(delta,visits,awareness,_can_meet,route_reachable,_position_available)
- seating.step(delta,visits,meetings,busy_in_conversation,_orders.pending_for,route_reachable,_position_available,sight_clear)
+ seating.step(delta,visits,meetings,_seat_busy,_orders.pending_for,route_reachable,_position_available,sight_clear)
  for id in visits.keys():
   var visit: VisitState = visits[id]
   if (visit.phase==&"arriving" or visit.shopping_state==&"approaching") and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius): _arrived(visit)
   elif visit.phase == &"staying":
    if not busy_in_conversation(visit.id):
     visit.elapsed += elapsed
-    if not meetings.active(visit.id):
+    if not meetings.active(visit.id) and not peers.active(visit.id):
      _consider_purchase(visit,elapsed)
      _remarks(visit,delta)
-    if not seating.reserved(visit.id) and not meetings.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
+    if not seating.reserved(visit.id) and not meetings.active(visit.id) and not peers.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
      leisure.step(visit,elapsed,_markers,str(_data.characters[str(visit.character_id)].leisure_marker),_position_available,route_reachable)
    if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
+    if peers.active(visit.id):finish_peer()
     meetings.finish(visit.id)
     seating.release(visit.id)
     var exit_position: Array = _markers[_data.exit_markers[_rng.randi_range(0,_data.exit_markers.size()-1)]]
@@ -100,6 +110,8 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
  leisure.prune(visits.keys())
  awareness.prune(visits)
  meetings.prune(visits)
+ var cancelled_peer := peers.prune(visits)
+ if not cancelled_peer.is_empty() and peer_cancel.is_valid():peer_cancel.call(cancelled_peer)
  seating.prune(visits)
  _cooldown=maxf(0,_cooldown-elapsed)
  if _cooldown<=0:
@@ -138,18 +150,20 @@ func _arrived(visit: VisitState) -> void:
   encounter_requested.emit(&"service_request",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
   return
  encounter_requested.emit(&"arrival",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
- # A conversation may happen when friends happen to meet; no scheduled pair spawn.
- if visit.character_id in [&"samir",&"mahmoud"] and not _flags.get("football_started",false):
-  var pair := PackedStringArray()
-  for other in visits.values():
-   if other.character_id in [&"mahmoud",&"samir"] and other.phase==&"staying":pair.append(str(other.id))
-  if pair.size()==2 and not Array(pair).any(func(id):return busy_in_conversation(StringName(id))):
-   _flags.football_started=true
-   encounter_requested.emit(&"football",pair,{})
+ # Peer conversation starts only after an observed, purposeful meeting.
 func busy_in_conversation(visit_id: StringName) -> bool:
  return purchase_blocked.is_valid() and purchase_blocked.call(visit_id)
 func _can_meet(visit: VisitState) -> bool:
- return visit.phase==&"staying" and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and not busy_in_conversation(visit.id) and meeting_available.is_valid() and bool(meeting_available.call(visit.id))
+ return not peers.active(visit.id) and visit.phase==&"staying" and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and not busy_in_conversation(visit.id) and meeting_available.is_valid() and bool(meeting_available.call(visit.id))
+func _peer_eligible(visit: VisitState, own_conversation: String) -> bool:
+ return visit.phase==&"staying" and (not own_conversation.is_empty() or peers.active(visit.id) or visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius)) and visit.shopping_state in [&"undecided",&"declined",&"served"] and _orders.pending_for(visit.id)==null and not meetings.active(visit.id) and peer_available.is_valid() and bool(peer_available.call(visit.id,own_conversation))
+func _seat_busy(id: StringName) -> bool:
+ return busy_in_conversation(id) or peers.active(id)
+func effective_goal(visit: VisitState) -> Vector2:
+ return peers.goal(visit,meetings.goal(visit))
+func finish_peer() -> void:
+ var cancelled := peers.finish()
+ if not cancelled.is_empty() and peer_cancel.is_valid():peer_cancel.call(cancelled)
 func _position_available(point: Vector2, except_id: StringName = &"") -> bool:
  for other in visits.values():
   if other.id==except_id:continue
@@ -206,6 +220,8 @@ func record_service(_order_id: StringName, visit_id: StringName, item: PreparedI
  if visit.character_id == &"amgad": memory.last_served_quality = str(item.quality_key)
  encounter_requested.emit(&"served",PackedStringArray([str(visit_id)]),{"quality_score":item.quality_score,"character_id":str(visit.character_id)})
 func clear_visits() -> void:
+ var cancelled := peers.clear()
+ if not cancelled.is_empty() and peer_cancel.is_valid():peer_cancel.call(cancelled)
  for visit in visits.values():
   _orders.cancel_visit(visit.id)
   departed.emit(visit.id)
@@ -220,7 +236,7 @@ func begin_day() -> void:
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in visits: records[id] = visits[id].snapshot()
- return {"seating":seating.snapshot(),"awareness":awareness.snapshot(),"meetings":meetings.snapshot(),"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
+ return {"peers":peers.snapshot(),"seating":seating.snapshot(),"awareness":awareness.snapshot(),"meetings":meetings.snapshot(),"leisure":leisure.snapshot(),"history":history.snapshot(),"visits":records,"visit_counts":_other_visit_counts.duplicate(),"memory":memory.duplicate(true),"flags":_flags.duplicate(),"cooldown":_cooldown,"next_id":_next,"rng_state":str(_rng.state)}
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("visit_counts") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_counts")
  for id in data.visit_counts:
@@ -276,15 +292,22 @@ func restore(data: Dictionary) -> ActionResult:
  meetings_candidate.configure(_data.get("meetings",{}))
  var meetings_result := meetings_candidate.restore(data.get("meetings",{"active":"","records":{}}),candidate)
  if not meetings_result.ok:return meetings_result
+ var peer_candidate := PeerEncounters.new()
+ peer_candidate.configure(_data.get("peer_encounters",{}))
+ var peer_result := peer_candidate.restore(data.get("peers",PeerEncounters.empty_state()),candidate)
+ if not peer_result.ok:return peer_result
  var seating_candidate := VisitorSeating.new()
  seating_candidate.configure(_data.get("seating",{}),seat_catalog,_data.characters)
  seating_candidate.item_busy=seat_unavailable
  var seating_result := seating_candidate.restore(data.get("seating",{}),candidate)
  if not seating_result.ok:return seating_result
  for id in candidate:
+  if peer_candidate.active(StringName(id)) and meetings_candidate.active(StringName(id)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"conflicting_visitor_intents")
+  if peer_candidate.initiator()==StringName(id) and seating_candidate.reserved(StringName(id)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"conflicting_visitor_intents")
   if meetings_candidate.active(StringName(id)) and seating_candidate.reserved(StringName(id)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"conflicting_visitor_intents")
  seating_candidate.released.connect(_seat_released)
  if not meetings_candidate.snapshot().active.is_empty() and awareness_candidate.recalled(StringName(meetings_candidate.snapshot().active),"player").is_empty():return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"meeting_without_observation")
+ peers=peer_candidate
  seating=seating_candidate
  awareness=awareness_candidate
  meetings=meetings_candidate

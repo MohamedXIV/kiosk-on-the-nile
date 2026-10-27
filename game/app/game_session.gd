@@ -260,6 +260,14 @@ func configure(source: SessionConfig) -> ActionResult:
   stories[id] = story
  var narrative_result := narrative.configure(self,source.section("encounters"),stories)
  if not narrative_result.ok: return narrative_result
+ visitors.peer_available=func(id,own):
+  var visit: VisitState=visitors.visits.get(str(id))
+  if visit==null or social_life.reserved(str(visit.character_id)) or (personal!=null and personal.holds_visit(StringName(id))):return false
+  for conversation: ConversationSession in narrative.sessions.values():
+   if str(conversation.id)!=str(own) and str(id) in conversation.participants:return false
+  return true
+ visitors.peer_cancel=func(id):narrative.cancel(StringName(id))
+ narrative.chapter_finished.connect(func(id,_reason):visitors.peers.conversation_ended(str(id)))
  personal=PersonalConversations.new()
  personal.configure(self)
  inner=InnerMonologue.new()
@@ -333,6 +341,15 @@ func _step_narrative(frame: Dictionary) -> void:
  narrative.tick(float(frame.delta))
  inner.tick(frame)
 func _start_encounter(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
+ if kind==&"peer":
+  var peer_id: String=str(extra.peer_id)
+  if not visitors.peers.pending(peer_id,participants):return
+  var result := await narrative.start(StringName(extra.encounter_id),participants,extra)
+  if result.ok:
+   var conversation_id: String=str(result.details.session_id)
+   if not visitors.peers.link(peer_id,conversation_id):narrative.cancel(StringName(conversation_id))
+  elif visitors.peers.pending(peer_id,participants):visitors.finish_peer()
+  return
  if kind==&"service_request":
   var result := await narrative.start(&"service_availability",participants,{"manual_read":true,"line_variant":visitors.random_index(3)})
   var conversation: ConversationSession=narrative.sessions.get(result.details.get("session_id","")) if result.ok else null

@@ -43,6 +43,7 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  return data
 func start(encounter_id: StringName, participants: PackedStringArray, extra: Dictionary = {}) -> ActionResult:
  if encounter_id==&"social_invitation" and _session.personal.active():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
+ if extra.has("peer_id") and not _session.visitors.peers.pending(str(extra.peer_id),participants):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  var definition: Dictionary = _definitions.get(str(encounter_id),{})
  if definition.is_empty() or not _encounter_available(definition,participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  if encounter_id==&"social_invitation" and not _session.actions.preview(&"personal_focus").ok:return _session.actions.preview(&"personal_focus")
@@ -83,7 +84,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation),_session.ink_players)
  _opening.erase(key)
  if wants_manual:_manual_opening=false
- if not result.ok or not _encounter_available(definition,participants):
+ if not result.ok or not _encounter_available(definition,participants) or (extra.has("peer_id") and not _session.visitors.peers.pending(str(extra.peer_id),participants)):
   conversation.runtime.queue_free()
   return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  sessions[str(conversation.id)] = conversation
@@ -122,6 +123,10 @@ func tick(delta: float) -> void:
    if conversation.current.ended: _finish(conversation)
    else: _advance(conversation)
 func _can_offer(conversation: ConversationSession) -> bool:
+ if conversation.context_extra.has("peer_id"):
+  if not _can_hear(conversation) or not _session.actions.preview(&"personal_focus").ok:return false
+  if _session.social_life.participation_blocked.is_valid() and _session.social_life.participation_blocked.call():return false
+  return conversation.choice_elapsed<float(_definitions[str(conversation.encounter_id)].get("choice_expiry",8))
  var definition: Dictionary = _definitions[str(conversation.encounter_id)]
  return _session.conditions.permits(definition.get("offer_requires",{}),conversation.participants)
 func _advance(conversation: ConversationSession) -> ActionResult:
@@ -201,7 +206,7 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
  var conversation: ConversationSession = sessions.get(str(session_id))
  if conversation == null or conversation.finished: return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
  var definition: Dictionary = _definitions[str(conversation.encounter_id)]
- if not _encounter_available(definition,conversation.participants): return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
+ if not _encounter_available(definition,conversation.participants) or (conversation.context_extra.has("peer_id") and not _can_offer(conversation)): return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
  var candidates: Array = choices(conversation)
  if automatic and conversation.optional: candidates = conversation.current.choices.map(func(choice):return {"id":str(conversation.choice_id(choice)),"index":choice.index})
  for choice in candidates:
