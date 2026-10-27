@@ -105,6 +105,11 @@ func tick(delta: float) -> void:
   conversation.elapsed += delta
   if not conversation.current.choices.is_empty():
    conversation.choice_elapsed += delta
+   if not conversation.current.autonomous.is_empty() and conversation.choice_elapsed>=float(definition.get("choice_expiry",8)):
+    var continued := conversation.runtime.continue_autonomously(conversation.current.autonomous)
+    if continued.ok:_advance(conversation)
+    else:_report_failure(conversation,continued);_finish(conversation)
+    continue
    if conversation.optional and conversation.choice_elapsed>=float(definition.get("choice_expiry",8)):
     if not _can_hear(conversation):
      _finish(conversation)
@@ -145,6 +150,16 @@ func _advance(conversation: ConversationSession) -> ActionResult:
    _report_failure(conversation,rejected)
    _finish(conversation)
    return rejected
+ for i in range(conversation.current.effects.size()):
+  var effect: Dictionary=conversation.current.effects[i]
+  if effect.get("scope","hearing")!="world":continue
+  var actors: Array=[]
+  for id in conversation.participants:actors.append(str(_session.presence.record(id).character_id))
+  if not effect.get("from","") in actors or not effect.get("to","") in actors:
+   var invalid := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_peer_effect_participants")
+   _report_failure(conversation,invalid);_finish(conversation);return invalid
+  var applied := _session.effects.apply(effect,StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
+  if not applied.ok:_report_failure(conversation,applied);_finish(conversation);return applied
  var hearing := _hear_current(conversation)
  if not hearing.ok:return hearing
  if _focus.is_empty() and (manual(conversation) or not conversation.current.choices.is_empty()) and _can_offer(conversation): _focus = conversation.id
@@ -154,7 +169,7 @@ func _hear_current(conversation: ConversationSession) -> ActionResult:
  if conversation.heard_beat==conversation.beat or not _can_hear(conversation):return ActionResult.success()
  var speaker := str(conversation.current.speaker_id)
  for i in range(conversation.current.effects.size()):
-  if not _can_hear(conversation):continue
+  if conversation.current.effects[i].get("scope","hearing")=="world":continue
   var applied := _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
   if not applied.ok:
    _report_failure(conversation,applied)

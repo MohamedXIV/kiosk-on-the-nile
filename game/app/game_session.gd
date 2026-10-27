@@ -241,6 +241,7 @@ func configure(source: SessionConfig) -> ActionResult:
  conditions.learning=learning
  conditions.recipe_ids=source.section("recipe_workflows").keys()+source.section("learning").families.values()
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
+ effects.relationships=relationships
  effects.social_life=social_life
  effects.service_provider=_service_effect
  effects.finance_provider=financial_effect

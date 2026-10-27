@@ -83,7 +83,7 @@ func _advance_frame() -> NarrativeTypes.Frame:
     return _frame
   for tag in _player.current_tags:
    var parts: PackedStringArray = str(tag).split(":", true, 1)
-   if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join", "loc"]:
+   if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join", "loc", "autonomous"]:
     _frame.result = ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"unknown_story_metadata")
     _frame.effects.clear()
     _frame.ended = true
@@ -91,6 +91,11 @@ func _advance_frame() -> NarrativeTypes.Frame:
    var key := parts[0].strip_edges()
    var value := parts[1].strip_edges()
    match key:
+    "autonomous":
+     if not value.is_valid_identifier():
+      _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
+      return _frame
+     _frame.autonomous=value
     "loc":
      _frame.loc_id=value
      _frame.loc_args=_context.get("localization_args",{}).duplicate(true)
@@ -102,8 +107,12 @@ func _advance_frame() -> NarrativeTypes.Frame:
      _frame.duration = value.to_float()
     "effect":
      var fields := value.split("|")
+     var scope := "hearing"
+     if fields.size()>0 and fields[0]=="world":scope="world";fields.remove_at(0)
      if fields.size() == 2 and fields[0] == "mood" and fields[1].is_valid_float():
       _frame.effects.append({"kind":"mood","amount":fields[1].to_float()})
+     elif fields.size()==5 and fields[0]=="peer_relation" and fields[4].is_valid_float():
+      _frame.effects.append({"kind":"peer_relation","from":fields[1],"to":fields[2],"axis":fields[3],"amount":fields[4].to_float()})
      elif fields.size()==2 and fields[0]=="supply":
       _frame.effects.append({"kind":"supply","action_id":fields[1]})
      elif fields.size()==2 and fields[0]=="finance":
@@ -118,12 +127,16 @@ func _advance_frame() -> NarrativeTypes.Frame:
       _frame.result = ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"invalid_story_effect")
       _frame.effects.clear()
       return _frame
+     if scope=="world":_frame.effects[-1]["scope"]="world"
  for choice in _player.current_choices:
   var record := {"id":str(choice.index),"index":choice.index,"text":choice.text.strip_edges()}
   if choice.tags is Array:
    for tag in choice.tags:
     if str(tag).begins_with("loc:"):record["loc_id"]=str(tag).trim_prefix("loc:").strip_edges()
   _frame.choices.append(record)
+ if not _frame.autonomous.is_empty() and (not _valid_autonomous_path(_frame.autonomous) or _frame.choices.is_empty()):
+  _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
+  return _frame
  if not _frame.choices.is_empty():_frame.loc_args=_context.get("localization_args",{}).duplicate(true)
  _frame.ended = not _player.can_continue and _frame.choices.is_empty()
  return _frame
@@ -134,6 +147,12 @@ func choose(index: int) -> ActionResult:
   return ActionResult.failure(ActionResult.Code.INVALID_CHOICE, &"invalid_choice")
  _player.choose_choice_index(index)
  return ActionResult.success()
+func _valid_autonomous_path(path: String) -> bool:
+ return _player!=null and path.is_valid_identifier() and _player._story.main_content_container.named_content.has(path)
+func continue_autonomously(path: String) -> ActionResult:
+ if not _valid_autonomous_path(path):return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
+ _player.choose_path(path)
+ return ActionResult.success() if _error.is_empty() else ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
 func snapshot() -> Dictionary:
  if _player == null: return {}
  var state: String = _player.get_state()
@@ -147,6 +166,7 @@ func restore(data: Dictionary) -> ActionResult:
  for flow in state.flows.values():
   if not flow is Dictionary or not flow.get("callstack") is Dictionary or not flow.get("outputStream") is Array or not flow.get("currentChoices") is Array: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_flow")
  var displayed: Dictionary = data.frame
+ if displayed.has("autonomous") and (not displayed.autonomous is String or not displayed.autonomous.is_valid_identifier()):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_autonomous_path")
  if displayed.has("loc_id") and (not displayed.loc_id is String or not displayed.get("loc_args") is Dictionary):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_localized_frame")
  if not displayed.get("text") is String or not displayed.get("speaker_id") is String or not ContentValidation.number(displayed.get("duration")) or displayed.duration<=0 or not displayed.get("choices") is Array or not displayed.get("effects") is Array or not displayed.get("ended") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_frame")
  for choice in displayed.choices:
@@ -164,6 +184,7 @@ func restore(data: Dictionary) -> ActionResult:
    if effect.get("kind")=="mood" and ContentValidation.number(effect.get("amount")): effect.amount=float(effect.amount)
   valid_hash = data.get("state_hash")== (data.ink+JSON.stringify(legacy,"",true)).sha256_text()
  if not valid_hash: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_story_state")
+ if displayed.has("autonomous") and (displayed.choices.is_empty() or not _valid_autonomous_path(displayed.autonomous)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_autonomous_path")
  var previous: String = _player.get_state()
  _player.set_state(data.ink)
  if not _error.is_empty() or _player.current_choices.size()!=displayed.choices.size():
