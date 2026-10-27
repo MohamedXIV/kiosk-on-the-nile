@@ -238,5 +238,45 @@
     "sha256": "29c0bd2aa5f1a4274f6b1cc8b5a186055597bce6767b3fd4e74f4ef0919ba71e",
     "original_branch": "build/supplier-38396bb",
     "original_commit": "d44d4c0521c0268c949c7462b5bf36e48fd7ebb7"
+  },
+  {
+    "version": "godot-preview-2026-10-22-933f1b7",
+    "path": "godot-preview-2026-10-22-933f1b7/kiosk-on-the-nile-web-release.zip",
+    "bytes": 11150471,
+    "sha256": "8f9906cf52b09e19e412f6210b499f768632ebde312387a2523cf3242bcaa621",
+    "original_branch": "godot-preview-2026-10-22-933f1b7",
+    "original_commit": "9efef633c4f7397d39a4b7485dde4f7a51cad819"
+  },
+  {
+    "version": "godot-preview-dialogue-fix-6dcb784",
+    "path": "godot-preview-dialogue-fix-6dcb784/kiosk-on-the-nile-web-dialogue-fix.zip",
+    "bytes": 11150445,
+    "sha256": "2eca98e8cebfedd4d19b774a916d784935638dad37595343040bf8fa1734451f",
+    "original_branch": "godot-preview-dialogue-fix-6dcb784",
+    "original_commit": "8acdf378701a1cb50c058442fbc525bfb5a7eb71"
+  },
+  {
+    "version": "godot-preview-sleep-mood-8754ac5",
+    "path": "godot-preview-sleep-mood-8754ac5/kiosk-on-the-nile-web-sleep-mood.zip",
+    "bytes": 11164436,
+    "sha256": "03eeee33040e3d2498d35b22323859f3a4453a3c9eedfdad9d3716d1231e2711",
+    "original_branch": "godot-preview-sleep-mood-8754ac5",
+    "original_commit": "e087b2d0ace51cee22540fdb376e1e4ecf97a7c0"
+  },
+  {
+    "version": "godot-preview-sleep-mood-8b4b033",
+    "path": "godot-preview-sleep-mood-8b4b033/kiosk-on-the-nile-web-sleep-mood.zip",
+    "bytes": 11164371,
+    "sha256": "8dddf913d14dfec804de1f797305f0df7a408a42d4c8c7b0a466aa5c4c5ca59a",
+    "original_branch": "godot-preview-sleep-mood-8b4b033",
+    "original_commit": "4f0161d107724bb55272d41c05f11b5a9a1f01b2"
+  },
+  {
+    "version": "godot-preview-social-hud-c752382",
+    "path": "godot-preview-social-hud-c752382/kiosk-on-the-nile-web-social-hud.zip",
+    "bytes": 11138430,
+    "sha256": "fc18ff2db2d4b1a0db856746cfd2bbab41d87861bf3f8dff269ba30fbfe92ad9",
+    "original_branch": "godot-preview-social-hud-c752382",
+    "original_commit": "ab2be380d1b35541ff92f8d180f36c88585e39ad"
   }
 ]
