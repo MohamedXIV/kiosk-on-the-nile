@@ -13,7 +13,9 @@ done
 mkdir -p "$OUT"
 PRESET=Web
 if [[ "$MODE" == release ]]; then PRESET="Web Release"; fi
-BUILD_STEM="kiosk-$(git -C "$ROOT" rev-parse --short=12 HEAD)"
+BUILD_CONTEXT=$(python3 "$ROOT/tools/release.py" context)
+BUILD_STEM=$(python3 "$ROOT/tools/release.py" stem)
 bash "$ROOT/tools/godot.sh" --headless --path "$ROOT" --export-"$MODE" "$PRESET" "$OUT/$BUILD_STEM.html"
 mv "$OUT/$BUILD_STEM.html" "$OUT/index.html"
 cp -R "$ROOT/content" "$OUT/"
+python3 "$ROOT/tools/release.py" metadata --web-root "$OUT" --mode "$MODE" --context "$BUILD_CONTEXT"

@@ -16,6 +16,10 @@ reference; its visitor and service behavior does not override that vision.
 
 [All preserved playable versions](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) · [Archive consolidation record](docs/roadmap/ARTIFACTS.md).
 
+## Version and release policy
+
+Current target: **0.1.0-prealpha.1** (`VERSION`); the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
+
 ## Current Web preview
 
 [Web save acknowledgment preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/web-save-ack-e8cfa15) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/631345edf67cb868757a952c13eab2a3c80ea8b9/web-save-ack-e8cfa15/kiosk-on-the-nile-web-save-ack.zip).

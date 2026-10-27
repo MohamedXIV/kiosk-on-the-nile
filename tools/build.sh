@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 mkdir -p .cache/build-logs
+python3 tools/release.py check
 bash tools/compile-ink.sh --check
 python3 tools/extract-localization.py --check
 if ! bash tools/godot.sh --headless --editor --path . --import > .cache/build-logs/import.log 2>&1; then
