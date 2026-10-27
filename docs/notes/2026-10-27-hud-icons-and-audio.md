@@ -23,3 +23,17 @@ No automated gameplay suite was added or run. Build and actual browser observati
 ## Native observations
 
 Content loaded with all new SVG resources. Phase boundaries at0/359/360/719/720/900/1080/1260/1439 selected the expected authored texture and localized label. An actual locale change refreshed the tooltip without a time change. HUD presentation left the ingredient inventory equal. Missing midnight coverage and missing SVG path were rejected; old external UI without the optional icons block was accepted. The production physical-world lifecycle observation still removed the player from old/travel maps and freed maps at teardown. These short native fixtures reported46 ObjectDB instances/21 resources still in use at exit; they are recorded, not presented as a general leak diagnosis.
+
+Final product `131642326d4dfab4f1eb105411415e29c2e28e88` passed311 stable Ink localization references, Godot4.7.2 import and Release Web export with no script/parse/compile errors. No audio, navigation, domain service, recipe, story or save format edits are in this product. Its gameplay code diff is confined to status-strip presentation and optional HUD metadata validation.
+
+## Web observations
+
+The draft export displayed the Arabic needs icons and night icon, without the tea/liver row. [Arabic presentation](evidence/2026-10-27-hud-icons/web-ar-draft.png). Final product additionally refreshes the cached phase tooltip on locale revision; geometry/art/data are identical. A stale cached initial HTML navigation first showed the older HUD; navigating with a new build query requested the correct versioned engine files. Final export uses the unique `kiosk-131642326d4d.*` filenames. Keep exports together and hard refresh when replacing them.
+
+The exact final1316423 export opened the existing revision15 save via actual Continue, with wallet45, the moved player and active Amgad choices retained. The final Arabic strip shows the three needs icons and night icon with no tea/liver row. [Final Arabic](evidence/2026-10-27-hud-icons/web-ar-final.png). No injected browser state or gameplay command bridge was used. Software WebGL at960×540 is a presentation observation, not a player-hardware FPS benchmark.
+
+Actual language-picker input switched the final export to English; Continue opened the same existing save and the English HUD fitted with its needs/day icons. [Final English](evidence/2026-10-27-hud-icons/web-en-final.png). Already-heard/saved dialogue keeps its captured language by the existing localization policy. No page/script errors or save/content rejection warnings were logged.
+
+## Published preview
+
+[GitHub prerelease](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/hud-icons-1316423) · [Pinned complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/a574a0c27cbf6c719aa00d548dcb1063cd2c6a98/builds/kiosk-on-the-nile-hud-icons.zip). ZIP12125769 bytes, SHA256 `201f8541fc6431c27d11a9767f82be724a0a83dc0c7ab2fcca90178ce1273c82`. Independently downloaded the pinned artifact and verified SHA256, ZIP CRC, source/schema metadata, a single engine file set, every shipping content file (including all11 current Ink stories and both locales), and Web evidence. No fixture settings are packaged. Product remains `131642326d4dfab4f1eb105411415e29c2e28e88`; source preview branch may advance with documentation only. Main is unchanged.
