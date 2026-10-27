@@ -10,6 +10,10 @@ the pace. It records the owner's clarification and the gaps in the current
 preview. The unchanged three-quarter HTML prototype is a historical porting
 reference; its visitor and service behavior does not override that vision.
 
+## Project status
+
+[Delivered work and roadmap](docs/roadmap/STATUS.md) · [Branch integration audit](docs/roadmap/BRANCH_AUDIT.md).
+
 ## Current Web preview
 
 [HUD icons preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/hud-icons-1316423) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/a574a0c27cbf6c719aa00d548dcb1063cd2c6a98/builds/kiosk-on-the-nile-hud-icons.zip).
