@@ -22,6 +22,8 @@ var _prompt_panel: PanelContainer
 var _prompt: Label
 var _station: Label
 var _thought: Label
+func show_save_status(key: String) -> void:
+ _strip.show_save_status(key)
 func configure(text: UiText) -> void:
  _text = text
  theme = text.make_theme()

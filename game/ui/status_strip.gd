@@ -12,6 +12,7 @@ var _periods: Array=[]
 var _period_textures: Array[Texture2D]=[]
 var _held: Label
 var _bars: Dictionary = {}
+var _save_feedback: Label
 func configure(text: UiText) -> void:
  _text = text
  var settings: Dictionary = text.data.hud
@@ -81,6 +82,15 @@ func configure(text: UiText) -> void:
  _held.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
  _held.clip_text = true
  details.add_child(_held)
+ _save_feedback=UiText.label()
+ _save_feedback.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ box.add_child(_save_feedback)
+ _save_feedback.hide()
+func show_save_status(key: String) -> void:
+ _save_feedback.visible=not key.is_empty()
+ if not key.is_empty():
+  _save_feedback.text=_text.text(key)
+  UiText.bind_control(_save_feedback,"ui."+key)
 func present(session: GameSession) -> void:
  var minute := int(session.clock.minutes)%1440
  _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})

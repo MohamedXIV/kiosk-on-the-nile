@@ -1047,6 +1047,8 @@
     "story.river_company.choice_003": "(Stay and listen.)",
     "story.river_company.line_009": "Let’s sit a little longer before life catches up with us.",
     "story.river_company.line_010": "No rush. We’ve got a moment.",
-    "manual_topic.river_company/river_chat": "A moment by the Nile"
+    "manual_topic.river_company/river_chat": "A moment by the Nile",
+    "ui.saving": "Saving to browser storage…",
+    "ui.save_unconfirmed": "Could not confirm browser storage. Please save again before leaving."
   }
 }
