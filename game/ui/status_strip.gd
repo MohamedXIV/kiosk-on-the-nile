@@ -5,7 +5,11 @@ var _text: UiText
 var _clock: Label
 var _money: Label
 var _state: Label
-var _inventory: Label
+var _day_icon: TextureRect
+var _day_period: int=-1
+var _day_locale_revision: int=-1
+var _periods: Array=[]
+var _period_textures: Array[Texture2D]=[]
 var _held: Label
 var _bars: Dictionary = {}
 func configure(text: UiText) -> void:
@@ -23,8 +27,17 @@ func configure(text: UiText) -> void:
  heading.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
  heading.add_theme_constant_override("separation",18)
  box.add_child(heading)
+ var clock_group := HBoxContainer.new()
+ clock_group.layout_direction=Control.LAYOUT_DIRECTION_INHERITED
+ heading.add_child(clock_group)
+ var icons: Dictionary=settings.get("icons",{})
+ _periods=icons.get("day_periods",[])
+ if not _periods.is_empty():
+  _day_icon=_icon("",float(icons.get("size",22)))
+  clock_group.add_child(_day_icon)
+  for period: Dictionary in _periods:_period_textures.append(load(period.path) as Texture2D)
  _clock = UiText.label()
- heading.add_child(_clock)
+ clock_group.add_child(_clock)
  _money = UiText.label()
  heading.add_child(_money)
  _state = UiText.label()
@@ -44,11 +57,10 @@ func configure(text: UiText) -> void:
  details.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
  details.add_theme_constant_override("separation",18)
  box.add_child(details)
- _inventory = UiText.label()
- details.add_child(_inventory)
  for key in ["hunger","rest","mood"]:
   var meter := HBoxContainer.new()
   meter.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
+  if icons.get("needs",{}).has(key):meter.add_child(_icon(icons.needs[key],float(icons.get("size",22))))
   meter.add_child(text.key_label(key))
   var bar := ProgressBar.new()
   bar.custom_minimum_size = Vector2(float(settings.meter_width),8)
@@ -72,6 +84,17 @@ func configure(text: UiText) -> void:
 func present(session: GameSession) -> void:
  var minute := int(session.clock.minutes)%1440
  _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
+ if _day_icon!=null:
+  var period_index: int=0
+  for index in _periods.size():
+   if minute>=int(_periods[index].start_minute):period_index=index
+  var locale_revision: int=LocaleService.current.revision if LocaleService.current else 0
+  if period_index!=_day_period or locale_revision!=_day_locale_revision:
+   _day_locale_revision=locale_revision
+   _day_period=period_index
+   _day_icon.texture=_period_textures[period_index]
+   _day_icon.tooltip_text=_text.text(_periods[period_index].label)
+   _clock.tooltip_text=_day_icon.tooltip_text
  _money.text = _text.text("money",{"amount":"%.2f" % (session.wallet.balance/100.0)})
  _state.text = _text.text("open") if session.kiosk_open else _text.text("closed")
  if not session.accounts.business_allowed():_state.text+=" · "+_text.text("hud_business_suspended")
@@ -79,11 +102,19 @@ func present(session: GameSession) -> void:
  elif session.needs.rest<session.tuning.value("fatigue_warning"):_state.text+=" · "+_text.text("hud_tired")
  _state.tooltip_text=_text.text("hud_focus",{"rest":"%.1f" % session.needs.rest,"focus":"%.1f" % session.alertness.effective_focus()})
  if session.fatigue.visual_scale<1:_state.tooltip_text+=" · "+_text.text("hud_fatigue_visual",{"percent":"%.0f" % (session.fatigue.visual_scale*100)})
- var stock := session.cooking.inventory_snapshot()
- _inventory.text = _text.text("stock_short",{"tea":int(stock.tea),"kebda":int(stock.kebda)})
  var held := session.items.get_item(session.inventory.held_id())
  _held.text = _text.text("held",{"item":ItemText.instance(session,held)}) if not held.is_empty() else _text.text("empty_hands")
  _held.tooltip_text = _held.text
  for key in _bars:
   _bars[key].value = session.needs.get(key)
   _bars[key].tooltip_text = _text.text(key)
+
+func _icon(path: String, extent: float) -> TextureRect:
+ var icon := TextureRect.new()
+ icon.custom_minimum_size=Vector2.ONE*extent
+ icon.mouse_filter=Control.MOUSE_FILTER_PASS
+ icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ icon.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+ if not path.is_empty():icon.texture=load(path) as Texture2D
+ return icon

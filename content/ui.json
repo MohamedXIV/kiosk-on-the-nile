@@ -196,7 +196,47 @@
       "rest": "#7aa9af",
       "mood": "#9aaf7c"
     },
-    "dialogue_width_ratio": 0.35
+    "dialogue_width_ratio": 0.35,
+    "icons": {
+      "size": 22,
+      "needs": {
+        "hunger": "res://assets/ui/icons/hunger.svg",
+        "rest": "res://assets/ui/icons/rest.svg",
+        "mood": "res://assets/ui/icons/mood.svg"
+      },
+      "day_periods": [
+        {
+          "start_minute": 0,
+          "label": "hud_phase_night",
+          "path": "res://assets/ui/icons/night.svg"
+        },
+        {
+          "start_minute": 360,
+          "label": "hud_phase_morning",
+          "path": "res://assets/ui/icons/morning.svg"
+        },
+        {
+          "start_minute": 720,
+          "label": "hud_phase_noon",
+          "path": "res://assets/ui/icons/noon.svg"
+        },
+        {
+          "start_minute": 900,
+          "label": "hud_phase_afternoon",
+          "path": "res://assets/ui/icons/noon.svg"
+        },
+        {
+          "start_minute": 1080,
+          "label": "hud_phase_evening",
+          "path": "res://assets/ui/icons/evening.svg"
+        },
+        {
+          "start_minute": 1260,
+          "label": "hud_phase_night",
+          "path": "res://assets/ui/icons/night.svg"
+        }
+      ]
+    }
   },
   "arrange": "ترتيب المكان",
   "arrange_title": "ترتيب الأثاث والأجهزة",
@@ -316,5 +356,10 @@
       "KNOWN_ABDUL_FAMILY": "notebook.note.KNOWN_ABDUL_FAMILY",
       "KNOWN_SHAWARMA_BASICS": "notebook.note.KNOWN_SHAWARMA_BASICS"
     }
-  }
+  },
+  "hud_phase_night": "ليل",
+  "hud_phase_morning": "الصباح",
+  "hud_phase_noon": "الظهيرة",
+  "hud_phase_afternoon": "بعد الظهر",
+  "hud_phase_evening": "المساء"
 }

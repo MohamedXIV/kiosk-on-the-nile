@@ -1028,6 +1028,11 @@
     "ui.phone_busy": "The call isn’t available right now. Finish your current conversation and move near the phone.",
     "ui.phone_near": "Move near the desk phone upstairs or the last kiosk counter to make a call.",
     "records.activation.name": "Accounts notebook",
-    "records.activation.text": "Housing and district rent are due weekly, with future due dates shown in the notebook and no automatic deduction."
+    "records.activation.text": "Housing and district rent are due weekly, with future due dates shown in the notebook and no automatic deduction.",
+    "ui.hud_phase_night": "Night",
+    "ui.hud_phase_morning": "Morning",
+    "ui.hud_phase_noon": "Noon",
+    "ui.hud_phase_afternoon": "Afternoon",
+    "ui.hud_phase_evening": "Evening"
   }
 }
