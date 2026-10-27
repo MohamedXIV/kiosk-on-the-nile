@@ -2,7 +2,7 @@
 
 > Execute inline using superpowers:executing-plans. User requested this foundational task before further gameplay. No repeated scope approval for routine naming/tooling choices.
 
-**Goal:** A clear pre-alpha version/save policy and reproducible traceable releases.
+**Goal:** A clear pre-alpha version/save policy and repeatable traceable releases.
 **Architecture:** VERSION is authoritative; release.py checks/synchronizes Godot metadata, generates build provenance and packages formal tagged releases. Curated CHANGELOG.md and docs/RELEASING.md define the human workflow.
 **Tech stack:** Godot4.7.2, Python standard library, shell/Git/GitHub Actions, SemVer2/Keep a Changelog1.1.
 **Spec:** docs/superpowers/specs/2026-10-27-prealpha-versioning-design.md

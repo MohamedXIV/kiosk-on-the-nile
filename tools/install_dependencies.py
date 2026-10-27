@@ -17,8 +17,10 @@ def artifact(name):
 engine=artifact('godot')
 with zipfile.ZipFile(engine) as z:
  name=next(n for n in z.namelist() if n.endswith('linux.x86_64'))
- destination=CACHE/'bin'/'godot-4.7.2'; destination.parent.mkdir(exist_ok=True)
- if not destination.exists(): destination.write_bytes(z.read(name)); destination.chmod(0o755)
+ destination=CACHE/'bin'/('godot-'+lock['godot']['version']); destination.parent.mkdir(exist_ok=True)
+ data=z.read(name)
+ if not destination.exists() or hashlib.sha256(destination.read_bytes()).digest()!=hashlib.sha256(data).digest():destination.write_bytes(data)
+ destination.chmod(0o755)
 compiler=artifact('ink')
 compiler_dir=CACHE/'inklecate'
 if not (compiler_dir/'inklecate').exists():
@@ -44,11 +46,12 @@ if not font.exists():
    target.write_bytes(data)
    print('Verified font asset',target.name,flush=True)
 templates=artifact('templates')
-template_dir=CACHE/'data/godot/export_templates/4.7.2.stable'; template_dir.mkdir(parents=True,exist_ok=True)
+template_dir=CACHE/'data/godot/export_templates'/(lock['godot']['version']+'.stable'); template_dir.mkdir(parents=True,exist_ok=True)
 with zipfile.ZipFile(templates) as z:
  for member in z.namelist():
   basename=pathlib.PurePosixPath(member).name
   if (basename.startswith('web_') and basename.endswith('.zip')) or basename=='version.txt':
    target=template_dir/basename
-   if not target.exists():target.write_bytes(z.read(member))
+   data=z.read(member)
+   if not target.exists() or hashlib.sha256(target.read_bytes()).digest()!=hashlib.sha256(data).digest():target.write_bytes(data)
 print('Pinned dependencies ready',flush=True)
