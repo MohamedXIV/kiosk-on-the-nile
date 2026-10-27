@@ -17,3 +17,7 @@ Cleanup completed:30 duplicate build branch refs removed atomically with expecte
 Five early preview branches were subsequently found to contain ZIP-only unique commits. They were added with original history/provenance at612203028ce317e86cafdd7c9f38951d55fa5219, bringing the archive to35 versions. See INTEGRATION.md.
 
 Final source consolidation completed through PR#9. Only main/artifacts remain; the earlier38-head count is an intermediate snapshot.
+
+## Quiet social preview appended
+
+Immutable artifact commit `fcb340545b29f6a760d4334cef6750662ccdd103` appends one archive to the existing artifacts history:36 total, with the previous35 manifest entries unchanged. [Complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/fcb340545b29f6a760d4334cef6750662ccdd103/quiet-social-706d7d0/kiosk-on-the-nile-quiet-social.zip); 12393457 bytes, SHA256 `b01ae721da310628662a7fe9e6e02ef9e545c4126284c65a62348fca2f05cd12`. Independently downloaded bytes/CRC, unique WASM/PCK, source/revision metadata, all external content files and12 authored stories were checked. Source `706d7d0d8a4dee3ec56625db112cc0488ee7c120`; no new artifact branch or main merge.
