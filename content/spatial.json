@@ -57,5 +57,17 @@
     "replan_cooldown_seconds": 0.75,
     "max_replans": 2,
     "max_fallbacks": 2
+  },
+  "avoidance": {
+    "enabled": true,
+    "radius": 0.24,
+    "neighbor_distance": 2.5,
+    "max_neighbors": 8,
+    "time_horizon_agents": 1.0,
+    "sample_age_seconds": 0.25,
+    "conflict_lookahead": 1.2,
+    "path_skip_distance": 0.75,
+    "max_wait_seconds": 6,
+    "passing_margin": 0.12
   }
 }

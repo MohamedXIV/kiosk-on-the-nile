@@ -16,6 +16,8 @@ var _cursor: int=-1
 var _best: float=INF
 var _failed: bool=false
 var _failure_pending: bool=false
+var _yield_wait: float=0
+var _yield_reported: bool=false
 func configure(navigation: KioskNavigation, settings: Dictionary) -> void:
  _navigation=navigation
  _settings=settings.duplicate(true)
@@ -27,9 +29,11 @@ func step(motor: ActorMotor, destination: Vector2, delta: float, paused: bool=fa
   _goal=destination;_has_goal=true;_revision=_navigation.revision
   _dirty=true;_stall=0;_cooldown=0;_attempts=0;_cursor=-1;_best=INF
   _failed=false;_failure_pending=false
+  _yield_wait=0;_yield_reported=false
   motor.reset_path()
  if paused:
   _stall=0
+  _yield_wait=0;_yield_reported=false
   motor.step_input(Vector2.ZERO,delta)
   return
  var radius := float(_settings.get("arrival_radius",0.12))
@@ -50,7 +54,14 @@ func step(motor: ActorMotor, destination: Vector2, delta: float, paused: bool=fa
    motor.step_input(Vector2.ZERO,delta)
    _retry()
    return
- motor.step_path(_path,delta,minf(0.08,radius*0.5))
+ motor.step_path(_path,delta,minf(0.08,radius*0.5),_navigation.walkable_segment)
+ if motor.motion_yielded:
+  _stall=0;_yield_wait+=delta
+  if _yield_wait>=motor.dynamic_wait_limit and not _yield_reported:
+   _yield_reported=true;_failure_pending=true
+   RuntimePerformance.observe("npc_yield_timeout",0)
+  return
+ _yield_wait=0;_yield_reported=false
  var cursor := motor.path_cursor()
  var distance := motor.waypoint_distance()
  if cursor!=_cursor:
@@ -76,4 +87,4 @@ func claim_fallback() -> bool:
  _fallbacks+=1
  return true
 func status() -> Dictionary:
- return {"fallbacks":_fallbacks,"failed":_failed,"attempts":_attempts,"revision":_revision,"stall_seconds":_stall}
+ return {"fallbacks":_fallbacks,"failed":_failed,"attempts":_attempts,"revision":_revision,"stall_seconds":_stall,"yield_seconds":_yield_wait}

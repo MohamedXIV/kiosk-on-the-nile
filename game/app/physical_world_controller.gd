@@ -8,6 +8,8 @@ var residential: ResidentialController
 var visitors: VisitorController
 var input_provider: Callable
 var _session: GameSession
+var _avoidance: Dictionary={}
+var _player_speed: float=4.5
 func configure(session: GameSession, parent: Node2D) -> ActionResult:
  _session = session
  for id in session.config.section("locations"):
@@ -21,6 +23,13 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
  room.add_child(motor)
  motor.pose = session.player_pose
  var spatial := session.config.section("spatial")
+ _player_speed=float(spatial.player_speed)
+ for location in rooms:
+  var local := NpcAvoidanceWorld.new()
+  local.name=str(location)+"Avoidance"
+  parent.add_child(local)
+  local.configure(rooms[location].navigation,spatial.get("avoidance",{}))
+  _avoidance[location]=local
  motor.configure(room.mapping,float(spatial.player_speed),float(spatial.foot_radius))
  if session.locations.is_physical(session.location_id):motor.teleport(session.location_id,session.player_ground)
  character = preload("res://game/presentation/character_view.tscn").instantiate()
@@ -36,7 +45,7 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
  visitors = VisitorController.new()
  parent.add_child(visitors)
  session.visitors.update_markers(rooms.kiosk.definition.data.markers)
- visitors.configure(session.visitors,rooms.kiosk)
+ visitors.configure(session.visitors,rooms.kiosk,_avoidance.kiosk)
  session.visitors.observed_actors=func():
   var actors: Dictionary={}
   if session.locations.is_physical(session.location_id):actors["player"]=session.player_pose
@@ -46,12 +55,18 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
  residential=ResidentialController.new()
  parent.add_child(residential)
  residential.session=session;residential.room=rooms.rooftop
+ residential.avoidance=_avoidance.rooftop
  session.spaces.set_adapter(_refresh)
  return ActionResult.success()
 func step(delta: float) -> void:
+ for local: NpcAvoidanceWorld in _avoidance.values():local.begin_step(delta)
  var direction := Vector2.ZERO
  if input_provider.is_valid(): direction = input_provider.call()
  if _session.locations.is_physical(_session.location_id):motor.step_input(direction,delta)
+ for location in _avoidance:
+  var local: NpcAvoidanceWorld=_avoidance[location]
+  if location==str(_session.location_id):local.sync(&"player",_session.player_ground,false,_player_speed,true)
+  else:local.remove_actor(&"player")
  visitors.step(delta)
  residential.step(delta)
 func set_active_location(id: StringName) -> void:

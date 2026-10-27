@@ -142,7 +142,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if not features.ok:return features
  var motion := CharacterMotionValidation.validate(bundle)
  if not motion.ok:return motion
- return SeatingContentValidation.validate(bundle)
+ var seating := SeatingContentValidation.validate(bundle)
+ if not seating.ok:return seating
+ return AvoidanceContentValidation.validate(bundle)
 static func vector(value: Variant, count: int) -> bool:
  if not value is Array or value.size()!=count: return false
  for component in value:

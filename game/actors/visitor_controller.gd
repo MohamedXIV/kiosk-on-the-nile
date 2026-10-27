@@ -5,9 +5,11 @@ var _room: LocationView
 var _motors: Dictionary = {}
 var _followers: Dictionary = {}
 var _spatial: Dictionary={}
-func configure(service: VisitorService, room: LocationView) -> void:
+var avoidance: NpcAvoidanceWorld
+func configure(service: VisitorService, room: LocationView, local_avoidance: NpcAvoidanceWorld=null) -> void:
  _service = service
  _room = room
+ avoidance=local_avoidance
  _spatial=room.session.config.section("spatial")
  var navigation_settings: Dictionary=_spatial.get("navigation",{}).duplicate(true)
  if not navigation_settings.has("arrival_radius"):navigation_settings["arrival_radius"]=float(room.session.config.section("visitors").arrival_radius)*0.8
@@ -16,6 +18,7 @@ func configure(service: VisitorService, room: LocationView) -> void:
 func step(delta: float) -> void:
  for id in _motors.keys():
   if not _service.visits.has(id):
+   if avoidance!=null:avoidance.remove_actor(StringName(id))
    _motors[id].queue_free()
    _motors.erase(id)
    _followers.erase(id)
@@ -38,7 +41,17 @@ func step(delta: float) -> void:
    var follower := NpcNavigation.new()
    follower.configure(_room.navigation,_spatial.get("navigation",{}))
    _followers[id]=follower
+   if avoidance!=null:avoidance.tune_motor(motor,visit.id)
    RuntimePerformance.finish("visitor_node_spawn",perf)
+ if avoidance!=null and avoidance.enabled():
+  for id in _service.visits:
+   var visit: VisitState=_service.visits[id]
+   var sitting := _service.seating.seated(visit.id)
+   var stationary := sitting or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id)) or visit.pose.ground.distance_to(_service.meetings.goal(visit))<=float(_spatial.navigation.arrival_radius)
+   var point: Vector2=_service.seating.slot_for(visit.id).anchor if sitting else visit.pose.ground
+   avoidance.sync(visit.id,point,stationary,float(_spatial.npc_speed),false,_service.meetings.goal(visit))
+ for id in _service.visits:
+  var visit: VisitState=_service.visits[id]
   var motor: ActorMotor = _motors[id]
   var follower: NpcNavigation=_followers[id]
   var sitting := _service.seating.seated(visit.id)
