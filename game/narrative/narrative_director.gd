@@ -100,6 +100,8 @@ func tick(delta: float) -> void:
   if not _encounter_available(definition,conversation.participants):
    cancel(conversation.id)
    continue
+  var hearing := _hear_current(conversation)
+  if not hearing.ok:continue
   conversation.elapsed += delta
   if not conversation.current.choices.is_empty():
    conversation.choice_elapsed += delta
@@ -143,6 +145,14 @@ func _advance(conversation: ConversationSession) -> ActionResult:
    _report_failure(conversation,rejected)
    _finish(conversation)
    return rejected
+ var hearing := _hear_current(conversation)
+ if not hearing.ok:return hearing
+ if _focus.is_empty() and (manual(conversation) or not conversation.current.choices.is_empty()) and _can_offer(conversation): _focus = conversation.id
+ changed.emit()
+ return ActionResult.success()
+func _hear_current(conversation: ConversationSession) -> ActionResult:
+ if conversation.heard_beat==conversation.beat or not _can_hear(conversation):return ActionResult.success()
+ var speaker := str(conversation.current.speaker_id)
  for i in range(conversation.current.effects.size()):
   if not _can_hear(conversation):continue
   var applied := _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
@@ -160,8 +170,7 @@ func _advance(conversation: ConversationSession) -> ActionResult:
   if conversation.encounter_id!=&"social_invitation" or conversation.context_extra.get("invitation_listening",false):
    var topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
    _session.social_life.heard_topic(topic)
- if _focus.is_empty() and (manual(conversation) or not conversation.current.choices.is_empty()) and _can_offer(conversation): _focus = conversation.id
- changed.emit()
+ conversation.heard_beat=conversation.beat
  return ActionResult.success()
 func choices(conversation: ConversationSession) -> Array[Dictionary]:
  var offered: Array[Dictionary] = []
@@ -274,6 +283,9 @@ func restore(data: Dictionary) -> ActionResult:
   result = conversation.runtime.restore(record.runtime)
   if not result.ok: return _reject_candidates(candidates)
   conversation.current = conversation.runtime.frame()
+  var heard: Variant=record.get("heard_beat",conversation.beat)
+  if not ContentValidation.integer(heard) or heard<0 or heard>conversation.beat:return _reject_candidates(candidates)
+  conversation.heard_beat=int(heard)
   if not conversation.topic_selection.is_empty() and not restored_history.contains(conversation.topic_selection):
    # Control-only frames and speech outside hearing range do not consume a
    # topic. Preserve their cursor without inventing heard speech or effects;
