@@ -13,3 +13,5 @@
 Only duplicate `build/*` branch refs are eligible for this cleanup, with expected-head leases. Source branches remain for PR#9 review. Historical branch audit is a pre-cleanup snapshot, not a live count. No game code/build was changed and no gameplay tests were run in this archive maintenance task.
 
 Cleanup completed:30 duplicate build branch refs removed atomically with expected-head leases. Remote heads now total38 (includes artifacts and integration branch). Source branches and main remain unchanged.
+
+Five early preview branches were subsequently found to contain ZIP-only unique commits. They were added with original history/provenance at612203028ce317e86cafdd7c9f38951d55fa5219, bringing the archive to35 versions. See INTEGRATION.md.

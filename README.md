@@ -12,7 +12,7 @@ reference; its visitor and service behavior does not override that vision.
 
 ## Project status
 
-[Delivered work and roadmap](docs/roadmap/STATUS.md) · [Branch integration audit](docs/roadmap/BRANCH_AUDIT.md).
+[Delivered work and roadmap](docs/roadmap/STATUS.md) · [Branch integration audit](docs/roadmap/BRANCH_AUDIT.md) · [Integration gate and evidence](docs/roadmap/INTEGRATION.md).
 
 [All preserved playable versions](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) · [Archive consolidation record](docs/roadmap/ARTIFACTS.md).
 
