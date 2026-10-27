@@ -1,6 +1,6 @@
 # Preserved playable Web archives
 
-35 verified archives; original commits remain reachable. Do not merge artifact history into source. Extract complete ZIP and use local HTTP. SHA256/provenance: manifest.json.
+36 verified archives; original commits remain reachable. Do not merge artifact history into source. Extract complete ZIP and use local HTTP. SHA256/provenance: manifest.json.
 
 - [accounts-930c928](accounts-930c928/kiosk-on-the-nile-accounts.zip)
 - [body-clock-2fd6048](body-clock-2fd6048/kiosk-on-the-nile-body-clock.zip)
@@ -37,3 +37,5 @@
 - [godot-preview-sleep-mood-8754ac5](godot-preview-sleep-mood-8754ac5/kiosk-on-the-nile-web-sleep-mood.zip)
 - [godot-preview-sleep-mood-8b4b033](godot-preview-sleep-mood-8b4b033/kiosk-on-the-nile-web-sleep-mood.zip)
 - [godot-preview-social-hud-c752382](godot-preview-social-hud-c752382/kiosk-on-the-nile-web-social-hud.zip)
+- [quiet-social-706d7d0](quiet-social-706d7d0/kiosk-on-the-nile-quiet-social.zip)
+

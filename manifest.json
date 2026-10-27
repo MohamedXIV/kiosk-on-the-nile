@@ -278,5 +278,13 @@
     "sha256": "fc18ff2db2d4b1a0db856746cfd2bbab41d87861bf3f8dff269ba30fbfe92ad9",
     "original_branch": "godot-preview-social-hud-c752382",
     "original_commit": "ab2be380d1b35541ff92f8d180f36c88585e39ad"
+  },
+  {
+    "version": "quiet-social-706d7d0",
+    "path": "quiet-social-706d7d0/kiosk-on-the-nile-quiet-social.zip",
+    "bytes": 12393457,
+    "sha256": "b01ae721da310628662a7fe9e6e02ef9e545c4126284c65a62348fca2f05cd12",
+    "original_branch": "feature/quiet-social-encounters",
+    "original_commit": "706d7d0d8a4dee3ec56625db112cc0488ee7c120"
   }
 ]
