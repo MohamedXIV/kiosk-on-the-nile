@@ -18,7 +18,7 @@ reference; its visitor and service behavior does not override that vision.
 
 ## Version and release policy
 
-Current target: **0.1.0-prealpha.1** (`VERSION`); the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
+Current target: **0.1.0-prealpha.2** (`VERSION`); the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
 
 ## Current Web preview
 

@@ -23,7 +23,11 @@ jobs:
         run: python3 tools/release.py check
       - name: Check formal release tag
         if: startsWith(github.ref, 'refs/tags/v')
-        run: python3 tools/release.py check-tag --tag "$GITHUB_REF_NAME"
+        run: |
+          # Checkout's shallow tag ref may be peeled to a commit. Refresh only
+          # this job's local ref from the authoritative remote annotated tag.
+          git fetch --force --no-tags --depth=1 origin "$GITHUB_REF:$GITHUB_REF"
+          python3 tools/release.py check-tag --tag "$GITHUB_REF_NAME"
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

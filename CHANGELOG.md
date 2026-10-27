@@ -5,7 +5,20 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.1.0-prealpha.2] - 2026-10-27
+
+First published numbered pre-alpha baseline, including the complete candidate1 feature/policy baseline below.
+
+**Save compatibility:** No save-format change in this batch (schema4/revision16). Pre-alpha backward compatibility remains optional; future reset requirements will be explicit.
+
+### Fixed
+
+- Tagged CI now fetches the actual annotated tag object for a shallow checkout before enforcing source/tag consistency.
+
+
 ## [0.1.0-prealpha.1] - 2026-10-27
+
+Tagged validation candidate; not published as a GitHub release. Its local build/package passed, while tag CI stopped because shallow checkout omitted the annotation. Candidate2 records the CI correction; the original tag and bytes are retained.
 
 First numbered pre-alpha baseline. Earlier technical previews used descriptive/hash tags; this entry records the current baseline rather than assigning invented versions to those previews.
 
@@ -37,5 +50,6 @@ First numbered pre-alpha baseline. Earlier technical previews used descriptive/h
 
 Historical notes, descriptive tags and immutable downloads remain in the [archive index](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts). They are not retroactively renamed or assigned SemVer numbers.
 
-[Unreleased]: https://github.com/MohamedXIV/kiosk-on-the-nile/compare/v0.1.0-prealpha.1...HEAD
-[0.1.0-prealpha.1]: https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/v0.1.0-prealpha.1
+[Unreleased]: https://github.com/MohamedXIV/kiosk-on-the-nile/compare/v0.1.0-prealpha.2...HEAD
+[0.1.0-prealpha.2]: https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/v0.1.0-prealpha.2
+[0.1.0-prealpha.1]: https://github.com/MohamedXIV/kiosk-on-the-nile/tree/v0.1.0-prealpha.1

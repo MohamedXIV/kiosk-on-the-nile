@@ -16,7 +16,7 @@ Current product stage: **unpublished pre-alpha**. GitHub prereleases are technic
 
 ## SemVer project conventions
 
-SemVer defines version syntax/precedence and0.x as initial development; it does not standardize game production stages. Our first numbered baseline is0.1.0-prealpha.1. For coherent published batches:
+SemVer defines version syntax/precedence and0.x as initial development; it does not standardize game production stages. The baseline target is0.1.0: candidate1 remains a tagged validation record, and candidate2 is the first published numbered preview after the CI checkout correction. For coherent published batches:
 
 - New gameplay/capability milestone or intentional breaking change: increment the0.x minor base, e.g.0.2.0-prealpha.1.
 - Correction to a released milestone: increment patch, e.g.0.1.1-prealpha.1.
@@ -59,6 +59,6 @@ Keep corruption detection, coherent writes/backups and truthful storage feedback
 
 Drafts can use `package` without `--release`; they retain explicit development/source_dirty metadata and a commit-qualified filename. Do not publish them as the formal numbered release. Source changes after an export require rebuilding; a docs-only commit also changes provenance and is not silently relabeled as the earlier build.
 
-CI validates versions and v-tags, exports the Web build and retains artifacts/diagnostics. CI has read-only repository permissions and does not automatically publish releases or merge branches. Normal task instructions govern gameplay observations/tests; versioning is not a reason to re-run historical-save acceptance work.
+CI retrieves only the current annotated v-tag object into its ephemeral shallow checkout (without rewriting the remote tag), validates versions and v-tags, exports the Web build and retains artifacts/diagnostics. CI has read-only repository permissions and does not automatically publish releases or merge branches. Normal task instructions govern gameplay observations/tests; versioning is not a reason to re-run historical-save acceptance work.
 
 These checks make the process repeatable and traceable; they do not promise bit-for-bit identical exports across machines or export timestamps.
