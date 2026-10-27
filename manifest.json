@@ -286,5 +286,13 @@
     "sha256": "b01ae721da310628662a7fe9e6e02ef9e545c4126284c65a62348fca2f05cd12",
     "original_branch": "feature/quiet-social-encounters",
     "original_commit": "706d7d0d8a4dee3ec56625db112cc0488ee7c120"
+  },
+  {
+    "version": "web-save-ack-e8cfa15",
+    "path": "web-save-ack-e8cfa15/kiosk-on-the-nile-web-save-ack.zip",
+    "bytes": 12956188,
+    "sha256": "f1dbfbba09f38fe15916dbaaddb189cc0c3afaf0de1118a4d0a7c32d7536f871",
+    "original_branch": "fix/web-save-durability",
+    "original_commit": "e8cfa150e1a02ef3f47b96b8f0268e5ac127309f"
   }
 ]
