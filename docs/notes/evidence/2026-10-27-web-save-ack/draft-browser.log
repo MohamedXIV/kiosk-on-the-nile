@@ -1,0 +1,41 @@
+CONSOLE error Failed to load resource: the server responded with a status of 404 (File not found)
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+READY
+STORAGE 1793094744039 {"exists":true,"checksum":"77cd977173afcbb3d86cc020c22ce40491148b5dc5e945cf72ee3b072d6c30a9","revision":16,"bytes":24548}
+DONE {"click":[480,332],"wait":2000,"storage":true,"shot":"/tmp/kiosk-ack-continued.png"}
+DONE {"delay_reads":5000}
+DONE {"click":[50,28],"wait":100}
+DONE {"click":[130,252],"wait":300,"shot":"/tmp/kiosk-ack-pending.png"}
+DIALOG beforeunload 
+NAVIGATION_BLOCKED page.reload: Timeout 1500ms exceeded.
+Call log:
+[2m  - waiting for navigation until "commit"[22m
+
+DONE {"attempt_reload":true,"shot":"/tmp/kiosk-ack-navigation-held.png"}
+STORAGE 1793094772216 {"exists":true,"checksum":"23d346e99e498948c2df445a01e3003bc7b2c069a3b0c69b1bde115b21243d4e","revision":16,"bytes":28577}
+DONE {"wait":5000,"storage":true,"shot":"/tmp/kiosk-ack-success.png"}
+DONE {"delay_reads":30000}
+DONE {"click":[50,28],"wait":100}
+DONE {"click":[130,252],"wait":16500,"shot":"/tmp/kiosk-ack-timeout.png"}
+DIALOG beforeunload 
+NAVIGATION_BLOCKED page.reload: Timeout 1500ms exceeded.
+Call log:
+[2m  - waiting for navigation until "commit"[22m
+
+DONE {"attempt_reload":true,"shot":"/tmp/kiosk-ack-error-held.png"}
+DONE {"restore_reads":true}
+DONE {"click":[50,28],"wait":100}
+DONE {"click":[130,284],"wait":2500,"shot":"/tmp/kiosk-ack-retry.png"}
+STORAGE 1793094978284 {"exists":true,"checksum":"1195abee23de3565d118a2198c50d71a59dd8b3f917890d6d7749b02eac444ff","revision":16,"bytes":29445}
+DONE {"wait":500,"storage":true,"shot":"/tmp/kiosk-ack-retry-later.png"}
+DONE {"delay_reads":5000}
+DONE {"click":[50,28],"wait":100}
+DONE {"click":[130,252],"wait":200}
+DONE {"click":[50,28],"wait":100}
+DONE {"click":[130,284],"wait":5500,"shot":"/tmp/kiosk-ack-queued-middle.png"}
+DONE {"wait":5500,"shot":"/tmp/kiosk-ack-queued-complete.png"}
+STORAGE 1793095048714 {"exists":true,"checksum":"c6425549a95c5c77c65ea54287d434e3f65a457a934635794bed27e090457b09","revision":16,"bytes":35424}
+DONE {"restore_reads":true,"storage":true}
+DONE {"close":true}

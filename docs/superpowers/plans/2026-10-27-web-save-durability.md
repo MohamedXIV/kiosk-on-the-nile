@@ -14,9 +14,11 @@ No game/save schema/Ink changes, new save authority or patched engine bundle. Ex
 Never acknowledge stale/different bytes or a failed transaction. Never create an absent backend by probing it. Serialize repeated/deferred saves, including retries after failure. Keep unload warning through unconfirmed failures and release it only for confirmed bytes. Preserve native completion and avoid double notifications.
 
 ## Tasks
-- [ ] 1. Reproduce boundary and record engine/API evidence. Inspect actual persisted bytes around a real Save before product changes; record narrower claims if the timing race varies.
-- [ ] 2. Add game/persistence/web_save_ack.gd as isolated Web-only observer. Integrate SaveCoordinator in-flight/pending state and signals; preserve Store writer/native behavior. Observe exact acknowledgment, wrong bytes, error/timeout and retry through bounded temporary fixtures.
-- [ ] 3. Add validated external UI timing and Arabic/English pending/failed feedback. Wire one notification path in main.gd; allow persistent ToastStack feedback. Build-only gate, then actual Chrome rapid Save/ack/reload/Continue and delayed-ack unload warning. No gameplay bridge or synthetic save.
-- [ ] 4. Fresh whole-diff review, one material fix pass, exact-source Release, complete ZIP, independent download/content/hash/CRC checks, issue10/roadmap/notes. Keep source and artifacts separate; record limitations.
+- [x] 1. Reproduce boundary and record engine/API evidence. Inspect actual persisted bytes around a real Save before product changes; record narrower claims if the timing race varies.
+- [x] 2. Add game/persistence/web_save_ack.gd as isolated Web-only observer. Integrate SaveCoordinator in-flight/pending state and signals; preserve Store writer/native behavior. Observe exact acknowledgment, wrong bytes, error/timeout and retry through bounded temporary fixtures.
+- [x] 3. Add validated external UI timing and Arabic/English pending/failed feedback. Wire one notification path in main.gd; allow persistent ToastStack feedback. Build-only gate, then actual Chrome rapid Save/ack/reload/Continue and delayed-ack unload warning. No gameplay bridge or synthetic save.
+- [x] 4. Fresh whole-diff review, one material fix pass, exact-source Release, complete ZIP, independent download/content/hash/CRC checks, issue10/roadmap/notes. Keep source and artifacts separate; record limitations.
 
 Preflight/self-review: Store returns after MEMFS rename, coordinator owns a single durable request, adapter acknowledgment must refer to the exact captured bytes; UI success occurs only through coordinator.completed. All spec requirements map above. Native observer availability must never change native SaveStore paths.
+
+Delivery: exact e8cfa15 Release, full archive independently verified, one fresh review and one material fix pass, native/Chrome evidence recorded. Pending/error feedback uses a dedicated HUD row so ordinary action toasts cannot evict it. Source integration/acceptance remains explicit; issue10 is implemented but stays open until integration. See delivery note for backend/browser limits.

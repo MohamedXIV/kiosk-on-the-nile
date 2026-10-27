@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-27 (Africa/Cairo). Main baseline product: `131642326d4dfab4f1eb105411415e29c2e28e88`. New isolated preview product: `706d7d0d8a4dee3ec56625db112cc0488ee7c120` (feature branch; not merged). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-27 (Africa/Cairo). Main baseline product: `131642326d4dfab4f1eb105411415e29c2e28e88`. New isolated preview product: `e8cfa150e1a02ef3f47b96b8f0268e5ac127309f` (feature branch; not merged). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -39,3 +39,9 @@ Epic#2 now has a complete [playable preview](https://github.com/MohamedXIV/kiosk
 Before integration: [durable Web save acknowledgment#10](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/10), preview acceptance, and review of the recorded group multi-choice/candidate-config limits. A rapid reload during pending synchronization lost a requested save in one fixture; longer-wait group persistence and ordinary migration/Continue succeeded. No exact safe delay is established. Epic#2 remains open until integration/acceptance. Narrow-passage coordination#3 remains separate; no universal third-person displacement was added.
 
 Next planned gameplay batch after those gates: narrow-passage coordination, hospitality/payment#4, continuing stories/messages#5, multi-day pacing#6. Player/residential seating#7 remains proposed.
+
+## Web save fix preview delivered
+
+[Corrected full preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/web-save-ack-e8cfa15) includes quiet-social plus issue10's implemented acknowledgment fix: exact persisted bytes, pending/error/retry HUD, serialized/coalesced requests and pending beforeunload warning. Native save/backups and revision16 remain. Fresh review's BOM edge was reproduced and corrected; exact Release Chrome fault/retry/immediate-after-ack reload/Continue and native observations are recorded in docs/notes/2026-10-27-web-save-acknowledgment.md.37 playable archive versions are preserved.
+
+The earlier technical storage gate now has an implemented fix. Source integration and preview acceptance remain pending, so#10/#2 stay open; main is unchanged. Browser/OS termination or overriding the navigation warning is outside a durable completion guarantee. The adapter's4.7.2 backend pin requires revalidation on engine upgrades. Next gameplay work remains bounded passage coordination#3; the group multi-choice/candidate-config limits remain recorded.

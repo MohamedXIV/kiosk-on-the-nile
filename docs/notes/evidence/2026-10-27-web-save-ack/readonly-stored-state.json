@@ -1,0 +1,14 @@
+{
+  "revision": 16,
+  "clock": {
+    "day": 1,
+    "minutes": 1072.3166666665372,
+    "simulation_seconds": 142.31666666667206,
+    "tick": 8539,
+    "world_delta": 0.016666666666666666,
+    "world_minutes": 1072.3166666665372
+  },
+  "wallet": {
+    "balance": 4500
+  }
+}
