@@ -304,6 +304,20 @@
     "bytes": 11939323,
     "sha256": "c21d86d5c321a318802f9d6d259a463bacf579b684312852ee268ac07cb7c8ff",
     "original_branch": "chore/prealpha-versioning",
-    "original_commit": "f861e9e10dc427f0e135ebf63e68c8b8b09b1a22"
+    "original_commit": "f861e9e10dc427f0e135ebf63e68c8b8b09b1a22",
+    "status": "validation-candidate",
+    "ci": "tag checkout omitted annotation; retained unchanged",
+    "superseded_by": "v0.1.0-prealpha.2"
+  },
+  {
+    "version": "v0.1.0-prealpha.2",
+    "game_version": "0.1.0-prealpha.2",
+    "tag": "v0.1.0-prealpha.2",
+    "stage": "pre-alpha",
+    "path": "v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip",
+    "bytes": 11939692,
+    "sha256": "2daaebb5e5afce3320b9c3914b66c161fca4bda9ff3559bd6e910277a1dddabe",
+    "original_branch": "chore/prealpha-versioning",
+    "original_commit": "51c5b0de7411f3b0a74934ab0a491342144d5a7b"
   }
 ]
