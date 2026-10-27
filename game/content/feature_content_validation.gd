@@ -138,8 +138,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
       if not topic.characters is Array or topic.characters.is_empty(): return ContentValidation.fail("encounters.topics.characters")
       for actor in topic.characters:
        if not actor in bundle.visitors.characters: return ContentValidation.fail("encounters.topics.characters")
+   if definition.has("peer") and not definition.peer is bool:return ContentValidation.fail("encounters.peer")
    if definition.get("optional",false):
-    if not ContentValidation.bounded(definition.get("choice_expiry"),0.1,120) or not ContentValidation.integer(definition.get("listen_choice")) or definition.listen_choice<0: return ContentValidation.fail("encounters.optional")
+    if not ContentValidation.bounded(definition.get("choice_expiry"),0.1,120) or (not definition.get("peer",false) and (not ContentValidation.integer(definition.get("listen_choice")) or definition.listen_choice<0)): return ContentValidation.fail("encounters.optional")
   for location in bundle.get("locations",{}).values():
    for interaction in location.interactions:
     for action in [interaction.get("action",""),interaction.get("secondary_action","")]:

@@ -267,6 +267,7 @@ func configure(source: SessionConfig) -> ActionResult:
    if str(conversation.id)!=str(own) and str(id) in conversation.participants:return false
   return true
  visitors.peer_cancel=func(id):narrative.cancel(StringName(id))
+ visitors.peer_manual=func(id):return narrative.sessions.has(id) and narrative.manual(narrative.sessions[id])
  narrative.chapter_finished.connect(func(id,_reason):visitors.peers.conversation_ended(str(id)))
  personal=PersonalConversations.new()
  personal.configure(self)
@@ -344,7 +345,11 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
  if kind==&"peer":
   var peer_id: String=str(extra.peer_id)
   if not visitors.peers.pending(peer_id,participants):return
-  var result := await narrative.start(StringName(extra.encounter_id),participants,extra)
+  var context := extra.duplicate(true)
+  var definition: Dictionary=config.section("encounters")[str(extra.encounter_id)]
+  var variants: int=int(definition.topics[0].variants) if definition.has("topics") and not definition.topics.is_empty() else 1
+  context["line_variant"]=int((peer_id+":variant").sha256_text().substr(0,8).hex_to_int())%variants
+  var result := await narrative.start(StringName(extra.encounter_id),participants,context)
   if result.ok:
    var conversation_id: String=str(result.details.session_id)
    if not visitors.peers.link(peer_id,conversation_id):narrative.cancel(StringName(conversation_id))

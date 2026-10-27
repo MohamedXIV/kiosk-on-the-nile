@@ -126,9 +126,9 @@ func validate_links() -> ActionResult:
  # Legacy manual chapters gain a hub at their existing cursor, without replay.
  if not active():
   for conversation: ConversationSession in _session.narrative.sessions.values():
-   if _session.narrative.manual(conversation):adopt(conversation);break
+   if _session.narrative.manual(conversation) and not conversation.context_extra.has("peer_id"):adopt(conversation);break
  for conversation: ConversationSession in _session.narrative.sessions.values():
-  if _session.narrative.manual(conversation) and (not active() or _hub.session_id!=str(conversation.id) or not holds_visit(StringName(conversation.participants[0]))):return _fail()
+  if _session.narrative.manual(conversation) and not conversation.context_extra.has("peer_id") and (not active() or _hub.session_id!=str(conversation.id) or not holds_visit(StringName(conversation.participants[0]))):return _fail()
  return ActionResult.success()
 func _fail() -> ActionResult:
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")

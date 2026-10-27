@@ -222,6 +222,8 @@ func _install(candidate: GameSession) -> void:
  _hud.notebook_requested.connect(_toggle_notebook)
  _hud.diagnostics_requested.connect(_diagnostics)
  _session.narrative.failed.connect(func(_result):_hud.toast.show_message(_text.text("narrative_failed")))
+ _hud.dialogue.group_advance_requested.connect(func(id):_session.narrative.advance_manual(id))
+ _hud.dialogue.group_leave_requested.connect(func(id):_session.narrative.leave_peer(id))
  _hud.dialogue.choice_selected.connect(_choose)
  _hud.dialogue.advance_requested.connect(func():_session.personal.advance())
  _hud.dialogue.topic_selected.connect(func(key):await _session.personal.select_topic(key))
@@ -335,6 +337,12 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   return
  if _hud.notebook.visible: return
+ var peer_focus := _session.narrative.focused_session()
+ if peer_focus!=null and peer_focus.context_extra.get("peer_participating",false):
+  if event.is_action_pressed("cancel"):
+   _session.narrative.leave_peer(peer_focus.id);get_viewport().set_input_as_handled();return
+  if event.is_action_pressed("ui_accept"):
+   _session.narrative.advance_manual(peer_focus.id);get_viewport().set_input_as_handled();return
  if _session.personal.active():
   if event.is_action_pressed("cancel"):
    _session.personal.leave()

@@ -9,6 +9,7 @@ var meetings := VisitorMeetings.new()
 var peers := PeerEncounters.new()
 var peer_available: Callable
 var peer_cancel: Callable
+var peer_manual: Callable
 var seating := VisitorSeating.new()
 var seat_catalog: SeatCatalog
 var seat_unavailable: Callable
@@ -78,7 +79,9 @@ func spawn(character_id: StringName) -> VisitState:
 func tick(delta: float, calendar_delta: float = -1) -> void:
  var elapsed := delta if calendar_delta<0 else calendar_delta
  awareness.step(delta,visits,observed_actors.call() if observed_actors.is_valid() else {},sight_clear)
- var event := peers.step(delta,visits,awareness,_peer_eligible,route_reachable,_position_available)
+ var peer_started := RuntimePerformance.begin()
+ var event := peers.step(delta,visits,awareness,_peer_eligible,route_reachable,_position_available,peer_manual)
+ RuntimePerformance.finish("peer_update",peer_started)
  if event.has("cancel") and not str(event.cancel).is_empty() and peer_cancel.is_valid():peer_cancel.call(event.cancel)
  var peer_initiator := peers.initiator()
  if peer_initiator!=&"" and not peers.paused(peer_initiator) and seating.reserved(peer_initiator):seating.release(peer_initiator)

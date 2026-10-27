@@ -41,7 +41,7 @@ func clear() -> String:
  var cancelled := finish()
  _records.clear();_cooldown=0
  return cancelled
-func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligible: Callable, reachable: Callable, available: Callable) -> Dictionary:
+func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligible: Callable, reachable: Callable, available: Callable, manual: Callable=Callable()) -> Dictionary:
  for id in _records.keys():
   if not visits.has(id):_records.erase(id)
  _cooldown=maxf(0,_cooldown-delta)
@@ -51,7 +51,7 @@ func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligibl
   var a: VisitState=visits[_active.initiator]
   var b: VisitState=visits[_active.target]
   if not eligible.call(a,str(_active.conversation)) or not eligible.call(b,str(_active.conversation)):return {"cancel":finish()}
-  _active.elapsed=float(_active.elapsed)+delta
+  if not (manual.is_valid() and not str(_active.conversation).is_empty() and manual.call(str(_active.conversation))):_active.elapsed=float(_active.elapsed)+delta
   if float(_active.elapsed)>=float(_data.max_seconds):return {"cancel":finish()}
   if _active.phase=="conversing":return {}
   var memory := awareness.recalled(a.id,str(b.character_id))
@@ -91,11 +91,13 @@ func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligibl
   if _sample(a.id,"chance")>=float(_data.chance):continue
   var direction := observed.direction_to(a.pose.ground)
   if direction.is_zero_approx():direction=Vector2.DOWN
+  var search_started := RuntimePerformance.begin()
   var chosen := Vector2(INF,INF)
   for index in range(8):
    var candidate := observed+direction.rotated(float(index)*TAU/8)*float(_data.stop_distance)
    if available.is_valid() and not available.call(candidate,a.id):continue
    if reachable.call(a.pose.ground,candidate):chosen=candidate;break
+  RuntimePerformance.finish("peer_search",search_started)
   if not chosen.is_finite():continue
   _active={"id":"peer_%d" % _next,"initiator":str(a.id),"target":str(b.id),"encounter":pair.encounter,"phase":"approaching","elapsed":0.0,"goal":[chosen.x,chosen.y],"observed":[observed.x,observed.y],"target_point":[b.pose.ground.x,b.pose.ground.y],"conversation":""}
   _next+=1

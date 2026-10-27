@@ -3,6 +3,8 @@ extends PanelContainer
 signal choice_selected(session_id: StringName, choice_id: StringName)
 signal advance_requested
 signal topic_selected(key: String)
+signal group_advance_requested(session_id: StringName)
+signal group_leave_requested(session_id: StringName)
 signal leave_requested
 var _box: VBoxContainer
 var _scroll: ScrollContainer
@@ -21,12 +23,16 @@ func configure(text: UiText) -> void:
  _text=text
  add_theme_font_size_override("font_size",int(text.data.hud.dialogue_font_size))
  _maximum_height_ratio=float(text.data.hud.dialogue_max_height_ratio)
-func present(conversation: ConversationSession, choices: Array[Dictionary]) -> void:
- if conversation==null or choices.is_empty():hide();_signature="";return
+func present(conversation: ConversationSession, choices: Array[Dictionary], speaker_name: String="") -> void:
+ var joined: bool=conversation!=null and bool(conversation.context_extra.get("peer_participating",false))
+ if conversation==null or (choices.is_empty() and not joined):hide();_signature="";return
  var signature := str(LocaleService.current.revision if LocaleService.current else 0)+str(conversation.id)+":"+str(conversation.beat)+JSON.stringify(choices)
  if _begin(signature):
+  if not speaker_name.is_empty():_line(speaker_name)
   _line(LocalizedNarrative.line(conversation.current))
-  _choices(conversation,choices)
+  if choices.is_empty():_button(_text.text("dialogue_continue"),func():group_advance_requested.emit(conversation.id))
+  else:_choices(conversation,choices)
+  if joined:_button(_text.text("dialogue_leave"),func():group_leave_requested.emit(conversation.id))
  _fit()
 func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
  var conversation: ConversationSession=view.get("conversation")

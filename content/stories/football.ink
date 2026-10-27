@@ -1,14 +1,14 @@
 INCLUDE context.inkinc
 {line_variant:
 - 0:
- الحكم بوّظ الماتش امبارح يا سمير! # speaker:mahmoud # duration:3.4 # loc:story.football.line_001
- يا عم فريقك كان نايم أصلًا طول الشوط التاني! # speaker:samir # duration:6 # loc:story.football.line_002
+ الحكم بوّظ الماتش امبارح يا سمير! # speaker:mahmoud # duration:3.4 # effect:world\|peer_relation\|mahmoud\|samir\|familiarity\|1 # effect:world\|peer_relation\|samir\|mahmoud\|familiarity\|1 # loc:story.football.line_001
+ يا عم فريقك كان نايم أصلًا طول الشوط التاني! # speaker:samir # duration:6 # autonomous:football_ambient_end # loc:story.football.line_002
 - 1:
- سمعت الاستوديو التحليلي؟ ساعتين كلام على جون واحد! # speaker:samir # duration:4 # loc:story.football.line_003
- ما هو لو الدفاع صاحي كنا خلصنا الحكاية من بدري. # speaker:mahmoud # duration:6 # loc:story.football.line_004
+ سمعت الاستوديو التحليلي؟ ساعتين كلام على جون واحد! # speaker:samir # duration:4 # effect:world\|peer_relation\|mahmoud\|samir\|familiarity\|1 # effect:world\|peer_relation\|samir\|mahmoud\|familiarity\|1 # loc:story.football.line_003
+ ما هو لو الدفاع صاحي كنا خلصنا الحكاية من بدري. # speaker:mahmoud # duration:6 # autonomous:football_ambient_end # loc:story.football.line_004
 - else:
- نفسي نروح نتفرج في الاستاد بدل قعدة القهوة. # speaker:mahmoud # duration:4 # loc:story.football.line_005
- روح إنت.. أنا أحب أتفرج وأرجع بيتي من غير زحمة. # speaker:samir # duration:6 # loc:story.football.line_006
+ نفسي نروح نتفرج في الاستاد بدل قعدة القهوة. # speaker:mahmoud # duration:4 # effect:world\|peer_relation\|mahmoud\|samir\|familiarity\|1 # effect:world\|peer_relation\|samir\|mahmoud\|familiarity\|1 # loc:story.football.line_005
+ روح إنت.. أنا أحب أتفرج وأرجع بيتي من غير زحمة. # speaker:samir # duration:6 # autonomous:football_ambient_end # loc:story.football.line_006
 }
 * [المهم تفضل القعدة حلوة # loc:story.football.line_007]
  عندك حق يا معلم، أهي الكورة تخلص والصحبة تفضل. # speaker:mahmoud # duration:4.5 # loc:story.football.line_008
@@ -19,6 +19,9 @@ INCLUDE context.inkinc
  حاضر يا سيدي، نستريح شوية. # speaker:mahmoud # duration:4.5 # loc:story.football.line_012
  -> END
 * [(اسمعهم وابتسم من غير ما تتدخل) # loc:story.football.line_013]
+ -> football_ambient_end
+
+=== football_ambient_end ===
  خلاص يا محمود، خلّينا نشرب الشاي قبل ما يبرد. # speaker:samir # duration:4.5 # loc:story.football.line_014
  أنا أصلًا جاي عشان القعدة، سيبك من الماتش. # speaker:mahmoud # duration:4.5 # loc:story.football.line_015
  -> END

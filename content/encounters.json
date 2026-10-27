@@ -169,7 +169,9 @@
         "label": "نكمل كلامنا"
       }
     ],
-    "advancement": "automatic"
+    "advancement": "automatic",
+    "manual": false,
+    "peer": true
   },
   "visitors": {
     "story": "visitors",
@@ -802,5 +804,30 @@
     "offer_requires": {
       "participants_available": true
     }
+  },
+  "river_company": {
+    "story": "river_company",
+    "requires": {
+      "participants_available": true
+    },
+    "offer_requires": {},
+    "choice_conditions": {},
+    "optional": true,
+    "choice_expiry": 10,
+    "manual": false,
+    "advancement": "automatic",
+    "topics": [
+      {
+        "id": "river_chat",
+        "scope": "day",
+        "modes": [
+          0
+        ],
+        "variants": 2,
+        "requires": {},
+        "label": "قعدة على النيل"
+      }
+    ],
+    "peer": true
   }
 }
