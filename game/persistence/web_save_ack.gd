@@ -17,6 +17,8 @@ const SCRIPT := """
  host.begin = (path, expected, timeoutMs, intervalMs, callback) => {
   if (host.cancel) host.cancel();
   host.dirty = true;
+  let expectedBytes = new TextEncoder().encode(expected);
+  expected = null;
   let done = false, db = null, poll = null, deadline = null;
   const finish = status => {
    if (done) return;
@@ -24,13 +26,13 @@ const SCRIPT := """
    if (db) db.close();
    host.cancel = null;
    if (status === 'confirmed') host.dirty = false;
-   const report = callback; callback = null; expected = null;
+   const report = callback; callback = null; expectedBytes = null;
    report(status);
   };
   host.cancel = () => {
    done = true; clearTimeout(poll); clearTimeout(deadline);
    if (db) db.close();
-   callback = null; expected = null;
+   callback = null; expectedBytes = null;
    host.cancel = null;
   };
   deadline = setTimeout(() => finish('timeout'), timeoutMs);
@@ -41,9 +43,12 @@ const SCRIPT := """
     const request = transaction.objectStore('FILE_DATA').get(path);
     let matched = false;
     request.onsuccess = () => {
+     if (done) return;
      try {
-      const bytes = request.result?.contents;
-      matched = !!bytes && new TextDecoder('utf-8', {fatal: true}).decode(bytes) === expected;
+      const stored = request.result?.contents;
+      const bytes = stored instanceof ArrayBuffer ? new Uint8Array(stored) :
+       ArrayBuffer.isView(stored) ? new Uint8Array(stored.buffer, stored.byteOffset, stored.byteLength) : null;
+      matched = !!bytes && bytes.length === expectedBytes.length && bytes.every((value, index) => value === expectedBytes[index]);
      } catch (_) { finish('storage_error'); }
     };
     transaction.oncomplete = () => {

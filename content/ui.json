@@ -362,7 +362,7 @@
   "hud_phase_noon": "الظهيرة",
   "hud_phase_afternoon": "بعد الظهر",
   "hud_phase_evening": "المساء",
-  "saving": "بنحفظ القعدة في المتصفح…",
+  "saving": "بنحفظ القعدة…",
   "save_unconfirmed": "ماقدرناش نأكد حفظ المتصفح؛ جرّب تحفظ تاني قبل ما تمشي.",
   "save_feedback": {
     "timeout_seconds": 15,
