@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-27 (Africa/Cairo). Main baseline product: `131642326d4dfab4f1eb105411415e29c2e28e88`. New isolated preview product: `e8cfa150e1a02ef3f47b96b8f0268e5ac127309f` (feature branch; not merged). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-27 (Africa/Cairo). Main baseline product: `131642326d4dfab4f1eb105411415e29c2e28e88`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integration pending). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -49,3 +49,9 @@ The earlier technical storage gate now has an implemented fix. Source integratio
 ## Versioning foundation before further gameplay
 
 User policy clarified: unpublished pre-alpha; do not spend routine development effort on historical-save compatibility. SemVer/Keep a Changelog and a first numbered baseline0.1.0-prealpha.1 are being established before epic3. VERSION/project metadata/build provenance/annotated tags and package consistency are tracked together. Future breaking save changes may require a new game and must say so; existing integrity guards remain. See docs/RELEASING.md and CHANGELOG.md.
+
+## Versioning foundation delivered
+
+The first published numbered baseline is v0.1.0-prealpha.2, source51c5b0d. Canonical VERSION/Godot metadata, SemVer prerelease tags, curated changelog/save-impact entries, verified actual toolchain/export provenance and reusable packaging are in place. Tagged CI passed40562637988; independent archive checks completed. Candidate1 remains a labeled validation record, with no rewritten tag.39 packages are preserved, including all37 legacy versions.
+
+User policy is now explicit in AGENTS.md/docs/RELEASING.md: unpublished pre-alpha saves do not receive routine backward-compatibility/migration work. Future resets are allowed and documented; integrity guards remain. No gameplay/save-format changes in this foundation batch. This priority precedes the next gameplay epic3; source integration/acceptance is still separate.

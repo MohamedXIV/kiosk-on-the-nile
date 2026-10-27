@@ -11,8 +11,10 @@
 No historical-save acceptance/migration work; no game behavior change; retain integrity guards. No invented past SemVer/date or overwritten tag. Separate engine/source/save-format IDs. Dirty/stale export cannot become a formal release. Validate source content/digest/engine filenames and constrain package paths. No automated test suite unless user asks. One fresh final review, one material fix pass, no main merge.
 
 ## Tasks
-- [ ] 1. Record save/release policy, VERSION0.1.0-prealpha.1, baseline CHANGELOG and contributor instructions; link from README/roadmap.
-- [ ] 2. Implement release.py check/set-version/check-tag/metadata/package; integrate export/build and CI. Commands must report clear errors and permit explicitly identified draft builds. Build-only execution/static checks rather than gameplay/save regression work.
-- [ ] 3. Fresh whole-diff review and one material fix pass. Freeze source, create annotated first SemVer tag, exact Release export/package through the new tooling, independent GitHub archive verification and release/changelog links. Preserve legacy history and source isolation; record actual results/limitations.
+- [x] 1. Record save/release policy, VERSION0.1.0-prealpha.1, baseline CHANGELOG and contributor instructions; link from README/roadmap.
+- [x] 2. Implement release.py check/set-version/check-tag/metadata/package; integrate export/build and CI. Commands must report clear errors and permit explicitly identified draft builds. Build-only execution/static checks rather than gameplay/save regression work.
+- [x] 3. Fresh whole-diff review and one material fix pass. Freeze source, create annotated first SemVer tag, exact Release export/package through the new tooling, independent GitHub archive verification and release/changelog links. Preserve legacy history and source isolation; record actual results/limitations.
 
 Preflight: VERSION/Godot project/tag/changelog must agree; metadata describes actual export/source/content, package verifies rather than trusting filenames. Product stage is pre-alpha; save compatibility policy is independent of SemVer. First dated entry becomes true only when its release is actually published.
+
+Delivered: first published numbered baseline v0.1.0-prealpha.2 after preserving candidate1 as a tagged validation record. Local verified-toolchain formal build/package, corrected tagged CI40562637988 and independent archive checks passed.39 archive packages retained; no historical-save work or main merge. See docs/notes/2026-10-27-versioning-and-prealpha-policy.md for exact provenance and policy.

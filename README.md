@@ -18,18 +18,16 @@ reference; its visitor and service behavior does not override that vision.
 
 ## Version and release policy
 
-Current target: **0.1.0-prealpha.2** (`VERSION`); the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
+See [VERSION](VERSION) for the current code version; the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
 
 ## Current Web preview
 
-[Web save acknowledgment preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/web-save-ack-e8cfa15) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/631345edf67cb868757a952c13eab2a3c80ea8b9/web-save-ack-e8cfa15/kiosk-on-the-nile-web-save-ack.zip).
-Includes the full quiet-social batch: purposeful Mahmoud/Samir and Amgad/Hassan encounters, autonomous Ink, truthful listening, optional manual group reading and eligible Farid approaches. All12 current authored stories/324 localization references and Arabic/English ship offline. Save format remains schema4/revision16, with older-save migration/archived football compatibility. Expected engine files: `kiosk-e8cfa150e1a0.*`.
+[**v0.1.0-prealpha.2 — first numbered baseline**](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/v0.1.0-prealpha.2) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip) · [SHA256](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip.sha256).
+This technical preview includes the existing quiet-social/Godot/Ink baseline, offline Arabic/English and the acknowledged Web save fix. VERSION, Godot metadata, annotated tag, BUILD.json and package naming identify the same release. [Foundation, review and CI evidence](docs/notes/2026-10-27-versioning-and-prealpha-policy.md).
 
-Web Save now reports success after matching requested bytes are observed in committed browser storage. Independent pending/error feedback, retry, queued requests and a pending-navigation warning address [issue10](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/10). Native saves/backups are preserved. The readonly adapter pins Godot4.7.2's backend; engine upgrades require revalidation. Browser user-activation policy and explicitly overriding a leave warning/termination cannot provide a crash-proof save guarantee. [Implementation, review and evidence](docs/notes/2026-10-27-web-save-acknowledgment.md).
+This batch leaves save schema4/revision16 unchanged. **Future pre-alpha releases may require a new game**; each changelog entry states its actual reset/migration impact. The game is not publicly launched or feature-complete. General passage coordination and the previously recorded group-choice/candidate-config limits remain; see CHANGELOG.md.
 
-This corrected preview remains on `fix/web-save-durability`; main integration/acceptance is pending. Additional joined group choice windows and the internally capped8-candidate configuration are still recorded follow-ups; narrow-passage coordination remains#3. [Quiet-social design and limits](docs/notes/2026-10-27-quiet-social-encounters.md).
-
-Extract the whole ZIP into a fresh folder and use local HTTP; do not open file:// or mix exports. [Earlier quiet-social archive](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/quiet-social-706d7d0) and [all preserved versions](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) remain available. Bounded observations/build checks do not claim an exhaustive regression suite or universal FPS guarantee.
+Extract the whole ZIP into a fresh folder and serve over local HTTP; do not open file:// or mix exports. [All preserved archives](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) include the old descriptive/hash previews and the retained candidate1 validation record. Source integration remains separate.
 
 ## Open and run
 

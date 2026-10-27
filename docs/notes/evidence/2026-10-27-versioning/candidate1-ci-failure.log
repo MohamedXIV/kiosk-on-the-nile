@@ -1,0 +1,13 @@
+web	Check formal release tag	﻿2026-10-27T18:39:56.8398961Z ##[group]Run python3 tools/release.py check-tag --tag "$GITHUB_REF_NAME"
+web	Check formal release tag	2026-10-27T18:39:56.8399830Z [36;1mpython3 tools/release.py check-tag --tag "$GITHUB_REF_NAME"[0m
+web	Check formal release tag	2026-10-27T18:39:56.8464051Z shell: /usr/bin/bash -e {0}
+web	Check formal release tag	2026-10-27T18:39:56.8464531Z env:
+web	Check formal release tag	2026-10-27T18:39:56.8465025Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+web	Check formal release tag	2026-10-27T18:39:56.8465731Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+web	Check formal release tag	2026-10-27T18:39:56.8466427Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+web	Check formal release tag	2026-10-27T18:39:56.8467056Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+web	Check formal release tag	2026-10-27T18:39:56.8467672Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+web	Check formal release tag	2026-10-27T18:39:56.8468303Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+web	Check formal release tag	2026-10-27T18:39:56.8468847Z ##[endgroup]
+web	Check formal release tag	2026-10-27T18:39:56.9579788Z Release error: Formal release requires a matching annotated tag
+web	Check formal release tag	2026-10-27T18:39:56.9656977Z ##[error]Process completed with exit code 1.
