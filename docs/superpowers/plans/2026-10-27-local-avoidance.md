@@ -23,8 +23,8 @@ Chosen in conversation: native local avoidance above the existing grid. NavMesh 
 - [x] Implement avoidance-only RID lifecycle/steering, motion filtering and finite segment clearance/config validation.
 - [x] Integrate visitors, residential actor, player location changes and stationary seated/dialogue state.
 - [x] Preserve cached paths during yielding and safely advance waypoints after detours; observe narrow passage arbitration.
-- [ ] Observe same-path/crossing/opposing/stationary/wall/door/clear-blocker/pause/cleanup/disabled/load cases and bounded costs; import/export and actual Web coverage.
-- [ ] One fresh final review, material fix pass, publish a complete pinned preview and update documentation/README.
+- [x] Observe same-path/crossing/opposing/stationary/wall/door/clear-blocker/pause/cleanup/disabled/load cases and bounded costs; import/export and actual Web coverage.
+- [x] Attempt fresh final review (service usage limit; documented self-review fallback), publish verified complete pinned preview and update documentation/README.
 
 ## Review focus
 

@@ -14,7 +14,7 @@ SEAT_ACCEPT accepted=true pending=true
 SEATED_ORDER seated=true pending=true at_access=true
 REV15_CONTINUE true  { "session": @Node@335:<Node#323515058242>, "migration_report": {  } }
 RESTORED seating_equal=true pending=true
-REV14_CONTINUE true 
+REV14_CONTINUE true
 MIGRATION wallet=true clock=true rng=true pending=true empty_seating=true
 DUPLICATE rejected=true
 RELEASE_STORE true no_slot=true
