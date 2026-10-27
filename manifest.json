@@ -294,5 +294,16 @@
     "sha256": "2a340bb9ae699682b3fba427fbec3ac05559747111bf12febe9d099335f1570e",
     "original_branch": "fix/web-save-durability",
     "original_commit": "e8cfa150e1a02ef3f47b96b8f0268e5ac127309f"
+  },
+  {
+    "version": "v0.1.0-prealpha.1",
+    "game_version": "0.1.0-prealpha.1",
+    "tag": "v0.1.0-prealpha.1",
+    "stage": "pre-alpha",
+    "path": "v0.1.0-prealpha.1/kiosk-on-the-nile-0.1.0-prealpha.1-web.zip",
+    "bytes": 11939323,
+    "sha256": "c21d86d5c321a318802f9d6d259a463bacf579b684312852ee268ac07cb7c8ff",
+    "original_branch": "chore/prealpha-versioning",
+    "original_commit": "f861e9e10dc427f0e135ebf63e68c8b8b09b1a22"
   }
 ]
