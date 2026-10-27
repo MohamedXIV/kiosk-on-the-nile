@@ -290,8 +290,8 @@
   {
     "version": "web-save-ack-e8cfa15",
     "path": "web-save-ack-e8cfa15/kiosk-on-the-nile-web-save-ack.zip",
-    "bytes": 12956188,
-    "sha256": "f1dbfbba09f38fe15916dbaaddb189cc0c3afaf0de1118a4d0a7c32d7536f871",
+    "bytes": 12956565,
+    "sha256": "2a340bb9ae699682b3fba427fbec3ac05559747111bf12febe9d099335f1570e",
     "original_branch": "fix/web-save-durability",
     "original_commit": "e8cfa150e1a02ef3f47b96b8f0268e5ac127309f"
   }
