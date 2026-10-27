@@ -1,5 +1,7 @@
 # Project conventions
 
+These instructions apply throughout this repository, including work delegated to subagents. Before editing, read this file and `docs/RELEASING.md`; include both paths in delegated task handoffs. Nested instructions may add detail but must not silently override these project-wide policies. If an older plan conflicts with the pre-alpha save policy below, follow this policy and the user's latest instructions.
+
 - The game is **unpublished pre-alpha**. Read `docs/GAME_VISION.md` for design and `docs/RELEASING.md` for release policy.
 - Historical save compatibility is optional during pre-alpha. Do not add migrations, archived Ink graphs or old-save regression work solely to preserve unpublished saves unless explicitly requested or justified by a concrete current need.
 - Preserve save integrity and clear unsupported/corrupt-save handling. Never silently delete or reset a user's save.
