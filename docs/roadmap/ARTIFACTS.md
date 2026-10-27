@@ -15,3 +15,5 @@ Only duplicate `build/*` branch refs are eligible for this cleanup, with expecte
 Cleanup completed:30 duplicate build branch refs removed atomically with expected-head leases. Remote heads now total38 (includes artifacts and integration branch). Source branches and main remain unchanged.
 
 Five early preview branches were subsequently found to contain ZIP-only unique commits. They were added with original history/provenance at612203028ce317e86cafdd7c9f38951d55fa5219, bringing the archive to35 versions. See INTEGRATION.md.
+
+Final source consolidation completed through PR#9. Only main/artifacts remain; the earlier38-head count is an intermediate snapshot.

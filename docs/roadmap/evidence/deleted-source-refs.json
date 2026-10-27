@@ -1,0 +1,177 @@
+[
+  {
+    "branch": "godot-preview-2026-10-22-933f1b7",
+    "sha": "9efef633c4f7397d39a4b7485dde4f7a51cad819",
+    "preserved_in": "artifacts"
+  },
+  {
+    "branch": "godot-preview-dialogue-fix-6dcb784",
+    "sha": "8acdf378701a1cb50c058442fbc525bfb5a7eb71",
+    "preserved_in": "artifacts"
+  },
+  {
+    "branch": "godot-preview-sleep-mood-8754ac5",
+    "sha": "e087b2d0ace51cee22540fdb376e1e4ecf97a7c0",
+    "preserved_in": "artifacts"
+  },
+  {
+    "branch": "godot-preview-sleep-mood-8b4b033",
+    "sha": "4f0161d107724bb55272d41c05f11b5a9a1f01b2",
+    "preserved_in": "artifacts"
+  },
+  {
+    "branch": "godot-preview-social-hud-c752382",
+    "sha": "ab2be380d1b35541ff92f8d180f36c88585e39ad",
+    "preserved_in": "artifacts"
+  },
+  {
+    "branch": "preview/accounts-930c928",
+    "sha": "d26b1d191216acb84bfcec513d28ab1f76c869c5",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/body-clock-2fd6048",
+    "sha": "981b41a94b805612f2763f62d99aee1b16c78200",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/body-clock-5c89ec0",
+    "sha": "5c89ec0d7aab3930003003bd060d060227c10c39",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/body-clock-8d0a1a3",
+    "sha": "8d0a1a3f60d1865142c3ba22cd5641b9bc0e07ca",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/buildings-9543cd0",
+    "sha": "af1aeace725cd6e4d2c2e040f20955bb6b60bd59",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/character-life-c1c7997",
+    "sha": "1fbbf6dc3a41425b9d05501b1827c27fe01ac826",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/companionship-669f9de",
+    "sha": "bdd6dff6e73cabd5480cec333db261d161e1098a",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/companionship-ed5153d",
+    "sha": "ed5153deaef9b2951b12fa929c28eea2765a2397",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/dialogue-journal-7e3818d",
+    "sha": "a8e158e788639890dbe9cfe7d6f50df33dbfd7b6",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/dynamic-seating-2ab7f73",
+    "sha": "d52364496a5d4e4bf82dbff3ab80f8f057aad8a4",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/hud-c2dae7d",
+    "sha": "ed7ded4e046491c20b32a89f450ed49a48f082e6",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/hud-icons-1316423",
+    "sha": "621b9a0a5e139d30ff93f90fb4c3d6af13417afa",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/independent-visits-b97b532",
+    "sha": "962bd135e985d20e0e55a03db98dbae5463b04ef",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/items-a07aedb",
+    "sha": "30e37816256dbdbebb8a9b8a082066c4ba3c897b",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/items-a338d83",
+    "sha": "a338d8308a0a0bd6873adea188e561a8bab8f3e9",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/living-spaces-3a07e8d",
+    "sha": "3a07e8d08ead2e1d02820f41571cf39d1c9b45fd",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/living-spaces-f865d16",
+    "sha": "f865d16057f5434233d41a9e674375e76b0e6c25",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/local-avoidance-d17a497",
+    "sha": "344b533191c154ed0a513f8c84e3eaccd9b476b2",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/localization-0ea4572",
+    "sha": "03f9391edd55d20142595e7c77d7491422f9b20b",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/localization-4e3876d",
+    "sha": "4e3876d6b352d8469465dfd4101b10d4bab23270",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/localization-67e8e69",
+    "sha": "67e8e694dff05075c9220d6c1e1d826efaa2b6e3",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/notebook-420cfe0",
+    "sha": "87c6e0df50431c3c3a241dc040474429a96fbfe1",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/outings-07bb9a1",
+    "sha": "ed615764c4507b7defa299c3f4f615c80dd655ee",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/outings-bf5d8f7",
+    "sha": "bf5d8f73f7427b549e004ded0b3921a305b07b72",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/performance-1f090e8",
+    "sha": "c8719e86399857b4a02886efb607a58c00e42ab0",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/performance-f5da764",
+    "sha": "abf3a11d0bb1f822c5c780eda49da520da3d98bf",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/prompts-46a26af",
+    "sha": "7e601cef934103bd9dcdfcad47a5d12b42a4d49a",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/spatial-awareness-8fa96b5",
+    "sha": "badc9cf5d2f65d5850e2bb5f6d9f47994f3cd9cf",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/stability-e9b816d",
+    "sha": "5c75714471ac47b7de775ae1f35fa9b5735f7dfe",
+    "preserved_in": "main"
+  },
+  {
+    "branch": "preview/supplier-38396bb",
+    "sha": "70d035f051450685fd059f0cec0a1b64e1fcb850",
+    "preserved_in": "main"
+  }
+]

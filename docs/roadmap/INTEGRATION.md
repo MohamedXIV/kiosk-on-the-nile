@@ -20,3 +20,7 @@ Existing permanent heads after approved cleanup: main and artifacts. The integra
 ## Retained known limitations
 
 Narrow stationary-person bottlenecks, player/home guest seating proposal, broader social stories/encounters and source vision gaps remain on roadmap#8. No gameplay implementation is included in this maintenance task. No universal regression/performance claim.
+
+## Completed outcome
+
+PR#9 merged as360579bf5a76c9883da7f683c7a775adf962ae66 after final-head Web/security checks passed. The post-merge main Web build also passed. Source cleanup removed35 refs with expected-head leases; GitHub removed the merged integration head. The repository now has only main and artifacts. Exact removed refs and preserved ancestry are recorded in evidence/deleted-source-refs.json. All source and archived version histories remain reachable. This outcome closes epic#1; next gameplay epic is#2.
