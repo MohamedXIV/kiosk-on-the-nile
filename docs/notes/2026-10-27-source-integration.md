@@ -24,5 +24,7 @@ The Web-save observer is pinned to the verified Godot4.7.2 backend. Previously r
 ## Execution record
 
 - Remote main refreshed and confirmed to be an ancestor of the integration branch. The three source batches form a single descendant chain; the aggregate source diff does not include the artifacts archive.
-- Version consistency and whitespace checks passed before integration preparation.
-- Build, independent review, PR and merge outcomes will be recorded after completion.
+- Version consistency and whitespace checks of the integration-preparation edits passed. The aggregate diff retains trailing whitespace in historical fixture/browser evidence logs; those records are not rewritten as unrelated cleanup.
+- Fresh independent read-only integration review of `63b6a09..7ddf812` plus preparation commit `cc64e0c` found no Critical/Important blocker, artifact-history merge, deleted files or accidental feature pruning. Its minor evidence-whitespace wording finding is corrected here. The reviewer did not independently run builds/gameplay/browser/archive checks.
+- `bash tools/build.sh --release --out /tmp/kiosk-integration-cc64e0c-web` completed with exit0 on clean source `cc64e0c4515e17fbc4d483da96c8056b24186e2f`: verified pinned toolchain,324 stable Ink localization references, editor import and Web export. Generated BUILD.json reports version0.1.0-prealpha.2, source_dirty=false, build_mode=release, publication_state=development and schema4/revision16. This is an integration build, not a new tagged/published package. The subsequent evidence-only commit changes provenance; PR CI must build that final proposed source independently.
+- PR/CI and merge outcomes will be recorded after completion. No gameplay or historical-save suite was added/run for this integration.
