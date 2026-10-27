@@ -50,7 +50,7 @@ func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligibl
   if not visits.has(_active.initiator) or not visits.has(_active.target):return {"cancel":finish()}
   var a: VisitState=visits[_active.initiator]
   var b: VisitState=visits[_active.target]
-  if not eligible.call(a,str(_active.conversation)) or not eligible.call(b,str(_active.conversation)):return {"cancel":finish()}
+  if a.pose.location_id!=b.pose.location_id or not eligible.call(a,str(_active.conversation)) or not eligible.call(b,str(_active.conversation)):return {"cancel":finish()}
   if not (manual.is_valid() and not str(_active.conversation).is_empty() and manual.call(str(_active.conversation))):_active.elapsed=float(_active.elapsed)+delta
   if float(_active.elapsed)>=float(_data.max_seconds):return {"cancel":finish()}
   if _active.phase=="conversing":return {}

@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+POLICY valid=true {  }
+TRACE 0 state={ "active": {  }, "records": { "visit_1": { "attempted": false, "remaining": 0.98333333333333 } }, "next_id": 1, "cooldown": 0.0 } phases=staying/staying
+TRACE 120 state={ "active": {  }, "records": { "visit_1": { "attempted": false, "remaining": 0.0 } }, "next_id": 1, "cooldown": 0.0 } phases=staying/staying
+TRACE 240 state={ "active": {  }, "records": { "visit_1": { "attempted": false, "remaining": 0.0 } }, "next_id": 1, "cooldown": 0.0 } phases=staying/staying
+TRACE 360 state={ "active": { "id": "peer_1", "initiator": "visit_1", "target": "visit_2", "encounter": "river_company", "phase": "conversing", "elapsed": 0.96666666666667, "goal": [-7.40000009536743, 2.70000004768372], "observed": [-6.5, 2.70000004768372], "target_point": [-6.5, 2.70000004768372], "conversation": "conversation_2" }, "records": { "visit_1": { "attempted": true, "remaining": 0.0 } }, "next_id": 2, "cooldown": 0.0 } phases=staying/staying
+TRACE 480 state={ "active": { "id": "peer_1", "initiator": "visit_1", "target": "visit_2", "encounter": "river_company", "phase": "conversing", "elapsed": 2.96666666666666, "goal": [-7.40000009536743, 2.70000004768372], "observed": [-6.5, 2.70000004768372], "target_point": [-6.5, 2.70000004768372], "conversation": "conversation_2" }, "records": { "visit_1": { "attempted": true, "remaining": 0.0 } }, "next_id": 2, "cooldown": 0.0 } phases=staying/staying
+TRACE 600 state={ "active": { "id": "peer_1", "initiator": "visit_1", "target": "visit_2", "encounter": "river_company", "phase": "conversing", "elapsed": 4.96666666666665, "goal": [-7.40000009536743, 2.70000004768372], "observed": [-6.5, 2.70000004768372], "target_point": [-6.5, 2.70000004768372], "conversation": "conversation_2" }, "records": { "visit_1": { "attempted": true, "remaining": 0.0 } }, "next_id": 2, "cooldown": 0.0 } phases=staying/staying
+MEETING ready=river_company text=ربنا يروّق بالنا زي صاحبها.
+OFFER choices=3 text=ربنا يروّق بالنا زي صاحبها.
+JOIN true manual=true personal_hub=false text=تسلم يا معلم.. كفاية إن الواحد يلاقي حد يسمعه.
+MANUAL_WAIT same_beat=تسلم يا معلم.. كفاية إن الواحد يلاقي حد يسمعه. deadline_paused=true
+SAVE16 true
+SAVE16_STATE peer_equal=true wallet=true clock=true rng=true
+ORPHAN rejected=true reason=invalid_peer_links
+LEAVE true manual_off=true
+OWNER_RESTORE true {  }
+CLEAR peers={ "active": {  }, "records": {  }, "next_id": 2, "cooldown": 0.0 } conversations=0
+WARNING: 99 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

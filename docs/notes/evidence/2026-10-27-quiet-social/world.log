@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+POLICY valid=true {  }
+MEETING { "id": "peer_1", "initiator": "visit_1", "target": "visit_2", "encounter": "football", "phase": "conversing", "elapsed": 0.3, "goal": [-4.73141288757324, 0.90156227350235], "observed": [-5.62791633605957, 0.82230305671692], "target_point": [-5.62791633605957, 0.82230305671692], "conversation": "conversation_1" } a=(-4.657103, 0.908132) b=(-5.627916, 0.822303) conversations=1
+OWNER_RESTORE true {  }
+CLEAR peers={ "active": {  }, "records": {  }, "next_id": 2, "cooldown": 0.0 } conversations=0
+WARNING: 51 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

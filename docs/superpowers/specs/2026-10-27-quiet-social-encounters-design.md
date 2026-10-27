@@ -1,6 +1,6 @@
 # Quiet social encounters — proposed execution design
 
-Status: concrete design for roadmap epic#2; user authorized starting the batch. Product implementation awaits review of the decisions below. No gameplay changes in this design commit.
+Status: design approved in chat; epic#2 implementation proceeds on feature/quiet-social-encounters.
 
 ## Intent and constraints
 
@@ -53,7 +53,7 @@ Persist semantic meeting ID, visit references, roles, phase, elapsed/attempt/coo
 
 No automated gameplay suite without user request. Use build-only gate, bounded native runtime observations and actual Web mouse/keyboard observations; record limitations. Cover independent/no-player start, missed/unheard speech, join midway, expired choice, interrupted meeting, saved old dialogue, approach/speech/participation restore, chair movement, pending order priority and disabled policy. Include source-review and profiling observations (bounded candidates, no per-frame paths/Ink opens). No universal FPS claim. Preserve known teardown warnings as evidence until separately diagnosed. Publish one complete archive under artifacts only after coherent delivery.
 
-## User-visible decisions to review
+## Approved user-visible decisions
 
 - First two authored pairs: Mahmoud/Samir and Amgad/Hassan.
 - NPC talk continues out of hearing; the player's history includes only what was actually heard.
