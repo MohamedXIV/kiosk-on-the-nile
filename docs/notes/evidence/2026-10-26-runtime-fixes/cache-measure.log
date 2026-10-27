@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARM_OPEN amgad median_us=7006 max_us=7906 idle=1
+WARM_OPEN football median_us=6598 max_us=7515 idle=2
+WARM_OPEN shawarma_learning median_us=7006 max_us=8272 idle=3
+WARM_OPEN visitors median_us=8433 max_us=9407 idle=4
+WARM_OPEN venue_comments median_us=6104 max_us=7536 idle=5
+WARM_OPEN orders median_us=7549 max_us=9138 idle=6
+WARM_OPEN companionship median_us=2809 max_us=3202 idle=7
+WARM_OPEN inner_monologue median_us=1089 max_us=1453 idle=8
+WARM_OPEN service_availability median_us=2698 max_us=3563 idle=8
+WARM_OPEN landlord median_us=9654 max_us=12524 idle=8
+WARM_OPEN supplier median_us=2205 max_us=3517 idle=8
+OBSERVATION stories=11 first_frame_differences=0 restore_failures=0
+CONCURRENT distinct_players=true untouched_other_state=true

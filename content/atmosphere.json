@@ -1,0 +1,68 @@
+{
+  "audio": {
+    "fade_speed": 4,
+    "layers": {
+      "river": {
+        "path": "res://assets/audio/river.wav",
+        "kiosk_gain": 0.12,
+        "rooftop_gain": 0.02
+      },
+      "sizzle": {
+        "path": "res://assets/audio/sizzle.wav",
+        "kiosk_gain": 0.16,
+        "rooftop_gain": 0
+      },
+      "kettle": {
+        "path": "res://assets/audio/kettle.wav",
+        "kiosk_gain": 0.1,
+        "rooftop_gain": 0
+      },
+      "fan": {
+        "path": "res://assets/audio/fan.wav",
+        "kiosk_gain": 0,
+        "rooftop_gain": 0.11
+      },
+      "radio": {
+        "path": "res://assets/audio/radio.wav",
+        "rooftop_gain": 0.045,
+        "kiosk_gain": 0.035
+      },
+      "oven": {
+        "path": "res://assets/audio/fan.wav",
+        "kiosk_gain": 0.02,
+        "rooftop_gain": 0.01
+      }
+    },
+    "cues": {
+      "pour": "res://assets/audio/pour.wav",
+      "coin": "res://assets/audio/coin.wav",
+      "chime": "res://assets/audio/chime.wav"
+    }
+  },
+  "night": {
+    "start": 1080,
+    "end": 1200,
+    "afternoon_factor": 0.25,
+    "night_factor": 0.9,
+    "opacity": 0.55,
+    "morning_end": 300,
+    "color": "#0a0d18"
+  },
+  "steam": {
+    "interval": 0.1,
+    "rise_speed": 35,
+    "lifetime": 1.3,
+    "radius": 6
+  },
+  "light": {
+    "color": "#ffc46b",
+    "energy": 0.7,
+    "radius": 240
+  },
+  "equipment": {
+    "working": "#d9a24a",
+    "ready": "#83bf7a",
+    "burnt": "#ca5141",
+    "ready_cue": "chime"
+  }
+}

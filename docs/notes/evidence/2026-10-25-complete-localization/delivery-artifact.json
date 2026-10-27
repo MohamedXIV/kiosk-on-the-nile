@@ -1,0 +1,21 @@
+{
+  "sha256": "e2d588b32e0ee67d02fec0922be9de50d0dc371c067964bb574c4a50ba8e2ba9",
+  "bytes": 11899194,
+  "build": {
+    "source_commit": "0ea45729ee8094842c817ec72ce58e45493a6d5d",
+    "godot": "4.7.2",
+    "variant": "release-web",
+    "save_schema": 4,
+    "save_revision": 12,
+    "feature": "complete-offline-arabic-english-localization",
+    "debug_probe": false
+  },
+  "catalogs": [
+    1027,
+    1027
+  ],
+  "paired": true,
+  "wasm_count": 1,
+  "pck_count": 1,
+  "guide_current": true
+}

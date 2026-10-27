@@ -1,0 +1,54 @@
+{
+  "minutes_per_second": 1,
+  "start_day": 1,
+  "start_minutes": 930,
+  "fixed_step": 0.016666666666666666,
+  "system_dependencies": {
+    "clock": [],
+    "needs": [
+      "clock"
+    ],
+    "scheduler": [
+      "narrative"
+    ],
+    "cooking": [
+      "body"
+    ],
+    "visitors": [
+      "hygiene"
+    ],
+    "narrative": [
+      "social_life"
+    ],
+    "motion": [
+      "cooking"
+    ],
+    "travel": [
+      "clock"
+    ],
+    "shops": [
+      "travel"
+    ],
+    "hygiene": [
+      "motion"
+    ],
+    "customer_experience": [
+      "visitors"
+    ],
+    "social_life": [
+      "customer_experience"
+    ],
+    "body": [
+      "needs"
+    ],
+    "accounts": [
+      "shops"
+    ],
+    "residential": [
+      "accounts"
+    ],
+    "deliveries": [
+      "accounts"
+    ]
+  }
+}

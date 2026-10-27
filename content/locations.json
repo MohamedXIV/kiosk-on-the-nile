@@ -1,0 +1,592 @@
+{
+  "kiosk": {
+    "canvas_origin": [
+      0,
+      0
+    ],
+    "title": "كورنيش النيل — الكشك",
+    "font_path": "res://assets/fonts/Cairo.ttf",
+    "background": "#0d0c0b",
+    "player_bounds": [
+      -9.5,
+      -2.95,
+      9.5,
+      3.6
+    ],
+    "navigation_bounds": [
+      -15.5,
+      -3.1,
+      15.5,
+      4.3
+    ],
+    "navigation_cell": 0.25,
+    "navigation_clearance": 0.2,
+    "spawn": [
+      -0.2,
+      -0.2
+    ],
+    "floor": {
+      "kind": "kiosk",
+      "pavement": [
+        -17,
+        -3.3,
+        17,
+        4.5
+      ],
+      "pavement_color": "#38332e",
+      "boards": [
+        -2.5,
+        -2.25,
+        4.5,
+        1.75
+      ],
+      "boards_color": "#4e3b2b"
+    },
+    "water": {
+      "horizon": -3.3,
+      "top": "#091824",
+      "bottom": "#153a50",
+      "shimmer_count": 28,
+      "boat": {
+        "initial_x": -11,
+        "depth": -7.2,
+        "speed": 0.45,
+        "wrap_left": -16,
+        "wrap_right": 16
+      }
+    },
+    "props": [
+      {
+        "kind": "railing",
+        "ground": [
+          0,
+          -3.3
+        ],
+        "length": 34,
+        "height": 0.85,
+        "spacing": 1.5,
+        "color": "#1f2328"
+      },
+      {
+        "kind": "lamp",
+        "ground": [
+          -7.5,
+          -2.8
+        ],
+        "height": 3.6,
+        "pole": "#25282c",
+        "bulb": "#ffbe66"
+      },
+      {
+        "id": "counter",
+        "kind": "box",
+        "ground": [
+          -0.55,
+          0.7
+        ],
+        "size": [
+          3.45,
+          0.72,
+          0.96
+        ],
+        "top": "#9c6e42",
+        "front": "#6e4b2a",
+        "children": [
+          {
+            "kind": "kettle",
+            "station_id": "tea",
+            "ground": [
+              -1.3,
+              0.7
+            ],
+            "height_offset": 1.02,
+            "body": "#b87333",
+            "lid": "#d99658"
+          },
+          {
+            "kind": "grill",
+            "station_id": "kebda",
+            "ground": [
+              0.4,
+              0.7
+            ],
+            "height_offset": 1.02,
+            "body": "#1f2024",
+            "raw": "#8b322c",
+            "cooked": "#4f2412"
+          }
+        ],
+        "owned": true
+      },
+      {
+        "kind": "stool",
+        "ground": [
+          -1.3,
+          1.68
+        ],
+        "height": 0.45,
+        "pole": "#3d2816",
+        "top": "#7c5330",
+        "owned": true
+      },
+      {
+        "kind": "stool",
+        "ground": [
+          1.1,
+          1.68
+        ],
+        "height": 0.45,
+        "pole": "#3d2816",
+        "top": "#7c5330",
+        "owned": true
+      },
+      {
+        "kind": "table",
+        "ground": [
+          6.25,
+          1.6
+        ],
+        "height": 0.72,
+        "pole": "#1f425c",
+        "top": "#2d5a7b",
+        "owned": true
+      },
+      {
+        "kind": "sign",
+        "ground": [
+          1.75,
+          -2.15
+        ],
+        "height_offset": 1.35,
+        "font_path": "res://assets/fonts/Cairo.ttf",
+        "open_text": "مفتوح",
+        "closed_text": "مغلق",
+        "open_color": "#4a7c44",
+        "closed_color": "#7c3838"
+      },
+      {
+        "kind": "box",
+        "ground": [
+          0,
+          -2.15
+        ],
+        "size": [
+          0.05,
+          0.05,
+          0.05
+        ],
+        "top": "#6b4728",
+        "front": "#6b4728",
+        "details": [
+          {
+            "kind": "rect",
+            "offset": [
+              -0.5,
+              0.12,
+              1.45
+            ],
+            "rect": [
+              -95,
+              0,
+              190,
+              8
+            ],
+            "color": "#6b4728"
+          },
+          {
+            "kind": "rect",
+            "offset": [
+              -0.5,
+              0.12,
+              1.45
+            ],
+            "rect": [
+              -80,
+              -16,
+              18,
+              16
+            ],
+            "color": "#c83e2b"
+          },
+          {
+            "kind": "rect",
+            "offset": [
+              -0.5,
+              0.12,
+              1.45
+            ],
+            "rect": [
+              -56,
+              -16,
+              18,
+              16
+            ],
+            "color": "#c83e2b"
+          },
+          {
+            "kind": "rect",
+            "offset": [
+              -0.5,
+              0.12,
+              1.45
+            ],
+            "rect": [
+              15,
+              -18,
+              22,
+              18
+            ],
+            "color": "#d4a359"
+          }
+        ]
+      }
+    ],
+    "solids": [],
+    "markers": {
+      "tea": [
+        -1.3,
+        0.65
+      ],
+      "kebda": [
+        0.35,
+        0.65
+      ],
+      "phone": [
+        -1.95,
+        -1.15
+      ],
+      "counter_1": [
+        -1.5,
+        2.375
+      ],
+      "counter_2": [
+        0.5,
+        2.375
+      ],
+      "table_a": [
+        5.1,
+        1.6
+      ],
+      "table_b": [
+        7.4,
+        1.6
+      ],
+      "railing_1": [
+        -4.8,
+        -2.85
+      ],
+      "railing_2": [
+        3.5,
+        -2.85
+      ],
+      "takeaway": [
+        0,
+        2.35
+      ],
+      "spawn_west": [
+        -14.5,
+        3.6
+      ],
+      "spawn_east": [
+        14.5,
+        3.6
+      ],
+      "stroll_west": [
+        -8,
+        2.8
+      ],
+      "stroll_east": [
+        10.5,
+        2.8
+      ],
+      "bench_east": [
+        7.7,
+        -0.4
+      ],
+      "bench_west": [
+        -5.2,
+        2.7
+      ],
+      "river_middle": [
+        0,
+        -2.9
+      ]
+    },
+    "interactions": [
+      {
+        "id": "tea",
+        "ground": [
+          -1.3,
+          0.65
+        ],
+        "radius": 1.6,
+        "primary": "البراد",
+        "action": "cook",
+        "station_id": "tea",
+        "secondary": "تغيير السكر",
+        "secondary_action": "sugar",
+        "instance_id": "tea"
+      },
+      {
+        "id": "kebda",
+        "ground": [
+          0.35,
+          0.65
+        ],
+        "radius": 1.6,
+        "primary": "الجريل جاهز",
+        "action": "cook",
+        "station_id": "kebda",
+        "instance_id": "kebda"
+      },
+      {
+        "id": "sign",
+        "ground": [
+          1.75,
+          -1.35
+        ],
+        "radius": 1.6,
+        "primary": "افتح الكشك واستقبل الزباين",
+        "action": "toggle_kiosk",
+        "secondary": "روّح أوضة السطح",
+        "secondary_action": "travel",
+        "destination": "rooftop"
+      },
+      {
+        "id": "phone",
+        "ground": [
+          -1.95,
+          -1.15
+        ],
+        "radius": 1.6,
+        "primary": "روح السوق تشتري الخامات",
+        "action": "buy_stock",
+        "secondary": "روح تشوف عرض المروحة المستعملة",
+        "secondary_action": "buy_fan",
+        "secondary_requires": {
+          "all": [
+            {
+              "fact_known": "KNOWN_CHEAP_FAN"
+            },
+            {
+              "not": {
+                "home_item_owned": "fan"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "river",
+        "ground": [
+          -2.2,
+          -2.85
+        ],
+        "radius": 1.7,
+        "primary": "اقف ع السور اتأمل النيل شوية (يروق المزاج)",
+        "action": "river"
+      }
+    ]
+  },
+  "rooftop": {
+    "canvas_origin": [
+      4096,
+      0
+    ],
+    "title": "أوضة السطح — البيت",
+    "font_path": "res://assets/fonts/Cairo.ttf",
+    "background": "#121016",
+    "player_bounds": [
+      -8.5,
+      -5.5,
+      8.5,
+      5.5
+    ],
+    "navigation_bounds": [
+      -8.5,
+      -5.5,
+      8.5,
+      5.5
+    ],
+    "navigation_cell": 0.25,
+    "navigation_clearance": 0.2,
+    "spawn": [
+      0,
+      0.5
+    ],
+    "floor": {
+      "kind": "rooftop",
+      "surroundings": [
+        -9,
+        -6,
+        9,
+        6
+      ],
+      "surroundings_color": "#38332e",
+      "room": [
+        -3,
+        -2.25,
+        3,
+        2.25
+      ],
+      "room_color": "#6b5744",
+      "rug": [
+        -1.2,
+        -0.7,
+        1.2,
+        1.2
+      ],
+      "rug_color": "#7c352b",
+      "door": [
+        0,
+        4.25
+      ],
+      "door_label": "سلم النزول للكورنيش"
+    },
+    "props": [
+      {
+        "id": "bed",
+        "kind": "box",
+        "ground": [
+          -1.7,
+          -1.3
+        ],
+        "size": [
+          2.05,
+          1.25,
+          0.42
+        ],
+        "top": "#c8b8a6",
+        "front": "#4e3620",
+        "details": [
+          {
+            "kind": "rect",
+            "offset": [
+              -0.65,
+              0,
+              0.45
+            ],
+            "rect": [
+              -14,
+              -18,
+              28,
+              36
+            ],
+            "color": "#e8dfd5"
+          }
+        ],
+        "owned": true
+      },
+      {
+        "id": "desk",
+        "kind": "box",
+        "ground": [
+          1.6,
+          -1.6
+        ],
+        "size": [
+          1.2,
+          0.7,
+          0.72
+        ],
+        "top": "#8c6239",
+        "front": "#5c3e22",
+        "details": [
+          {
+            "kind": "circle",
+            "offset": [
+              0,
+              0,
+              0.75
+            ],
+            "center": [
+              -12,
+              0
+            ],
+            "radius": 9,
+            "color": "#dedede"
+          }
+        ],
+        "owned": true
+      },
+      {
+        "kind": "fan",
+        "ground": [
+          0.3,
+          -1.4
+        ],
+        "height": 1.15,
+        "rotation_speed": 21,
+        "owned": true
+      }
+    ],
+    "solids": [],
+    "markers": {
+      "bed": [
+        -1.65,
+        -1.2
+      ],
+      "desk": [
+        1.6,
+        -1.45
+      ],
+      "fan": [
+        0.25,
+        -1.35
+      ],
+      "exit": [
+        0,
+        2.05
+      ]
+    },
+    "interactions": [
+      {
+        "id": "bed",
+        "ground": [
+          -1.65,
+          -1.2
+        ],
+        "radius": 1.65,
+        "primary": "اختار مدة النوم والراحة",
+        "action": "sleep",
+        "instance_id": "bed"
+      },
+      {
+        "id": "snack",
+        "ground": [
+          1.6,
+          -1.45
+        ],
+        "radius": 1.55,
+        "primary": "لقمة خفيفة بـ {snack_price} ج.م (يسد الجوع)",
+        "action": "snack",
+        "instance_id": "desk"
+      },
+      {
+        "id": "fan",
+        "ground": [
+          0.25,
+          -1.35
+        ],
+        "radius": 1.5,
+        "primary": "شغّل المروحة (تلطيف الجو والراحة)",
+        "action": "toggle_fan",
+        "requires": {
+          "home_item_owned": "fan"
+        },
+        "instance_id": "legacy_fan"
+      },
+      {
+        "id": "exit",
+        "ground": [
+          0,
+          4.25
+        ],
+        "radius": 1.0,
+        "primary": "انزل السلم وروح للكشك ع النيل",
+        "action": "travel",
+        "destination": "kiosk"
+      }
+    ]
+  }
+}

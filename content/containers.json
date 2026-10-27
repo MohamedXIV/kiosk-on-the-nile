@@ -1,0 +1,89 @@
+{
+  "player_hand": {
+    "id": "player_hand",
+    "location_id": "player",
+    "kind": "hand",
+    "capacity": 1,
+    "allowed_tags": [
+      "prepared",
+      "batch",
+      "ingredient"
+    ],
+    "host_id": ""
+  },
+  "kiosk_dry": {
+    "id": "kiosk_dry",
+    "location_id": "kiosk",
+    "kind": "dry",
+    "capacity": 48,
+    "allowed_tags": [
+      "ingredient"
+    ],
+    "host_id": ""
+  },
+  "kiosk_furniture": {
+    "id": "kiosk_furniture",
+    "location_id": "kiosk",
+    "kind": "storage",
+    "capacity": 1000,
+    "allowed_tags": [
+      "furniture",
+      "equipment"
+    ],
+    "host_id": ""
+  },
+  "rooftop_furniture": {
+    "id": "rooftop_furniture",
+    "location_id": "rooftop",
+    "kind": "storage",
+    "capacity": 1000,
+    "allowed_tags": [
+      "furniture",
+      "equipment"
+    ],
+    "host_id": ""
+  },
+  "rooftop_world": {
+    "id": "rooftop_world",
+    "location_id": "rooftop",
+    "kind": "placed",
+    "capacity": 1000,
+    "allowed_tags": [
+      "furniture",
+      "equipment"
+    ],
+    "host_id": ""
+  },
+  "kiosk_world": {
+    "id": "kiosk_world",
+    "location_id": "kiosk",
+    "kind": "placed",
+    "capacity": 1000,
+    "allowed_tags": [
+      "furniture",
+      "equipment"
+    ],
+    "host_id": ""
+  },
+  "player_bag": {
+    "id": "player_bag",
+    "location_id": "player",
+    "kind": "purchase_bag",
+    "capacity": 48,
+    "allowed_tags": [
+      "ingredient",
+      "batch"
+    ],
+    "host_id": ""
+  },
+  "rooftop_dry": {
+    "id": "rooftop_dry",
+    "location_id": "rooftop",
+    "kind": "dry",
+    "capacity": 48,
+    "allowed_tags": [
+      "ingredient"
+    ],
+    "host_id": ""
+  }
+}

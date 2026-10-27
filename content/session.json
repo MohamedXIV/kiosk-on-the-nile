@@ -1,0 +1,7 @@
+{
+  "home": {
+    "has_fan": false,
+    "fan_on": false
+  },
+  "kiosk_open": false
+}

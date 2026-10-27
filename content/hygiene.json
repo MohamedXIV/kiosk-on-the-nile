@@ -1,0 +1,107 @@
+{
+  "profiles": {
+    "surface": {
+      "clean_minutes": 3,
+      "dust_per_minute": 0,
+      "food_contact": true,
+      "uses": {
+        "prep": 3,
+        "assembly": 2
+      }
+    },
+    "fryer": {
+      "clean_minutes": 8,
+      "dust_per_minute": 0,
+      "food_contact": true,
+      "uses": {
+        "batch": 6
+      }
+    },
+    "oven": {
+      "clean_minutes": 8,
+      "dust_per_minute": 0,
+      "food_contact": true,
+      "uses": {
+        "batch": 3
+      }
+    },
+    "spit": {
+      "clean_minutes": 8,
+      "dust_per_minute": 0,
+      "food_contact": true,
+      "uses": {
+        "batch": 4
+      }
+    },
+    "kettle": {
+      "clean_minutes": 8,
+      "dust_per_minute": 0,
+      "food_contact": true,
+      "uses": {
+        "batch": 2
+      }
+    },
+    "fridge": {
+      "clean_minutes": 8,
+      "dust_per_minute": 0,
+      "food_contact": false,
+      "uses": {
+        "batch": 0
+      }
+    },
+    "furniture": {
+      "clean_minutes": 3,
+      "dust_per_minute": 0.001,
+      "food_contact": false,
+      "uses": {}
+    },
+    "bed": {
+      "clean_minutes": 3,
+      "dust_per_minute": 0.001,
+      "food_contact": false,
+      "uses": {
+        "sleep": 2
+      }
+    },
+    "floor": {
+      "clean_minutes": 5,
+      "dust_per_minute": 0.005,
+      "food_contact": false,
+      "uses": {
+        "visit": 1
+      }
+    }
+  },
+  "item_profiles": {
+    "counter": "surface",
+    "desk": "surface",
+    "griddle": "spit",
+    "kettle": "kettle",
+    "fridge": "fridge",
+    "rotisserie": "spit",
+    "fryer": "fryer",
+    "oven": "oven",
+    "bed": "bed",
+    "chair": "furniture",
+    "table": "furniture",
+    "fan": "furniture",
+    "radio": "furniture"
+  },
+  "thresholds": {
+    "wipe": 60,
+    "dirty": 30
+  },
+  "labels": {
+    "clean": "نظيف",
+    "wipe": "محتاج مسحة",
+    "dirty": "متسخ"
+  },
+  "food": {
+    "penalty_below": 30,
+    "max_penalty": 1
+  },
+  "sleep": {
+    "dirty_below": 30,
+    "rest_multiplier": 0.9
+  }
+}

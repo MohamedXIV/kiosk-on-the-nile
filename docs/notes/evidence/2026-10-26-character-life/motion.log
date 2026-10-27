@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+INTENTIONAL_IDLE { "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0 } paths=0
+PAUSED { "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0 } position=(0.0, 0.0)
+NORMAL_ROUTE { "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.03333333333333 } position=(1.899999, 0.0) paths=1
+COLLISION { "fallbacks": 0, "failed": true, "attempts": 2, "revision": 1, "stall_seconds": 2.0 } position=(0.382297, 0.0) walk_phase=0.0 path_calls=3 failure_once=true failure_twice=false
+LAYOUT_RECOVERY { "fallbacks": 0, "failed": false, "attempts": 0, "revision": 2, "stall_seconds": 0.0 } position=(1.882296, 0.0)
+EMPTY_ROUTE { "fallbacks": 0, "failed": true, "attempts": 2, "revision": 3, "stall_seconds": 0.0 } path_calls=3
+COSMETIC60s blinks=11 breath=-0.84999999542897..0.84999973187145 domain_rng_unchanged=true

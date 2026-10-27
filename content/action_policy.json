@@ -1,0 +1,92 @@
+{
+  "classes": {
+    "personal_focus": {
+      "focus": true,
+      "hunger": false,
+      "refusal": false
+    },
+    "practical_talk": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "cooking_for_self": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "commercial_preparation": {
+      "focus": true,
+      "hunger": false,
+      "refusal": true
+    },
+    "ordinary_effort": {
+      "focus": true,
+      "hunger": true,
+      "refusal": true
+    },
+    "eating": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "supply_access": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "return_home": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "sleep": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "payment": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    },
+    "help": {
+      "focus": false,
+      "hunger": false,
+      "refusal": false
+    }
+  },
+  "effort": {
+    "preparation": {
+      "rest": 0.4,
+      "mood": 0.6
+    },
+    "cleaning": {
+      "rest": 0.6,
+      "mood": 0.3
+    },
+    "arranging": {
+      "rest": 0.3,
+      "mood": 0.2
+    }
+  },
+  "caffeine": {
+    "foods": {
+      "tea": {
+        "boost": 12,
+        "duration_minutes": 90
+      }
+    },
+    "multipliers": [
+      1,
+      0.6,
+      0.3,
+      0.1,
+      0
+    ],
+    "window_minutes": 360,
+    "reset_sleep_hours": 4,
+    "maximum_boost": 12,
+    "maximum_exemption_minutes": 180
+  }
+}

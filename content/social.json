@@ -1,0 +1,31 @@
+{
+  "initial_facts": [
+    "START_ROUTINE"
+  ],
+  "initial_notes": [
+    "الكشك على النيل، والحياة على رواقة. إيجار السكن لعم عبد الكريم وإيجار الكشك للحي أسبوعيًا؛ التفاصيل والمواعيد في دفتر المستحقات."
+  ],
+  "facts": [
+    "START_ROUTINE",
+    "KNOWN_CHEAP_FAN",
+    "BOUGHT_FAN",
+    "KNOWN_SHAWARMA_BASICS",
+    "WORKSHOP_OPPORTUNITY",
+    "YOUSSEF_WORK_STUDY",
+    "WORK_TRIAL_APPOINTMENT",
+    "WORK_TRIAL_RESULT",
+    "WORK_TRIAL_WEEK",
+    "KNOWN_ABDUL_FAMILY"
+  ],
+  "relationship_defaults": {
+    "familiarity": 0,
+    "trust": 0
+  },
+  "relationship_bounds": [
+    0,
+    100
+  ],
+  "initial_relationships": {},
+  "conversation_familiarity_threshold": 30,
+  "hearing_radius": 7
+}

@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true {  }
+SESSION true
+RESERVATIONS first={ "id": "chair_1:seat", "item_id": "chair_1", "location_id": "kiosk", "access": (-5.75, 0.85), "anchor": (-5.75, 0.25), "facing": (0.0, 1.0), "height": 0.45, "table_id": "" } second={ "id": "chair_2:seat", "item_id": "chair_2", "location_id": "kiosk", "access": (-4.75, 0.85), "anchor": (-4.75, 0.25), "facing": (0.0, 1.0), "height": 0.45, "table_id": "" } unique=true rng=true
+APPROACH_CLEAN started=true reason= reserved_before=true
+APPROACH_YIELDS released=true not_seated=true normal_destination=(-8.0, 2.8)
+CLEAN_CONTINUES active=true
+AUTHORING_RADIUS rejected=true reason={ "path": "visitors.seating.arrival_radius" }
+AUTHORING_EARLY_SIT rejected=true
+WARNING: 48 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

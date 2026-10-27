@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Identical parsed values/types for 35 story-related sections
+Escape/numeric probes identical
+PARSER_PAIRED visitors old_median_us=24200 new_median_us=16271
+PARSER_PAIRED orders old_median_us=13928 new_median_us=9378
+PARSER_PAIRED venue_comments old_median_us=3134 new_median_us=2130
+PARSER_PAIRED inner_monologue old_median_us=1235 new_median_us=911

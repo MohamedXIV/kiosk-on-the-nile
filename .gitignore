@@ -1,0 +1,6 @@
+.godot/
+.cache/
+.superpowers/
+tools/node_modules/
+exports/
+*.tmp

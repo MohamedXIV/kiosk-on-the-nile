@@ -1,0 +1,1111 @@
+[
+  {
+    "recent_slow": [
+      {
+        "at_us": 286044000,
+        "span": "frame_interval",
+        "us": 112800
+      },
+      {
+        "at_us": 286170900,
+        "span": "frame_interval",
+        "us": 126900
+      },
+      {
+        "at_us": 286321800,
+        "span": "frame_interval",
+        "us": 150900
+      },
+      {
+        "at_us": 286432300,
+        "span": "frame_interval",
+        "us": 110400
+      },
+      {
+        "at_us": 286550000,
+        "span": "frame_interval",
+        "us": 117800
+      },
+      {
+        "at_us": 286744400,
+        "span": "frame_interval",
+        "us": 194400
+      },
+      {
+        "at_us": 286871000,
+        "span": "frame_interval",
+        "us": 126600
+      },
+      {
+        "at_us": 287005400,
+        "span": "frame_interval",
+        "us": 134400
+      },
+      {
+        "at_us": 287131400,
+        "span": "frame_interval",
+        "us": 125700
+      },
+      {
+        "at_us": 287231200,
+        "span": "frame_interval",
+        "us": 100100
+      },
+      {
+        "at_us": 287367200,
+        "span": "frame_interval",
+        "us": 135900
+      },
+      {
+        "at_us": 287497000,
+        "span": "frame_interval",
+        "us": 129800
+      },
+      {
+        "at_us": 287607700,
+        "span": "frame_interval",
+        "us": 110800
+      },
+      {
+        "at_us": 287733900,
+        "span": "frame_interval",
+        "us": 126200
+      },
+      {
+        "at_us": 287851500,
+        "span": "frame_interval",
+        "us": 117600
+      },
+      {
+        "at_us": 287954600,
+        "span": "frame_interval",
+        "us": 103100
+      },
+      {
+        "at_us": 288072400,
+        "span": "frame_interval",
+        "us": 117800
+      },
+      {
+        "at_us": 288200500,
+        "span": "frame_interval",
+        "us": 128100
+      },
+      {
+        "at_us": 288320400,
+        "span": "frame_interval",
+        "us": 119900
+      },
+      {
+        "at_us": 288431000,
+        "span": "frame_interval",
+        "us": 110600
+      },
+      {
+        "at_us": 288561500,
+        "span": "frame_interval",
+        "us": 130500
+      },
+      {
+        "at_us": 288667800,
+        "span": "frame_interval",
+        "us": 106300
+      },
+      {
+        "at_us": 288866500,
+        "span": "frame_interval",
+        "us": 198600
+      },
+      {
+        "at_us": 288969900,
+        "span": "frame_interval",
+        "us": 103300
+      },
+      {
+        "at_us": 289093500,
+        "span": "frame_interval",
+        "us": 123800
+      },
+      {
+        "at_us": 289227600,
+        "span": "frame_interval",
+        "us": 134000
+      },
+      {
+        "at_us": 289384100,
+        "span": "frame_interval",
+        "us": 156500
+      },
+      {
+        "at_us": 289616900,
+        "span": "simulation_tick",
+        "us": 88900
+      },
+      {
+        "at_us": 289617100,
+        "span": "frame_interval",
+        "us": 233000
+      },
+      {
+        "at_us": 289744500,
+        "span": "frame_interval",
+        "us": 127500
+      },
+      {
+        "at_us": 289870600,
+        "span": "frame_interval",
+        "us": 126000
+      },
+      {
+        "at_us": 289968700,
+        "span": "frame_interval",
+        "us": 98100
+      }
+    ],
+    "spans": {
+      "audio_projection": {
+        "count": 73,
+        "max_us": 9000,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 31200
+      },
+      "captions_projection": {
+        "count": 73,
+        "max_us": 200,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 2300
+      },
+      "character_blink": {
+        "count": 2,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "frame_interval": {
+        "count": 73,
+        "max_us": 379500,
+        "over_100ms": 70,
+        "over_16ms": 73,
+        "over_250ms": 2,
+        "over_50ms": 73,
+        "total_us": 10030800
+      },
+      "hud_projection": {
+        "count": 73,
+        "max_us": 17900,
+        "over_100ms": 0,
+        "over_16ms": 1,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 144200
+      },
+      "interaction_projection": {
+        "count": 73,
+        "max_us": 13200,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 124800
+      },
+      "npc_path": {
+        "count": 3,
+        "max_us": 600,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 1200
+      },
+      "seat_released": {
+        "count": 1,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "seat_reserved": {
+        "count": 1,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "seat_search": {
+        "count": 1,
+        "max_us": 300,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 300
+      },
+      "simulation_tick": {
+        "count": 542,
+        "max_us": 88900,
+        "over_100ms": 0,
+        "over_16ms": 5,
+        "over_250ms": 0,
+        "over_50ms": 1,
+        "total_us": 1258000
+      },
+      "spatial_observation": {
+        "count": 19,
+        "max_us": 10500,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 11600
+      },
+      "visitor_node_spawn": {
+        "count": 1,
+        "max_us": 5900,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 5900
+      }
+    },
+    "window_seconds": 10.0308
+  },
+  {
+    "recent_slow": [
+      {
+        "at_us": 296103700,
+        "span": "frame_interval",
+        "us": 113200
+      },
+      {
+        "at_us": 296228200,
+        "span": "frame_interval",
+        "us": 124500
+      },
+      {
+        "at_us": 296333800,
+        "span": "frame_interval",
+        "us": 105600
+      },
+      {
+        "at_us": 296449600,
+        "span": "frame_interval",
+        "us": 115800
+      },
+      {
+        "at_us": 296559500,
+        "span": "frame_interval",
+        "us": 109900
+      },
+      {
+        "at_us": 296678600,
+        "span": "frame_interval",
+        "us": 119000
+      },
+      {
+        "at_us": 296791900,
+        "span": "frame_interval",
+        "us": 113300
+      },
+      {
+        "at_us": 296905600,
+        "span": "frame_interval",
+        "us": 113800
+      },
+      {
+        "at_us": 297005100,
+        "span": "frame_interval",
+        "us": 99500
+      },
+      {
+        "at_us": 297122600,
+        "span": "frame_interval",
+        "us": 117400
+      },
+      {
+        "at_us": 297359000,
+        "span": "frame_interval",
+        "us": 236500
+      },
+      {
+        "at_us": 297540600,
+        "span": "frame_interval",
+        "us": 181600
+      },
+      {
+        "at_us": 297701200,
+        "span": "frame_interval",
+        "us": 160600
+      },
+      {
+        "at_us": 297840300,
+        "span": "frame_interval",
+        "us": 139100
+      },
+      {
+        "at_us": 297950300,
+        "span": "frame_interval",
+        "us": 110000
+      },
+      {
+        "at_us": 298071400,
+        "span": "frame_interval",
+        "us": 121100
+      },
+      {
+        "at_us": 298195300,
+        "span": "frame_interval",
+        "us": 123900
+      },
+      {
+        "at_us": 298306600,
+        "span": "frame_interval",
+        "us": 111300
+      },
+      {
+        "at_us": 298422400,
+        "span": "frame_interval",
+        "us": 115700
+      },
+      {
+        "at_us": 298539700,
+        "span": "frame_interval",
+        "us": 117400
+      },
+      {
+        "at_us": 298656800,
+        "span": "frame_interval",
+        "us": 117100
+      },
+      {
+        "at_us": 298789700,
+        "span": "frame_interval",
+        "us": 132800
+      },
+      {
+        "at_us": 298922300,
+        "span": "frame_interval",
+        "us": 132700
+      },
+      {
+        "at_us": 299055400,
+        "span": "frame_interval",
+        "us": 133000
+      },
+      {
+        "at_us": 299165300,
+        "span": "frame_interval",
+        "us": 110000
+      },
+      {
+        "at_us": 299333800,
+        "span": "frame_interval",
+        "us": 168500
+      },
+      {
+        "at_us": 299443500,
+        "span": "frame_interval",
+        "us": 109700
+      },
+      {
+        "at_us": 299563700,
+        "span": "frame_interval",
+        "us": 120200
+      },
+      {
+        "at_us": 299711200,
+        "span": "frame_interval",
+        "us": 147500
+      },
+      {
+        "at_us": 299843800,
+        "span": "frame_interval",
+        "us": 132600
+      },
+      {
+        "at_us": 299952400,
+        "span": "frame_interval",
+        "us": 108500
+      },
+      {
+        "at_us": 300070500,
+        "span": "frame_interval",
+        "us": 118200
+      }
+    ],
+    "spans": {
+      "audio_projection": {
+        "count": 81,
+        "max_us": 1000,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 11900
+      },
+      "captions_projection": {
+        "count": 81,
+        "max_us": 200,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 2400
+      },
+      "character_blink": {
+        "count": 3,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "frame_interval": {
+        "count": 81,
+        "max_us": 236500,
+        "over_100ms": 78,
+        "over_16ms": 81,
+        "over_250ms": 0,
+        "over_50ms": 81,
+        "total_us": 10101900
+      },
+      "hud_projection": {
+        "count": 81,
+        "max_us": 8000,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 151300
+      },
+      "interaction_projection": {
+        "count": 81,
+        "max_us": 11400,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 146600
+      },
+      "npc_path": {
+        "count": 2,
+        "max_us": 1100,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 1200
+      },
+      "seat_reserved": {
+        "count": 1,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "seat_search": {
+        "count": 1,
+        "max_us": 200,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 200
+      },
+      "simulation_tick": {
+        "count": 586,
+        "max_us": 17200,
+        "over_100ms": 0,
+        "over_16ms": 1,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 1056200
+      },
+      "spatial_observation": {
+        "count": 24,
+        "max_us": 800,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 3500
+      },
+      "visitor_node_spawn": {
+        "count": 1,
+        "max_us": 500,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 500
+      }
+    },
+    "window_seconds": 10.1019
+  },
+  {
+    "recent_slow": [
+      {
+        "at_us": 67541600,
+        "span": "frame_interval",
+        "us": 93200
+      },
+      {
+        "at_us": 67709000,
+        "span": "frame_interval",
+        "us": 167400
+      },
+      {
+        "at_us": 67926700,
+        "span": "frame_interval",
+        "us": 172300
+      },
+      {
+        "at_us": 67991100,
+        "span": "frame_interval",
+        "us": 65400
+      },
+      {
+        "at_us": 68078300,
+        "span": "frame_interval",
+        "us": 87300
+      },
+      {
+        "at_us": 68161500,
+        "span": "frame_interval",
+        "us": 83100
+      },
+      {
+        "at_us": 68249500,
+        "span": "frame_interval",
+        "us": 88100
+      },
+      {
+        "at_us": 68301500,
+        "span": "frame_interval",
+        "us": 51900
+      },
+      {
+        "at_us": 68416400,
+        "span": "frame_interval",
+        "us": 115000
+      },
+      {
+        "at_us": 68497300,
+        "span": "frame_interval",
+        "us": 80900
+      },
+      {
+        "at_us": 68592400,
+        "span": "frame_interval",
+        "us": 95000
+      },
+      {
+        "at_us": 68670400,
+        "span": "frame_interval",
+        "us": 77900
+      },
+      {
+        "at_us": 70064800,
+        "span": "frame_interval",
+        "us": 1394500
+      },
+      {
+        "at_us": 70334400,
+        "span": "frame_interval",
+        "us": 269600
+      },
+      {
+        "at_us": 70639600,
+        "span": "frame_interval",
+        "us": 305000
+      },
+      {
+        "at_us": 70797800,
+        "span": "frame_interval",
+        "us": 158400
+      },
+      {
+        "at_us": 70974900,
+        "span": "frame_interval",
+        "us": 177200
+      },
+      {
+        "at_us": 71133300,
+        "span": "frame_interval",
+        "us": 158400
+      },
+      {
+        "at_us": 71297900,
+        "span": "frame_interval",
+        "us": 164600
+      },
+      {
+        "at_us": 71460400,
+        "span": "frame_interval",
+        "us": 162400
+      },
+      {
+        "at_us": 71587600,
+        "span": "frame_interval",
+        "us": 127000
+      },
+      {
+        "at_us": 71770000,
+        "span": "frame_interval",
+        "us": 182600
+      },
+      {
+        "at_us": 71970500,
+        "span": "frame_interval",
+        "us": 200600
+      },
+      {
+        "at_us": 72112700,
+        "span": "frame_interval",
+        "us": 142200
+      },
+      {
+        "at_us": 72249100,
+        "span": "frame_interval",
+        "us": 136400
+      },
+      {
+        "at_us": 72387500,
+        "span": "frame_interval",
+        "us": 138300
+      },
+      {
+        "at_us": 72594300,
+        "span": "frame_interval",
+        "us": 206900
+      },
+      {
+        "at_us": 72740000,
+        "span": "frame_interval",
+        "us": 145700
+      },
+      {
+        "at_us": 72917800,
+        "span": "frame_interval",
+        "us": 177800
+      },
+      {
+        "at_us": 73087200,
+        "span": "frame_interval",
+        "us": 169300
+      },
+      {
+        "at_us": 73248300,
+        "span": "frame_interval",
+        "us": 161100
+      },
+      {
+        "at_us": 73419400,
+        "span": "frame_interval",
+        "us": 171200
+      }
+    ],
+    "spans": {
+      "audio_projection": {
+        "count": 19,
+        "max_us": 900,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 4600
+      },
+      "captions_projection": {
+        "count": 19,
+        "max_us": 700,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 1600
+      },
+      "frame_interval": {
+        "count": 96,
+        "max_us": 1394500,
+        "over_100ms": 24,
+        "over_16ms": 95,
+        "over_250ms": 3,
+        "over_50ms": 85,
+        "total_us": 10053600
+      },
+      "hud_projection": {
+        "count": 19,
+        "max_us": 8900,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 70700
+      },
+      "interaction_projection": {
+        "count": 19,
+        "max_us": 1700,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 13600
+      },
+      "npc_path": {
+        "count": 2,
+        "max_us": 1200,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 1300
+      },
+      "seat_catalog": {
+        "count": 1,
+        "max_us": 700,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 700
+      },
+      "seat_reserved": {
+        "count": 1,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "seat_search": {
+        "count": 1,
+        "max_us": 300,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 300
+      },
+      "simulation_tick": {
+        "count": 160,
+        "max_us": 9800,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 279900
+      },
+      "spatial_observation": {
+        "count": 2,
+        "max_us": 100,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 100
+      },
+      "visitor_node_spawn": {
+        "count": 1,
+        "max_us": 800,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 800
+      }
+    },
+    "window_seconds": 10.0536
+  },
+  {
+    "recent_slow": [
+      {
+        "at_us": 89097700,
+        "span": "frame_interval",
+        "us": 101700
+      },
+      {
+        "at_us": 89241700,
+        "span": "frame_interval",
+        "us": 144000
+      },
+      {
+        "at_us": 89366300,
+        "span": "frame_interval",
+        "us": 124600
+      },
+      {
+        "at_us": 89508400,
+        "span": "frame_interval",
+        "us": 142100
+      },
+      {
+        "at_us": 89623800,
+        "span": "frame_interval",
+        "us": 115400
+      },
+      {
+        "at_us": 89766600,
+        "span": "frame_interval",
+        "us": 142800
+      },
+      {
+        "at_us": 89880200,
+        "span": "frame_interval",
+        "us": 113500
+      },
+      {
+        "at_us": 90017700,
+        "span": "frame_interval",
+        "us": 137600
+      },
+      {
+        "at_us": 90134800,
+        "span": "frame_interval",
+        "us": 117100
+      },
+      {
+        "at_us": 90276500,
+        "span": "frame_interval",
+        "us": 141700
+      },
+      {
+        "at_us": 90403000,
+        "span": "frame_interval",
+        "us": 126500
+      },
+      {
+        "at_us": 90537800,
+        "span": "frame_interval",
+        "us": 134800
+      },
+      {
+        "at_us": 90663700,
+        "span": "frame_interval",
+        "us": 125900
+      },
+      {
+        "at_us": 90805500,
+        "span": "frame_interval",
+        "us": 141800
+      },
+      {
+        "at_us": 90928300,
+        "span": "frame_interval",
+        "us": 122800
+      },
+      {
+        "at_us": 91066000,
+        "span": "frame_interval",
+        "us": 137600
+      },
+      {
+        "at_us": 91307200,
+        "span": "frame_interval",
+        "us": 241200
+      },
+      {
+        "at_us": 91508500,
+        "span": "frame_interval",
+        "us": 164800
+      },
+      {
+        "at_us": 91733200,
+        "span": "frame_interval",
+        "us": 224600
+      },
+      {
+        "at_us": 91870300,
+        "span": "frame_interval",
+        "us": 137300
+      },
+      {
+        "at_us": 92079500,
+        "span": "frame_interval",
+        "us": 209200
+      },
+      {
+        "at_us": 92180000,
+        "span": "frame_interval",
+        "us": 100300
+      },
+      {
+        "at_us": 92319600,
+        "span": "frame_interval",
+        "us": 139600
+      },
+      {
+        "at_us": 92459700,
+        "span": "frame_interval",
+        "us": 140300
+      },
+      {
+        "at_us": 92590100,
+        "span": "frame_interval",
+        "us": 130400
+      },
+      {
+        "at_us": 92701800,
+        "span": "frame_interval",
+        "us": 111600
+      },
+      {
+        "at_us": 92828300,
+        "span": "frame_interval",
+        "us": 126600
+      },
+      {
+        "at_us": 92965400,
+        "span": "frame_interval",
+        "us": 137100
+      },
+      {
+        "at_us": 93094800,
+        "span": "frame_interval",
+        "us": 129300
+      },
+      {
+        "at_us": 93199100,
+        "span": "frame_interval",
+        "us": 104400
+      },
+      {
+        "at_us": 93337200,
+        "span": "frame_interval",
+        "us": 138000
+      },
+      {
+        "at_us": 93469300,
+        "span": "frame_interval",
+        "us": 132200
+      }
+    ],
+    "spans": {
+      "audio_projection": {
+        "count": 68,
+        "max_us": 12600,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 29200
+      },
+      "captions_projection": {
+        "count": 68,
+        "max_us": 1900,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 5900
+      },
+      "character_blink": {
+        "count": 5,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "frame_interval": {
+        "count": 68,
+        "max_us": 243300,
+        "over_100ms": 67,
+        "over_16ms": 68,
+        "over_250ms": 0,
+        "over_50ms": 67,
+        "total_us": 10040700
+      },
+      "hud_projection": {
+        "count": 68,
+        "max_us": 19200,
+        "over_100ms": 0,
+        "over_16ms": 1,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 185200
+      },
+      "interaction_projection": {
+        "count": 68,
+        "max_us": 13400,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 193100
+      },
+      "npc_path": {
+        "count": 2,
+        "max_us": 400,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 500
+      },
+      "seat_reserved": {
+        "count": 1,
+        "max_us": 0,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 0
+      },
+      "seat_search": {
+        "count": 1,
+        "max_us": 500,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 500
+      },
+      "simulation_tick": {
+        "count": 529,
+        "max_us": 17200,
+        "over_100ms": 0,
+        "over_16ms": 1,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 1263100
+      },
+      "spatial_observation": {
+        "count": 30,
+        "max_us": 900,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 5100
+      },
+      "visitor_node_spawn": {
+        "count": 1,
+        "max_us": 500,
+        "over_100ms": 0,
+        "over_16ms": 0,
+        "over_250ms": 0,
+        "over_50ms": 0,
+        "total_us": 500
+      }
+    },
+    "window_seconds": 10.0407
+  }
+]
