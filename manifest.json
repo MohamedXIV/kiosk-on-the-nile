@@ -1,0 +1,242 @@
+[
+  {
+    "version": "accounts-930c928",
+    "path": "accounts-930c928/kiosk-on-the-nile-accounts.zip",
+    "bytes": 11590729,
+    "sha256": "d733770670ebd30340c6adb59f3f3090a77d8c3fa9ee8d6c4d4357fbd1ed6363",
+    "original_branch": "build/accounts-930c928",
+    "original_commit": "e506662e0b5fda7093acc4ea5731e00c58dc942b"
+  },
+  {
+    "version": "body-clock-2fd6048",
+    "path": "body-clock-2fd6048/kiosk-on-the-nile-body-clock.zip",
+    "bytes": 11517503,
+    "sha256": "2e637fc6f5d9151a42f571ff739a987e54c95c464a1591df9440381c404f4c88",
+    "original_branch": "build/body-clock-2fd6048",
+    "original_commit": "798317021c4d8070b8243a63365c40b145ecc9ef"
+  },
+  {
+    "version": "body-clock-5c89ec0",
+    "path": "body-clock-5c89ec0/kiosk-on-the-nile-body-clock.zip",
+    "bytes": 11517216,
+    "sha256": "f0b99b78347ab1a2ee3a33dac9fe0d3852380587fcaadba5472ddb31420525e8",
+    "original_branch": "build/body-clock-5c89ec0",
+    "original_commit": "5e9fddef6f50c3fac47d1688e61b74174e44187f"
+  },
+  {
+    "version": "body-clock-8d0a1a3",
+    "path": "body-clock-8d0a1a3/kiosk-on-the-nile-body-clock.zip",
+    "bytes": 11517357,
+    "sha256": "8d909de95047c1c82966bc19f63d920e602a3f892f8662cb716ff1aa27076acc",
+    "original_branch": "build/body-clock-8d0a1a3",
+    "original_commit": "d1fa5283ceddc3d3c0ea96fad7acdddbb2e1684c"
+  },
+  {
+    "version": "buildings-9543cd0",
+    "path": "buildings-9543cd0/kiosk-on-the-nile-buildings.zip",
+    "bytes": 11398686,
+    "sha256": "bf7f01382983d564cbe8e72eb591612db8ece30cd49cd35e4f275f5994da7208",
+    "original_branch": "build/buildings-9543cd0",
+    "original_commit": "461440728c2cfcd93cd558f71067ccbe75677b0b"
+  },
+  {
+    "version": "character-life-c1c7997",
+    "path": "character-life-c1c7997/kiosk-on-the-nile-character-life.zip",
+    "bytes": 11915073,
+    "sha256": "7d7205bf32aa74afa3f5800678ce5ec270419306c43a20a3136d7eeda2474685",
+    "original_branch": "build/character-life-c1c7997",
+    "original_commit": "2d69935e3ee7a5086e072edc7d2ab96d43cfc36a"
+  },
+  {
+    "version": "companionship-669f9de",
+    "path": "companionship-669f9de/kiosk-on-the-nile-companionship.zip",
+    "bytes": 11446839,
+    "sha256": "5926353229fde81557d5665f9d65eb22bc52f73d5bc7c997c24a27706bd88d6d",
+    "original_branch": "build/companionship-669f9de",
+    "original_commit": "0be260b6a0ce9a5b1a88c4bfacaa7165eea26e4f"
+  },
+  {
+    "version": "companionship-ed5153d",
+    "path": "companionship-ed5153d/kiosk-on-the-nile-companionship.zip",
+    "bytes": 11446695,
+    "sha256": "012dfe07a85dd0053ab8722b4bb4e4f2523bfd53bb3c84eea88a484829b0070f",
+    "original_branch": "build/companionship-ed5153d",
+    "original_commit": "1bdb8b789332132fb436dde263017c91cf8fb811"
+  },
+  {
+    "version": "dialogue-journal-7e3818d",
+    "path": "dialogue-journal-7e3818d/kiosk-on-the-nile-dialogue-journal.zip",
+    "bytes": 11480017,
+    "sha256": "f16468040b786d6b120d46ead1e25eb3a9d8638ca14bb1373b3e99760e2e8f30",
+    "original_branch": "build/dialogue-journal-7e3818d",
+    "original_commit": "986c3e9ce3b918086b94e55b54b4213aca4f2cfa"
+  },
+  {
+    "version": "dynamic-seating-2ab7f73",
+    "path": "dynamic-seating-2ab7f73/kiosk-on-the-nile-dynamic-seating.zip",
+    "bytes": 12231543,
+    "sha256": "e6956774a60da86d5065ae61c4876366b9cc1af0e57101bf688abb03fa2be3e1",
+    "original_branch": "build/dynamic-seating-2ab7f73",
+    "original_commit": "17177907446518a126f01da12e6c911cbb863b3f"
+  },
+  {
+    "version": "hud-c2dae7d",
+    "path": "hud-c2dae7d/kiosk-on-the-nile-hud.zip",
+    "bytes": 11798538,
+    "sha256": "2475862b3a9ac3457c73c3ceb34b04e44b94c75ce651179fd41092c26627ccc6",
+    "original_branch": "build/hud-c2dae7d",
+    "original_commit": "363f8cf3ac47eaa732d78db76a7ea171eabfbf5d"
+  },
+  {
+    "version": "hud-icons-1316423",
+    "path": "hud-icons-1316423/kiosk-on-the-nile-hud-icons.zip",
+    "bytes": 12125769,
+    "sha256": "201f8541fc6431c27d11a9767f82be724a0a83dc0c7ab2fcca90178ce1273c82",
+    "original_branch": "build/hud-icons-1316423",
+    "original_commit": "a574a0c27cbf6c719aa00d548dcb1063cd2c6a98"
+  },
+  {
+    "version": "independent-visits-b97b532",
+    "path": "independent-visits-b97b532/kiosk-on-the-nile-independent-visits.zip",
+    "bytes": 11415461,
+    "sha256": "4e44def4c904c561bca2eee578ddc5609437cb9326fcfdf13bde021b4f3f3444",
+    "original_branch": "build/independent-visits-b97b532",
+    "original_commit": "0e92d0640320364ad85b0455ff9203e258f7f0ea"
+  },
+  {
+    "version": "items-a07aedb",
+    "path": "items-a07aedb/kiosk-on-the-nile-items.zip",
+    "bytes": 11783522,
+    "sha256": "92da69374b6774e9058cb9ccef142adc0e65b74c29267d9e75b3ab6ee0bf4e37",
+    "original_branch": "build/items-a07aedb",
+    "original_commit": "3ac3faccfe70a0bc4d4171f8490f0ccab25feee0"
+  },
+  {
+    "version": "items-a338d83",
+    "path": "items-a338d83/kiosk-on-the-nile-items.zip",
+    "bytes": 11783408,
+    "sha256": "3218adaddef76e2e0c5d2ca17ed21babd4d38df6e89d9a9b750eae630be7290d",
+    "original_branch": "build/items-a338d83",
+    "original_commit": "a8f4380b063c3f8b21f44abb33d40064284c3535"
+  },
+  {
+    "version": "living-spaces-3a07e8d",
+    "path": "living-spaces-3a07e8d/kiosk-on-the-nile-living-spaces.zip",
+    "bytes": 11371818,
+    "sha256": "16fd9245cb8e4fa9d7d921aaf161b2571a89982dd872991d130bb2574be3c9a4",
+    "original_branch": "build/living-spaces-3a07e8d",
+    "original_commit": "d5bbea87219c72837fa07c75b8e639989012fcf2"
+  },
+  {
+    "version": "living-spaces-f865d16",
+    "path": "living-spaces-f865d16/kiosk-on-the-nile-living-spaces.zip",
+    "bytes": 11370529,
+    "sha256": "24e63c66147799160cc00625a4d230af0af754a7ae1792461b6c86ac91ac4e84",
+    "original_branch": "build/living-spaces-f865d16",
+    "original_commit": "d047b26c06f02b25b05dbcf333401b1e7220bf02"
+  },
+  {
+    "version": "local-avoidance-d17a497",
+    "path": "local-avoidance-d17a497/kiosk-on-the-nile-local-avoidance.zip",
+    "bytes": 12145486,
+    "sha256": "8891fe1268367f06b80b8bcac62c511737d2f7d109d5a2bdf9e2e7cf0fc3abc4",
+    "original_branch": "build/local-avoidance-d17a497",
+    "original_commit": "45c4474eb3a4508b4960cd75ace811f48ed45e53"
+  },
+  {
+    "version": "localization-0ea4572",
+    "path": "localization-0ea4572/kiosk-on-the-nile-localization.zip",
+    "bytes": 11899194,
+    "sha256": "e2d588b32e0ee67d02fec0922be9de50d0dc371c067964bb574c4a50ba8e2ba9",
+    "original_branch": "build/localization-0ea4572",
+    "original_commit": "c70f3e585aec4f825b834c01989a4266eed0726d"
+  },
+  {
+    "version": "localization-4e3876d",
+    "path": "localization-4e3876d/kiosk-on-the-nile-localization.zip",
+    "bytes": 11898894,
+    "sha256": "40fc417d244e685691bac9b95bb068d0d5b79bd4c48e56337e7465c87599b2d4",
+    "original_branch": "build/localization-4e3876d",
+    "original_commit": "f0a1c8565f0d80cdd2005ed9ee899d5f4961a614"
+  },
+  {
+    "version": "localization-67e8e69",
+    "path": "localization-67e8e69/kiosk-on-the-nile-localization.zip",
+    "bytes": 11899141,
+    "sha256": "8c288b915dbeec200d828d47701f6629cfae2e79420241b98dd9af38659a90af",
+    "original_branch": "build/localization-67e8e69",
+    "original_commit": "19ea3c18f021c92cc3d86c1e8b61881a10a60a2d"
+  },
+  {
+    "version": "notebook-420cfe0",
+    "path": "notebook-420cfe0/kiosk-on-the-nile-notebook.zip",
+    "bytes": 11759932,
+    "sha256": "aa981f5f6fe985aa78bd977672e198f615652ec0f47bc88c787b1b9852b8ac7e",
+    "original_branch": "build/notebook-420cfe0",
+    "original_commit": "18ff8586abd32b16b6cbedb3af64d5e5fc8586ba"
+  },
+  {
+    "version": "outings-07bb9a1",
+    "path": "outings-07bb9a1/kiosk-on-the-nile-outings.zip",
+    "bytes": 11795955,
+    "sha256": "64ae411c6415580dec73b0d1c8de69ef999847cf05899525390a9f049917c545",
+    "original_branch": "build/outings-07bb9a1",
+    "original_commit": "aa0893d129bcbfc7308ea6a5fe1ba6cd6581c489"
+  },
+  {
+    "version": "outings-bf5d8f7",
+    "path": "outings-bf5d8f7/kiosk-on-the-nile-outings.zip",
+    "bytes": 11793579,
+    "sha256": "20a151d97be05bc85c2fb4e40e716a9fe2feedf43f22a0cc9f59bdca5ed8d546",
+    "original_branch": "build/outings-bf5d8f7",
+    "original_commit": "65a8f188b0abc6fbd88f257d09fe5eed70c7c745"
+  },
+  {
+    "version": "performance-1f090e8",
+    "path": "performance-1f090e8/kiosk-on-the-nile-performance.zip",
+    "bytes": 11897944,
+    "sha256": "7dedcd61dcde80a06d5c312f287eb3c5c397752c0ab8fc06a6687a462a1a191f",
+    "original_branch": "build/performance-1f090e8",
+    "original_commit": "4e4429cff57da3590345228c7ed27518e87453c8"
+  },
+  {
+    "version": "performance-f5da764",
+    "path": "performance-f5da764/kiosk-on-the-nile-runtime-fixes.zip",
+    "bytes": 11900530,
+    "sha256": "9352bd38f5a6a03947939595cc53fd66eba62f1e194473560161f5d6af1c6f70",
+    "original_branch": "build/performance-f5da764",
+    "original_commit": "6b80e0011c506f9f178b20758501b8b2e1fea78b"
+  },
+  {
+    "version": "prompts-46a26af",
+    "path": "prompts-46a26af/kiosk-on-the-nile-prompts.zip",
+    "bytes": 11802758,
+    "sha256": "7d5775e851042692e735e443bc26176aa948cbb113856ccbe3ede683aa58128a",
+    "original_branch": "build/prompts-46a26af",
+    "original_commit": "9df91c1173c882b4d9bf4b3368079f9b59ec8184"
+  },
+  {
+    "version": "spatial-awareness-8fa96b5",
+    "path": "spatial-awareness-8fa96b5/kiosk-on-the-nile-spatial-awareness.zip",
+    "bytes": 11928023,
+    "sha256": "633d37e096ea0ebc1c7ed5171ea7e1b140b6afb42c4d313591094ecfe822ccd4",
+    "original_branch": "build/spatial-awareness-8fa96b5",
+    "original_commit": "12dcdaa4fb5749c2ec5c79786af11936270bbe2f"
+  },
+  {
+    "version": "stability-e9b816d",
+    "path": "stability-e9b816d/kiosk-on-the-nile-stability.zip",
+    "bytes": 11732482,
+    "sha256": "b472a55edc4216624df7b144e1c2f13578089a4cb36d8df42ffaaa19b002a409",
+    "original_branch": "build/stability-e9b816d",
+    "original_commit": "fe5804fe99a3d3b65d31c90cd9a390a44626e5c2"
+  },
+  {
+    "version": "supplier-38396bb",
+    "path": "supplier-38396bb/kiosk-on-the-nile-supplier.zip",
+    "bytes": 11645586,
+    "sha256": "29c0bd2aa5f1a4274f6b1cc8b5a186055597bce6767b3fd4e74f4ef0919ba71e",
+    "original_branch": "build/supplier-38396bb",
+    "original_commit": "d44d4c0521c0268c949c7462b5bf36e48fd7ebb7"
+  }
+]
