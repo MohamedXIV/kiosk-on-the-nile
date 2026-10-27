@@ -460,6 +460,7 @@ func start_manual_topic(visit_id: StringName, key: String) -> ActionResult:
   return await start(StringName(topic.encounter),PackedStringArray([str(visit_id)]),{"requested_topic":str(topic.topic),"manual_read":true})
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
 func validate_paused(record: Dictionary) -> ActionResult:
+ if not ContentValidation.integer(record.get("heard_beat",record.get("beat",-1))) or int(record.get("heard_beat",record.get("beat",-1)))<0 or int(record.get("heard_beat",record.get("beat",-1)))>int(record.get("beat",-1)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_heard_receipt")
  if not _definitions.has(record.get("encounter_id")) or not ContentValidation.integer(record.get("beat")) or record.beat<1 or not ContentValidation.number(record.get("elapsed")) or record.elapsed<0 or not ContentValidation.number(record.get("choice_elapsed")) or record.choice_elapsed<0 or not record.get("topic_selection") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not valid_sequence(str(record.id),"conversation_",_next):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not record.topic_selection.is_empty():
@@ -488,6 +489,7 @@ func resume_record(record: Dictionary, visit_id: StringName) -> ActionResult:
  conversation.context_extra["manual_read"]=true
  conversation.topic_selection=record.topic_selection.duplicate(true)
  conversation.beat=int(record.beat)
+ conversation.heard_beat=int(record.get("heard_beat",record.beat))
  conversation.elapsed=float(record.elapsed)
  conversation.choice_elapsed=float(record.choice_elapsed)
  if not available_for(conversation):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")

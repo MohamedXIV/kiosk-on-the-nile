@@ -116,6 +116,15 @@ static func upgrade(envelope: Dictionary, config: SessionConfig, target_revision
   if not candidate.state.get("visitors") is Dictionary:return _fail("seating_visitors")
   candidate.state.visitors["seating"]={}
   candidate.schema_revision=15
+ if candidate.schema_revision==15 and target_revision>=16:
+  if not candidate.state.get("visitors") is Dictionary or not candidate.state.get("narrative") is Dictionary or not candidate.state.get("personal") is Dictionary:return _fail("peer_components")
+  candidate.state.visitors["peers"]=PeerEncounters.empty_state()
+  for group in [candidate.state.narrative.get("sessions",{}),candidate.state.personal.get("paused",{})]:
+   if not group is Dictionary:return _fail("hearing_components")
+   for record in group.values():
+    if not record is Dictionary or not ContentValidation.integer(record.get("beat")):return _fail("hearing_receipt")
+    record["heard_beat"]=int(record.beat)
+  candidate.schema_revision=16
  candidate.erase("checksum")
  candidate["checksum"]=StableJson.stringify(candidate).sha256_text()
  return ActionResult.success({"data":candidate})

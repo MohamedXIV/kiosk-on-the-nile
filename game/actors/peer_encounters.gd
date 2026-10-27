@@ -113,7 +113,7 @@ func restore(data: Variant, visits: Dictionary) -> ActionResult:
  if not a.is_empty():
   for key in ["id","initiator","target","encounter","phase","conversation"]:
    if not a.get(key) is String:return _fail()
-  if not a.id.begins_with("peer_") or not a.id.trim_prefix("peer_").is_valid_int() or int(a.id.trim_prefix("peer_"))<1 or int(a.id.trim_prefix("peer_"))>=data.next_id:return _fail()
+  if not a.id.begins_with("peer_") or not a.id.trim_prefix("peer_").is_valid_int() or int(a.id.trim_prefix("peer_"))<1 or int(a.id.trim_prefix("peer_"))>=data.next_id or a.id.trim_prefix("peer_")!=str(int(a.id.trim_prefix("peer_"))):return _fail()
   if a.initiator==a.target or not visits.has(a.initiator) or not visits.has(a.target) or not data.records.has(a.initiator) or not data.records[a.initiator].attempted:return _fail()
   if not a.phase in ["approaching","greeting","conversing"] or not ContentValidation.bounded(a.get("elapsed"),0,86400) or (a.phase=="conversing")!=not a.conversation.is_empty():return _fail()
   for key in ["goal","observed","target_point"]:
