@@ -29,7 +29,7 @@ Departure, explicit personal/service interaction, lost target, unreachable appro
 
 Peer conversation may start and continue without the player. Lines and autonomous branches belong to Ink; finite metadata identifies a participation opportunity and its authored no-player continuation. No magic numeric choice index, automatic player reply or simulated player consent. Existing old football cursors/choices continue on archived graphs; new starts use the new graph.
 
-The player hears only the current audible speech; entering midway does not replay missed lines. Offscreen lines/knowledge never enter player history. World/NPC effects execute independently from player hearing, once only; hearing effects (player facts/history/topic consumption) require actual hearing. Participant reservations stop physical movement during speech. A player reply is available only while the window is live, in the same location and hearing range, and action/participation policy permits it. Waiting or walking away takes an authored autonomous continuation without penalties for the player. Participation temporarily uses existing dialogue focus; never opens over a blocking panel or steals an existing personal conversation. Once speaking directly with the player, existing manual reading/choices continue to apply, with explicit distance/interruption behavior.
+Register the current line at first actual audibility, including entering midway, exactly once per conversation/beat via a saved heard receipt. Scope metadata for new effects is explicit and validated: world/NPC effects versus player-hearing effects. Untagged legacy effects keep their existing hearing-gated meaning; never reinterpret old graphs globally. The player hears only the current audible speech; entering midway does not replay missed lines. Offscreen lines/knowledge never enter player history. World/NPC effects execute independently from player hearing, once only; hearing effects (player facts/history/topic consumption) require actual hearing. Participant reservations stop physical movement during speech. A player reply is available only while the window is live, in the same location and hearing range, and action/participation policy permits it. Waiting or walking away takes an authored autonomous continuation without penalties for the player. Participation temporarily uses existing dialogue focus; never opens over a blocking panel or steals an existing personal conversation. Once speaking directly with the player, existing manual reading/choices continue to apply, with explicit distance/interruption behavior.
 
 Keep existing hearing-radius semantics in this batch; do not silently impose sight-only hearing. Screen captions and focused dialogue display the same localized frame/speaker. No transcript of unheard lines. Existing captured historical text remains in its recorded language.
 
@@ -41,7 +41,9 @@ Pair definitions, encounter metadata, timers/chance, cooldown and finite candida
 
 ## Narrow passages
 
-Keep local avoidance/grid backend. Add bounded recovery only where safe: wait, release/abandon peer intent and resume leisure; an idle unoccupied actor may yield to a nearby clear reachable point if a separate bounded policy proves safe. Never shove or interrupt a speaker/sitter/player. If no legal bypass exists, admit the blocked passage. Comprehensive corridor right-of-way remains epic#3; this batch cannot claim universal deadlock elimination.
+Keep local avoidance/grid backend. Recovery here is bounded waiting, release/abandon of peer intent and resumption of leisure. Never shove or interrupt a speaker/sitter/player. If no legal bypass exists, admit the blocked passage. Moving a third actor aside is outside this batch and belongs to epic#3. Comprehensive corridor right-of-way remains epic#3; this batch cannot claim universal deadlock elimination.
+
+Sleep or any owner operation that clears visits/conversations interrupts peer meetings and releases reservations before clearing participants. Do not invent skipped speech, hearing or social completion during a sleep time jump. This differs from normal ongoing simulation while the player is elsewhere.
 
 ## Save and migration
 
@@ -57,3 +59,7 @@ No automated gameplay suite without user request. Use build-only gate, bounded n
 - NPC talk continues out of hearing; the player's history includes only what was actually heard.
 - Participation uses explicit, expiring opportunities; silence takes an NPC continuation, not a player answer.
 - Comprehensive passage arbitration and player/home seating remain separately scoped roadmap work.
+
+## Builder check
+
+One fresh read-only design review completed. It identified first-audibility receipts, explicit effect scopes preserving legacy semantics, sleep/visit clearing, and passage scope. All were incorporated above as author decisions; no new unresolved user question was raised. No implementation or tests were performed during this design step.
