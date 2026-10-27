@@ -22,6 +22,8 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if pair.initiator==pair.target or pair.initiator in initiators:return _fail("pair.roles")
   initiators.append(pair.initiator)
   if not pair.get("encounter") is String or not bundle.get("encounters",{}).has(pair.encounter) or bundle.encounters[pair.encounter].get("peer")!=true:return _fail("pair.encounter")
+  var encounter: Dictionary=bundle.encounters[pair.encounter]
+  if not InkRuntime.valid_autonomous_story(bundle.get("story_"+str(encounter.get("story","")),{}),encounter.get("autonomous")):return _fail("pair.autonomous")
  return ActionResult.success()
 static func _fail(key: String) -> ActionResult:
  return ContentValidation.fail("visitors.peer_encounters."+key)

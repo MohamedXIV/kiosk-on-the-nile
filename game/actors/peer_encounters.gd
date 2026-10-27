@@ -61,7 +61,10 @@ func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligibl
   # A moving target is no longer waiting at the reserved meeting point.
   if observed.distance_to(last)>float(_data.target_tolerance):return {"cancel":finish()}
   if _active.phase=="approaching" and a.pose.ground.distance_to(goal(a,a.destination))<=float(_data.arrival_radius):
-   if not awareness.visible(a.id,str(b.character_id)) or a.pose.ground.distance_to(b.pose.ground)>float(_data.stop_distance)+float(_data.arrival_radius)+float(_data.target_tolerance):return {"cancel":finish()}
+   # Restore clears transient visibility; allow its staggered sample to refresh.
+   # Memory expiry, target displacement and the encounter deadline still bound waiting.
+   if not awareness.visible(a.id,str(b.character_id)):return {}
+   if a.pose.ground.distance_to(b.pose.ground)>float(_data.stop_distance)+float(_data.arrival_radius)+float(_data.target_tolerance):return {"cancel":finish()}
    _active.phase="greeting"
    return {"id":_active.id,"encounter":_active.encounter,"participants":PackedStringArray([a.id,b.id])}
   return {}

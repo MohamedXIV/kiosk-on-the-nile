@@ -11,6 +11,25 @@ var _definition: StoryDefinition
 var _frame := NarrativeTypes.Frame.new()
 var _error: String = ""
 var _context: Dictionary={}
+static func valid_autonomous_story(compiled: Dictionary, fallback: Variant) -> bool:
+ # Compiled Ink details stay within this adapter. Check declarations before activation.
+ var containers: Variant=compiled.get("root")
+ if not containers is Array or containers.is_empty() or not containers[-1] is Dictionary:return false
+ var named: Dictionary=containers[-1]
+ if not fallback is String or not fallback.is_valid_identifier() or not named.get(fallback) is Array:return false
+ return _valid_autonomous_tags(containers,named,0)
+static func _valid_autonomous_tags(value: Variant, named: Dictionary, depth: int) -> bool:
+ if depth>128:return false
+ if value is String and value.begins_with("^autonomous:"):
+  var path: String=value.trim_prefix("^autonomous:").strip_edges()
+  return path.is_valid_identifier() and named.get(path) is Array
+ if value is Array:
+  for child in value:
+   if not _valid_autonomous_tags(child,named,depth+1):return false
+ elif value is Dictionary:
+  for child in value.values():
+   if not _valid_autonomous_tags(child,named,depth+1):return false
+ return true
 func open(definition: StoryDefinition, context: Dictionary, cache: InkPlayerCache = null) -> ActionResult:
  var perf := RuntimePerformance.begin()
  var result := await _open(definition,context,cache)

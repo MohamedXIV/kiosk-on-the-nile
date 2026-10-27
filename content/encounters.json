@@ -171,7 +171,8 @@
     ],
     "advancement": "automatic",
     "manual": false,
-    "peer": true
+    "peer": true,
+    "autonomous": "football_ambient_end"
   },
   "visitors": {
     "story": "visitors",
@@ -828,6 +829,7 @@
         "label": "قعدة على النيل"
       }
     ],
-    "peer": true
+    "peer": true,
+    "autonomous": "river_ambient_end"
   }
 }

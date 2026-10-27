@@ -143,8 +143,8 @@ func _advance(conversation: ConversationSession) -> ActionResult:
   _finish(conversation)
   return conversation.current.result
  if conversation.context_extra.has("peer_id") and not conversation.current.choices.is_empty() and conversation.current.autonomous.is_empty():
-  var invalid := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"missing_peer_continuation")
-  _report_failure(conversation,invalid);_finish(conversation);return invalid
+  # A validated encounter default also covers authored choices without a local tag.
+  conversation.current.autonomous=str(_definitions[str(conversation.encounter_id)].autonomous)
  var speaker := str(conversation.current.speaker_id)
  if not speaker.is_empty():
   var valid_speaker := false
@@ -280,6 +280,10 @@ func _finish(conversation: ConversationSession, reason: StringName = &"completed
 func cancel_all() -> void:
  for conversation in sessions.values():
   if not conversation.finished: _finish(conversation,&"cancelled")
+func leave_location() -> void:
+ for conversation: ConversationSession in sessions.values():
+  if conversation.context_extra.has("peer_id"):leave_peer(conversation.id)
+  elif not conversation.finished:_finish(conversation,&"cancelled")
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in sessions:

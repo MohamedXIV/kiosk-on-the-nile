@@ -283,7 +283,7 @@ func configure(source: SessionConfig) -> ActionResult:
  life.travelled.connect(func(destination):
   if destination!=&"kiosk":
    personal.leave()
-   narrative.cancel_all())
+   narrative.leave_location())
  contact=SupplierContact.new();contact.configure(self)
  contracts=SupplierContracts.new();contracts.configure(self)
  deliveries=DeliveryService.new();deliveries.configure(self)
@@ -295,7 +295,7 @@ func configure(source: SessionConfig) -> ActionResult:
   residential.clear()
   contact.close()
   personal.leave()
-  narrative.cancel_all())
+  narrative.leave_location())
  life.sleep_started.connect(residential.clear)
  life.sleep_started.connect(contact.close)
  scheduler.configure({})
