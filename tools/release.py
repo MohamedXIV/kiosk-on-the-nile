@@ -215,6 +215,7 @@ def package(web_root, out, formal):
                 require(sha(payload) == data['files'][name], f'Export changed while packaging: {name}')
             archive.writestr(name, payload)
         for path, name in [(ROOT / 'VERSION', 'VERSION'), (ROOT / 'CHANGELOG.md', 'CHANGELOG.md'), (ROOT / 'docs/RELEASING.md', 'RELEASING.md'),
+                           (ROOT / 'docs/PLAYTEST_GUIDE_AR.md', 'PLAYTEST_GUIDE_AR.md'),
                            (ROOT / 'third_party/licenses/Godot-LICENSE.txt', 'licenses/Godot-LICENSE.txt'), (ROOT / 'assets/fonts/OFL.txt', 'licenses/Cairo-OFL.txt'),
                            (ROOT / 'addons/inkgd/LICENSE', 'licenses/inkgd-LICENSE'), (ROOT / 'addons/inkgd/UPSTREAM_LICENSE.txt', 'licenses/inkgd-UPSTREAM_LICENSE.txt')]:
             archive.write(path, name)

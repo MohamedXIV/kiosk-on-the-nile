@@ -21,7 +21,21 @@ func _draw() -> void:
  var height := float(_building.roof.height)
  var color := Color(_building.roof.color)
  var origin := Vector2(_space.origin[0],_space.origin[1])
+ var membership := {}
+ for cell in _cells:membership[cell]=true
  for cell in _cells:
   var point := origin+Vector2(cell)*scale
-  var polygon := PackedVector2Array([_mapping.to_canvas(point,height),_mapping.to_canvas(point+Vector2(scale,0),height),_mapping.to_canvas(point+Vector2(scale,scale),height),_mapping.to_canvas(point+Vector2(0,scale),height)])
-  draw_colored_polygon(polygon,color)
+  var a := _mapping.to_canvas(point,height)
+  var b := _mapping.to_canvas(point+Vector2(scale,scale),height)
+  var rect := Rect2(a,b-a)
+  draw_rect(rect,color)
+  # Corrugations stop exactly at authored roof cells, including edited shapes.
+  for x in range(int(a.x)+3,int(b.x),8):
+   draw_line(Vector2(x,a.y),Vector2(x,b.y),color.lightened(0.055),1)
+   draw_line(Vector2(x+2,a.y),Vector2(x+2,b.y),color.darkened(0.08),1)
+  if not membership.has(cell+Vector2i(0,1)):
+   draw_line(Vector2(a.x,b.y-1),b-Vector2(0,1),color.darkened(0.3),3)
+  if not membership.has(cell+Vector2i(0,-1)):
+   draw_line(a,Vector2(b.x,a.y),color.lightened(0.15),2)
+  if not membership.has(cell+Vector2i(-1,0)):draw_line(a,Vector2(a.x,b.y),color.darkened(0.2),2)
+  if not membership.has(cell+Vector2i(1,0)):draw_line(Vector2(b.x,a.y),b,color.darkened(0.2),2)

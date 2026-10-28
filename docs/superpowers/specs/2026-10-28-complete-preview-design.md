@@ -1,0 +1,11 @@
+# Complete combined playtest preview
+
+User explicitly requests all remaining work, including deferred scope, in one preview before judging/reporting feedback. This supersedes earlier home-guest exclusion and design-approval pauses. Build on native Godot4.7.2/GDScript/Ink/JSON, existing grid/RVO, SeatCatalog and current social/save owners.
+
+Complete #6 with bounded mixed-week economic observations and tangible quiet Egyptian early2000s rendering/audio polish against WORLD_DIRECTION. Human visual/audio feel remains the user's final judgment, not an implementation blocker. No artificial crowds or guaranteed sales.
+
+Complete #7 with explicit player sit/stand in both venues and residential guest seating. Reuse furniture-derived slots and existing NPC posture; add one small owner for player/residential reservations coordinated with VisitorSeating. Player sits only close to a clear seat access, keeps actual feet (no forced route), and stands on movement/cancel/travel/sleep. Occupied furniture/table cannot move/store/clean. Reservations are exclusive, validate against actual layout/actors and restore coherently.
+
+Extend the existing one-person ResidentialVisits owner for optional invitations to known Farid/Youssef. Invite through authored Ink at a real kiosk encounter, with postpone/cancel; next-day afternoon/evening arrival requires player home, speaker absent from kiosk and no workshop reservation. Landlord agenda takes precedence. One home guest at a time, no duplication across venues, no guaranteed simultaneous arrival. Guests choose an available home chair, otherwise stand and talk. Leaving home/sleep/visit end cancels seating. Existing landlord accounting works while seated. New visits have small grounded offline Arabic/English home conversation, no purchase/order fabrication.
+
+Schema4/revision19 explicitly requires a new game for previous pre-alpha saves; no migrations/archived Ink graphs, no deleting/resetting saves. Version/publication follow RELEASING. Deliver one exact-source complete Release Web export/package with guide, current build evidence and independent whole-branch review. No automated suites, only content/Ink/import/build gates and bounded native/browser observations. User is authorized to make final acceptance after playing.

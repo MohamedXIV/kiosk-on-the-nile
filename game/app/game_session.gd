@@ -8,6 +8,7 @@ var alertness: AlertnessService
 var actions: ActionPolicy
 var fatigue: FatigueService
 var presence: ActorPresence
+var seat_use: SeatUse
 var residential: ResidentialVisits
 var accounts: AccountBook
 var commitments: CommitmentService
@@ -177,7 +178,7 @@ func configure(source: SessionConfig) -> ActionResult:
  cooking.foods=foods
  hygiene=HygieneService.new()
  hygiene.policy=actions
- var hygiene_result := hygiene.configure(source.section("hygiene"),items,spaces,clock,func():return player_pose,func(id):return cooking.legacy_busy(id) or equipment.is_busy(id) or (visitors!=null and visitors.seating.busy_item(id)))
+ var hygiene_result := hygiene.configure(source.section("hygiene"),items,spaces,clock,func():return player_pose,func(id):return cooking.legacy_busy(id) or equipment.is_busy(id) or (visitors!=null and visitors.seating.busy_item(id)) or (seat_use!=null and seat_use.busy_item(id)))
  if not hygiene_result.ok:return hygiene_result
  cooking.set_hygiene_provider(hygiene.food_contact_evidence,func(id):hygiene.record_use(StringName("legacy:"+str(id)),id,&"batch"))
  workflow.hygiene_provider=hygiene.food_contact_evidence
@@ -208,6 +209,8 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.food_selector=_choose_food
  service.configure(wallet,cooking,visitors.is_available,balance,foods,clock)
  visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open)
+ seat_use=SeatUse.new();seat_use.configure(self)
+ visitors.seating.external_owner=seat_use.external_owner
  customer_experience=CustomerExperience.new()
  var experience_result := customer_experience.configure(source.section("customer_experience"),hygiene,spaces,clock)
  if not experience_result.ok:return experience_result
@@ -236,7 +239,7 @@ func configure(source: SessionConfig) -> ActionResult:
  if not initial_relationships.ok: return initial_relationships
  social_life=SocialLife.new()
  social_life.configure(self)
- visitors.availability_provider=func(actor):return not social_life.reserved(actor)
+ visitors.availability_provider=func(actor):return not social_life.reserved(actor) and not residential.reserved(actor)
  life.sleep_started.connect(social_life.before_time_jump)
  conditions = ConditionEvaluator.new(knowledge,relationships,clock,visitors,home,player_pose,source.section("social").facts,actors,locations.ids())
  conditions.presence=presence
@@ -249,6 +252,7 @@ func configure(source: SessionConfig) -> ActionResult:
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
  effects.relationships=relationships
  effects.social_life=social_life
+ effects.home_provider=residential.action
  effects.service_provider=_service_effect
  effects.finance_provider=financial_effect
  ink_players=InkPlayerCache.new()
@@ -302,6 +306,7 @@ func configure(source: SessionConfig) -> ActionResult:
   contact.close()
   personal.leave()
   narrative.leave_location())
+ life.sleep_started.connect(seat_use.stand)
  life.sleep_started.connect(residential.clear)
  life.sleep_started.connect(contact.close)
  scheduler.configure({})
@@ -317,7 +322,7 @@ func rebuild_order() -> ActionResult:
  handlers["deliveries"]=func(frame):
   contact.tick(frame)
   return deliveries.tick(frame)
- handlers["residential"]=func(frame):residential.tick(frame)
+ handlers["residential"]=func(frame):residential.tick(frame);seat_use.tick()
  handlers["body"]=func(frame):alertness.tick(frame);fatigue.tick(frame)
  handlers["travel"]=func(frame):travel.tick(frame)
  handlers["shops"]=func(frame):shops.tick(frame)
@@ -422,7 +427,7 @@ func _actor_snapshots() -> Array[Dictionary]:
  return result
 
 func _equipment_busy(id: StringName) -> bool:
- return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id)) or (visitors!=null and visitors.seating.busy_item(id))
+ return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id)) or (visitors!=null and visitors.seating.busy_item(id)) or (seat_use!=null and seat_use.busy_item(id))
 
 func _choose_food(character_id: StringName) -> StringName:
  var character := visitors.character(character_id)

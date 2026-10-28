@@ -1,0 +1,57 @@
+extends SceneTree
+var content: ContentStore
+var session: GameSession
+var locale: LocaleService
+func _initialize() -> void:
+ call_deferred("observe")
+func observe() -> void:
+ root.size=Vector2i(1280,720)
+ content=ContentStore.new()
+ root.add_child(content)
+ content.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var loaded := content.load_directory("res://content")
+ print("CONTENT ",loaded.ok," ",loaded.details)
+ if not loaded.ok:quit(1);return
+ locale=LocaleService.new()
+ locale.configure(content.bundle())
+ session=GameSession.new()
+ root.add_child(session)
+ var configured := session.configure(SessionConfig.new(content.bundle()))
+ print("SESSION ",configured.ok," ",configured.details)
+ if not configured.ok:quit(1);return
+ for locale_id in ["ar_EG","en"]:
+  locale.set_locale(locale_id)
+  for room in ["kiosk","rooftop"]:
+   session.location_id=StringName(room)
+   session.player_ground=Vector2(-4,1.8) if room=="kiosk" else Vector2(0,0.5)
+   var world := LocationView.new()
+   root.add_child(world)
+   world.configure(LocationDefinition.new(StringName(room),content.section("locations")[room]),session)
+   var camera := Camera2D.new()
+   root.add_child(camera)
+   camera.position=world.position+Vector2(0,-36)
+   camera.make_current()
+   var player := CharacterView.new()
+   world.add_child(player)
+   player.configure(content.section("spatial").character)
+   var pose := ActorPose.new()
+   pose.ground=session.player_ground
+   pose.location_id=StringName(room)
+   player.position=world.mapping.to_canvas(pose.ground)
+   player.present(pose,Color("3d7a8a"),true)
+   var atmosphere := Atmosphere.new()
+   root.add_child(atmosphere)
+   atmosphere.configure(content.section("atmosphere"))
+   for minute in [930,1140,1320]:
+    atmosphere.present(minute,StringName(room))
+    await process_frame
+    await process_frame
+    await RenderingServer.frame_post_draw
+    var path: String = "res://docs/notes/evidence/2026-10-28-world-presentation/"+room+"-"+str(locale_id)+"-"+str(minute)+".png"
+    print("SCREENSHOT ",path," ",root.get_texture().get_image().save_png(path))
+   atmosphere.free()
+   world.free()
+   camera.free()
+ session.free()
+ content.free()
+ quit()

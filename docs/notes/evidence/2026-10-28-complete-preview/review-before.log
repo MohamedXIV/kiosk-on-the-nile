@@ -1,0 +1,34 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LEGAL BLOCKING LAYOUT true
+BLOCKED ACCESS SIT ACCEPTED true
+GUEST CLAIM BEFORE BLOCK home_chair_2:seat
+GUEST BLOCK LAYOUT true
+GUEST CLAIM AFTER BLOCK home_chair_2:seat
+WORKSHOP SETUP meet_farid true
+WORKSHOP SETUP meet_youssef true
+WORKSHOP SETUP hear_farid true
+WORKSHOP SETUP hear_youssef true
+WORKSHOP SETUP refer_farid true
+WORKSHOP SETUP refer_youssef true
+WORKSHOP SETUP consent_farid true
+WORKSHOP SETUP consent_youssef true
+HOME BEFORE RESERVATION true
+WORKSHOP WITH HOME GUEST active
+WORKSHOP HOME SAVE false invalid_residential_presence
+WARNING: Save candidate rejected: complete_preview_requires_new_game ({ "required_revision": 19 }); retaining previous save
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_candidate (res://game/persistence/save_coordinator.gd:55)
+         [1] continue_game (res://game/app/main.gd:129)
+         [2] run (res://work/complete-review-observe.gd:37)
+WARNING: Save load rejected: complete_preview_requires_new_game ({ "required_revision": 19 })
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] continue_game (res://game/app/main.gd:137)
+         [1] run (res://work/complete-review-observe.gd:37)
+TITLE SAVE MESSAGE Could not restore the saved session.
+WARNING: 142 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 21 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

@@ -20,5 +20,9 @@ func present(is_open: bool) -> void:
  queue_redraw()
 func _draw() -> void:
  if _data.is_empty(): return
- draw_rect(Rect2(-22,-14,44,26),Color(_data.open_color if _open else _data.closed_color))
- draw_rect(Rect2(-22,-14,44,26),Color("e6a145"),false,1)
+ draw_line(Vector2(-15,-14),Vector2(-8,-23),Color("90816b"),1,true)
+ draw_line(Vector2(15,-14),Vector2(8,-23),Color("90816b"),1,true)
+ draw_rect(Rect2(-24,-16,48,30),Color("68543c"))
+ draw_rect(Rect2(-22,-14,44,26),Color(_data.open_color if _open else _data.closed_color).darkened(0.15))
+ draw_line(Vector2(-22,-14),Vector2(22,-14),Color("bba47a"),1)
+ for x in [-20,20]:draw_circle(Vector2(x,-12),1,Color("c2b399"))

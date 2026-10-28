@@ -97,6 +97,20 @@
       "quantity": 1,
       "container_id": "kiosk_world",
       "attributes": {}
+    },
+    {
+      "id": "home_chair_1",
+      "definition_id": "chair",
+      "quantity": 1,
+      "container_id": "rooftop_world",
+      "attributes": {}
+    },
+    {
+      "id": "home_chair_2",
+      "definition_id": "chair",
+      "quantity": 1,
+      "container_id": "rooftop_world",
+      "attributes": {}
     }
   ],
   "placements": {
@@ -249,6 +263,28 @@
       "cell": [
         23,
         4
+      ],
+      "rotation": 0,
+      "host_id": "",
+      "slot_id": ""
+    },
+    "home_chair_1": {
+      "instance_id": "home_chair_1",
+      "location_id": "rooftop",
+      "cell": [
+        -5,
+        -2
+      ],
+      "rotation": 0,
+      "host_id": "",
+      "slot_id": ""
+    },
+    "home_chair_2": {
+      "instance_id": "home_chair_2",
+      "location_id": "rooftop",
+      "cell": [
+        4,
+        -2
       ],
       "rotation": 0,
       "host_id": "",

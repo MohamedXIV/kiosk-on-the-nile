@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 18
-const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
+const SCHEMA_REVISION := 19
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","seat_use","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -28,7 +28,7 @@ func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
  return ActionResult.success()
 func create_candidate(data: Dictionary, config: SessionConfig, destination: Node = null) -> ActionResult:
  if not valid_digest(data):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_save")
- if data.get("schema_version")!=SCHEMA_VERSION or data.get("schema_revision")!=SCHEMA_REVISION:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"stories_save_requires_new_game",{"required_revision":SCHEMA_REVISION})
+ if data.get("schema_version")!=SCHEMA_VERSION or data.get("schema_revision")!=SCHEMA_REVISION:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"complete_preview_requires_new_game",{"required_revision":SCHEMA_REVISION})
  var legacy := ActionResult.success({"data":data}) if data.get("schema_version")==SCHEMA_VERSION else SaveMigrations.upgrade(data)
  if not legacy.ok:return legacy
  var migration := LivingSpacesMigration.upgrade(legacy.details.data,config,SCHEMA_REVISION)
@@ -80,6 +80,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    if order==null or order.status!=&"delivered" or str(order.character_id)!=actor or str(order.visit_id)!=memory.visit_id or str(order.food_id)!=memory.food_id or order.served_quality!=memory.quality or str(order.settlement)!=memory.settlement or order.payment!=memory.payment:
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_service_memory")
+ result=candidate.seat_use.validate_links()
+ if not result.ok:
+  candidate.queue_free()
+  return result
  result=HospitalitySaveLinks.validate(candidate)
  if not result.ok:
   candidate.queue_free()

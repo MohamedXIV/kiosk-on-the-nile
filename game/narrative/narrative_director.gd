@@ -415,7 +415,7 @@ func talk_encounter(visit_id: StringName) -> StringName:
  return &""
 func _select_topic(encounter: StringName, participants: PackedStringArray, extra: Dictionary) -> Dictionary:
  if encounter in [&"landlord",&"supplier"]:return {}
- if participants.is_empty() or not _session.presence.has(participants[0]): return {}
+ if participants.is_empty() or not _session.presence.record(participants[0]) is VisitState: return {}
  return history.select(encounter,_definitions[str(encounter)],_session.presence.record(participants[0]),_session,int(extra.get("mode",0)),str(extra.get("requested_topic","")))
 func _saved_story(record: Dictionary) -> StoryDefinition:
  var story: StoryDefinition = _stories[_definitions[record.encounter_id].story]
@@ -473,6 +473,10 @@ func manual_topics_for(visit_id: StringName) -> Array[Dictionary]:
  if visit==null or not _session.presence.is_available(visit_id):return result
  if visit.character_id==&"fathi":return [{"key":"supplier","label":"نتكلم عن التوريد والحساب","encounter":"supplier","topic":""}]
  if visit.character_id==&"abdul_karim":return [{"key":"landlord","label":"نتكلم على حسابنا وأحوالنا","encounter":"landlord","topic":""}]
+ if visit is ResidentialRecord:
+  return [{"key":"home/visit","label":str(_session.config.section("ui").home_visit),"encounter":"home_company","topic":""},{"key":"home/goodbye","label":str(_session.config.section("ui").home_goodbye),"encounter":"home_goodbye","topic":""}]
+ if _session.residential.can_invite(visit_id):result.append({"key":"home/invite","label":str(_session.config.section("ui").home_invite),"encounter":"home_invite","topic":""})
+ if _session.residential.invitation.get("actor","")==str(visit.character_id):result.append({"key":"home/cancel","label":str(_session.config.section("ui").home_cancel),"encounter":"home_cancel","topic":""})
  for topic in _session.social_life.topics_for(visit_id):result.append({"key":"social:"+str(topic.id),"label":str(topic.label),"encounter":str(topic.encounter),"topic":""})
  var ids: Array=_session.presence.profile(visit.character_id).get("manual_encounters",["amgad"] if visit.character_id==&"amgad" else ["visitors"])
  for encounter in ids:
@@ -486,7 +490,7 @@ func start_manual_topic(visit_id: StringName, key: String) -> ActionResult:
   if topic.key!=key:continue
   if key=="order_recall":
    return await start(&"orders",PackedStringArray([str(visit_id)]),{"mode":6,"line_variant":_session.visitors.random_index(3),"manual_read":true})
-  return await start(StringName(topic.encounter),PackedStringArray([str(visit_id)]),{"requested_topic":str(topic.topic),"manual_read":true})
+  return await start(StringName(topic.encounter),PackedStringArray([str(visit_id)]),{"requested_topic":str(topic.topic),"manual_read":true,"home_mode":"invite" if key=="home/invite" else "cancel" if key=="home/cancel" else "goodbye" if key=="home/goodbye" else "visit"})
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
 func validate_paused(record: Dictionary) -> ActionResult:
  if not ContentValidation.integer(record.get("heard_beat",record.get("beat",-1))) or int(record.get("heard_beat",record.get("beat",-1)))<0 or int(record.get("heard_beat",record.get("beat",-1)))>int(record.get("beat",-1)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_heard_receipt")

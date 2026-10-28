@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `4131a1997fbee743d692cad0c8374daaf20fdc52`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-28 (Africa/Cairo). Main source baseline before the combined preview: `422adb93e3c472a22e883912040f2afadb86bccf`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -28,7 +28,7 @@ Evidence: see dated delivery notes under `docs/notes/`. Delivered does not imply
 
 Integration cleanup first. Then quiet social encounters with bounded passage coordination; hospitality/payment; continuing stories/messages; combined multi-day pacing and presentation work. Player/residential seating remains a proposal until designed. No gameplay implementation starts as part of this documentation task.
 
-Current action: first bounded #6 pacing/world-direction milestone on an isolated branch. PR#15 integrated two continuing-story arcs/messages as4131a19; exact-head readiness/proposed merge tree matched the checked source and post-merge build40646350266 passed. Issues#4/#5 are closed for their bounded implementations. Home guests remain excluded. #6 retains longer-term economic and human visual/audio acceptance work.
+Current action: deliver one combined playtest preview at development target0.2.0-prealpha.1, including previously deferred player/home seating and home friends as explicitly authorized by the user. PR#16 integrated as422adb9; main build40649107406 passed. #6 mixed-week pacing/presentation and #7 seating/invitations are implemented on the combined branch, with bounded evidence and independent review fixes. Human playtest/feedback is the next acceptance step; do not interpret older home-guest exclusions as current scope.
 
 
 ## Integration completed
@@ -84,3 +84,7 @@ PR#14 integrated hospitality/payment as4bcdfcb with successful main build4064379
 ## Quiet-days milestone — 2026-10-28
 
 New games receive240EGP finite savings rather than45EGP, addressing the first-week no-sales shortfall without changing rents, needs, arrivals, preparation or existing saved wallets. Controlled native day1→first-rent observations with sleep/food leave162EGP before120 rent (42 arithmetic headroom), with empty intervals, independent closed/away visits and no orders. This excludes actual walking/UI rent payment and does not claim sustained balance. Existing revision18 saves remain; actual1234-minor restored wallets received no grant. [Delivery/evidence](../notes/2026-10-28-quiet-days.md) and [art/audio direction](../art/WORLD_DIRECTION.md) document the bounded scope. No new production assets or home guests; #6 stays open.
+
+## Combined preview — 2026-10-28
+
+The user's latest instruction includes all remaining/deferred work before one trial. [Combined delivery record](../notes/2026-10-28-complete-preview.md), [Arabic guide](../PLAYTEST_GUIDE_AR.md), [mixed weeks](../notes/2026-10-28-mixed-days.md) and [presentation](../notes/2026-10-28-world-presentation.md) record player/home seating, optional known-friend invitations, actual household/workshop exclusivity, source-correct sound, procedural polish, closed-sign purchasing and12/28EGP paid prices. Save19/new game is explicit; prior files remain. Final source/preview integration and human acceptance are recorded live on #6/#7/#8. No production-final feel claim, automated suites, published tag rewrite or branch deletion.

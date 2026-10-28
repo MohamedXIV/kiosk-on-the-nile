@@ -46,6 +46,12 @@ func nearest() -> InteractionTarget:
   var phone := InteractionTarget.new(StringName("phone:"+str(point.host_id)),point.ground,float(_session.config.section("suppliers").phone_radius))
   phone.primary=_text.text("supplier_phone")
   targets.append(phone)
+ for slot in _session.visitors.seat_catalog.entries(_session.location_id):
+  if _session.player_ground.distance_to(slot.access)>0.65:continue
+  if _session.seat_use.player_slot().get("id","")==slot.id:
+   var target := InteractionTarget.new(&"stand",_session.player_ground,0.7);target.primary=_text.text("stand");targets.push_front(target)
+  elif _session.seat_use.available(slot):
+   var target := InteractionTarget.new(StringName("sit:"+str(slot.id)),slot.access,0.65);target.primary=_text.text("sit");targets.push_front(target)
  var selected := InteractionSelector.nearest(_session.player_ground,targets)
  var people: Array[InteractionTarget]=[]
  for target in targets:
@@ -65,6 +71,8 @@ func execute(secondary: bool) -> ActionResult:
   return await _session.person_interaction(target.secondary_visit_id)
  if secondary and _session.cooking.held_item() and (target==null or target.secondary.is_empty()): return _session.life.consume_held()
  if target==null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_target")
+ if target.id==&"stand" and not secondary:_session.seat_use.stand();return ActionResult.success()
+ if str(target.id).begins_with("sit:") and not secondary:return _session.seat_use.sit(str(target.id).trim_prefix("sit:"))
  var station := _session.cooking.job(target.id)
  if secondary and station!=null and station.stage!=&"EMPTY" and not _session.cooking.legacy_busy(target.id):return ActionResult.success({"show_recipes":str(target.id)})
  if str(target.id).begins_with("phone:") and not secondary:return await _session.contact.begin(str(target.id).trim_prefix("phone:"))

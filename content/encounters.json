@@ -1012,5 +1012,69 @@
     },
     "offer_requires": {},
     "advancement": "manual"
+  },
+  "home_company": {
+    "story": "home_company",
+    "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "home_invite": {
+    "story": "home_company",
+    "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "home_cancel": {
+    "story": "home_company",
+    "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "home_goodbye": {
+    "story": "home_company",
+    "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
   }
 }

@@ -135,8 +135,10 @@ func continue_game() -> void:
    _hud.toast.show_message(_text.text("building_migration",{"moved":report.moved.size(),"stored":report.stored.size()}))
  else:
   push_warning("Save load rejected: %s (%s)" % [result.message_key,result.details])
-  var error := UiText.label(_text.text("load_failed"))
+  var error := UiText.label(_text.outcome(result) if _text.data.get("errors",{}).has(str(result.message_key)) else _text.text("load_failed"))
   error.position = Vector2(30,30)
+  error.custom_minimum_size.x=maxf(200,get_viewport_rect().size.x-60)
+  error.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
   _title.add_child(error)
  _busy = false
 func _install(candidate: GameSession) -> void:
@@ -267,6 +269,8 @@ func _present() -> void:
  RuntimePerformance.finish("audio_projection",perf)
  _atmosphere.present(_session.clock.minutes,_session.location_id)
  _character.present(_session.player_pose,Color(_config.section("spatial").character.player_color),true)
+ var slot := _session.seat_use.player_slot()
+ _character.present_seat(not slot.is_empty(),(_motor._mapping.to_canvas(slot.anchor,float(slot.height))-_motor._mapping.to_canvas(_session.player_ground)+Vector2(0,14)) if not slot.is_empty() else Vector2.ZERO,float(slot.height)*_motor._mapping.height_scale if not slot.is_empty() else 0.0)
  _character.get_node("HeldItem").present_record(_session.items.get_item(_session.inventory.held_id()))
  _camera.global_position = _motor.global_position
  _camera.offset.y = -(float(_config.section("spatial").camera_vertical_anchor)-0.5)*get_viewport_rect().size.y
@@ -363,6 +367,8 @@ func _unhandled_input(event: InputEvent) -> void:
    _session.personal.advance()
    get_viewport().set_input_as_handled()
    return
+ if event.is_action_pressed("cancel") and _session.seat_use.player_seated():
+  _session.seat_use.stand();get_viewport().set_input_as_handled();return
  if event.is_action_pressed("interact_primary") or event.is_action_pressed("interact_secondary"):
   get_viewport().set_input_as_handled()
   _busy = true
