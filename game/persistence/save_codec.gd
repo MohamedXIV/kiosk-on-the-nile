@@ -1,7 +1,7 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 15
+const SCHEMA_REVISION := 16
 const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
@@ -17,6 +17,12 @@ func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
  if data.get("schema_version")!=SCHEMA_VERSION or data.get("schema_revision")!=SCHEMA_REVISION or not data.get("content_fingerprint") is String or not data.get("state") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_save_envelope")
  for id in COMPONENTS+["narrative","player_pose"]:
   if not data.state.get(id) is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_saved_component",{"component":id})
+ if not data.state.visitors.get("peers") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_peer_encounters")
+ var chapters: Variant=data.state.narrative.get("sessions")
+ var paused: Variant=data.state.personal.get("paused")
+ if not chapters is Dictionary or not paused is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_heard_receipt")
+ for record in chapters.values()+paused.values():
+  if not record is Dictionary or not ContentValidation.integer(record.get("heard_beat")) or not ContentValidation.integer(record.get("beat")) or record.heard_beat<0 or record.heard_beat>record.beat:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_heard_receipt")
  if not data.state.items.get("consumed") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_consumption_history")
  if not data.state.get("kiosk_open") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kiosk_state")
  return ActionResult.success()
@@ -91,6 +97,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    candidate.queue_free()
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"missing_financial_chapter")
  result = await candidate.narrative.restore(restored_data.state.narrative)
+ if not result.ok:
+  candidate.queue_free()
+  return result
+ result=PeerSaveLinks.validate(candidate)
  if not result.ok:
   candidate.queue_free()
   return result

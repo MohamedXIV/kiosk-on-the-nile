@@ -4,3 +4,5 @@
 tools/node_modules/
 exports/
 *.tmp
+__pycache__/
+*.py[cod]

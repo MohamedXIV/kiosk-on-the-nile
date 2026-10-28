@@ -3,6 +3,7 @@ extends RefCounted
 var supply_provider: Callable
 var finance_provider: Callable
 var service_provider: Callable
+var relationships: RelationshipStore
 var social_life: SocialLife
 var _knowledge: KnowledgeBook
 var _needs: NeedsService
@@ -13,7 +14,11 @@ func _init(knowledge: KnowledgeBook, needs: NeedsService, facts: Array) -> void:
  _needs = needs
  _facts = facts.duplicate()
 func valid(effect: Dictionary) -> bool:
+ var scope: Variant=effect.get("scope","hearing")
+ if not scope in ["hearing","world"]:return false
+ if scope=="world" and effect.get("kind")!="peer_relation":return false
  match effect.get("kind"):
+  "peer_relation":return scope=="world" and relationships!=null and effect.get("from") is String and effect.get("to") is String and effect.from!="player" and effect.to!="player" and effect.from!=effect.to and effect.get("axis") is String and ContentValidation.bounded(effect.get("amount"),-10,10) and relationships.can_adjust(StringName(effect.from),StringName(effect.to),StringName(effect.axis),float(effect.amount))
   "supply":return supply_provider.is_valid() and effect.get("action_id") in ["manage","emergency"]
   "finance":return finance_provider.is_valid() and effect.get("action_id") in ["pay_housing","pay_partial","repay_loan","personal","repair","accept_offer","decline_offer","offer_day_1","offer_day_3","offer_day_7","offer_loan_0","offer_loan_1","offer_loan_2"]
   "service":return service_provider.is_valid() and effect.get("action_id") in ["accept","decline"]
@@ -25,6 +30,9 @@ func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "", 
  if not valid(effect): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect")
  if _applied.has(str(occurrence_id)): return ActionResult.success({"duplicate":true})
  match effect.kind:
+  "peer_relation":
+   var result := relationships.adjust(StringName(effect.from),StringName(effect.to),StringName(effect.axis),float(effect.amount))
+   if not result.ok:return result
   "supply":
    var result: ActionResult=supply_provider.call(effect.action_id,str(occurrence_id),participants)
    if not result.ok:return result

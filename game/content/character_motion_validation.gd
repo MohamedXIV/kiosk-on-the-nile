@@ -26,6 +26,10 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not data is Dictionary or not data.get("enabled") is bool or not data.get("actors") is Array or data.actors.size()>4:return _fail("visitors.meetings")
   for actor in data.actors:
    if not actor is String or not visitors.characters.has(actor) or not actor in bundle.get("social_life",{}).get("companionship",{}).get("actors",[]):return _fail("visitors.meetings.actor")
+  if data.has("delay_overrides"):
+   if not data.delay_overrides is Dictionary or data.delay_overrides.size()>4:return _fail("visitors.meetings.delay_overrides")
+   for actor in data.delay_overrides:
+    if not actor in data.actors or not _interval(data.delay_overrides[actor],5,300):return _fail("visitors.meetings.delay_override")
   if not _interval(data.get("delay_seconds"),5,300) or not ContentValidation.bounded(data.get("chance"),0,1):return _fail("visitors.meetings.schedule")
   if not ContentValidation.bounded(data.get("retarget_seconds"),0.5,10) or not ContentValidation.bounded(data.get("retarget_distance"),0.25,3) or not ContentValidation.bounded(data.get("max_seconds"),5,120) or not ContentValidation.bounded(data.get("lost_wait_seconds"),1,30):return _fail("visitors.meetings.timing")
   if not ContentValidation.bounded(data.get("stop_distance"),0.7,2.5) or float(data.stop_distance)+0.15>=float(bundle.get("social_life",{}).get("companionship",{}).get("radius",1.8)):return _fail("visitors.meetings.distance")

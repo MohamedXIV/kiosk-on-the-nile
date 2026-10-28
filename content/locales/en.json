@@ -1033,6 +1033,22 @@
     "ui.hud_phase_morning": "Morning",
     "ui.hud_phase_noon": "Noon",
     "ui.hud_phase_afternoon": "Afternoon",
-    "ui.hud_phase_evening": "Evening"
+    "ui.hud_phase_evening": "Evening",
+    "story.river_company.line_001": "It’s nice having a spot away from all that traffic.",
+    "story.river_company.line_002": "I left the radio blaring back there. I’d rather listen to the water.",
+    "story.river_company.line_003": "See that boat out there? No hurry in the world.",
+    "story.river_company.line_004": "Wish my head would slow down like that.",
+    "story.river_company.choice_001": "Good company makes the place.",
+    "story.river_company.line_005": "Cheers, mate. Sometimes you just need someone to listen.",
+    "story.river_company.line_006": "A few kind words can take the weight off a day.",
+    "story.river_company.choice_002": "What were you two talking about?",
+    "story.river_company.line_007": "Nothing much. The breeze, a bit of peace.",
+    "story.river_company.line_008": "And getting a breather after a long day.",
+    "story.river_company.choice_003": "(Stay and listen.)",
+    "story.river_company.line_009": "Let’s sit a little longer before life catches up with us.",
+    "story.river_company.line_010": "No rush. We’ve got a moment.",
+    "manual_topic.river_company/river_chat": "A moment by the Nile",
+    "ui.saving": "Saving…",
+    "ui.save_unconfirmed": "Could not confirm browser storage. Please save again before leaving."
   }
 }

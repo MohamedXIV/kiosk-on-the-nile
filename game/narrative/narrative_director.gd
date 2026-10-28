@@ -43,6 +43,7 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  return data
 func start(encounter_id: StringName, participants: PackedStringArray, extra: Dictionary = {}) -> ActionResult:
  if encounter_id==&"social_invitation" and _session.personal.active():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
+ if extra.has("peer_id") and not _session.visitors.peers.pending(str(extra.peer_id),participants):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  var definition: Dictionary = _definitions.get(str(encounter_id),{})
  if definition.is_empty() or not _encounter_available(definition,participants): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  if encounter_id==&"social_invitation" and not _session.actions.preview(&"personal_focus").ok:return _session.actions.preview(&"personal_focus")
@@ -57,8 +58,8 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  if _opening.has(key): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_opening")
  for existing in sessions.values():
   if not existing.finished and existing.encounter_id==encounter_id and existing.participants==participants and int(existing.context_extra.get("mode",0))==int(extra.get("mode",0)): return ActionResult.success({"session_id":str(existing.id)})
- var selected := _select_topic(encounter_id,participants,extra)
- if definition.has("topics") and selected.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
+ var selected: Dictionary={} if extra.has("peer_id") else _select_topic(encounter_id,participants,extra)
+ if not extra.has("peer_id") and definition.has("topics") and selected.is_empty(): return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
  if definition.get("manual",encounter_id in [&"amgad",&"visitors"]) and int(extra.get("mode",0))==0:
   for existing: ConversationSession in sessions.values():
    if existing.participants==participants and existing.current.choices.is_empty() and existing.encounter_id!=&"football": _finish(existing)
@@ -83,7 +84,7 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
  var result := await conversation.runtime.open(_stories[definition.story],_context_for(conversation),_session.ink_players)
  _opening.erase(key)
  if wants_manual:_manual_opening=false
- if not result.ok or not _encounter_available(definition,participants):
+ if not result.ok or not _encounter_available(definition,participants) or (extra.has("peer_id") and not _session.visitors.peers.pending(str(extra.peer_id),participants)):
   conversation.runtime.queue_free()
   return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"encounter_unavailable")
  sessions[str(conversation.id)] = conversation
@@ -96,25 +97,39 @@ func start(encounter_id: StringName, participants: PackedStringArray, extra: Dic
 func tick(delta: float) -> void:
  for conversation: ConversationSession in sessions.values():
   if conversation.finished: continue
+  if conversation.context_extra.get("peer_participating",false) and (not _can_hear(conversation) or not _session.actions.preview(&"personal_focus").ok):leave_peer(conversation.id)
   var definition: Dictionary = _definitions[str(conversation.encounter_id)]
   if not _encounter_available(definition,conversation.participants):
    cancel(conversation.id)
    continue
+  var hearing := _hear_current(conversation)
+  if not hearing.ok:continue
   conversation.elapsed += delta
   if not conversation.current.choices.is_empty():
    conversation.choice_elapsed += delta
-   if conversation.optional and conversation.choice_elapsed>=float(definition.get("choice_expiry",8)):
+   if not manual(conversation) and not conversation.current.autonomous.is_empty() and conversation.choice_elapsed>=float(definition.get("choice_expiry",8)):
+    var continued := conversation.runtime.continue_autonomously(conversation.current.autonomous)
+    if continued.ok:_advance(conversation)
+    else:_report_failure(conversation,continued);_finish(conversation)
+    continue
+   if not manual(conversation) and conversation.optional and conversation.choice_elapsed>=float(definition.get("choice_expiry",8)):
     if not _can_hear(conversation):
      _finish(conversation)
      continue
     var listen := str(int(definition.get("listen_choice",2)))
     choose(conversation.id,StringName("%s:%d:%s" % [conversation.id,conversation.beat,listen]),true)
    elif _focus.is_empty() and _can_offer(conversation): _focus = conversation.id; changed.emit()
-  elif manual(conversation):continue
+  elif manual(conversation):
+   if conversation.context_extra.has("peer_id") and _focus.is_empty() and _can_offer(conversation):_focus=conversation.id;changed.emit()
+   continue
   elif conversation.elapsed>=maxf(conversation.current.duration,0.05):
    if conversation.current.ended: _finish(conversation)
    else: _advance(conversation)
 func _can_offer(conversation: ConversationSession) -> bool:
+ if conversation.context_extra.has("peer_id"):
+  if _manual_opening or _session.personal.active() or not _can_hear(conversation) or not _session.actions.preview(&"personal_focus").ok:return false
+  if _session.social_life.participation_blocked.is_valid() and _session.social_life.participation_blocked.call():return false
+  return bool(conversation.context_extra.get("peer_participating",false)) or conversation.choice_elapsed<float(_definitions[str(conversation.encounter_id)].get("choice_expiry",8))
  var definition: Dictionary = _definitions[str(conversation.encounter_id)]
  return _session.conditions.permits(definition.get("offer_requires",{}),conversation.participants)
 func _advance(conversation: ConversationSession) -> ActionResult:
@@ -127,6 +142,9 @@ func _advance(conversation: ConversationSession) -> ActionResult:
   _report_failure(conversation,conversation.current.result)
   _finish(conversation)
   return conversation.current.result
+ if conversation.context_extra.has("peer_id") and not conversation.current.choices.is_empty() and conversation.current.autonomous.is_empty():
+  # A validated encounter default also covers authored choices without a local tag.
+  conversation.current.autonomous=str(_definitions[str(conversation.encounter_id)].autonomous)
  var speaker := str(conversation.current.speaker_id)
  if not speaker.is_empty():
   var valid_speaker := false
@@ -137,14 +155,34 @@ func _advance(conversation: ConversationSession) -> ActionResult:
    _report_failure(conversation,rejected)
    _finish(conversation)
    return rejected
+ var peer_actors: Array=[]
+ for id in conversation.participants:
+  var actor: Variant=_session.presence.record(id)
+  if actor!=null:peer_actors.append(str(actor.character_id))
  for effect in conversation.current.effects:
+  if effect.get("scope","hearing")=="world" and (not effect.get("from","") in peer_actors or not effect.get("to","") in peer_actors):
+   var invalid := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_peer_effect_participants")
+   _report_failure(conversation,invalid);_finish(conversation);return invalid
   if not _session.effects.valid(effect):
    var rejected := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect")
    _report_failure(conversation,rejected)
    _finish(conversation)
    return rejected
  for i in range(conversation.current.effects.size()):
-  if not _can_hear(conversation):continue
+  var effect: Dictionary=conversation.current.effects[i]
+  if effect.get("scope","hearing")!="world":continue
+  var applied := _session.effects.apply(effect,StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
+  if not applied.ok:_report_failure(conversation,applied);_finish(conversation);return applied
+ var hearing := _hear_current(conversation)
+ if not hearing.ok:return hearing
+ if _focus.is_empty() and (manual(conversation) or not conversation.current.choices.is_empty()) and _can_offer(conversation): _focus = conversation.id
+ changed.emit()
+ return ActionResult.success()
+func _hear_current(conversation: ConversationSession) -> ActionResult:
+ if conversation.heard_beat==conversation.beat or not _can_hear(conversation):return ActionResult.success()
+ var speaker := str(conversation.current.speaker_id)
+ for i in range(conversation.current.effects.size()):
+  if conversation.current.effects[i].get("scope","hearing")=="world":continue
   var applied := _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
   if not applied.ok:
    _report_failure(conversation,applied)
@@ -160,8 +198,7 @@ func _advance(conversation: ConversationSession) -> ActionResult:
   if conversation.encounter_id!=&"social_invitation" or conversation.context_extra.get("invitation_listening",false):
    var topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
    _session.social_life.heard_topic(topic)
- if _focus.is_empty() and (manual(conversation) or not conversation.current.choices.is_empty()) and _can_offer(conversation): _focus = conversation.id
- changed.emit()
+ conversation.heard_beat=conversation.beat
  return ActionResult.success()
 func choices(conversation: ConversationSession) -> Array[Dictionary]:
  var offered: Array[Dictionary] = []
@@ -175,9 +212,10 @@ func choices(conversation: ConversationSession) -> Array[Dictionary]:
  return offered
 func choose(session_id: StringName, choice_id: StringName, automatic: bool = false) -> ActionResult:
  var conversation: ConversationSession = sessions.get(str(session_id))
+ if conversation!=null and conversation.context_extra.has("peer_id") and automatic:return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"invalid_peer_reply")
  if conversation == null or conversation.finished: return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
  var definition: Dictionary = _definitions[str(conversation.encounter_id)]
- if not _encounter_available(definition,conversation.participants): return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
+ if not _encounter_available(definition,conversation.participants) or (conversation.context_extra.has("peer_id") and not _can_offer(conversation)): return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
  var candidates: Array = choices(conversation)
  if automatic and conversation.optional: candidates = conversation.current.choices.map(func(choice):return {"id":str(conversation.choice_id(choice)),"index":choice.index})
  for choice in candidates:
@@ -200,13 +238,25 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
    conversation.context_extra["invitation_answered"]=true
    conversation.context_extra["invitation_listening"]=int(choice.index)==0
    if int(choice.index)==0:conversation.context_extra["manual_read"]=true
-  if manual(conversation) and not _session.personal.adopt(conversation):
+  if conversation.context_extra.has("peer_id") and not automatic:
+   conversation.context_extra["peer_participating"]=true
+   conversation.context_extra["manual_read"]=true
+  if manual(conversation) and not conversation.context_extra.has("peer_id") and not _session.personal.adopt(conversation):
    _finish(conversation,&"cancelled")
    return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_busy")
   if _focus==session_id: _focus = &""
   var advanced := _advance(conversation)
   return ActionResult.success({"cue":"chime"}) if advanced.ok else advanced
  return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"stale_choice")
+func leave_peer(id: StringName) -> ActionResult:
+ var conversation: ConversationSession=sessions.get(str(id))
+ if conversation==null or not conversation.context_extra.has("peer_id"):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
+ conversation.context_extra["peer_participating"]=false
+ conversation.context_extra["manual_read"]=false
+ conversation.choice_elapsed=0
+ if _focus==id:_focus=&""
+ changed.emit()
+ return ActionResult.success()
 func focused_session() -> ConversationSession:
  var conversation: ConversationSession = sessions.get(str(_focus))
  if conversation and not conversation.finished and _can_offer(conversation): return conversation
@@ -230,6 +280,10 @@ func _finish(conversation: ConversationSession, reason: StringName = &"completed
 func cancel_all() -> void:
  for conversation in sessions.values():
   if not conversation.finished: _finish(conversation,&"cancelled")
+func leave_location() -> void:
+ for conversation: ConversationSession in sessions.values():
+  if conversation.context_extra.has("peer_id"):leave_peer(conversation.id)
+  elif not conversation.finished:_finish(conversation,&"cancelled")
 func snapshot() -> Dictionary:
  var records: Dictionary = {}
  for id in sessions:
@@ -274,6 +328,9 @@ func restore(data: Dictionary) -> ActionResult:
   result = conversation.runtime.restore(record.runtime)
   if not result.ok: return _reject_candidates(candidates)
   conversation.current = conversation.runtime.frame()
+  var heard: Variant=record.get("heard_beat",conversation.beat)
+  if not ContentValidation.integer(heard) or heard<0 or heard>conversation.beat:return _reject_candidates(candidates)
+  conversation.heard_beat=int(heard)
   if not conversation.topic_selection.is_empty() and not restored_history.contains(conversation.topic_selection):
    # Control-only frames and speech outside hearing range do not consume a
    # topic. Preserve their cursor without inventing heard speech or effects;
@@ -393,7 +450,7 @@ func manual(conversation: ConversationSession) -> bool:
  return _definitions[str(conversation.encounter_id)].get("advancement","automatic")=="manual" and int(conversation.context_extra.get("mode",0))==0
 func advance_manual(id: StringName) -> ActionResult:
  var conversation: ConversationSession=sessions.get(str(id))
- if conversation==null or not manual(conversation) or not _can_hear(conversation) or not _encounter_available(_definitions[str(conversation.encounter_id)],conversation.participants):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
+ if conversation==null or (conversation.context_extra.has("peer_id") and not _can_offer(conversation)) or not manual(conversation) or not _can_hear(conversation) or not _encounter_available(_definitions[str(conversation.encounter_id)],conversation.participants):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")
  if not conversation.current.choices.is_empty():return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"choose_a_reply")
  if conversation.current.ended:_finish(conversation)
  else:return _advance(conversation)
@@ -428,6 +485,7 @@ func start_manual_topic(visit_id: StringName, key: String) -> ActionResult:
   return await start(StringName(topic.encounter),PackedStringArray([str(visit_id)]),{"requested_topic":str(topic.topic),"manual_read":true})
  return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"nothing_new_to_say")
 func validate_paused(record: Dictionary) -> ActionResult:
+ if not ContentValidation.integer(record.get("heard_beat",record.get("beat",-1))) or int(record.get("heard_beat",record.get("beat",-1)))<0 or int(record.get("heard_beat",record.get("beat",-1)))>int(record.get("beat",-1)):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_heard_receipt")
  if not _definitions.has(record.get("encounter_id")) or not ContentValidation.integer(record.get("beat")) or record.beat<1 or not ContentValidation.number(record.get("elapsed")) or record.elapsed<0 or not ContentValidation.number(record.get("choice_elapsed")) or record.choice_elapsed<0 or not record.get("topic_selection") is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not valid_sequence(str(record.id),"conversation_",_next):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_paused_conversation")
  if not record.topic_selection.is_empty():
@@ -456,6 +514,7 @@ func resume_record(record: Dictionary, visit_id: StringName) -> ActionResult:
  conversation.context_extra["manual_read"]=true
  conversation.topic_selection=record.topic_selection.duplicate(true)
  conversation.beat=int(record.beat)
+ conversation.heard_beat=int(record.get("heard_beat",record.beat))
  conversation.elapsed=float(record.elapsed)
  conversation.choice_elapsed=float(record.choice_elapsed)
  if not available_for(conversation):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"conversation_unavailable")

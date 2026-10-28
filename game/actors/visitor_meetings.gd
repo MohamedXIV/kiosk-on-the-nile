@@ -17,7 +17,7 @@ func step(delta: float, visits: Dictionary, awareness: SpatialAwareness, eligibl
    finish(visit.id)
    continue
   if not _records.has(id):
-   var delay: Array=_data.delay_seconds
+   var delay: Array=_data.get("delay_overrides",{}).get(str(visit.character_id),_data.delay_seconds)
    _records[id]={"remaining":lerpf(float(delay[0]),float(delay[1]),_sample(visit.id,"meeting_delay")),"attempted":false,"elapsed":0.0,"waiting":0.0,"retarget":0.0,"goal":[],"observed":[]}
   var record: Dictionary=_records[id]
   if id==_active:

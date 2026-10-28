@@ -22,6 +22,8 @@ var _prompt_panel: PanelContainer
 var _prompt: Label
 var _station: Label
 var _thought: Label
+func show_save_status(key: String) -> void:
+ _strip.show_save_status(key)
 func configure(text: UiText) -> void:
  _text = text
  theme = text.make_theme()
@@ -145,7 +147,12 @@ func present(target: InteractionTarget) -> void:
  var focused := _session.narrative.focused_session()
  if notebook.visible or sleep_panel.visible:dialogue.hide()
  elif _session.personal.active():dialogue.present_personal(_session.personal.view(),_session.narrative)
- else:dialogue.present(focused,_session.narrative.choices(focused))
+ else:
+  var speaker_name := ""
+  if focused!=null and focused.context_extra.has("peer_id"):
+   var actor := str(focused.current.speaker_id)
+   speaker_name=LocalizedNarrative.speaker(actor,_session.tuning.display_name(actor,str(_session.presence.profile(StringName(actor)).get("name",actor))))
+  dialogue.present(focused,_session.narrative.choices(focused),speaker_name)
  var thought := _session.inner.view()
  _thought.text="" if thought.is_empty() else _text.text("thought_name")+": "+str(thought.text)
  _thought.visible=not thought.is_empty() and not _session.personal.active() and focused==null and not notebook.visible and not sleep_panel.visible

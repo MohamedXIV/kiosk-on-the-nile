@@ -1,0 +1,26 @@
+CONSOLE error Failed to load resource: the server responded with a status of 404 (File not found)
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+READY
+DONE {"click":[480,385],"wait":200,"shot":"/tmp/kiosk-fixture-locale.png"}
+DONE {"click":[480,450],"wait":300}
+DONE {"click":[480,273],"wait":13000,"shot":"/tmp/kiosk-football-offer.png"}
+DONE {"key":"d","ms":400,"wait":3000,"shot":"/tmp/kiosk-football-live.png"}
+DONE {"wait":500,"shot":"/tmp/kiosk-football-choice.png"}
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+DONE {"goto":"http://127.0.0.1:8869/?build=706d7d0-football2","wait":28000,"shot":"/tmp/kiosk-football2-title.png"}
+DONE {"click":[480,273],"wait":16000,"shot":"/tmp/kiosk-football2-offer.png"}
+DONE {"click":[774,216],"wait":400,"shot":"/tmp/kiosk-football-manual.png"}
+DONE {"click":[909,28],"wait":200,"shot":"/tmp/kiosk-football-menu.png"}
+DONE {"click":[125,252],"wait":1400,"shot":"/tmp/kiosk-peer-web-save.png"}
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+DONE {"goto":"http://127.0.0.1:8869/?build=706d7d0-group-resume","wait":30000,"shot":"/tmp/kiosk-peer-web-title.png"}
+DONE {"click":[480,332],"wait":2000,"shot":"/tmp/kiosk-peer-web-resumed.png"}
+DONE {"press":"Enter","wait":400,"shot":"/tmp/kiosk-peer-web-next.png"}
+DONE {"press":"Escape","wait":300,"shot":"/tmp/kiosk-peer-web-left.png"}
+DONE {"close":true}

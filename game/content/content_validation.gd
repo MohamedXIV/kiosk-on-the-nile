@@ -2,6 +2,10 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ var save_feedback := SaveFeedbackValidation.validate(bundle)
+ if not save_feedback.ok:return save_feedback
+ var peer_result := PeerContentValidation.validate(bundle)
+ if not peer_result.ok:return peer_result
  var hud_result := HudContentValidation.validate(bundle)
  if not hud_result.ok:return hud_result
  var notebook_result := NotebookView.validate_layout(bundle)

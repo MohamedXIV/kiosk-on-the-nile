@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-27 (Africa/Cairo). Current product: `131642326d4dfab4f1eb105411415e29c2e28e88`; documentation head before this record: `621b9a0`. This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-27 (Africa/Cairo). Main baseline product: `131642326d4dfab4f1eb105411415e29c2e28e88`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integration pending). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -8,7 +8,7 @@ Recorded 2026-10-27 (Africa/Cairo). Current product: `131642326d4dfab4f1eb105411
 - Continuous Ink conversations, inner thoughts, knowledge, directional relationships, notebook/history and workshop trial with actual outcome/follow-up.
 - Weekly accounts, landlord, deferrals/loans, district rent/prepayment/suspension, supplier contracts and deliveries.
 - Shopping journeys, shared home/kiosk grid placement, developer-only structures, storage, equipment-dependent recipes and hygiene.
-- Offline Arabic/English UI and all 11 current authored Ink stories; historical captured text retains its language.
+- Offline Arabic/English UI and all12 current preview authored Ink stories; historical captured text retains its language.
 - Cached grid navigation, idle animation, observed-location memory, bounded Youssef approach, dynamic visitor seating and local person avoidance.
 - HUD cleanup and bundled needs/day icons. Audio report withdrawn after user confirmed sound works.
 
@@ -28,6 +28,32 @@ Evidence: see dated delivery notes under `docs/notes/`. Delivered does not imply
 
 Integration cleanup first. Then quiet social encounters with bounded passage coordination; hospitality/payment; continuing stories/messages; combined multi-day pacing and presentation work. Player/residential seating remains a proposal until designed. No gameplay implementation starts as part of this documentation task.
 
+Current action: integrate the three delivered source batches (quiet-social, Web-save acknowledgment, versioning) as one descendant chain, subject to fresh integration review/build and PR CI. See [integration record](../notes/2026-10-27-source-integration.md). This precedes new gameplay epic #3; historical save-compatibility gates in older plans are superseded by AGENTS.md/docs/RELEASING.md.
+
 ## Integration completed
 
 PR#9 merged into main after successful checks; post-merge build passed. Epic#1 is complete. Permanent remote branches are now main and artifacts, with35 preserved playable archive versions. Historical66-branch audit is retained as evidence; see INTEGRATION.md for outcome and guarded deletion manifest. Next planned batch: quiet social encounters (epic#2), with narrow-passage coordination (#3) considered within that design. No new gameplay work was performed during cleanup.
+
+## Quiet social preview delivered; integration pending
+
+Epic#2 now has a complete [playable preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/quiet-social-706d7d0): two observed NPC pairs, autonomous Ink, first-audibility receipts, optional manual participation, broadened Farid approach and revision16 compatibility. Fresh review findings were addressed in one pass; bounded native/Chrome evidence is in the delivery notes.35 old archives plus this preview are retained on the single artifacts branch (36 total). Main remains unchanged.
+
+Before integration: [durable Web save acknowledgment#10](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/10), preview acceptance, and review of the recorded group multi-choice/candidate-config limits. A rapid reload during pending synchronization lost a requested save in one fixture; longer-wait group persistence and ordinary migration/Continue succeeded. No exact safe delay is established. Epic#2 remains open until integration/acceptance. Narrow-passage coordination#3 remains separate; no universal third-person displacement was added.
+
+Next planned gameplay batch after those gates: narrow-passage coordination, hospitality/payment#4, continuing stories/messages#5, multi-day pacing#6. Player/residential seating#7 remains proposed.
+
+## Web save fix preview delivered
+
+[Corrected full preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/web-save-ack-e8cfa15) includes quiet-social plus issue10's implemented acknowledgment fix: exact persisted bytes, pending/error/retry HUD, serialized/coalesced requests and pending beforeunload warning. Native save/backups and revision16 remain. Fresh review's BOM edge was reproduced and corrected; exact Release Chrome fault/retry/immediate-after-ack reload/Continue and native observations are recorded in docs/notes/2026-10-27-web-save-acknowledgment.md.37 playable archive versions are preserved.
+
+The earlier technical storage gate now has an implemented fix. Source integration and preview acceptance remain pending, so#10/#2 stay open; main is unchanged. Browser/OS termination or overriding the navigation warning is outside a durable completion guarantee. The adapter's4.7.2 backend pin requires revalidation on engine upgrades. Next gameplay work remains bounded passage coordination#3; the group multi-choice/candidate-config limits remain recorded.
+
+## Versioning foundation before further gameplay
+
+User policy clarified: unpublished pre-alpha; do not spend routine development effort on historical-save compatibility. SemVer/Keep a Changelog and a first numbered baseline0.1.0-prealpha.1 are being established before epic3. VERSION/project metadata/build provenance/annotated tags and package consistency are tracked together. Future breaking save changes may require a new game and must say so; existing integrity guards remain. See docs/RELEASING.md and CHANGELOG.md.
+
+## Versioning foundation delivered
+
+The first published numbered baseline is v0.1.0-prealpha.2, source51c5b0d. Canonical VERSION/Godot metadata, SemVer prerelease tags, curated changelog/save-impact entries, verified actual toolchain/export provenance and reusable packaging are in place. Tagged CI passed40562637988; independent archive checks completed. Candidate1 remains a labeled validation record, with no rewritten tag.39 packages are preserved, including all37 legacy versions.
+
+User policy is now explicit in AGENTS.md/docs/RELEASING.md: unpublished pre-alpha saves do not receive routine backward-compatibility/migration work. Future resets are allowed and documented; integrity guards remain. No gameplay/save-format changes in this foundation batch. This priority precedes the next gameplay epic3; source integration/acceptance is still separate.

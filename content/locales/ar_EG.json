@@ -1033,6 +1033,22 @@
     "ui.hud_phase_morning": "الصباح",
     "ui.hud_phase_noon": "الظهيرة",
     "ui.hud_phase_afternoon": "بعد الظهر",
-    "ui.hud_phase_evening": "المساء"
+    "ui.hud_phase_evening": "المساء",
+    "story.river_company.line_001": "حلوة القعدة بعيد عن زحمة الشارع.",
+    "story.river_company.line_002": "أنا سايب الراديو بدوشته وجاي أسمع الميّه.",
+    "story.river_company.line_003": "شايف المركب اللي بعيد دي؟ ماشية على مهلها خالص.",
+    "story.river_company.line_004": "ربنا يروّق بالنا زي صاحبها.",
+    "story.river_company.choice_001": "القعدة الحلوة بتحلى بأهلها.",
+    "story.river_company.line_005": "تسلم يا معلم.. كفاية إن الواحد يلاقي حد يسمعه.",
+    "story.river_company.line_006": "أهو كلمتين حلوين بيخففوا اليوم.",
+    "story.river_company.choice_002": "كنتوا بتحكوا عن إيه؟",
+    "story.river_company.line_007": "ولا حاجة كبيرة.. بنتكلم عن الهوا وهدوء المكان.",
+    "story.river_company.line_008": "والفاصل اللي الواحد محتاجه بعد يوم طويل.",
+    "story.river_company.choice_003": "(أكتفي بالسماع من غير ما أتدخل)",
+    "story.river_company.line_009": "طيب نقعد شوية قبل ما الدنيا تسحبنا تاني.",
+    "story.river_company.line_010": "لسه بدري.. نسيب الدقيقة تعدّي على مهلها.",
+    "manual_topic.river_company/river_chat": "قعدة على النيل",
+    "ui.saving": "بنحفظ القعدة…",
+    "ui.save_unconfirmed": "ماقدرناش نأكد حفظ المتصفح؛ جرّب تحفظ تاني قبل ما تمشي."
   }
 }

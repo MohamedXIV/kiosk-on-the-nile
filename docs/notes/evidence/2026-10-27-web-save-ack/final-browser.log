@@ -1,0 +1,33 @@
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+READY
+DONE {"click":[480,385],"wait":200}
+DONE {"click":[480,450],"wait":300}
+DONE {"click":[480,332],"wait":1500,"shot":"/tmp/kiosk-save-ack-final-continued.png"}
+READONLY_BOM_FIXTURE
+DONE {"bom_reads":true}
+DONE {"click":[909,28],"wait":100}
+DONE {"click":[130,252],"wait":16500,"shot":"/tmp/kiosk-save-ack-final-bom.png"}
+DIALOG beforeunload 
+NAVIGATION_BLOCKED page.reload: Timeout 1500ms exceeded.
+Call log:
+[2m  - waiting for navigation until "commit"[22m
+
+DONE {"attempt_reload":true,"shot":"/tmp/kiosk-save-ack-final-bom-held.png"}
+DONE {"restore_bom":true}
+DONE {"click":[909,28],"wait":100}
+DONE {"click":[130,284],"wait":100}
+DURABLE_ACK
+STORAGE 1793095247159 {"exists":true,"checksum":"2182fd543e9fc12e71fedd3bc8fc60dee7ca455758802eb2598ffe11825986cf","revision":16,"bytes":19686}
+DONE {"wait_saved":true,"storage":true,"shot":"/tmp/kiosk-save-ack-final-saved.png"}
+DONE {"click":[909,28],"wait":100}
+DONE {"click":[130,252]}
+DURABLE_ACK
+STORAGE 1793095285066 {"exists":true,"checksum":"c9817eb9b6908e5039f7f1c752762b7d7ddf32f5f3ae8fca918be56d932c41c7","revision":16,"bytes":21065}
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+DONE {"wait_saved":true,"storage":true,"goto":"http://127.0.0.1:8867/?build=e8cfa15-immediate-after-ack","wait":30000,"shot":"/tmp/kiosk-save-ack-final-reload-title.png"}
+DONE {"click":[480,332],"wait":2000,"shot":"/tmp/kiosk-save-ack-final-resumed.png"}
+DONE {"close":true}

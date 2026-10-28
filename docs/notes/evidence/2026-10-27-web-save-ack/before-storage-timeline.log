@@ -1,0 +1,24 @@
+CONSOLE error Failed to load resource: the server responded with a status of 404 (File not found)
+CONSOLE log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CONSOLE log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+CONSOLE log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+READY
+STORAGE 1793094223203 {"exists":true,"checksum":"7ee9bf85eed54982a31992a30e0f6b085ec0bf8d4fb2b3e8a74ff6fa13dd6482","revision":16,"bytes":24513}
+DONE {"click":[480,332],"wait":1500,"storage":true,"shot":"/tmp/kiosk-sync-before.png"}
+DONE {"click":[50,28],"wait":100}
+DONE {"click":[130,252],"wait":100,"shot":"/tmp/kiosk-sync-request.png"}
+STORAGE 1793094235940 {"exists":true,"checksum":"7ee9bf85eed54982a31992a30e0f6b085ec0bf8d4fb2b3e8a74ff6fa13dd6482","revision":16,"bytes":24513}
+DONE {"storage":true,"wait":100}
+STORAGE 1793094236221 {"exists":true,"checksum":"7ee9bf85eed54982a31992a30e0f6b085ec0bf8d4fb2b3e8a74ff6fa13dd6482","revision":16,"bytes":24513}
+DONE {"storage":true,"wait":300}
+STORAGE 1793094236645 {"exists":true,"checksum":"77cd977173afcbb3d86cc020c22ce40491148b5dc5e945cf72ee3b072d6c30a9","revision":16,"bytes":24548}
+DONE {"storage":true,"wait":500}
+STORAGE 1793094237399 {"exists":true,"checksum":"77cd977173afcbb3d86cc020c22ce40491148b5dc5e945cf72ee3b072d6c30a9","revision":16,"bytes":24548}
+DONE {"storage":true,"wait":1000}
+STORAGE 1793094238695 {"exists":true,"checksum":"77cd977173afcbb3d86cc020c22ce40491148b5dc5e945cf72ee3b072d6c30a9","revision":16,"bytes":24548}
+DONE {"storage":true,"wait":1000}
+STORAGE 1793094239981 {"exists":true,"checksum":"77cd977173afcbb3d86cc020c22ce40491148b5dc5e945cf72ee3b072d6c30a9","revision":16,"bytes":24548}
+DONE {"storage":true,"wait":3000}
+STORAGE 1793094243069 {"exists":true,"checksum":"77cd977173afcbb3d86cc020c22ce40491148b5dc5e945cf72ee3b072d6c30a9","revision":16,"bytes":24548}
+DONE {"storage":true}
+DONE {"close":true}

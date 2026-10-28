@@ -17,3 +17,15 @@ Cleanup completed:30 duplicate build branch refs removed atomically with expecte
 Five early preview branches were subsequently found to contain ZIP-only unique commits. They were added with original history/provenance at612203028ce317e86cafdd7c9f38951d55fa5219, bringing the archive to35 versions. See INTEGRATION.md.
 
 Final source consolidation completed through PR#9. Only main/artifacts remain; the earlier38-head count is an intermediate snapshot.
+
+## Quiet social preview appended
+
+Immutable artifact commit `fcb340545b29f6a760d4334cef6750662ccdd103` appends one archive to the existing artifacts history:36 total, with the previous35 manifest entries unchanged. [Complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/fcb340545b29f6a760d4334cef6750662ccdd103/quiet-social-706d7d0/kiosk-on-the-nile-quiet-social.zip); 12393457 bytes, SHA256 `b01ae721da310628662a7fe9e6e02ef9e545c4126284c65a62348fca2f05cd12`. Independently downloaded bytes/CRC, unique WASM/PCK, source/revision metadata, all external content files and12 authored stories were checked. Source `706d7d0d8a4dee3ec56625db112cc0488ee7c120`; no new artifact branch or main merge.
+
+## Web save acknowledgment preview
+
+[Complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/631345edf67cb868757a952c13eab2a3c80ea8b9/web-save-ack-e8cfa15/kiosk-on-the-nile-web-save-ack.zip), sourcee8cfa15, immutable artifact commit `631345edf67cb868757a952c13eab2a3c80ea8b9`, 12956565bytes/SHA256 `2a340bb9ae699682b3fba427fbec3ac05559747111bf12febe9d099335f1570e`.37 version folders; previous36 manifest entries and history unchanged. The final artifact records the exact readonly clock17:52.31 observation, replacing an approximate note before release publication; the earlier artifact objects remain reachable in the same history. Independent download passed size/hash/CRC/source-revision/HTML-engine/allcontent/12story checks. No new build branch or main merge.
+
+## First numbered pre-alpha baseline
+
+[v0.1.0-prealpha.2](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip), 11939692 bytes, SHA256 `2daaebb5e5afce3320b9c3914b66c161fca4bda9ff3559bd6e910277a1dddabe`. Canonical ZIP/checksum filenames, annotated source tag, automatic BUILD provenance and curated changelog agree. Source51c5b0d, artifact `c52c952db2468e6203851a2b75544cc2032a1a94`. Full CI and independent download/digest/CRC/content checks completed. Candidate1's original bytes/tag remain as a labeled validation record after its shallow-checkout CI guard failure; candidate2 corrects the workflow.39 archives total; all37 legacy entries remain unchanged. No per-build branch or artifact-history merge into source.

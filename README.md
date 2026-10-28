@@ -16,11 +16,18 @@ reference; its visitor and service behavior does not override that vision.
 
 [All preserved playable versions](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) · [Archive consolidation record](docs/roadmap/ARTIFACTS.md).
 
+## Version and release policy
+
+See [VERSION](VERSION) for the current code version; the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
+
 ## Current Web preview
 
-[HUD icons preview](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/hud-icons-1316423) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/a574a0c27cbf6c719aa00d548dcb1063cd2c6a98/builds/kiosk-on-the-nile-hud-icons.zip).
-The status strip uses bundled needs/day-period icons and drops the legacy tea/liver summary; actual inventory/cooking/orders remain. `content/ui.json` → `hud.icons` controls paths, size and time boundaries. Both offline languages and save4/revision15 remain compatible. Previous local avoidance, spatial memory, chairs/seated orders and Ink are included. Audio behavior is unchanged (the reported silence was withdrawn after sound worked again); fixed-person bottlenecks behind the kiosk remain a known limitation. Expected files: `kiosk-131642326d4d.*`. See [changes, source audit, observations and limits](docs/notes/2026-10-27-hud-icons-and-audio.md). No universal FPS or comprehensive regression guarantee.
-All 11 current authored Ink stories and current UI have shipped translations. Historical heard/signed text, custom wording and already-open archived stories retain their original text. Extract the whole ZIP and serve over local HTTP; do not open file:// or mix exports. See [delivery coverage](docs/notes/2026-10-25-complete-localization.md) and [authoring](docs/LOCALIZATION.md).
+[**v0.1.0-prealpha.2 — first numbered baseline**](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/v0.1.0-prealpha.2) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip) · [SHA256](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip.sha256).
+This technical preview includes the existing quiet-social/Godot/Ink baseline, offline Arabic/English and the acknowledged Web save fix. VERSION, Godot metadata, annotated tag, BUILD.json and package naming identify the same release. [Foundation, review and CI evidence](docs/notes/2026-10-27-versioning-and-prealpha-policy.md).
+
+This batch leaves save schema4/revision16 unchanged. **Future pre-alpha releases may require a new game**; each changelog entry states its actual reset/migration impact. The game is not publicly launched or feature-complete. General passage coordination and the previously recorded group-choice/candidate-config limits remain; see CHANGELOG.md.
+
+Extract the whole ZIP into a fresh folder and serve over local HTTP; do not open file:// or mix exports. [All preserved archives](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) include the old descriptive/hash previews and the retained candidate1 validation record. Source integration remains separate.
 
 ## Open and run
 

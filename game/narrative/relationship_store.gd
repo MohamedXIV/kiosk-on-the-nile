@@ -11,8 +11,10 @@ func _init(social: Dictionary, actor_ids: Array) -> void:
  _actors = actor_ids.duplicate()
 func value(from: StringName, to: StringName, axis: StringName) -> float:
  return float(_values.get(str(from),{}).get(str(to),{}).get(str(axis),_defaults.get(str(axis),0)))
+func can_adjust(from: StringName, to: StringName, axis: StringName, amount: float) -> bool:
+ return str(from) in _actors and str(to) in _actors and _defaults.has(str(axis)) and is_finite(amount)
 func adjust(from: StringName, to: StringName, axis: StringName, amount: float) -> ActionResult:
- if not str(from) in _actors or not str(to) in _actors or not _defaults.has(str(axis)) or not is_finite(amount): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_relationship")
+ if not can_adjust(from,to,axis,amount): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_relationship")
  if not _values.has(str(from)): _values[str(from)] = {}
  if not _values[str(from)].has(str(to)): _values[str(from)][str(to)] = {}
  _values[str(from)][str(to)][str(axis)] = clampf(value(from,to,axis)+amount,float(_bounds[0]),float(_bounds[1]))

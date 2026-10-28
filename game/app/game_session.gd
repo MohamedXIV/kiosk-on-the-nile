@@ -241,6 +241,7 @@ func configure(source: SessionConfig) -> ActionResult:
  conditions.learning=learning
  conditions.recipe_ids=source.section("recipe_workflows").keys()+source.section("learning").families.values()
  effects = NarrativeEffects.new(knowledge,needs,source.section("social").facts)
+ effects.relationships=relationships
  effects.social_life=social_life
  effects.service_provider=_service_effect
  effects.finance_provider=financial_effect
@@ -259,6 +260,15 @@ func configure(source: SessionConfig) -> ActionResult:
   stories[id] = story
  var narrative_result := narrative.configure(self,source.section("encounters"),stories)
  if not narrative_result.ok: return narrative_result
+ visitors.peer_available=func(id,own):
+  var visit: VisitState=visitors.visits.get(str(id))
+  if visit==null or social_life.reserved(str(visit.character_id)) or (personal!=null and personal.holds_visit(StringName(id))):return false
+  for conversation: ConversationSession in narrative.sessions.values():
+   if str(conversation.id)!=str(own) and str(id) in conversation.participants:return false
+  return true
+ visitors.peer_cancel=func(id):narrative.cancel(StringName(id))
+ visitors.peer_manual=func(id):return narrative.sessions.has(id) and narrative.manual(narrative.sessions[id])
+ narrative.chapter_finished.connect(func(id,_reason):visitors.peers.conversation_ended(str(id)))
  personal=PersonalConversations.new()
  personal.configure(self)
  inner=InnerMonologue.new()
@@ -273,7 +283,7 @@ func configure(source: SessionConfig) -> ActionResult:
  life.travelled.connect(func(destination):
   if destination!=&"kiosk":
    personal.leave()
-   narrative.cancel_all())
+   narrative.leave_location())
  contact=SupplierContact.new();contact.configure(self)
  contracts=SupplierContracts.new();contracts.configure(self)
  deliveries=DeliveryService.new();deliveries.configure(self)
@@ -285,7 +295,7 @@ func configure(source: SessionConfig) -> ActionResult:
   residential.clear()
   contact.close()
   personal.leave()
-  narrative.cancel_all())
+  narrative.leave_location())
  life.sleep_started.connect(residential.clear)
  life.sleep_started.connect(contact.close)
  scheduler.configure({})
@@ -332,6 +342,19 @@ func _step_narrative(frame: Dictionary) -> void:
  narrative.tick(float(frame.delta))
  inner.tick(frame)
 func _start_encounter(kind: StringName, participants: PackedStringArray, extra: Dictionary) -> void:
+ if kind==&"peer":
+  var peer_id: String=str(extra.peer_id)
+  if not visitors.peers.pending(peer_id,participants):return
+  var context := extra.duplicate(true)
+  var definition: Dictionary=config.section("encounters")[str(extra.encounter_id)]
+  var variants: int=int(definition.topics[0].variants) if definition.has("topics") and not definition.topics.is_empty() else 1
+  context["line_variant"]=int((peer_id+":variant").sha256_text().substr(0,8).hex_to_int())%variants
+  var result := await narrative.start(StringName(extra.encounter_id),participants,context)
+  if result.ok:
+   var conversation_id: String=str(result.details.session_id)
+   if not visitors.peers.link(peer_id,conversation_id):narrative.cancel(StringName(conversation_id))
+  elif visitors.peers.pending(peer_id,participants):visitors.finish_peer()
+  return
  if kind==&"service_request":
   var result := await narrative.start(&"service_availability",participants,{"manual_read":true,"line_variant":visitors.random_index(3)})
   var conversation: ConversationSession=narrative.sessions.get(result.details.get("session_id","")) if result.ok else null

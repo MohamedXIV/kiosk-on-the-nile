@@ -67,6 +67,7 @@ func _ready() -> void:
  var localized := _locale.configure(_content.bundle())
  if not localized.ok:push_error("Invalid locale catalogs");return
  _text = UiText.new(_content.section("ui"))
+ _save.configure_feedback(_config.section("ui").get("save_feedback",{}))
  _locale.changed.connect(func():UiText.refresh_tree(self))
  Engine.physics_ticks_per_second = roundi(1.0/float(_config.section("time").fixed_step))
  _configure_input()
@@ -83,8 +84,12 @@ func _ready() -> void:
  _transition = LocationTransition.new()
  add_child(_transition)
  _transition.configure(_text.data.transition,_text.make_theme())
+ _save.started.connect(func():
+  if _hud:_hud.show_save_status("saving"))
  _save.completed.connect(func(result):
-  if _hud: _hud.toast.show_message(_save_message(result)))
+  if _hud:
+   _hud.show_save_status("save_unconfirmed" if _save.unconfirmed else "")
+   if result.message_key!=&"web_save_unconfirmed":_hud.toast.show_message(_save_message(result)))
  _title = TitleScreen.new()
  _ui_layer.add_child(_title)
  _title.configure(_text,_save.store.has_save())
@@ -222,6 +227,8 @@ func _install(candidate: GameSession) -> void:
  _hud.notebook_requested.connect(_toggle_notebook)
  _hud.diagnostics_requested.connect(_diagnostics)
  _session.narrative.failed.connect(func(_result):_hud.toast.show_message(_text.text("narrative_failed")))
+ _hud.dialogue.group_advance_requested.connect(func(id):_session.narrative.advance_manual(id))
+ _hud.dialogue.group_leave_requested.connect(func(id):_session.narrative.leave_peer(id))
  _hud.dialogue.choice_selected.connect(_choose)
  _hud.dialogue.advance_requested.connect(func():_session.personal.advance())
  _hud.dialogue.topic_selected.connect(func(key):await _session.personal.select_topic(key))
@@ -335,6 +342,12 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   return
  if _hud.notebook.visible: return
+ var peer_focus := _session.narrative.focused_session()
+ if peer_focus!=null and peer_focus.context_extra.get("peer_participating",false):
+  if event.is_action_pressed("cancel"):
+   _session.narrative.leave_peer(peer_focus.id);get_viewport().set_input_as_handled();return
+  if event.is_action_pressed("ui_accept"):
+   _session.narrative.advance_manual(peer_focus.id);get_viewport().set_input_as_handled();return
  if _session.personal.active():
   if event.is_action_pressed("cancel"):
    _session.personal.leave()
@@ -379,8 +392,7 @@ func _commit_transition(details: Dictionary) -> ActionResult:
  return result
 func _request_save() -> void:
  if _session==null: return
- var result := _save.save_at_boundary(_session)
- if not result.details.get("deferred",false): _hud.toast.show_message(_save_message(result))
+ _save.save_at_boundary(_session)
 func _choose(session_id: StringName, choice_id: StringName) -> void:
  var result := _session.narrative.choose(session_id,choice_id)
  _sound.play_action(result)
@@ -411,8 +423,9 @@ func _diagnostics() -> void:
  _hud.toast.show_message(_text.text("diagnostics_ok") if result.ok else _text.text("diagnostics_failed"))
 
 func _save_message(result: ActionResult) -> String:
+ if result.message_key==&"web_save_unconfirmed":return _text.text("save_unconfirmed")
  if not result.ok: return _text.text("save_failed")
- return _text.text("saved_web") if result.details.get("sync_requested",false) else _text.text("saved")
+ return _text.text("saved")
 
 func _begin_sleep(hours: int) -> void:
  if _busy or _transition.active or not _hud.sleep_panel.visible: return
