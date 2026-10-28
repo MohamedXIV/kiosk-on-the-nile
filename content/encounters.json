@@ -842,5 +842,175 @@
     ],
     "peer": true,
     "autonomous": "river_ambient_end"
+  },
+  "social_exam_open": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "exam_open",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_exam_follow": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "exam_follow",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_exam_ask": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "exam_ask",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_exam_answer": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "exam_answer",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_exam_return": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "exam_return",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_radio_open": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "radio_open",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_radio_follow": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "radio_follow",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_radio_ask": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "radio_ask",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_radio_answer": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "radio_answer",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_radio_return": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "radio_return",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
   }
 }

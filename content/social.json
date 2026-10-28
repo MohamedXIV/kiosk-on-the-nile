@@ -15,7 +15,11 @@
     "WORK_TRIAL_APPOINTMENT",
     "WORK_TRIAL_RESULT",
     "WORK_TRIAL_WEEK",
-    "KNOWN_ABDUL_FAMILY"
+    "KNOWN_ABDUL_FAMILY",
+    "YOUSSEF_EXAM_PLAN",
+    "YOUSSEF_EXAM_PROGRESS",
+    "FARID_RADIO_PLAN",
+    "FARID_RADIO_PROGRESS"
   ],
   "relationship_defaults": {
     "familiarity": 0,

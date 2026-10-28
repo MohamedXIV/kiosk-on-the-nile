@@ -5,6 +5,14 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+- Two quiet multi-day conversations: Youssef's exam preparation and Farid's old radio. Optional questions about an absent friend and explicitly sourced replies have durable, single-delivery receipts in Arabic and English.
+
+### Changed
+- Continuing-story follow-ups require a later calendar day; private progress is learned from its speaker. Message endpoints and dependencies are validated when loading.
+- **Save compatibility:** schema4/revision18 requires a new game for previous pre-alpha saves (including revision17). Unsupported saves are explained and their files remain intact; no migration or historical Ink graph is added.
+
+
 **Save compatibility:** Hospitality changes the format to schema4/revision17. Earlier pre-alpha saves require a new game and are rejected clearly; their files/backups are not silently removed. No historical migration is added. Passage coordination itself remains transient.
 
 ### Added
