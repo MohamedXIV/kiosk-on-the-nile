@@ -6,6 +6,7 @@ var pose := ActorPose.new()
 var phase: StringName=&"arriving"
 var destination := Vector2.ZERO
 var greeted: bool=false
+var depart_requested: bool=false
 var arrived_at: float=-1
 func snapshot() -> Dictionary:
- return {"greeted":greeted,"id":str(id),"character_id":str(character_id),"pose":pose.snapshot(),"phase":str(phase),"destination":[destination.x,destination.y],"arrived_at":arrived_at}
+ return {"greeted":greeted,"depart_requested":depart_requested,"id":str(id),"character_id":str(character_id),"pose":pose.snapshot(),"phase":str(phase),"destination":[destination.x,destination.y],"arrived_at":arrived_at}

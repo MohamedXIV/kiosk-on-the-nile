@@ -144,7 +144,7 @@ func _arrived(visit: VisitState) -> void:
   if visit.character_id==&"amgad":memory.amgad_visits+=1
   else:_other_visit_counts[str(visit.character_id)]=visit_count(visit.character_id)+1
  if visit.shopping_state==&"approaching":
-  if not _present() or (service_busy.is_valid() and service_busy.call()):
+  if not _present() or not _open.is_valid() or not bool(_open.call()) or (service_busy.is_valid() and service_busy.call()):
    visit.shopping_state=&"undecided"
    visit.food_id=&""
    _return_to_leisure(visit)
@@ -181,7 +181,7 @@ func _consider_purchase(visit: VisitState, delta: float) -> void:
  visit.decision_remaining=maxf(0,visit.decision_remaining-delta)
  if visit.decision_remaining>0:return
  visit.decision_remaining=_delay("purchase_retry_delay")
- if not _present() or (service_busy.is_valid() and service_busy.call()):return
+ if not _present() or not _open.is_valid() or not bool(_open.call()) or (service_busy.is_valid() and service_busy.call()):return
  var definition := character(visit.character_id)
  var service_point := _service_point(visit)
  if not _position_available(service_point,visit.id):return

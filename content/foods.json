@@ -1,7 +1,7 @@
 {
   "tea": {
     "label": "كوباية شاي ({sugar})",
-    "price_minor": 500,
+    "price_minor": 1200,
     "nourishment": {
       "hunger": 5,
       "base_mood": 12,
@@ -35,7 +35,7 @@
   },
   "kebda": {
     "label": "سندوتش كبدة إسكندراني",
-    "price_minor": 1200,
+    "price_minor": 2800,
     "nourishment": {
       "hunger": 35,
       "base_mood": 10,

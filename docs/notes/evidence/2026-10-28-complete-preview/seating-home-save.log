@@ -1,0 +1,55 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true {  }
+CONFIG true
+HOME SEATS [{ "id": "home_chair_1:seat", "item_id": "home_chair_1", "location_id": "rooftop", "access": (-1.0, 0.35), "anchor": (-1.0, -0.25), "facing": (0.0, 1.0), "height": 0.45, "table_id": "" }, { "id": "home_chair_2:seat", "item_id": "home_chair_2", "location_id": "rooftop", "access": (1.25, 0.35), "anchor": (1.25, -0.25), "facing": (0.0, 1.0), "height": 0.45, "table_id": "" }]
+PLAYER SIT true
+OCCUPIED STORE REJECT true
+OCCUPIED CLEAN REJECT true
+CROSS OWNER true
+PLAYER SEATED SAVE true
+STAND true
+TOPIC social:meet_farid true
+INK أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة.
+INK القعدة دي نعمة والله.. أهو نتعرف واحدة واحدة.
+KNOWN FRIEND INVITE true
+TOPIC home/invite true
+INK إنت بتعزمني أقعد معاك بكرة بعد الضهر؟ حلوة القعدة معاك، بس نخليها من غير التزامات.
+CHOICE true
+INK براحتك خالص، مش محتاجة وعد.
+POSTPONE NO PROMISE true
+TOPIC home/invite true
+INK إنت بتعزمني أقعد معاك بكرة بعد الضهر؟ حلوة القعدة معاك، بس نخليها من غير التزامات.
+CHOICE true
+INK حلوة القعدة معاك. أعدي بعد الضهر لحد بالليل لو لقينا بعض فاضيين، ومفيش أي استعجال.
+INVITATION RECORDED true { "actor": "farid", "offered_at": 930.0, "not_before": 2220.0, "expires": 2760.0 }
+INVITATION SAVE true
+LIVE KIOSK ACTOR BLOCKS HOME true
+HOME ARRIVAL true
+GUEST CLAIM true
+GUEST SEATED true
+PLAYER AND GUEST DISTINCT SEATS true
+BOTH SEATED SAVE true
+GUEST EXCLUSIVE true
+TOPIC home/visit true
+INK تسلم على القعدة. الواحد مش كل مرة لازم يكون جاي لحساب ولا شغل؛ ساعات كلمة حلوة وكوباية ميه يكفوا.
+TOPIC home/goodbye true
+INK نكتفي بالقعدة الحلوة دي النهارده ونكمل مرة تانية؟
+CHOICE true
+INK ربنا يخليك. أنا أمشي على مهلي، ونشوف بعض على خير.
+GOODBYE RELEASES SEAT true
+LANDLORD ARRIVAL true
+LANDLORD SEATED true
+SEATED CREDITOR PAYMENT CHANNEL true
+LANDLORD SEAT SAVE true
+SEAT BEFORE SLEEP true
+SLEEP STANDS true
+RELEASED SAVE true
+INVALID SEAT REJECT true invalid_seat_use
+EN SIT Sit for a while
+EN HOME Would you like to visit tomorrow?
+FAILURES 0
+WARNING: 195 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

@@ -232,7 +232,7 @@
     },
     "movable": true,
     "placement": {
-      "environment": "exterior",
+      "environment": "either",
       "allowed_locations": []
     },
     "seats": [

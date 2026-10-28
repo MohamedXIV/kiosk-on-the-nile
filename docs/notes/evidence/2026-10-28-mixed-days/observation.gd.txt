@@ -1,0 +1,156 @@
+extends SceneTree
+var s: GameSession
+var config: SessionConfig
+var meals:=0
+var refused:=0
+var revenue:=0
+var supplies:=0
+var rents:=0
+var gifts:=0
+var paid:=0
+var failures:=0
+var empty:=0
+var peak:=0
+var low:=0
+var arrivals:=0
+var previous_next:=1
+var food_counts:={"tea":0,"kebda":0}
+var mode:="full"
+var last_day:=0
+var upgraded:=false
+var initial:=0
+var cleaning_samples:=0
+func _initialize():call_deferred("observe")
+func check(r:ActionResult, action:String)->bool:
+ if not r.ok:
+  failures+=1;print("FAIL ",action," ",r.message_key," ",r.details)
+ return r.ok
+func step(seconds:float=1.0):
+ s.personal.leave();s.narrative.cancel_all();s.tick(seconds)
+ if not s.last_result.ok:check(s.last_result,"tick")
+ peak=maxi(peak,s.presence.at(&"kiosk").size())
+ if s.visitors.visits.is_empty():empty+=1
+ if s.needs.hunger<10:low+=1
+ arrivals+=s.visitors._next-previous_next;previous_next=s.visitors._next
+func wait_trip():
+ while s.travel.journey.data.get("phase") in ["outbound","returning"]:step()
+func purchase(shop:StringName, lines:Array[Dictionary]):
+ if not check(s.travel.depart(shop),"depart "+str(shop)):return
+ wait_trip()
+ var q:=s.shops.quote(shop,lines)
+ if check(q,"quote "+str(shop)):
+  var p:=s.shops.purchase(q.details.quote,StringName("mixed_%d"%s.clock.tick))
+  if check(p,"purchase "+str(shop)):
+   if shop==&"market":supplies+=int(p.details.receipt.total_minor)
+   print("PURCHASE day=",s.clock.day," shop=",shop," amount=",p.details.receipt.total_minor," wallet=",s.wallet.balance)
+ var bag:=StringName(s.travel.journey.data.purchase_container_id)
+ check(s.travel.begin_return(),"return");wait_trip()
+ check(s.inventory.unpack_purchase_bag(bag,&"kiosk"),"unpack")
+func pay_due():
+ if s.accounts.outstanding("district").is_empty():return
+ var amount:=0
+ for bill in s.accounts.outstanding("district"):amount+=int(bill.gross)-int(bill.paid)
+ if s.wallet.balance<amount:return
+ check(s.travel.depart(&"district"),"district");wait_trip()
+ var q:=s.accounts.quote("kiosk_lease","settle",s.clock.world_minutes)
+ if check(q,"district quote"):
+  var p:=s.finance.pay(q.details.quote.id,"district_%d"%s.clock.tick)
+  if check(p,"district pay"):rents+=int(p.details.receipt.net);print("RENT district day=",s.clock.day," amount=",p.details.receipt.net," wallet=",s.wallet.balance)
+ check(s.travel.begin_return(),"district return");wait_trip()
+func housing():
+ if s.accounts.outstanding("abdul_karim").is_empty():return
+ var amount:=0
+ for bill in s.accounts.outstanding("abdul_karim"):amount+=int(bill.gross)-int(bill.paid)
+ if s.wallet.balance<amount:return
+ # Explicit speaker fixture: a present, staying landlord beside the player.
+ var v:=ResidentialRecord.new()
+ v.id=&"mixed_landlord";v.character_id=&"abdul_karim";v.phase=&"staying";v.pose.location_id=&"kiosk";v.pose.ground=s.player_ground
+ var previous=s.residential.current;s.residential.current=v
+ var q:=s.accounts.quote("housing_lease","settle",s.clock.world_minutes)
+ if check(q,"housing quote"):
+  var p:=s.finance.pay(q.details.quote.id,"housing_%d"%s.clock.tick)
+  if check(p,"housing pay"):rents+=int(p.details.receipt.net);print("RENT housing day=",s.clock.day," amount=",p.details.receipt.net," wallet=",s.wallet.balance)
+ s.residential.current=previous
+func serve(v:VisitState):
+ var gift:bool=v.needs_hospitality
+ if not gift and (paid+gifts)%6==5 and s.can_offer_hospitality(v.id):gift=true
+ if not check(s.visitors.accept_request(v.id,gift),"accept"):return
+ var food:=v.food_id
+ s.player_ground=Vector2(-1.5,-0.5) if food==&"tea" else Vector2(0,-0.5)
+ var begin:=s.workflow.start(food,&"kiosk",PackedStringArray([str(food)]))
+ if not check(begin,"cook "+str(food)):return
+ var job:=StringName(begin.details.job_id)
+ if food==&"tea":
+  for i in range(4):step()
+  if not check(s.workflow.act(job,&"add_tea"),"add tea"):return
+  for i in range(3):step()
+  if not check(s.workflow.act(job,&"pour"),"pour"):return
+ else:
+  for i in range(3):step()
+  if not check(s.workflow.act(job,&"flip"),"flip"):return
+  for i in range(2):step()
+  if not check(s.workflow.act(job,&"season"),"season"):return
+  if not check(s.workflow.act(job,&"take"),"take"):return
+ s.player_ground=v.pose.ground
+ var done:=s.complete_service(v.order_id,&"gift" if gift else &"paid")
+ if check(done,"complete"):
+  revenue+=int(done.details.payment);food_counts[str(food)]+=1
+  if gift:gifts+=1
+  else:paid+=1
+func clean_location(location:StringName):
+ s.location_id=location
+ for id in s.hygiene.snapshot().targets:
+  var value:=s.hygiene.state(StringName(id))
+  if value.location_id!=str(location) or float(value.cleanliness)>=95:continue
+  if not str(id).begins_with("floor:"):s.player_ground=s.spaces.ground(StringName(id))
+  if not check(s.hygiene.begin_clean(StringName(id)),"clean "+str(id)):continue
+  while not s.hygiene.active_action().is_empty():step();cleaning_samples+=1
+func report(label:String):
+ var due:=0
+ for b in s.accounts.state.obligations.values():due+=int(b.gross)-int(b.paid)
+ print(label," ",JSON.stringify({"day":s.clock.day,"minute":s.clock.minutes,"wallet":s.wallet.balance,"food_spent":meals*300,"refused":refused,"revenue":revenue,"supplies":supplies,"rent_paid":rents,"debt":due,"paid":paid,"gifts":gifts,"foods":food_counts,"arrivals":arrivals,"empty_samples":empty,"peak_scene_people":peak,"low_hunger_samples":low,"hunger":s.needs.hunger,"rest":s.needs.rest,"mood":s.needs.mood,"failures":failures,"business_allowed":s.accounts.business_allowed(),"cleaning_minutes":cleaning_samples,"reputation":s.customer_experience.reputation(&"kiosk").score,"stock_tea":s.inventory.stock_count(&"kiosk",&"tea_portion"),"stock_kebda":s.inventory.stock_count(&"kiosk",&"kebda_portion")}))
+func observe():
+ var args:=OS.get_cmdline_user_args();mode=args[0] if not args.is_empty() else "full"
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ if not check(store.load_directory("res://content"),"content"):quit(1);return
+ var bundle:=store.bundle().duplicate(true);bundle.visitors.seed=1701
+ # Explicit prices keep this evidence repeatable after the adopted data edit.
+ bundle.foods.tea.price_minor=500;bundle.foods.kebda.price_minor=1200
+ if mode in ["candidate","upgrade","limited"]:
+  bundle.foods.tea.price_minor=1200;bundle.foods.kebda.price_minor=2800
+ config=SessionConfig.new(bundle,store.fingerprint);s=GameSession.new();root.add_child(s)
+ if not check(s.configure(config),"configure"):quit(1);return
+ s.start_new();initial=s.wallet.balance;s.kiosk_open=true
+ s.motion_step=func(_delta):
+  for v in s.visitors.visits.values():v.pose.ground=v.destination
+ # Familiarity only permits deliberate occasional gifts; no money/stock grant.
+ for id in s.visitors._data.characters:s.relationships.adjust(&"player",StringName(id),&"familiarity",30)
+ print("CONDITIONS mode=",mode," seed=1701 initial=",initial," teleport visitor routes/player interactions, cancel dialogue; actual arrivals/purchase choice retained, 1s ticks; familiar fixture=30")
+ while s.clock.world_minutes<21*1440+1200:
+  if s.clock.day!=last_day:
+   report("DAY");last_day=s.clock.day
+   if mode!="unclean":clean_location(&"kiosk")
+  if s.clock.minutes>=1439:
+   s.location_id=&"rooftop";s.player_ground=Vector2(0,0.5)
+   if mode!="unclean":clean_location(&"rooftop")
+   check(s.life.sleep(8),"sleep");s.location_id=&"kiosk";s.kiosk_open=true
+   continue
+  s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+  if s.needs.hunger<=35:
+   if s.life.snack().ok:meals+=1
+   else:refused+=1
+  housing();pay_due()
+  if mode=="upgrade" and s.clock.day>=9 and not upgraded and s.wallet.balance>=8500:
+   purchase(&"homewares",[{"offer_id":"fan","quantity":1}]);upgraded=true
+  if s.clock.minutes>=600 and s.clock.minutes<620 and s.wallet.balance>=2000 and (s.inventory.stock_count(&"kiosk",&"tea_portion")<4 or s.inventory.stock_count(&"kiosk",&"kebda_portion")<4):
+   purchase(&"market",[{"offer_id":"supply_pack","quantity":1}])
+  var open:bool=mode!="limited" or (s.clock.minutes>=960 and s.clock.minutes<1320)
+  s.kiosk_open=open
+  if open:
+   for v in s.visitors.visits.values().duplicate():
+    if v.shopping_state==&"requesting" and s.request_can_prepare(v.food_id):serve(v)
+  step()
+  if s.clock.tick%120==0:await process_frame
+ housing();pay_due();report("FINAL")
+ print("WALLET_ACCOUNTING expected=",initial+revenue-meals*300-supplies-rents-(4500 if upgraded else 0)," actual=",s.wallet.balance)
+ quit(1 if failures>0 else 0)

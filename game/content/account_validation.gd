@@ -30,6 +30,11 @@ static func validate(bundle: Dictionary) -> ActionResult:
  if not visits is Dictionary or not visits.get("profiles") is Dictionary or not visits.profiles.has("abdul_karim") or not ContentValidation.vector(visits.get("window"),2) or visits.window[0]<0 or visits.window[0]>=visits.window[1] or visits.window[1]>1440 or not ContentValidation.vector(visits.get("arrival_delay_minutes"),2) or visits.arrival_delay_minutes[0]<=0 or visits.arrival_delay_minutes[0]>visits.arrival_delay_minutes[1] or not ContentValidation.vector(visits.get("entrance"),2) or not ContentValidation.vector(visits.get("standing"),2):return fail()
  for key in ["stay_minutes","return_minutes","speed","pre_due_minutes","greet_delay_minutes"]:
   if not ContentValidation.bounded(visits.get(key),0.1,10080):return fail()
+ if not visits.get("social_guests") is Array or visits.social_guests.size()>2 or not ContentValidation.vector(visits.get("guest_window"),2) or visits.guest_window[0]<0 or visits.guest_window[0]>=visits.guest_window[1] or visits.guest_window[1]>1440:return fail()
+ var known_guests: Array=[]
+ for actor in visits.social_guests:
+  if not actor in ["farid","youssef"] or not actor in bundle.visitors.characters or actor in known_guests:return fail()
+  known_guests.append(actor)
  for profile in visits.profiles.values():
   if not profile is Dictionary or not profile.get("name") is String or not profile.get("color") is String or not Color.html_is_valid(profile.color):return fail()
  return ActionResult.success()

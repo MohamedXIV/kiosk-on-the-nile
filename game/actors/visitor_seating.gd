@@ -4,6 +4,7 @@ signal released(visit_id: StringName)
 ## Visit-owned exclusive reservations. Neither paths nor furniture own orders.
 var catalog: SeatCatalog
 var item_busy: Callable
+var external_owner: Callable
 var _data: Dictionary={}
 var _characters: Dictionary={}
 var _records: Dictionary={}
@@ -49,7 +50,7 @@ func step(delta: float, visits: Dictionary, meetings: VisitorMeetings, busy: Cal
   var perf := RuntimePerformance.begin()
   for index in range(mini(candidates.size(),int(_data.max_candidates))):
    var slot: Dictionary=candidates[index]
-   if visit.pose.ground.distance_to(slot.access)>float(_data.search_radius) or owner(str(slot.id))!=&"":continue
+   if visit.pose.ground.distance_to(slot.access)>float(_data.search_radius) or owner(str(slot.id))!=&"" or (external_owner.is_valid() and external_owner.call(str(slot.id))!=&""):continue
    if _being_cleaned(slot):continue
    if not available.call(slot.access,visit.id) or not sight.call(visit.pose.ground,slot.access) or not reachable.call(visit.pose.ground,slot.access):continue
    record.seat=str(slot.id);record.seated=false

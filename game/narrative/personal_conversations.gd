@@ -65,7 +65,7 @@ func leave() -> void:
  if active() and not _hub.session_id.is_empty():
   var conversation: ConversationSession=_session.narrative.sessions.get(_hub.session_id)
   if conversation!=null:
-   if not conversation.encounter_id in [&"service_availability",&"orders"]:_paused[_hub.actor_id]=conversation.snapshot()
+   if not conversation.encounter_id in [&"service_availability",&"orders"] and not str(conversation.encounter_id).begins_with("home"):_paused[_hub.actor_id]=conversation.snapshot()
    _session.narrative.cancel(conversation.id)
  _hub={}
 func tick() -> void:
@@ -100,7 +100,7 @@ func restore(data: Dictionary) -> ActionResult:
   if visit==null or str(visit.character_id)!=data.hub.actor_id:return _fail()
  for actor in data.paused:
   var record: Variant=data.paused[actor]
-  if not _session.presence.profiles().has(actor) or not record is Dictionary or not record.get("runtime") is Dictionary or not record.get("context_extra") is Dictionary or not record.get("id") is String or not record.get("encounter_id") is String or not record.get("participants") is Array or record.participants.size()!=1 or record.encounter_id in ["service_availability","orders"]:return _fail()
+  if not _session.presence.profiles().has(actor) or not record is Dictionary or not record.get("runtime") is Dictionary or not record.get("context_extra") is Dictionary or not record.get("id") is String or not record.get("encounter_id") is String or not record.get("participants") is Array or record.participants.size()!=1 or record.encounter_id in ["service_availability","orders"] or str(record.encounter_id).begins_with("home"):return _fail()
   if record.context_extra.get("character_id",actor)!=actor:return _fail()
   if not record.runtime.get("frame") is Dictionary or record.runtime.frame.get("speaker_id","") not in ["",actor]:return _fail()
  _hub=data.hub.duplicate(true)

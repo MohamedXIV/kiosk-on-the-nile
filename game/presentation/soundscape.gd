@@ -27,7 +27,15 @@ func present(location: StringName, cooking: CookingService, home: HomeService, i
  var active_grill := false
  var active_tea := false
  for station_id in cooking.station_ids():
+  # The workflow is inspected below with its actual location and heat switch.
+  # Its legacy-facing display job is not an independent audible appliance.
+  if not cooking.legacy_busy(StringName(station_id)):continue
+  if spaces!=null:
+   var placement := spaces.placement(StringName(station_id))
+   if placement.is_empty() or placement.location_id!=str(location):continue
+  elif location!=&"kiosk":continue
   var job := cooking.job(StringName(station_id))
+  if job==null:continue
   if job.recipe.rules_id==&"kebda" and job.stage!=&"EMPTY": active_grill=true
   if job.recipe.rules_id==&"tea" and job.stage in [&"HEATING",&"BREWING"]: active_tea=true
  var active_oven := false
@@ -35,7 +43,8 @@ func present(location: StringName, cooking: CookingService, home: HomeService, i
   for job in workflow.snapshot().jobs.values():
    if job.status!="active" or job.location_id!=str(location):continue
    var step: Dictionary=job.definition.steps[int(job.step_index)]
-   if step.kind in ["heat","batch_heat"] and job.get("heat_on",true):
+   if step.kind in ["heat","batch_heat","brew"] and job.get("heat_on",true):
+    if step.capability=="heat_water":active_tea=true
     if step.capability in ["fry","griddle","roast_rotisserie"]:active_grill=true
     if step.capability=="bake":active_oven=true
  for id in _players:

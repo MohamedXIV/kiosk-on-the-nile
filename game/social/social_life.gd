@@ -85,6 +85,7 @@ func _moment(state: Dictionary, store: RelationshipStore, key: String, actor: St
 func reserved(actor: String) -> bool:
  return actor in _data.trial.actors and _state.activity.phase in ["scheduled","waiting","active"] and _session.clock.world_minutes>=float(_state.activity.not_before)-float(_data.trial.reservation_lead_minutes)
 func _participants_absent() -> bool:
+ if _session.residential.current!=null and str(_session.residential.current.character_id) in _data.trial.actors:return false
  for visit in _session.visitors.visits.values():
   if str(visit.character_id) in _data.trial.actors:return false
  return true

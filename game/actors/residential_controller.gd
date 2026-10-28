@@ -26,18 +26,24 @@ func step(delta: float) -> void:
   if avoidance!=null:avoidance.tune_motor(_motor,record.id)
   _motor.collision_mask=1;_motor.teleport(&"rooftop",record.pose.ground)
   var visual := CharacterView.new();visual.name="Visual";visual.configure(spatial.character);_motor.add_child(visual)
- var paused := record.phase==&"staying" and (session.narrative.speech_active(record.id) or session.personal.holds_visit(record.id))
+ var sitting := session.seat_use.guest_seated(record.id)
+ var paused := sitting or record.phase==&"staying" and (session.narrative.speech_active(record.id) or session.personal.holds_visit(record.id))
  var destination: Vector2=record.destination
  var coordinated := false
  var route := PackedVector2Array()
  if avoidance!=null:
-  avoidance.sync(record.id,record.pose.ground,paused or record.pose.ground.distance_to(record.destination)<=_arrival_radius,_speed,false,record.destination,paused)
+  avoidance.sync(record.id,record.pose.ground,paused or record.pose.ground.distance_to(record.destination)<=_arrival_radius,_speed,false,record.destination,paused or sitting)
   avoidance.prepare_passages(delta)
   destination=avoidance.movement_target(record.id,destination)
   route=avoidance.movement_path(record.id)
   paused=paused or avoidance.passage_waiting(record.id)
   coordinated=avoidance.passage_active(record.id)
  _navigation.step(_motor,destination,delta,paused,route)
- if _navigation.take_failure() and not coordinated and _navigation.claim_fallback() and session.residential.navigation_alternative(room.navigation):RuntimePerformance.observe("npc_route_fallback",0)
+ if _navigation.take_failure() and not coordinated:
+  if not session.seat_use.guest_slot().is_empty():session.seat_use.abandon_guest()
+  if _navigation.claim_fallback() and session.residential.navigation_alternative(room.navigation):RuntimePerformance.observe("npc_route_fallback",0)
  record.pose=_motor.pose
  _motor.get_node("Visual").present(record.pose,Color(session.presence.profile(record.character_id).color),false)
+ var slot := session.seat_use.guest_slot()
+ if sitting:record.pose.facing=slot.facing
+ _motor.get_node("Visual").present_seat(sitting,(room.mapping.to_canvas(slot.anchor,float(slot.height))-room.mapping.to_canvas(record.pose.ground)+Vector2(0,14)) if sitting else Vector2.ZERO,float(slot.height)*room.mapping.height_scale if sitting else 0.0)

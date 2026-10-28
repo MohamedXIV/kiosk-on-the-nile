@@ -138,6 +138,8 @@ func _advance_frame() -> NarrativeTypes.Frame:
       _frame.effects.append({"kind":"finance","action_id":fields[1]})
      elif fields.size()==2 and fields[0]=="service":
       _frame.effects.append({"kind":"service","action_id":fields[1]})
+     elif fields.size()==2 and fields[0]=="home":
+      _frame.effects.append({"kind":"home","action_id":fields[1]})
      elif fields.size()==2 and fields[0]=="social":
       _frame.effects.append({"kind":"social","action_id":fields[1]})
      elif fields.size() == 3 and fields[0] == "learn":

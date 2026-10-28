@@ -12,17 +12,25 @@ func configure(data: Dictionary, projection: SpatialMapping, font_path: String) 
 func _draw() -> void:
  if _mapping == null: return
  if _config.kind == "kiosk":
-  ground_rect(_config.pavement,Color(_config.pavement_color))
-  for x in range(-16,17): draw_line(_mapping.to_canvas(Vector2(x,-3.3)),_mapping.to_canvas(Vector2(x,4.5)),Color(0,0,0,0.22),1)
-  for y in range(-3,5): draw_line(_mapping.to_canvas(Vector2(-16,y)),_mapping.to_canvas(Vector2(16,y)),Color(0,0,0,0.22),1)
-  for tile in _config.get("building_tiles",[_config.boards]):ground_rect(tile,Color(_config.boards_color))
+  paving(_config.pavement,Color(_config.pavement_color))
+  for tile in _config.get("building_tiles",[_config.boards]):
+   ground_rect(tile,Color(_config.boards_color))
+   timber(tile)
  else:
-  ground_rect(_config.surroundings,Color(_config.surroundings_color))
-  for tile in _config.get("building_tiles",[_config.room]):ground_rect(tile,Color(_config.room_color))
+  paving(_config.surroundings,Color(_config.surroundings_color))
+  for tile in _config.get("building_tiles",[_config.room]):
+   ground_rect(tile,Color(_config.room_color))
+   var a := _mapping.to_canvas(Vector2(tile[0],tile[1]))
+   var b := _mapping.to_canvas(Vector2(tile[2],tile[3]))
+   draw_rect(Rect2(a,b-a),Color(0.15,0.12,0.09,0.2),false,1)
   ground_rect(_config.rug,Color(_config.rug_color))
   var start := _mapping.to_canvas(Vector2(_config.rug[0],_config.rug[1]))+Vector2(6,6)
   var end := _mapping.to_canvas(Vector2(_config.rug[2],_config.rug[3]))-Vector2(6,6)
-  draw_rect(Rect2(start,end-start),Color("d4a359"),false,2)
+  draw_rect(Rect2(start,end-start),Color("b38852"),false,2)
+  draw_rect(Rect2(start+Vector2(6,6),end-start-Vector2(12,12)),Color("b38852"),false,1)
+  for x in range(int(start.x)+4,int(end.x),9):
+   draw_line(Vector2(x,start.y-5),Vector2(x,start.y-9),Color("a99477"),1)
+   draw_line(Vector2(x,end.y+5),Vector2(x,end.y+9),Color("a99477"),1)
   var door := _mapping.to_canvas(Vector2(_config.door[0],_config.door[1]))
   var caption := TextLine.new()
   caption.direction=TextServer.DIRECTION_RTL if LocaleService.current==null or LocaleService.current.rtl() else TextServer.DIRECTION_LTR
@@ -30,6 +38,24 @@ func _draw() -> void:
   var size := caption.get_size()
   draw_rect(Rect2(door-Vector2(size.x/2+8,16),Vector2(size.x+16,25)),Color("8c6239"))
   caption.draw(get_canvas_item(),door-Vector2(size.x/2,12),Color("f3ece1"))
+# All marks are flat surface wear; no new route, obstacle or object is implied.
+func paving(box: Array, color: Color) -> void:
+ ground_rect(box,color)
+ for y in range(ceili(float(box[1])),floori(float(box[3]))):
+  for x in range(ceili(float(box[0])),floori(float(box[2]))):
+   var a := _mapping.to_canvas(Vector2(x,y))+Vector2(1,1)
+   var size := Vector2(_mapping.x_scale-2,_mapping.depth_scale-2)
+   var wear := (sin(x*12.73+y*37.11)+1)*0.5
+   draw_rect(Rect2(a,size),color.lightened(0.025+wear*0.035))
+   draw_line(a+Vector2(2,size.y-2),a+size-Vector2(2,2),Color(0.72,0.65,0.54,0.09),1)
+   if wear>0.72:
+    draw_line(a+Vector2(7,11),a+Vector2(17,10),Color(0.72,0.65,0.54,0.12),1)
+func timber(box: Array) -> void:
+ var a := _mapping.to_canvas(Vector2(box[0],box[1]))
+ var b := _mapping.to_canvas(Vector2(box[2],box[3]))
+ for y in range(int(a.y)+8,int(b.y),9):
+  draw_line(Vector2(a.x,y),Vector2(b.x,y),Color(0.12,0.08,0.05,0.28),1)
+  draw_line(Vector2(a.x+3,y+2),Vector2(b.x-3,y+2),Color(0.72,0.52,0.32,0.1),1)
 func ground_rect(box: Array, color: Color) -> void:
  var start := _mapping.to_canvas(Vector2(box[0],box[1]))
  var end := _mapping.to_canvas(Vector2(box[2],box[3]))

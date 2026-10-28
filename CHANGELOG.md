@@ -5,32 +5,31 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Changed
-- New games begin with240EGP in finite savings (previously45EGP), giving early quiet days room for food and the first weekly rents without requiring sales. Existing saved wallets are not topped up. The initial notebook note explains ongoing costs in Arabic and English; prices, rents, needs, visit timing and cooking windows remain unchanged.
-- **Save compatibility:** this pacing increment keeps schema4/revision18 and its current state shape. Existing revision18 wallets/notes/progress remain intact; earlier incompatible pre-alpha saves still require a new game as documented below.
+Current development target: **0.2.0-prealpha.1**, a combined playtest preview. An optimized development package is not a new formal tagged release.
 
-### Development
-- Recorded a quiet early-2000s Egyptian Nile art/audio direction before new production assets; this does not claim replacement artwork, final sound mix or sustained balance acceptance.
-
-
-### Added
-- Two quiet multi-day conversations: Youssef's exam preparation and Farid's old radio. Optional questions about an absent friend and explicitly sourced replies have durable, single-delivery receipts in Arabic and English.
-
-### Changed
-- Continuing-story follow-ups require a later calendar day; private progress is learned from its speaker. Message endpoints and dependencies are validated when loading.
-- **Save compatibility:** schema4/revision18 requires a new game for previous pre-alpha saves (including revision17). Unsupported saves are explained and their files remain intact; no migration or historical Ink graph is added.
-
-
-**Save compatibility:** Hospitality changes the format to schema4/revision17. Earlier pre-alpha saves require a new game and are rejected clearly; their files/backups are not silently removed. No historical migration is added. Passage coordination itself remains transient.
+**Save compatibility:** schema4/revision19 requires a new game for earlier pre-alpha saves, including revisions16–18. Unsupported saves show the localized requirement; their primary/backup files are retained. No historical migration or archived Ink graph is added. Current revision19 restores active seats, invitations and visits.
 
 ### Added
 
-- Deliberate paid service or hospitality, separate handover/settlement ownership and one-time financial receipts. A promised gift cannot become a paid sale.
-- An authored money-short request for Youssef on a repeat visit, three natural acceptance phrasings, humane refusal without eviction, and actual gift/refusal memory follow-up in offline Arabic/English.
-- A service-choice sheet before handover; its active recipient waits while the player decides.
+- Deliberate paid service or hospitality, separate handover/settlement receipts, three natural gift-acceptance phrasings and humane refusal; actual outcomes can be remembered later. The recipient waits while the player decides.
+- Two new multi-day conversations about Youssef's studying and Farid's old radio, with optional sourced questions/replies and once-only delivery receipts.
+- Explicit player sit/stand in both venues using the actual furniture-derived seats. Occupied chairs/tables cannot be moved, stored or cleaned; movement/Esc/travel/sleep releases the player seat.
+- Optional next-day home invitations to known Farid/Youssef, postponement/cancellation and a grounded home conversation/goodbye. The existing one-person household visit owner and furniture seats also serve the landlord. Actors cannot be physically present at home and in the workshop/kiosk simultaneously.
+- Two ordinary starter home chairs, transferable through existing furniture rules, and a bundled Arabic playtest guide. CI retains one complete versioned development package with guide/licenses/source metadata.
+- Bounded narrow-passage priority/retreat coordination; speaking/seated people and player keep control of position. Impossible refuges wait/reconsider safely; domain visit goals remain owned by their systems.
 
-- NPCs coordinate a stable right of way and a bounded nearby retreat when a narrow passage stays blocked. Speaking/seated people and the player keep control of their position; traffic does not replace visit goals or consume domain fallback while coordinated.
-- Optional validated spatial JSON settings bound retreat search, route length, wait duration and retry work. If no refuge is safe, people wait and periodically reconsider rather than forcing a passage.
+### Changed
+
+- New-game finite savings240EGP (previously45); paid base prices tea12EGP/kebda28EGP. Three-week bounded mixed service/food/ingredients/rent/upkeep observations support quieter low-volume play with gifts. Rents, needs, tips, attendance and cooking windows stay unchanged; no indefinite solvency guarantee.
+- Closed kiosk signs prevent new shopping approaches/requests while independent visits continue. Already accepted orders can still be served deliberately.
+- Warmer worn paving/timber, corrugated roofs, clearer ordinary furniture/lights/signs and restrained river/far-bank/boat rendering. Existing original audio/mix remain; appliance sounds now follow actual local jobs/heat state.
+- Home presence participates in workshop scheduling. A scheduled trial waits until its participants really leave, including an ongoing home conversation.
+
+### Fixed
+
+- Duplicate financial input does not consume another item, repeat income or reward; promised gifts cannot be changed to paid sales. Receipt item/recipient/provenance links are validated.
+- Blocked seat access is rejected. A home guest relinquishes failed/obstructed seat routes and keeps a safe standing fallback instead of endlessly overwriting navigation recovery.
+- Earlier-save rejection is displayed on the title screen, including the preserved-file/new-game explanation.
 
 ## [0.1.0-prealpha.2] - 2026-10-27
 

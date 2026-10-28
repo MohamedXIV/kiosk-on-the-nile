@@ -45,5 +45,13 @@
       4.5,
       4.4
     ]
+  ],
+  "social_guests": [
+    "farid",
+    "youssef"
+  ],
+  "guest_window": [
+    780,
+    1320
   ]
 }

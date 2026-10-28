@@ -56,20 +56,23 @@ func configure(session: GameSession, parent: Node2D) -> ActionResult:
  parent.add_child(residential)
  residential.session=session;residential.room=rooms.rooftop
  residential.avoidance=_avoidance.rooftop
+ session.seat_use.reachable=func(from: Vector2,to: Vector2):return rooms.rooftop.navigation.reachable(from,to,0.12)
  session.spaces.set_adapter(_refresh)
  return ActionResult.success()
 func step(delta: float) -> void:
  for local: NpcAvoidanceWorld in _avoidance.values():local.begin_step(delta)
  var direction := Vector2.ZERO
  if input_provider.is_valid(): direction = input_provider.call()
+ if not direction.is_zero_approx():_session.seat_use.stand()
  if _session.locations.is_physical(_session.location_id):motor.step_input(direction,delta)
  for location in _avoidance:
   var local: NpcAvoidanceWorld=_avoidance[location]
-  if location==str(_session.location_id):local.sync(&"player",_session.player_ground,false,_player_speed,true)
+  if location==str(_session.location_id):local.sync(&"player",_session.player_ground,_session.seat_use.player_seated(),_player_speed,true)
   else:local.remove_actor(&"player")
  visitors.step(delta)
  residential.step(delta)
 func set_active_location(id: StringName) -> void:
+ _session.seat_use.stand()
  if not _session.locations.is_physical(id):return
  var room: LocationView = rooms[str(id)]
  if motor.get_parent()!=room: motor.reparent(room,false)

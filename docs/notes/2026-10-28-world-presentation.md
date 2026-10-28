@@ -1,0 +1,25 @@
+# World presentation for the combined playtest
+
+This increment applies the direction in `docs/art/WORLD_DIRECTION.md` to the existing procedural scene. The user's combined-preview instruction authorizes implementation before visual/audio acceptance; these are reviewable materials, not an assertion of final art approval.
+
+The river has slow, faint grey-blue strokes, a narrow muted distant bank, and a worn sail/hull with a restrained wake. The corniche retains broad empty paving, with deterministic low-contrast slab variations and occasional scuffs. Existing timber floors have fine board lines; the rooftop rug has a woven border and fringe. Existing roofs have corrugations and edge trim, clipped to the actual building cells, including irregular edited buildings. Existing counters/walls/boxes have modest edge wear and panel seams; stools have splayed legs and a brace, tables have a worn rim, lamps have a simple shade and base, and the existing translated open/closed sign has a worn frame and hanging wire. No recording, downloaded artwork or new physical decorative object was introduced. All marks are reproducible source drawing commands.
+
+These changes leave placements, ownership, navmeshes, colliders, service windows, openings, seat anchors/access points, held-food surfaces, drawing layer ownership and routing with their existing owners. Surface marks never supply a route through a wall. Table tops respect their configured size; stools keep their existing seat silhouette/anchor. The roof still disappears according to the existing building/player rule. No crowd, animated window traffic, smartphone, branding, borrowed song or implied story-owned radio was added.
+
+## Source audio
+
+The existing PCM, gains, fades, cues, browser mute/autoplay behavior and radio placement/enabled gate remain. `tools/generate_audio.py` documents original procedural audio; the earlier living-spaces B record documents the existing original synthesized radio. Nothing new was licensed or downloaded, and the withdrawn silence report was not reopened.
+
+A narrow source correction prevents the legacy-facing display of a workflow job from becoming a second audio authority. Legacy cooking sounds require a genuinely busy legacy station in this location. Current workflow sounds use the actual active job location, step capability and heat switch; heat-water/brew steps drive the existing kettle layer. This also allows heat being switched off to silence the appropriate workflow appliance without a stale display job keeping it audible. The atmosphere JSON remains the mix authority.
+
+## Actual observations
+
+`evidence/2026-10-28-world-presentation/import.log`: pinned `bash tools/godot.sh --headless --editor --import --path . --quit` completed with Godot4.7.2 and no script/parse errors. The initial import found an inferred Variant in table drawing; it was corrected before the recorded clean import. Import is a compilation/import check, not gameplay acceptance. No automated suites were added or run.
+
+`component.log` and the PNGs: a bounded native component scene configured the real content, GameSession and LocationView and rendered normal-scale1280×720 views using the compatibility renderer and Mesa llvmpipe on a dummy X server. Kiosk and rooftop are shown at930,1140 and1320 minutes (afternoon/dusk/night), in Arabic and English. One player was positioned explicitly in each component scene; NPCs were not spawned. This is a presentation observation, not actual movement/interaction acceptance or a complete0/1/3-person scene-sheet gate. The screenshots omit gameplay HUD/dialogue. Earlier single-locale exploratory PNGs were replaced by the named bilingual set. The component source is retained as `scene-sheet.gd.txt`; copy it outside the project to run with `--script`, with a working X11 display. It does not modify shipped content.
+
+`source-audio.log`: a real workflow start through `RecipeWorkflow.start` returned success. Idle kiosk targets were river0.12 and all equipment0; idle rooftop river0.02 and all equipment0. Active local tea drove kettle0.1; viewing the rooftop left kettle0. Mute set all target layers to0. Original stream durations loaded successfully. This used the Dummy audio driver, and proves source selection/resource loading, not audible quality or browser/device output. Its bounded observation source is `source-audio.gd.txt`.
+
+Both component observations report46 ObjectDB instances and21 resources still in use during shutdown, matching earlier native fixture records. This is disclosed rather than treated as a clean teardown or investigated as unrelated work. The first audio launch coincided with registration of the concurrent SeatUse class; after a fresh editor import, the final recorded rerun loaded the session and succeeded.
+
+Final human visual/audio judgement, real-input browser sound, speakers/headphones and combined gameplay remain part of the requested integrated preview. No new save format or configuration edits are needed for this presentation change.
