@@ -227,6 +227,17 @@
         "label": "نكمل كلامنا"
       },
       {
+        "id": "hospitality_memory",
+        "scope": "once",
+        "modes": [
+          0
+        ],
+        "variants": 1,
+        "requires": {},
+        "requires_hospitality_memory": true,
+        "label": "فاكر قعدتنا يومها؟"
+      },
+      {
         "id": "memory",
         "scope": "once",
         "modes": [

@@ -193,6 +193,11 @@ func configure(source: SessionConfig) -> ActionResult:
  life = LifeActions.new(self)
  service = ServiceSystem.new()
  service.policy=actions
+ service.gift_allowed=can_offer_hospitality
+ service.receipt_recipes=source.section("recipe_workflows")
+ service.recipient_for=func(id):
+  var visit: VisitState=visitors.visits.get(str(id))
+  return visit.character_id if visit!=null else &""
  service.personal_item=func(id):return items.get_item(id).get("attributes",{}).get("personal_use",false)
  visitors = VisitorService.new()
  visitors.seat_catalog=SeatCatalog.new()
@@ -210,12 +215,13 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.service_presence=func():return location_id==&"kiosk"
  visitors.service_busy=func():return personal!=null and personal.active() or narrative!=null and narrative.focused_session()!=null
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
- visitors.purchase_blocked=func(id):return (narrative!=null and narrative.speech_active(StringName(id))) or (personal!=null and personal.holds_visit(StringName(id)))
+ visitors.purchase_blocked=func(id):return service.decision_visit()==StringName(id) or (narrative!=null and narrative.speech_active(StringName(id))) or (personal!=null and personal.holds_visit(StringName(id)))
  visitors.meeting_available=func(id):return social_life!=null and social_life.can_invite(id)
  visitors.departed.connect(_close_experience)
- service.settled.connect(visitors.record_service)
- service.settled.connect(func(order_id,visit_id,_item,_payment):_sync_experience(visit_id,order_id))
- service.settled.connect(func(_order,_visit,item,_payment):
+ service.handed_over.connect(func(order_id,visit_id,item):visitors.record_service(order_id,visit_id,item,0))
+ service.settled.connect(visitors.record_settlement)
+ service.handed_over.connect(func(order_id,visit_id,_item):_sync_experience(visit_id,order_id))
+ service.handed_over.connect(func(_order,_visit,item):
   if item.quality_score>=2: needs.apply_delta(0,0,float(config.section("needs").good_service_mood)))
  life.sleep_started.connect(hygiene.interrupt_clean)
  life.sleep_started.connect(visitors.clear_visits)
@@ -466,14 +472,27 @@ func _step_experiences(_frame: Dictionary) -> ActionResult:
 func request_can_prepare(food_id: StringName) -> bool:
  return str(food_id) in workflow.available_foods(&"kiosk")
 func _service_effect(action: String, participants: PackedStringArray) -> ActionResult:
- if action=="accept" and not accounts.business_allowed():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
+ if action in ["accept","accept_gift"] and not accounts.business_allowed():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  if participants.size()!=1 or not visitors.is_available(StringName(participants[0])):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var visit: VisitState=visitors.visits[participants[0]]
  if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("spatial").hearing_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  if action=="decline":return visitors.decline_request(visit.id)
  if not request_can_prepare(visit.food_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_ingredients")
- return visitors.accept_request(visit.id)
+ return visitors.accept_request(visit.id,action=="accept_gift")
 
+func can_offer_hospitality(visit_id: StringName) -> bool:
+ var visit: VisitState=visitors.visits.get(str(visit_id))
+ if visit==null:return false
+ return visit.needs_hospitality or relationships.value(&"player",visit.character_id,&"familiarity")>=float(config.section("social").conversation_familiarity_threshold)
+func complete_service(order_id: StringName, mode: StringName, expected_item: StringName=&"") -> ActionResult:
+ var order := service.order(order_id)
+ if order==null or not visitors.is_available(order.visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
+ var visit: VisitState=visitors.visits[str(order.visit_id)]
+ if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("visitors").interaction_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ if order.status==&"pending" and expected_item!=&"":
+  var item := cooking.held_item()
+  if item==null or item.id!=expected_item:return ActionResult.failure(ActionResult.Code.WRONG_ORDER,&"wrong_order")
+ return service.complete(order_id,mode)
 func _apply_tuning() -> void:
  clock.set_speed(tuning.value("clock_speed"))
  needs.apply_tuning(tuning)

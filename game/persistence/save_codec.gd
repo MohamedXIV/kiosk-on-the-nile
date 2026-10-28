@@ -1,7 +1,7 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 16
+const SCHEMA_REVISION := 17
 const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
@@ -27,6 +27,8 @@ func validate(data: Dictionary, _config: SessionConfig) -> ActionResult:
  if not data.state.get("kiosk_open") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_kiosk_state")
  return ActionResult.success()
 func create_candidate(data: Dictionary, config: SessionConfig, destination: Node = null) -> ActionResult:
+ if not valid_digest(data):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"corrupt_save")
+ if data.get("schema_version")!=SCHEMA_VERSION or data.get("schema_revision")!=SCHEMA_REVISION:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"hospitality_save_requires_new_game",{"required_revision":SCHEMA_REVISION})
  var legacy := ActionResult.success({"data":data}) if data.get("schema_version")==SCHEMA_VERSION else SaveMigrations.upgrade(data)
  if not legacy.ok:return legacy
  var migration := LivingSpacesMigration.upgrade(legacy.details.data,config,SCHEMA_REVISION)
@@ -71,12 +73,17 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    if order==null or order.visit_id!=visit.id:
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_order")
- for memories in candidate.visitors.history.snapshot().services.values():
-  for memory in memories:
+ var services: Dictionary=candidate.visitors.history.snapshot().services
+ for actor in services:
+  for memory in services[actor]:
    var order := candidate.service.order(StringName(memory.order_id))
-   if order==null or order.status!=&"delivered" or str(order.visit_id)!=memory.visit_id or str(order.food_id)!=memory.food_id:
+   if order==null or order.status!=&"delivered" or str(order.character_id)!=actor or str(order.visit_id)!=memory.visit_id or str(order.food_id)!=memory.food_id or order.served_quality!=memory.quality or str(order.settlement)!=memory.settlement or order.payment!=memory.payment:
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_service_memory")
+ result=HospitalitySaveLinks.validate(candidate)
+ if not result.ok:
+  candidate.queue_free()
+  return result
  result = LivingSpacesSaveValidation.validate(candidate,restored_data)
  if not result.ok:
   candidate.queue_free()

@@ -133,6 +133,7 @@ static func validate(bundle: Dictionary) -> ActionResult:
      for mode in topic.modes:
       if not ContentValidation.integer(mode) or not ContentValidation.bounded(mode,0,4): return ContentValidation.fail("encounters.topics.mode")
      if topic.has("minimum_visits") and (not ContentValidation.integer(topic.minimum_visits) or topic.minimum_visits<0): return ContentValidation.fail("encounters.topics.minimum_visits")
+     if topic.has("requires_hospitality_memory") and not topic.requires_hospitality_memory is bool:return ContentValidation.fail("encounters.topics.hospitality_memory")
      if topic.has("requires_previous_service") and not topic.requires_previous_service is bool: return ContentValidation.fail("encounters.topics.service_memory")
      if topic.has("characters"):
       if not topic.characters is Array or topic.characters.is_empty(): return ContentValidation.fail("encounters.topics.characters")

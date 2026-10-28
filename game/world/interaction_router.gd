@@ -35,8 +35,10 @@ func nearest() -> InteractionTarget:
    var display_name := NotebookView.name(str(visit.character_id),str(character.name))
    var item := _session.cooking.held_item()
    var order := _session.service.pending_for(visit.id)
-   if not (item and order and order.food_id==item.food_id) and order==null and not _session.narrative.can_talk(visit.id) and not _session.personal.can_open(visit.id): continue
+   var unsettled := _session.service.unsettled_for(visit.id)
+   if not (item and order and order.food_id==item.food_id) and order==null and unsettled==null and not _session.narrative.can_talk(visit.id) and not _session.personal.can_open(visit.id): continue
    target.primary = _text.text("serve",{"item":ItemText.instance(_session,_session.items.get_item(StringName(item.id))),"name":display_name}) if item and order and order.food_id==item.food_id else _text.text("talk",{"name":display_name})
+   if unsettled!=null:target.primary=_text.text("payment_recover",{"name":display_name})
    targets.append(target)
  for point in _session.contact.points():
   if point.location_id!=str(_session.location_id):continue
@@ -70,7 +72,9 @@ func execute(secondary: bool) -> ActionResult:
   if secondary: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_secondary")
   var item := _session.cooking.held_item()
   var order := _session.service.pending_for(target.visit_id)
-  if item and order and item.food_id==order.food_id: return _session.service.deliver(order.id)
+  if item and order and item.food_id==order.food_id:return ActionResult.success({"show_payment":str(order.id)})
+  var unsettled := _session.service.unsettled_for(target.visit_id)
+  if unsettled!=null:return ActionResult.success({"show_payment":str(unsettled.id)})
   return await _session.person_interaction(target.visit_id)
  var record: Dictionary = {}
  for data in _room.definition.data.interactions:

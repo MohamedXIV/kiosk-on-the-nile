@@ -21,7 +21,7 @@ func valid(effect: Dictionary) -> bool:
   "peer_relation":return scope=="world" and relationships!=null and effect.get("from") is String and effect.get("to") is String and effect.from!="player" and effect.to!="player" and effect.from!=effect.to and effect.get("axis") is String and ContentValidation.bounded(effect.get("amount"),-10,10) and relationships.can_adjust(StringName(effect.from),StringName(effect.to),StringName(effect.axis),float(effect.amount))
   "supply":return supply_provider.is_valid() and effect.get("action_id") in ["manage","emergency"]
   "finance":return finance_provider.is_valid() and effect.get("action_id") in ["pay_housing","pay_partial","repay_loan","personal","repair","accept_offer","decline_offer","offer_day_1","offer_day_3","offer_day_7","offer_loan_0","offer_loan_1","offer_loan_2"]
-  "service":return service_provider.is_valid() and effect.get("action_id") in ["accept","decline"]
+  "service":return service_provider.is_valid() and effect.get("action_id") in ["accept","accept_gift","decline"]
   "social":return social_life!=null and effect.get("action_id") is String and social_life.action_known(effect.action_id)
   "mood": return ContentValidation.bounded(effect.get("amount"),-100,100)
   "learn": return effect.get("fact_id") in _facts and effect.get("note") is String
