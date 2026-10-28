@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+frame=180 a=(-0.174209, -0.145524) b=(0.292671, 0.149593) a_nav={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0, "yield_seconds": 0.0 } b_nav={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0, "yield_seconds": 0.0 } coordination={ "active": 0, "holding": 2, "searches": 0, "acquisitions": 0 }
+frame=360 a=(-0.174209, -0.145524) b=(0.292671, 0.149593) a_nav={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0, "yield_seconds": 0.0 } b_nav={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0, "yield_seconds": 0.0 } coordination={ "active": 0, "holding": 2, "searches": 0, "acquisitions": 0 }
+frame=540 a=(-0.174209, -0.145524) b=(0.292671, 0.149593) a_nav={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0, "yield_seconds": 0.0 } b_nav={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 1, "stall_seconds": 0.0, "yield_seconds": 0.0 } coordination={ "active": 0, "holding": 2, "searches": 0, "acquisitions": 0 }
+OBSERVATION mode=no_refuge minimum_gap=0.55233180522919 maximum_step=0.04333337768912 path_calls=2 coordination={ "active": 0, "holding": 2, "searches": 0, "acquisitions": 0 }

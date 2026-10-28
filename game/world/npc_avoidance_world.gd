@@ -6,11 +6,13 @@ var _navigation: KioskNavigation
 var _map := RID()
 var _actors: Dictionary={}
 var _passing := LocalPassingPolicy.new()
+var _passages := PassageCoordinator.new()
 var _delta: float=0.0166666667
 var _updates: int=0
 func configure(navigation: KioskNavigation, settings: Dictionary) -> void:
  _clear()
  _navigation=navigation;_settings=settings.duplicate(true);_passing.configure(settings)
+ _passages.configure(settings.get("passages",{}),float(settings.get("radius",0.24))*2.0+float(settings.get("passing_margin",0.12)),float(settings.get("radius",0.24))*2.0)
  if not enabled():return
  _map=NavigationServer2D.map_create()
  NavigationServer2D.map_set_active(_map,true)
@@ -19,7 +21,7 @@ func enabled() -> bool:
 func begin_step(delta: float) -> void:
  _delta=maxf(delta,0.000001)
  for actor: Dictionary in _actors.values():actor.age=float(actor.age)+delta
-func sync(id: StringName, point: Vector2, stationary: bool, speed: float, external: bool=false, goal: Vector2=Vector2(INF,INF)) -> void:
+func sync(id: StringName, point: Vector2, stationary: bool, speed: float, external: bool=false, goal: Vector2=Vector2(INF,INF), protected: bool=true) -> void:
  if not enabled():return
  var key := str(id)
  if not _actors.has(key):
@@ -38,10 +40,11 @@ func sync(id: StringName, point: Vector2, stationary: bool, speed: float, extern
  if point.distance_to(actor.position)>speed*_delta*4.0+float(_settings.radius)*2.0:
   motion=Vector2.ZERO;actor.age=INF;actor.safe=Vector2.ZERO;actor.sample_input=Vector2.ZERO
   _passing.forget(id)
+  _passages.forget(id)
   NavigationServer2D.agent_set_velocity_forced(actor.rid,Vector2.ZERO)
  if stationary and not actor.stationary:NavigationServer2D.agent_set_velocity_forced(actor.rid,Vector2.ZERO)
  actor.position=point;actor.actual=Vector2.ZERO if stationary else motion.limit_length(speed);actor.stationary=stationary;actor.speed=speed
- actor.goal=goal
+ actor.goal=goal;actor.motion_goal=goal;actor.protected=protected or external
  NavigationServer2D.agent_set_position(actor.rid,point)
  NavigationServer2D.agent_set_max_speed(actor.rid,0.0 if stationary and not external else speed)
  NavigationServer2D.agent_set_avoidance_priority(actor.rid,1.0 if stationary or external else 0.5)
@@ -49,6 +52,26 @@ func sync(id: StringName, point: Vector2, stationary: bool, speed: float, extern
   actor.desired=actor.actual if external else Vector2.ZERO
   NavigationServer2D.agent_set_velocity(actor.rid,actor.desired)
   if external:NavigationServer2D.agent_set_velocity_forced(actor.rid,actor.actual)
+func prepare_passages(delta: float) -> void:
+ if not enabled():return
+ _passages.step(_actors,_navigation,delta)
+ for id in _actors:
+  var actor: Dictionary=_actors[id]
+  var identity := StringName(id)
+  actor.motion_goal=_passages.target(identity,actor.goal)
+  if not _passages.active(identity):continue
+  _passing.forget(identity)
+  if _passages.retreating(identity):actor.stationary=false
+  if _passages.waiting(identity):actor.stationary=true
+  NavigationServer2D.agent_set_max_speed(actor.rid,0.0 if actor.stationary and not actor.external else float(actor.speed))
+func movement_target(id: StringName, original: Vector2) -> Vector2:
+ return _passages.target(id,original)
+func movement_path(id: StringName) -> PackedVector2Array:
+ return _passages.route(id)
+func passage_waiting(id: StringName) -> bool:
+ return _passages.waiting(id)
+func passage_active(id: StringName) -> bool:
+ return _passages.active(id)
 func tune_motor(motor: ActorMotor, id: StringName) -> void:
  if not enabled():return
  motor.motion_filter=steer.bind(id)
@@ -72,7 +95,7 @@ func _steer(desired: Vector2, delta: float, id: StringName) -> Vector2:
   NavigationServer2D.agent_set_velocity(actor.rid,Vector2.ZERO)
   return Vector2.ZERO
  var peer := _passing.conflict(id,desired,_actors,_navigation)
- var preferred := desired if peer==&"" else _passing.preferred(id,desired,peer,_actors,_navigation)
+ var preferred := desired if peer==&"" or _passages.active(id) else _passing.preferred(id,desired,peer,_actors,_navigation)
  actor.desired=preferred
  NavigationServer2D.agent_set_velocity(actor.rid,preferred)
  # No nearby predicted conflict needs no solver delay or static-path distortion.
@@ -96,10 +119,12 @@ func remove_actor(id: StringName) -> void:
  NavigationServer2D.free_rid(actor.rid)
  _actors.erase(key)
  _passing.forget(id)
+ _passages.forget(id)
 func status() -> Dictionary:
- return {"enabled":enabled(),"agents":_actors.size(),"map_valid":_map.is_valid(),"samples":_updates}
+ return {"enabled":enabled(),"agents":_actors.size(),"map_valid":_map.is_valid(),"samples":_updates,"passages":_passages.status()}
 func _clear() -> void:
  for id in _actors.keys():remove_actor(StringName(id))
+ _passages.clear()
  if _map.is_valid():NavigationServer2D.free_rid(_map);_map=RID()
 func _exit_tree() -> void:
  _clear()

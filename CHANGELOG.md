@@ -5,6 +5,13 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+**Save compatibility:** No format change (schema4/revision16); passage coordination reconstructs from current physical state.
+
+### Added
+
+- NPCs coordinate a stable right of way and a bounded nearby retreat when a narrow passage stays blocked. Speaking/seated people and the player keep control of their position; traffic does not replace visit goals or consume domain fallback while coordinated.
+- Optional validated spatial JSON settings bound retreat search, route length, wait duration and retry work. If no refuge is safe, people wait and periodically reconsider rather than forcing a passage.
+
 ## [0.1.0-prealpha.2] - 2026-10-27
 
 First published numbered pre-alpha baseline, including the complete candidate1 feature/policy baseline below.

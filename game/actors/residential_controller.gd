@@ -27,8 +27,17 @@ func step(delta: float) -> void:
   _motor.collision_mask=1;_motor.teleport(&"rooftop",record.pose.ground)
   var visual := CharacterView.new();visual.name="Visual";visual.configure(spatial.character);_motor.add_child(visual)
  var paused := record.phase==&"staying" and (session.narrative.speech_active(record.id) or session.personal.holds_visit(record.id))
- if avoidance!=null:avoidance.sync(record.id,record.pose.ground,paused or record.pose.ground.distance_to(record.destination)<=_arrival_radius,_speed,false,record.destination)
- _navigation.step(_motor,record.destination,delta,paused)
- if _navigation.take_failure() and _navigation.claim_fallback() and session.residential.navigation_alternative(room.navigation):RuntimePerformance.observe("npc_route_fallback",0)
+ var destination: Vector2=record.destination
+ var coordinated := false
+ var route := PackedVector2Array()
+ if avoidance!=null:
+  avoidance.sync(record.id,record.pose.ground,paused or record.pose.ground.distance_to(record.destination)<=_arrival_radius,_speed,false,record.destination,paused)
+  avoidance.prepare_passages(delta)
+  destination=avoidance.movement_target(record.id,destination)
+  route=avoidance.movement_path(record.id)
+  paused=paused or avoidance.passage_waiting(record.id)
+  coordinated=avoidance.passage_active(record.id)
+ _navigation.step(_motor,destination,delta,paused,route)
+ if _navigation.take_failure() and not coordinated and _navigation.claim_fallback() and session.residential.navigation_alternative(room.navigation):RuntimePerformance.observe("npc_route_fallback",0)
  record.pose=_motor.pose
  _motor.get_node("Visual").present(record.pose,Color(session.presence.profile(record.character_id).color),false)

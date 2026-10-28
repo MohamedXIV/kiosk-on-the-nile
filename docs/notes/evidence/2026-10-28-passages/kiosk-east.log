@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT valid=true details={  }
+MISMATCH rejected=true details={ "path": "spatial.avoidance.passages.bounds" }
+SESSION configured=true
+WORLD frame=180 first=(4.584896, -2.773678) second=(5.313786, -2.272207) traffic={ "active": 0, "holding": 0, "searches": 4, "acquisitions": 1 }
+WORLD frame=360 first=(5.967546, -2.749923) second=(3.52721, -2.75944) traffic={ "active": 0, "holding": 0, "searches": 4, "acquisitions": 1 }
+WORLD frame=540 first=(5.967546, -2.749923) second=(3.52721, -2.75944) traffic={ "active": 0, "holding": 0, "searches": 4, "acquisitions": 1 }
+WORLD frame=720 first=(5.967546, -2.749923) second=(3.52721, -2.75944) traffic={ "active": 0, "holding": 0, "searches": 4, "acquisitions": 1 }
+WORLD frame=900 first=(5.967546, -2.749923) second=(3.52721, -2.75944) traffic={ "active": 0, "holding": 0, "searches": 4, "acquisitions": 1 }
+WORLD domain_goals=(6.0, -2.85)/(3.5, -2.85) final_gap=2.44035410881042
+WARNING: 46 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 21 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

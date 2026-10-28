@@ -68,6 +68,19 @@
     "conflict_lookahead": 1.2,
     "path_skip_distance": 0.75,
     "max_wait_seconds": 6,
-    "passing_margin": 0.12
+    "passing_margin": 0.12,
+    "passages": {
+      "enabled": true,
+      "delay_seconds": 0.9,
+      "max_seconds": 8.0,
+      "retry_seconds": 3.0,
+      "detect_distance": 1.8,
+      "retreat_distance": 2.5,
+      "pocket_margin": 0.15,
+      "arrival_radius": 0.12,
+      "progress_ratio": 0.15,
+      "candidate_limit": 10,
+      "route_distance": 3.5
+    }
   }
 }
