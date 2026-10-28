@@ -1082,6 +1082,7 @@
     "ui.payment_unsettled": "The {food} has already been served. Only payment remains to be settled.",
     "ui.payment_unsettled_promised": "The {food} was served as promised. Confirm it as a treat with no payment.",
     "ui.payment_paid_settle": "Take payment: EGP {amount}",
-    "ui.payment_gift_settle": "Record as a treat — no payment"
+    "ui.payment_gift_settle": "Record as a treat — no payment",
+    "manual_topic.visitors/hospitality_memory": "Remember our time here that day?"
   }
 }

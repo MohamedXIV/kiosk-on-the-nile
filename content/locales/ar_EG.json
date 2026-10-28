@@ -1082,6 +1082,7 @@
     "ui.payment_unsettled": "الطلب {food} اتقدّم بالفعل. باقي بس تسوية الحساب.",
     "ui.payment_unsettled_promised": "الطلب {food} اتقدّم ضيافة زي ما وعدته. أكّد تسجيل الضيافة من غير حساب.",
     "ui.payment_paid_settle": "حصّل الحساب: {amount} ج.م",
-    "ui.payment_gift_settle": "سجّل الطلب ضيافة — من غير حساب"
+    "ui.payment_gift_settle": "سجّل الطلب ضيافة — من غير حساب",
+    "manual_topic.visitors/hospitality_memory": "فاكر قعدتنا يومها؟"
   }
 }
