@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `4bcdfcbf4f95c1a369e2d91ac2f6bb2d0698da50`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `4131a1997fbee743d692cad0c8374daaf20fdc52`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -28,7 +28,7 @@ Evidence: see dated delivery notes under `docs/notes/`. Delivered does not imply
 
 Integration cleanup first. Then quiet social encounters with bounded passage coordination; hospitality/payment; continuing stories/messages; combined multi-day pacing and presentation work. Player/residential seating remains a proposal until designed. No gameplay implementation starts as part of this documentation task.
 
-Current action: continuing stories/messages #5 on an isolated branch. Hospitality/payment #4 integrated through PR#14 as `4bcdfcb`; exact-head readiness/proposed merge tree matched checked source and post-merge build40643790857 passed. No branch deletion or formal release. User explicitly leaves home guests aside. Next after this bounded #5 delivery: combined multi-day pacing/world identity #6.
+Current action: first bounded #6 pacing/world-direction milestone on an isolated branch. PR#15 integrated two continuing-story arcs/messages as4131a19; exact-head readiness/proposed merge tree matched the checked source and post-merge build40646350266 passed. Issues#4/#5 are closed for their bounded implementations. Home guests remain excluded. #6 retains longer-term economic and human visual/audio acceptance work.
 
 
 ## Integration completed
@@ -80,3 +80,7 @@ Tracked draft Release build/339 stable localization references and bounded paid/
 ## Continuing stories implementation — 2026-10-28
 
 PR#14 integrated hospitality/payment as4bcdfcb with successful main build40643790857. The next isolated #5 batch adds two multi-day exam/radio arcs and optional absent-friend question/reply delivery with strict provenance and once-only receipts. Native Arabic/English observations cover postponement, day/absence gates, pending/completed restore, repeats and malformed-state rejection. See [delivery record](../notes/2026-10-28-continuing-stories.md). Save revision18 requires a new game for earlier pre-alpha saves; old files remain. Source/preview acceptance remains pending; #6 next, home guests excluded.
+
+## Quiet-days milestone — 2026-10-28
+
+New games receive240EGP finite savings rather than45EGP, addressing the first-week no-sales shortfall without changing rents, needs, arrivals, preparation or existing saved wallets. Controlled native day1→first-rent observations with sleep/food leave162EGP before120 rent (42 arithmetic headroom), with empty intervals, independent closed/away visits and no orders. This excludes actual walking/UI rent payment and does not claim sustained balance. Existing revision18 saves remain; actual1234-minor restored wallets received no grant. [Delivery/evidence](../notes/2026-10-28-quiet-days.md) and [art/audio direction](../art/WORLD_DIRECTION.md) document the bounded scope. No new production assets or home guests; #6 stays open.

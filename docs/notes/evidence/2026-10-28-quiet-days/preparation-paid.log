@@ -1,0 +1,25 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true {  }
+SESSION true {  }
+REQUEST needs_hospitality=false state=requesting receipt={  }
+INK start=true { "session_id": "conversation_1" }
+INK line=لما تكون فاضي، ممكن الشاي على مهلك؟ choices=[{ "id": "conversation_1:1:0", "index": 0, "text": "طبعًا، أعمله لك.", "loc_id": "story.service_availability.007" }, { "id": "conversation_1:1:1", "index": 1, "text": "كنت بروّق دماغي شوية، معلش نخليها بعدين.", "loc_id": "story.service_availability.009" }]
+INK selected=0 ok=true { "cue": "chime" }
+AFTER CHOICE state=pending phase=staying order=order_1 receipt={  }
+COOK start=true { "job_id": "cook_1", "cue": "chime" }
+COOK add=true
+COOK pour=true { "completed": true, "item": <RefCounted#-9223371682922625004>, "score": 3, "mood_penalty": 0, "cue": "chime" }
+CANCEL CHOICE wallet={ "balance": 24000 } held_same=true order_pending=true decision_released=true
+COMPLETE ok=true result={ "payment": 800, "settlement": "paid", "visit_id": "visit_1", "cue": "coin" } wallet_before={ "balance": 24000 } wallet_after={ "balance": 24800 }
+REPEAT ok=true details={ "duplicate": true } conflicting_ok=false wallet={ "balance": 24800 } held=<null>
+ORDER { "character_id": "youssef", "gift_promised": false, "settlement": "paid", "payment": 800, "served_item": { "id": "food_17", "recipe_id": "tea", "food_id": "tea", "sugar_id": "regular", "quality_score": 3, "quality_key": "excellent" }, "id": "order_1", "visit_id": "visit_1", "food_id": "tea", "status": "delivered", "delivered_item_id": "food_17", "base_price": 500, "tips": [0.0, 0.0, 100.0, 300.0], "created_at": 930.0, "served_at": 930.0, "closed_at": 930.0, "served_quality": 3, "timing_known": true } HISTORY { "visits": { "youssef": { "day": 1, "count": 1, "world_minutes": 930.0 } }, "services": { "youssef": [{ "order_id": "order_1", "visit_id": "visit_1", "food_id": "tea", "quality": 3, "settlement": "paid", "payment": 800 }] }, "hospitality": {  } }
+SAVED REDUCED WALLET true balance=1234
+CURRENT_RESTORE true 
+RESTORED_WALLET_NO_GRANT 1234
+NOTE_AR معايا تحويشة أبدأ بيها على مهلي وأتعرف على الناس، بس مش دخل ثابت. لازم أحسب للأكل وإيجار السكن لعم عبد الكريم وإيجار الكشك للحي كل أسبوع؛ المواعيد في دفتر المستحقات.
+NOTE_EN I have some savings to begin slowly and get to know people, but they are not a regular income. I need to allow for food, weekly home rent to Uncle Abdel Karim and kiosk rent to the district. Dates are in the accounts pages.
+WARNING: 75 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

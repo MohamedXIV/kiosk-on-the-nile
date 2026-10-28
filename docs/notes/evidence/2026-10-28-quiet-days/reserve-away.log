@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true
+CONFIG true mode=away money=24000
+DAY 2 minute=479.0 wallet=23700 hunger=39.1 rest=100.0 mood=96.0 meals=1 arrivals=8 empty=194
+DAY 3 minute=479.0 wallet=22800 hunger=17.1 rest=100.0 mood=100.0 meals=4 arrivals=18 empty=767
+DAY 4 minute=479.0 wallet=21600 hunger=27.1 rest=100.0 mood=100.0 meals=8 arrivals=28 empty=1351
+DAY 5 minute=479.0 wallet=20400 hunger=37.1 rest=100.0 mood=100.0 meals=12 arrivals=38 empty=1923
+DAY 6 minute=479.0 wallet=19500 hunger=15.1 rest=100.0 mood=100.0 meals=15 arrivals=46 empty=2582
+DAY 7 minute=479.0 wallet=18300 hunger=25.1 rest=100.0 mood=100.0 meals=19 arrivals=55 empty=3183
+DAY 8 minute=479.0 wallet=17100 hunger=35.1 rest=100.0 mood=100.0 meals=23 arrivals=64 empty=3807
+DAY 8 minute=1200.0 wallet=16200 hunger=59.0 rest=51.93 mood=100.0 meals=26 arrivals=72 empty=4245
+FIRST_DUE { "opening": 24000, "wallet_before_rent": 16200, "food_spent": 7800, "due": 12000, "headroom_after_due": 4200, "meals": 26, "refused_meal_attempts": 0, "hunger_below10_minutes": 0, "empty_minutes": 4245, "peak": 3, "arrivals": 72, "service_orders": 0, "system_failures": 0, "business_allowed": true }
+CURRENT_RESTORE true 
+WARNING: 75 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
