@@ -313,6 +313,202 @@
       "moment": "",
       "familiarity": 0,
       "trust": 0
+    },
+    "exam_open": {
+      "actor": "youssef",
+      "needs": [
+        "meet_youssef"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "YOUSSEF_EXAM_PLAN",
+      "note": "عندي امتحان قريب، وبقسم المذاكرة حتت صغيرة بدل ما أفضل قلقان من الكل. القعدة هنا بتريح دماغي وبعدين أرجع للكتب.",
+      "moment": "exam_open",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [
+        "meet_youssef"
+      ],
+      "absent_actor": ""
+    },
+    "exam_follow": {
+      "actor": "youssef",
+      "needs": [
+        "exam_open"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "YOUSSEF_EXAM_PROGRESS",
+      "note": "فاكر لما قلت لك هقسم المذاكرة؟ خلصت الجزء اللي كنت مأجله، وراجعت مع زميل. لسه الامتحان قدامي، بس بقيت أهدى؛ مش لازم أخلص الدنيا في ليلة.",
+      "moment": "exam_follow",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [
+        "exam_open"
+      ],
+      "absent_actor": ""
+    },
+    "exam_ask": {
+      "actor": "farid",
+      "needs": [
+        "meet_farid"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "exam_ask",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [],
+      "absent_actor": "youssef",
+      "message": {
+        "kind": "request",
+        "from": "farid",
+        "to": "youssef",
+        "previous": ""
+      }
+    },
+    "exam_answer": {
+      "actor": "youssef",
+      "needs": [
+        "exam_ask",
+        "exam_follow"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "exam_answer",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [],
+      "absent_actor": "",
+      "message": {
+        "kind": "reply",
+        "from": "youssef",
+        "to": "farid",
+        "previous": "exam_ask"
+      }
+    },
+    "exam_return": {
+      "actor": "farid",
+      "needs": [
+        "exam_answer"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "exam_return",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [],
+      "absent_actor": "",
+      "message": {
+        "kind": "delivered",
+        "from": "youssef",
+        "to": "farid",
+        "previous": "exam_answer"
+      }
+    },
+    "radio_open": {
+      "actor": "farid",
+      "needs": [
+        "meet_farid"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "FARID_RADIO_PLAN",
+      "note": "عندي راديو قديم من أيام أبويا، بحاول أظبط صوته على مهلي. مش شغل ورشة ولا طلب لحد؛ حاجة بحب أقعد لها لما أروق.",
+      "moment": "radio_open",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [
+        "meet_farid"
+      ],
+      "absent_actor": ""
+    },
+    "radio_follow": {
+      "actor": "farid",
+      "needs": [
+        "radio_open"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "FARID_RADIO_PROGRESS",
+      "note": "الراديو اللي حكيت لك عنه؟ نضفت الوصلات واشتغل صوته تاني. لسه فيه وش خفيف، بس سمعت عليه أغنية قديمة وقعدت مبسوط. مش كل حاجة لازم ترجع جديدة.",
+      "moment": "radio_follow",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [
+        "radio_open"
+      ],
+      "absent_actor": ""
+    },
+    "radio_ask": {
+      "actor": "youssef",
+      "needs": [
+        "meet_youssef"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "radio_ask",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [],
+      "absent_actor": "farid",
+      "message": {
+        "kind": "request",
+        "from": "youssef",
+        "to": "farid",
+        "previous": ""
+      }
+    },
+    "radio_answer": {
+      "actor": "farid",
+      "needs": [
+        "radio_ask",
+        "radio_follow"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "radio_answer",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [],
+      "absent_actor": "",
+      "message": {
+        "kind": "reply",
+        "from": "farid",
+        "to": "youssef",
+        "previous": "radio_ask"
+      }
+    },
+    "radio_return": {
+      "actor": "youssef",
+      "needs": [
+        "radio_answer"
+      ],
+      "facts": [],
+      "phases": [],
+      "learn": "",
+      "note": "",
+      "moment": "radio_return",
+      "familiarity": 2,
+      "trust": 1,
+      "next_day_after": [],
+      "absent_actor": "",
+      "message": {
+        "kind": "delivered",
+        "from": "farid",
+        "to": "youssef",
+        "previous": "radio_answer"
+      }
     }
   },
   "topics": {
@@ -465,6 +661,86 @@
       "label": "لسه بتظبطوا الميعاد؟",
       "action": "",
       "encounter": "social_pending_youssef",
+      "automatic": false,
+      "phases": []
+    },
+    "exam_open": {
+      "actor": "youssef",
+      "label": "المذاكرة ماشية إزاي؟",
+      "action": "exam_open",
+      "encounter": "social_exam_open",
+      "automatic": true,
+      "phases": []
+    },
+    "exam_follow": {
+      "actor": "youssef",
+      "label": "عملت إيه مع خطة المذاكرة؟",
+      "action": "exam_follow",
+      "encounter": "social_exam_follow",
+      "automatic": true,
+      "phases": []
+    },
+    "exam_ask": {
+      "actor": "farid",
+      "label": "فريد بيسأل عن يوسف",
+      "action": "exam_ask",
+      "encounter": "social_exam_ask",
+      "automatic": false,
+      "phases": []
+    },
+    "exam_answer": {
+      "actor": "youssef",
+      "label": "فريد بيسأل عليك؛ تحب أقوله إيه؟",
+      "action": "exam_answer",
+      "encounter": "social_exam_answer",
+      "automatic": false,
+      "phases": []
+    },
+    "exam_return": {
+      "actor": "farid",
+      "label": "يوسف قال إنه كويس وبيذاكر بهدوء",
+      "action": "exam_return",
+      "encounter": "social_exam_return",
+      "automatic": false,
+      "phases": []
+    },
+    "radio_open": {
+      "actor": "farid",
+      "label": "بتقضي وقتك في إيه بعيد عن الشغل؟",
+      "action": "radio_open",
+      "encounter": "social_radio_open",
+      "automatic": true,
+      "phases": []
+    },
+    "radio_follow": {
+      "actor": "farid",
+      "label": "الصوت في الراديو اتظبط؟",
+      "action": "radio_follow",
+      "encounter": "social_radio_follow",
+      "automatic": true,
+      "phases": []
+    },
+    "radio_ask": {
+      "actor": "youssef",
+      "label": "يوسف بيسأل عن فريد",
+      "action": "radio_ask",
+      "encounter": "social_radio_ask",
+      "automatic": false,
+      "phases": []
+    },
+    "radio_answer": {
+      "actor": "farid",
+      "label": "يوسف بيسأل عليك؛ تحب أوصل له إيه؟",
+      "action": "radio_answer",
+      "encounter": "social_radio_answer",
+      "automatic": false,
+      "phases": []
+    },
+    "radio_return": {
+      "actor": "youssef",
+      "label": "فريد بخير والراديو اشتغل تاني",
+      "action": "radio_return",
+      "encounter": "social_radio_return",
       "automatic": false,
       "phases": []
     }

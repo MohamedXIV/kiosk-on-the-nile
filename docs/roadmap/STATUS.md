@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `00a1d95d0f324eb05d5e8d7caf6be6114f9f198d`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `4bcdfcbf4f95c1a369e2d91ac2f6bb2d0698da50`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -28,7 +28,8 @@ Evidence: see dated delivery notes under `docs/notes/`. Delivered does not imply
 
 Integration cleanup first. Then quiet social encounters with bounded passage coordination; hospitality/payment; continuing stories/messages; combined multi-day pacing and presentation work. Player/residential seating remains a proposal until designed. No gameplay implementation starts as part of this documentation task.
 
-Current action: review the isolated hospitality/payment#4 implementation after the approved PR#13 integration. Handover and settlement now have separate domain operations, with deliberate paid/gift choice and actual outcome receipts; source integration remains pending. The three delivered source batches were integrated through PR#12 with a merge commit and successful post-merge build. See [integration record](../notes/2026-10-27-source-integration.md). PR#13 then integrated bounded passage coordination; historical save-compatibility gates in older plans are superseded by AGENTS.md/docs/RELEASING.md.
+Current action: continuing stories/messages #5 on an isolated branch. Hospitality/payment #4 integrated through PR#14 as `4bcdfcb`; exact-head readiness/proposed merge tree matched checked source and post-merge build40643790857 passed. No branch deletion or formal release. User explicitly leaves home guests aside. Next after this bounded #5 delivery: combined multi-day pacing/world identity #6.
+
 
 ## Integration completed
 
@@ -75,3 +76,7 @@ Next: #4, hospitality and payment choice. Initial code inspection confirms Servi
 Issue#4 implemented on feat/hospitality-payment-choice: separate one-time handover/settlement, atomic production completion after player choice, gift promise binding, repeat-visit Youssef money-short request/three acceptance phrasings/humane refusal, actual service/refusal memory and a bilingual choice sheet. Explicit current-save receipt ownership/metadata/link validation is included. Schema4/revision17 intentionally requires a new game for earlier pre-alpha saves; unsupported files are retained. No migration/archived Ink graph was added.
 
 Tracked draft Release build/339 stable localization references and bounded paid/gift/refusal/current-save/native/Web-component observations passed; independent material findings were addressed. See [delivery note](../notes/2026-10-28-hospitality-payment.md) for evidence and limits. Exact committed-source build/PR CI are tracked with the source PR. #4 stays open for source/preview acceptance; #5 continuing stories/messages remains next.
+
+## Continuing stories implementation — 2026-10-28
+
+PR#14 integrated hospitality/payment as4bcdfcb with successful main build40643790857. The next isolated #5 batch adds two multi-day exam/radio arcs and optional absent-friend question/reply delivery with strict provenance and once-only receipts. Native Arabic/English observations cover postponement, day/absence gates, pending/completed restore, repeats and malformed-state rejection. See [delivery record](../notes/2026-10-28-continuing-stories.md). Save revision18 requires a new game for earlier pre-alpha saves; old files remain. Source/preview acceptance remains pending; #6 next, home guests excluded.

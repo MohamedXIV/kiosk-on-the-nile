@@ -1,0 +1,71 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true
+CONFIGURED true
+START meet_farid [true, &""]
+INK meet_farid أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة.
+INK meet_farid القعدة دي نعمة والله.. أهو نتعرف واحدة واحدة.
+DONE meet_farid true
+START meet_youssef [true, &""]
+INK meet_youssef يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة.
+INK meet_youssef حلو إن فيه مكان ينفع تسكت فيه من غير ما حد يسألك مالك.
+DONE meet_youssef true
+SAME DAY OPENS [false, false]
+START exam_open [true, &""]
+INK exam_open عندي امتحان قريب، وبقسم المذاكرة حتت صغيرة بدل ما أفضل قلقان من الكل. القعدة هنا بتريح دماغي وبعدين أرجع للكتب.
+DONE exam_open true
+START radio_open [true, &""]
+INK radio_open عندي راديو قديم من أيام أبويا، بحاول أظبط صوته على مهلي. مش شغل ورشة ولا طلب لحد؛ حاجة بحب أقعد لها لما أروق.
+DONE radio_open true
+SAME DAY FOLLOW [false, false]
+PRESENT SUBJECT QUESTION false
+ABSENT SUBJECT QUESTION true
+START exam_ask [true, &""]
+INK exam_ask مش شايف يوسف في القعدة النهارده. لو قابلته، تسأله عامل إيه؟ طمني عليه بس، مش عايز أزن عليه.
+INK exam_ask ولا يهمك، نتقابل على خير.
+DONE exam_ask false
+POSTPONE HAS RECEIPT false
+START exam_ask [true, &""]
+INK exam_ask مش شايف يوسف في القعدة النهارده. لو قابلته، تسأله عامل إيه؟ طمني عليه بس، مش عايز أزن عليه.
+INK exam_ask تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة.
+DONE exam_ask true
+EARLY ANSWER false
+START radio_ask [true, &""]
+INK radio_ask هو فريد ما جاش النهارده؟ لو شفته، اسأله أخباره إيه. بقالي شوية ما قعدتش معاه، ونفسي أطمن عليه.
+INK radio_ask تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة.
+DONE radio_ask true
+WRONG SPEAKER false
+START exam_follow [true, &""]
+INK exam_follow فاكر لما قلت لك هقسم المذاكرة؟ خلصت الجزء اللي كنت مأجله، وراجعت مع زميل. لسه الامتحان قدامي، بس بقيت أهدى؛ مش لازم أخلص الدنيا في ليلة.
+DONE exam_follow true
+START radio_follow [true, &""]
+INK radio_follow الراديو اللي حكيت لك عنه؟ نضفت الوصلات واشتغل صوته تاني. لسه فيه وش خفيف، بس سمعت عليه أغنية قديمة وقعدت مبسوط. مش كل حاجة لازم ترجع جديدة.
+DONE radio_follow true
+START exam_answer [true, &""]
+INK exam_answer فريد سأل عليا؟ تسلموا. قوله أنا كويس وبراجع للامتحان، وقسمت المذاكرة وبقيت أهدى. لما أفضى هعدي أسلم عليه؛ من غير ما أوعد بميعاد دلوقتي.
+DONE exam_answer true
+START radio_answer [true, &""]
+INK radio_answer يوسف بيسأل؟ قوله أنا بخير، والراديو القديم رجع يغني. لو قابلني نقعد نحكي؛ من غير مواعيد شغل ولا التزامات.
+DONE radio_answer true
+NO AUTOMATIC RETURN [false, false]
+PENDING REPLY RESTORE [true, &"", ""]
+START exam_return [true, &""]
+INK exam_return إنت قابلت يوسف وقال لك كده؟ الحمد لله، طمنتني. خليه ياخد وقته في المذاكرة؛ هنتقابل لما الظروف تسمح.
+DONE exam_return true
+START radio_return [true, &""]
+INK radio_return حلو إنك قابلت فريد وطمنتني. والراديو ده أكيد وراه حكايات؛ لما أشوفه أبقى أسمع منه. تسلم إنك وصلت الكلام.
+DONE radio_return true
+DUPLICATE { "duplicate": true }
+DUPLICATE RELATION UNCHANGED true
+COMPLETE RESTORE [true, &""]
+WRONG ENDPOINT [false, &"invalid_message_receipt"]
+PREMATURE FOLLOWUP [false, &"premature_story_followup"]
+WRONG FACT SOURCE [false, &"ungrounded_social_knowledge"]
+OLD REVISION [false, &"stories_save_requires_new_game"]
+RECEIPTS { "meet_farid": { "at": 930.0, "source": "conversation_1/1/0", "actor": "farid" }, "meet_youssef": { "at": 930.0, "source": "conversation_2/1/0", "actor": "youssef" }, "exam_open": { "at": 2370.0, "source": "conversation_3/1/0", "actor": "youssef" }, "radio_open": { "at": 2370.0, "source": "conversation_4/1/0", "actor": "farid" }, "exam_ask": { "at": 2370.0, "source": "conversation_6/2/0", "actor": "farid", "message": { "kind": "request", "from": "farid", "to": "youssef", "previous": "" } }, "radio_ask": { "at": 2370.0, "source": "conversation_7/2/0", "actor": "youssef", "message": { "kind": "request", "from": "youssef", "to": "farid", "previous": "" } }, "exam_follow": { "at": 3810.0, "source": "conversation_8/1/0", "actor": "youssef" }, "radio_follow": { "at": 3810.0, "source": "conversation_9/1/0", "actor": "farid" }, "exam_answer": { "at": 3810.0, "source": "conversation_10/1/0", "actor": "youssef", "message": { "kind": "reply", "from": "youssef", "to": "farid", "previous": "exam_ask" } }, "radio_answer": { "at": 3810.0, "source": "conversation_11/1/0", "actor": "farid", "message": { "kind": "reply", "from": "farid", "to": "youssef", "previous": "radio_ask" } }, "exam_return": { "at": 3810.0, "source": "conversation_12/1/0", "actor": "farid", "message": { "kind": "delivered", "from": "youssef", "to": "farid", "previous": "exam_answer" } }, "radio_return": { "at": 3810.0, "source": "conversation_13/1/0", "actor": "youssef", "message": { "kind": "delivered", "from": "farid", "to": "youssef", "previous": "radio_answer" } } }
+EN REQUEST LABELS ["Farid asks after Youssef", "Youssef asks after Farid"]
+EN TOPIC Tell Youssef: Farid is well; the radio works
+WARNING: 174 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

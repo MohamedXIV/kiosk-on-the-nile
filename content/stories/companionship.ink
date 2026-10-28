@@ -83,6 +83,46 @@ VAR appointment_label = ""
  -> END
 - "continuation_farid": -> continuation_farid
 - "continuation_youssef": -> continuation_youssef
+- "exam_open":
+ عندي امتحان قريب، وبقسم المذاكرة حتت صغيرة بدل ما أفضل قلقان من الكل. القعدة هنا بتريح دماغي وبعدين أرجع للكتب. # speaker:youssef # duration:9 # effect:social\|exam_open # loc:story.companionship.exam_open
+ -> END
+- "exam_follow":
+ فاكر لما قلت لك هقسم المذاكرة؟ خلصت الجزء اللي كنت مأجله، وراجعت مع زميل. لسه الامتحان قدامي، بس بقيت أهدى؛ مش لازم أخلص الدنيا في ليلة. # speaker:youssef # duration:9 # effect:social\|exam_follow # loc:story.companionship.exam_follow
+ -> END
+- "exam_ask":
+ مش شايف يوسف في القعدة النهارده. لو قابلته، تسأله عامل إيه؟ طمني عليه بس، مش عايز أزن عليه. # speaker:farid # duration:9 # loc:story.companionship.exam_ask
+ * [لو قابلته هسأله وأوصل لك كلامه. # loc:story.companionship.exam_ask.yes]
+  تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة. # speaker:farid # duration:5 # effect:social\|exam_ask # loc:story.companionship.exam_ask.confirm
+  -> END
+ * [مش هقدر أوعدك، خلينا على راحتنا. # loc:story.companionship.exam_ask.later]
+  ولا يهمك، نتقابل على خير. # speaker:farid # duration:5 # loc:story.companionship.exam_ask.okay
+  -> END
+- "exam_answer":
+ فريد سأل عليا؟ تسلموا. قوله أنا كويس وبراجع للامتحان، وقسمت المذاكرة وبقيت أهدى. لما أفضى هعدي أسلم عليه؛ من غير ما أوعد بميعاد دلوقتي. # speaker:youssef # duration:9 # effect:social\|exam_answer # loc:story.companionship.exam_answer
+ -> END
+- "exam_return":
+ إنت قابلت يوسف وقال لك كده؟ الحمد لله، طمنتني. خليه ياخد وقته في المذاكرة؛ هنتقابل لما الظروف تسمح. # speaker:farid # duration:9 # effect:social\|exam_return # loc:story.companionship.exam_return
+ -> END
+- "radio_open":
+ عندي راديو قديم من أيام أبويا، بحاول أظبط صوته على مهلي. مش شغل ورشة ولا طلب لحد؛ حاجة بحب أقعد لها لما أروق. # speaker:farid # duration:9 # effect:social\|radio_open # loc:story.companionship.radio_open
+ -> END
+- "radio_follow":
+ الراديو اللي حكيت لك عنه؟ نضفت الوصلات واشتغل صوته تاني. لسه فيه وش خفيف، بس سمعت عليه أغنية قديمة وقعدت مبسوط. مش كل حاجة لازم ترجع جديدة. # speaker:farid # duration:9 # effect:social\|radio_follow # loc:story.companionship.radio_follow
+ -> END
+- "radio_ask":
+ هو فريد ما جاش النهارده؟ لو شفته، اسأله أخباره إيه. بقالي شوية ما قعدتش معاه، ونفسي أطمن عليه. # speaker:youssef # duration:9 # loc:story.companionship.radio_ask
+ * [لو قابلته هسأله وأوصل لك كلامه. # loc:story.companionship.radio_ask.yes]
+  تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة. # speaker:youssef # duration:5 # effect:social\|radio_ask # loc:story.companionship.radio_ask.confirm
+  -> END
+ * [مش هقدر أوعدك، خلينا على راحتنا. # loc:story.companionship.radio_ask.later]
+  ولا يهمك، نتقابل على خير. # speaker:youssef # duration:5 # loc:story.companionship.radio_ask.okay
+  -> END
+- "radio_answer":
+ يوسف بيسأل؟ قوله أنا بخير، والراديو القديم رجع يغني. لو قابلني نقعد نحكي؛ من غير مواعيد شغل ولا التزامات. # speaker:farid # duration:9 # effect:social\|radio_answer # loc:story.companionship.radio_answer
+ -> END
+- "radio_return":
+ حلو إنك قابلت فريد وطمنتني. والراديو ده أكيد وراه حكايات؛ لما أشوفه أبقى أسمع منه. تسلم إنك وصلت الكلام. # speaker:youssef # duration:9 # effect:social\|radio_return # loc:story.companionship.radio_return
+ -> END
 - else: -> END
 }
 === consent_farid ===

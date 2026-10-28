@@ -21,6 +21,12 @@ func _available(id: String, state: Dictionary) -> bool:
  if action.is_empty() or state.receipts.has(id):return false
  for required in action.needs:
   if not state.receipts.has(required):return false
+ for required in action.get("next_day_after",[]):
+  if not state.receipts.has(required) or _session.clock.day<=floori(float(state.receipts[required].at)/1440.0)+1:return false
+ var absent := str(action.get("absent_actor",""))
+ if not absent.is_empty():
+  for visit in _session.visitors.visits.values():
+   if str(visit.character_id)==absent:return false
  for fact in action.facts:
   if not _session.knowledge.has(StringName(fact)):return false
  return action.phases.is_empty() or state.activity.phase in action.phases
@@ -43,6 +49,7 @@ func apply(id: String, source: String, speaker: String = "", internal: bool = fa
  if not result.ok:return result
  var now := _session.clock.world_minutes
  candidate.receipts[id]={"at":now,"source":source,"actor":action.actor}
+ if action.has("message"):candidate.receipts[id]["message"]=action.message.duplicate(true)
  if not str(action.actor).is_empty():candidate.people[action.actor]=true
  if not str(action.learn).is_empty() and not knowledge.has(StringName(action.learn)):
   knowledge.learn_from(StringName(action.learn),str(action.note),source,str(action.actor),now)
@@ -134,6 +141,13 @@ func _validate(data: Dictionary) -> ActionResult:
   var receipt: Variant=data.receipts[id]
   if not _data.actions.has(id) or not receipt is Dictionary or not ContentValidation.bounded(receipt.get("at"),0,now+0.001) or not receipt.get("source") is String or receipt.get("actor")!=_data.actions[id].actor:return _fail("invalid_social_receipt")
  for id in data.receipts:
+  var action: Dictionary=_data.actions[id]
+  var receipt: Dictionary=data.receipts[id]
+  if action.has("message"):
+   if receipt.get("message")!=action.message or receipt.source.is_empty():return _fail("invalid_message_receipt")
+  elif receipt.has("message"):return _fail("unexpected_message_receipt")
+  for required in action.get("next_day_after",[]):
+   if not data.receipts.has(required) or floori(float(receipt.at)/1440.0)<=floori(float(data.receipts[required].at)/1440.0):return _fail("premature_story_followup")
   for required in _data.actions[id].needs:
    if not data.receipts.has(required) or data.receipts[required].at>data.receipts[id].at:return _fail("invalid_social_dependency")
  var valid_moments: Array=[]
@@ -183,7 +197,10 @@ func cross_validate() -> ActionResult:
   var action: Dictionary=_data.actions[id]
   if action.learn!="" and not _session.knowledge.has(StringName(action.learn)):return _fail("missing_social_knowledge")
  var facts: Dictionary=_session.knowledge.snapshot().facts
- for fact in ["WORKSHOP_OPPORTUNITY","YOUSSEF_WORK_STUDY","WORK_TRIAL_APPOINTMENT","WORK_TRIAL_RESULT","WORK_TRIAL_WEEK"]:
+ var authored_facts: Array=[]
+ for action in _data.actions.values():
+  if action.learn!="" and not action.learn in authored_facts:authored_facts.append(action.learn)
+ for fact in authored_facts:
   if not facts.has(fact):continue
   var grounded := false
   var record: Dictionary=facts[fact]

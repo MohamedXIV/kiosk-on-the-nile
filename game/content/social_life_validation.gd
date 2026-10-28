@@ -34,6 +34,8 @@ static func validate(bundle: Dictionary) -> ActionResult:
    if not required in data.actions or required==id:return ContentValidation.fail("social_life.action.dependency")
   for phase in action.phases:
    if not phase in ["idle","coordinating","scheduled","waiting","active","completed"]:return ContentValidation.fail("social_life.action.phase")
+ var message_validation := StoryMessageValidation.validate(data,bundle.visitors.characters)
+ if not message_validation.ok:return message_validation
  for required in ["meet_farid","meet_youssef","hear_farid","hear_youssef","refer_farid","refer_youssef","consent_farid","consent_youssef","days_farid","days_youssef","trial_complete"]:
   if not data.actions.has(required):return ContentValidation.fail("social_life.required_action")
  for id in data.topics:
