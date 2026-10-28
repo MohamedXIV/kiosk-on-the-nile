@@ -319,5 +319,25 @@
     "sha256": "2daaebb5e5afce3320b9c3914b66c161fca4bda9ff3559bd6e910277a1dddabe",
     "original_branch": "chore/prealpha-versioning",
     "original_commit": "51c5b0de7411f3b0a74934ab0a491342144d5a7b"
+  },
+  {
+    "version": "complete-playtest-fc65ba3",
+    "game_version": "0.2.0-prealpha.1",
+    "stage": "pre-alpha",
+    "publication_state": "development",
+    "path": "complete-playtest-fc65ba3/kiosk-on-the-nile-0.2.0-prealpha.1-dev-fc65ba353236-web.zip",
+    "bytes": 12011449,
+    "sha256": "5def90b8ed0e3f281965d07bee937b2e9db33465b3380dee5b9fb479f3355b22",
+    "original_branch": "main",
+    "original_commit": "fc65ba353236a30670adaaa24991ac42ba6b2cb3",
+    "archive_commit": "9bcaae4800796e7bce1fc1ab07aa8424eaf6284b",
+    "url": "https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/9bcaae4800796e7bce1fc1ab07aa8424eaf6284b/complete-playtest-fc65ba3/kiosk-on-the-nile-0.2.0-prealpha.1-dev-fc65ba353236-web.zip",
+    "ci_run": 40735887811,
+    "save_format": {
+      "schema": 4,
+      "revision": 19
+    },
+    "save_impact": "New game required for earlier pre-alpha saves; existing files preserved.",
+    "verification": "Independently downloaded immutable archive: exact bytes/SHA256, ZIP CRC, clean source provenance and Arabic guide verified."
   }
 ]

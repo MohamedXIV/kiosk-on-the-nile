@@ -1,6 +1,6 @@
 # Preserved playable Web archives
 
-39 verified archives; original commits remain reachable. Do not merge artifact history into source. Extract complete ZIP and use local HTTP. SHA256/provenance: manifest.json.
+40 verified archives; original commits remain reachable. Do not merge artifact history into source. Extract complete ZIP and use local HTTP. SHA256/provenance: manifest.json.
 
 - [accounts-930c928](accounts-930c928/kiosk-on-the-nile-accounts.zip)
 - [body-clock-2fd6048](body-clock-2fd6048/kiosk-on-the-nile-body-clock.zip)
@@ -42,3 +42,11 @@
 - [v0.1.0-prealpha.1 — retained validation candidate (CI checkout blocked)](v0.1.0-prealpha.1/kiosk-on-the-nile-0.1.0-prealpha.1-web.zip) · [SHA256](v0.1.0-prealpha.1/kiosk-on-the-nile-0.1.0-prealpha.1-web.zip.sha256)
 - [v0.1.0-prealpha.2 — first numbered baseline](v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip) · [SHA256](v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip.sha256)
 
+
+## Complete combined playtest
+
+- [Download complete playtest 0.2.0-prealpha.1 (fc65ba3)](https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/9bcaae4800796e7bce1fc1ab07aa8424eaf6284b/complete-playtest-fc65ba3/kiosk-on-the-nile-0.2.0-prealpha.1-dev-fc65ba353236-web.zip)
+- [Arabic run/playtest guide](complete-playtest-fc65ba3/PLAYTEST_GUIDE_AR.md)
+- [SHA256](https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/9bcaae4800796e7bce1fc1ab07aa8424eaf6284b/complete-playtest-fc65ba3/kiosk-on-the-nile-0.2.0-prealpha.1-dev-fc65ba353236-web.zip.sha256)
+
+This retained development preview includes all agreed remaining/deferred batches, including player/home seating and optional home friends. It is not a formal tagged release. **Start a new game**; older saves remain preserved. Extract the complete game ZIP and follow the bundled Arabic guide. User playtest/feel acceptance remains pending.
