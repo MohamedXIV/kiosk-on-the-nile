@@ -22,3 +22,7 @@ VAR shawarma_quality = -1
 VAR venue_dirty_category = ""
 VAR venue_previous_food = ""
 VAR venue_previous_quality = -1
+
+VAR previous_settlement = ""
+VAR hospitality_outcome = ""
+VAR hospitality_gift = false

@@ -35,8 +35,12 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
   if recipe.quality_keys[i] == quality: quality = recipe.quality_names[str(i)]
  var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"kiosk_open":_session.kiosk_open,"business_allowed":_session.accounts.business_allowed(),"request_can_prepare":_session.request_can_prepare(StringName(intended_food)),"mode":0,"quality_score":0,"order_label":_session.foods.definition(StringName(intended_food)).get("menu_label","")}
  var visit: Variant = _session.presence.record(participants[0]) if not participants.is_empty() else null
+ var hospitality := _session.visitors.history.hospitality(character_id)
+ data.merge({"needs_hospitality":visit.needs_hospitality if visit is VisitState else false,"hospitality_outcome":str(hospitality.get("outcome","")),"hospitality_offer":_session.can_offer_hospitality(visit.id) if visit is VisitState else false},true)
+ var gifted := _session.service.order(StringName(str(hospitality.get("order_id",""))))
+ data["hospitality_gift"]=gifted!=null and gifted.status==&"delivered" and gifted.settlement==&"gift" and visit!=null and gifted.visit_id!=visit.id
  var previous := _session.visitors.history.previous_service(character_id,visit.id) if visit else {}
- data.merge({"topic_id":"","line_variant":0,"hour":int(_session.clock.minutes)/60,"bought_fan":_session.home.has_fan,"visit_count":_session.visitors.visit_count(StringName(character_id)),"previous_quality":int(previous.get("quality",-1)),"previous_food":str(previous.get("food_id",""))},true)
+ data.merge({"topic_id":"","line_variant":0,"hour":int(_session.clock.minutes)/60,"bought_fan":_session.home.has_fan,"visit_count":_session.visitors.visit_count(StringName(character_id)),"previous_quality":int(previous.get("quality",-1)),"previous_food":str(previous.get("food_id","")),"previous_settlement":str(previous.get("settlement",""))},true)
  if character_id=="fathi":data.merge(_session.supplier_context(str(extra.get("chapter_id",""))),true)
  if character_id=="abdul_karim":data.merge(_session.financial_context(str(extra.get("chapter_id",""))),true)
  data.merge(extra,true)

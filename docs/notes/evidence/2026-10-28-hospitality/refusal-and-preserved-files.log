@@ -1,0 +1,29 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true {  }
+SESSION true {  }
+REQUEST needs_hospitality=true state=requesting receipt={ "character_id": "youssef", "visit_id": "visit_1", "order_id": "", "outcome": "requested", "at": 930.0 }
+INK start=true { "session_id": "conversation_1" }
+INK line=كنت هطلب الشاي.. بس بصراحة اللي معايا مش مكفّي النهاردة، ومكسوف أقولك. choices=[{ "id": "conversation_1:1:0", "index": 0, "text": "يا راجل خليها علينا.", "loc_id": "story.service_availability.016" }, { "id": "conversation_1:1:1", "index": 1, "text": "ربنا الرزاق، أعمله لك وأنا مبسوط.", "loc_id": "story.service_availability.018" }, { "id": "conversation_1:1:2", "index": 2, "text": "ولا يهمك، إحنا أصحاب.", "loc_id": "story.service_availability.020" }, { "id": "conversation_1:1:3", "index": 3, "text": "والله يا صاحبي أنا كمان مزنوق، وعندي إيجار ومصاريف.", "loc_id": "story.service_availability.022" }]
+INK selected=3 ok=true { "cue": "chime" }
+AFTER CHOICE state=declined phase=staying order= receipt={ "character_id": "youssef", "visit_id": "visit_1", "order_id": "", "outcome": "declined", "at": 930.0 }
+CURRENT RESTORE ok=true key= details={ "session": @Node@9:<Node#351197465899>, "migration_report": {  } }
+RESTORED wallet={ "balance": 4500 } hospitality={ "character_id": "youssef", "visit_id": "visit_1", "order_id": "", "outcome": "declined", "at": 930.0 }
+OLD REVISION accepted=false reason=hospitality_save_requires_new_game
+WARNING: Save candidate rejected: hospitality_save_requires_new_game ({ "required_revision": 17 }); retaining previous save
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_candidate (res://game/persistence/save_coordinator.gd:55)
+         [1] observe (res://work/hospitality_observe.gd:129)
+         [2] start (res://game/narrative/narrative_director.gd:100)
+         [3] open (res://game/narrative/ink_runtime.gd:37)
+         [4] _open (res://game/narrative/ink_runtime.gd:75)
+         [5] _finalise_story_creation (res://addons/inkgd/ink_player.gd:819)
+         [6] _create_and_finalize_story (res://addons/inkgd/ink_player.gd:802)
+OLD FILE LOAD accepted=false primary_unchanged=true backup_unchanged=true
+MEMORY start=true details={ "session_id": "conversation_2" }
+MEMORY actual line=فاكر يوم ما حكيت لك إني مزنوق؟ فاهم ظروفك والله، وقعدتنا سوا ما اتغيّرتش. loc=story.visitors.hospitality_002
+WARNING: 75 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

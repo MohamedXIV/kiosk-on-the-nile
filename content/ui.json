@@ -22,7 +22,7 @@
   "open": "الكشك مفتوح",
   "closed": "الكشك مقفول",
   "talk": "كلّم {name}",
-  "serve": "قدّم {item} لـ {name}",
+  "serve": "قدّم {item} لـ {name} واختار الحساب",
   "consume": "كل / اشرب اللي معاك",
   "interaction": "[{primary_key}] {primary}",
   "secondary": "[{secondary_key}] {secondary}",
@@ -113,7 +113,11 @@
     "unknown_job": "التحضير ده ما بقاش شغال.",
     "recipe_wrong_location": "الوصفة دي مش متاحة في المكان ده",
     "recipe_station_mismatch": "ابدأ من محطة مناسبة للخطوة الأولى",
-    "invalid_cooking_stage": "الخطوة دي ما بقتش متاحة؛ راجع التحضير الجاري."
+    "invalid_cooking_stage": "الخطوة دي ما بقتش متاحة؛ راجع التحضير الجاري.",
+    "hospitality_promised": "الطلب ده اتوعد بيه ضيافة، من غير حساب.",
+    "hospitality_unavailable": "اختيار الضيافة مش متاح للشخص ده دلوقتي.",
+    "order_already_settled": "الطلب ده حسابه اتسوّى بالفعل.",
+    "hospitality_save_requires_new_game": "الحفظ ده من نسخة أقدم. دفعة الضيافة تحتاج لعبة جديدة؛ ملف حفظك القديم لم يُمسح."
   },
   "theme": {
     "font_size": 19,
@@ -367,5 +371,18 @@
   "save_feedback": {
     "timeout_seconds": 15,
     "poll_seconds": 0.1
-  }
+  },
+  "payment_heading": "طلب {name}",
+  "payment_choose": "الطلب {food} جاهز. قدّمه واختار طريقة الحساب.",
+  "payment_promised": "وعدته إن {food} ضيافة. قدّمه له على حسابك لما تكون جاهز.",
+  "payment_paid": "قدّم الطلب وخد الحساب: {amount} ج.م",
+  "payment_gift": "خليها علينا المرة دي — قدّم الطلب ضيافة",
+  "payment_later": "لسه، أرجع للطلب بعدين",
+  "payment_recover": "سوّي حساب {name}",
+  "payment_gift_done": "قدّمت الطلب ضيافة، من غير تحصيل حساب.",
+  "payment_paid_done": "قدّمت الطلب واتحصّل {amount} ج.م.",
+  "payment_unsettled": "الطلب {food} اتقدّم بالفعل. باقي بس تسوية الحساب.",
+  "payment_unsettled_promised": "الطلب {food} اتقدّم ضيافة زي ما وعدته. أكّد تسجيل الضيافة من غير حساب.",
+  "payment_paid_settle": "حصّل الحساب: {amount} ج.م",
+  "payment_gift_settle": "سجّل الطلب ضيافة — من غير حساب"
 }

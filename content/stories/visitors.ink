@@ -3,6 +3,7 @@ INCLUDE context.inkinc
 {mode == 2: -> served}
 {mode == 3: -> waiting}
 {mode == 4: -> ambient}
+{topic_id == "hospitality_memory": -> hospitality_memory}
 {topic_id == "memory": -> memory}
 -> smalltalk
 === arrival ===
@@ -184,5 +185,13 @@ INCLUDE context.inkinc
  - else:
   لفة ع الكورنيش قبل البيت.. الواحد محتاج يهدى شوية. # speaker:{character_id} # duration:5 # loc:story.visitors.line_079
  }
+}
+-> END
+
+=== hospitality_memory ===
+{previous_settlement == "gift" || hospitality_gift:
+ لسه فاكر المرة اللي عزمتني فيها. مش حكاية الأكل، ذوقك هو اللي عالق معايا. # speaker:{character_id} # duration:8 # loc:story.visitors.hospitality_001
+- else:
+ فاكر يوم ما حكيت لك إني مزنوق؟ فاهم ظروفك والله، وقعدتنا سوا ما اتغيّرتش. # speaker:{character_id} # duration:8 # loc:story.visitors.hospitality_002
 }
 -> END

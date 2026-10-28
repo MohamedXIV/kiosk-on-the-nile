@@ -1,0 +1,2 @@
+log: UI_READY wallet={ "balance": 4500 } promised=false
+log: UI_COMPLETE settlement=gift wallet={ "balance": 4500 } held=<null>

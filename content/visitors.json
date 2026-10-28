@@ -406,5 +406,13 @@
         "encounter": "river_company"
       }
     }
+  },
+  "hospitality": {
+    "enabled": true,
+    "actors": {
+      "youssef": {
+        "minimum_visits": 2
+      }
+    }
   }
 }

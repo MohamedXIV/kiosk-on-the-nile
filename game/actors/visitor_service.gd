@@ -149,6 +149,7 @@ func _arrived(visit: VisitState) -> void:
    visit.food_id=&""
    _return_to_leisure(visit)
    return
+  visit.needs_hospitality=history.request_hospitality(str(visit.character_id),visit.id,_data.get("hospitality",{}),visit_count(visit.character_id),_clock)
   visit.shopping_state=&"requesting"
   encounter_requested.emit(&"service_request",PackedStringArray([str(visit.id)]),{"character_id":str(visit.character_id)})
   return
@@ -215,13 +216,16 @@ func commit_pose(visit_id: StringName, pose: ActorPose) -> void:
 func record_service(_order_id: StringName, visit_id: StringName, item: PreparedItem, _payment: int) -> void:
  if not visits.has(str(visit_id)): return
  var visit: VisitState = visits[str(visit_id)]
- history.served(str(visit.character_id),_order_id,visit_id,item)
+ var order := _orders.order(_order_id)
+ history.served(str(visit.character_id),_order_id,visit_id,item,order.settlement,order.payment)
  visit.served = true
  visit.shopping_state=&"served"
  visit.elapsed = 0
  visit.remark_remaining = _rng.randf_range(float(_data.ambient_remark_delay[0]),float(_data.ambient_remark_delay[1]))
  if visit.character_id == &"amgad": memory.last_served_quality = str(item.quality_key)
  encounter_requested.emit(&"served",PackedStringArray([str(visit_id)]),{"quality_score":item.quality_score,"character_id":str(visit.character_id)})
+func record_settlement(order_id: StringName, visit_id: StringName, _item: PreparedItem, payment: int) -> void:
+ history.record_settlement("",order_id,_orders.order(order_id).settlement,payment)
 func clear_visits() -> void:
  var cancelled := peers.clear()
  if not cancelled.is_empty() and peer_cancel.is_valid():peer_cancel.call(cancelled)
@@ -271,6 +275,8 @@ func restore(data: Dictionary) -> ActionResult:
   visit.phase = StringName(record.phase)
   visit.elapsed = float(record.elapsed)
   visit.remark_remaining = float(record.remark_remaining)
+  if not record.get("needs_hospitality") is bool:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_hospitality_state")
+  visit.needs_hospitality=record.needs_hospitality
   visit.served = record.served
   if not record.get("shopping_state") in ["undecided","approaching","requesting","pending","declined","served"] or not ContentValidation.bounded(record.get("decision_remaining"),0,86400):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_purchase_decision")
   if not ContentValidation.integer(record.get("recall_variant")) or record.recall_variant< -1 or record.recall_variant>2:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_recall_variant")
@@ -373,20 +379,24 @@ func random_chance(probability: float) -> bool:
 
 func _present() -> bool:
  return service_presence.is_valid() and bool(service_presence.call())
-func accept_request(id: StringName) -> ActionResult:
+func accept_request(id: StringName, gift: bool=false) -> ActionResult:
  var visit: VisitState=visits.get(str(id))
  if visit==null or visit.phase!=&"staying" or not _present():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  var existing := _orders.pending_for(id)
  if existing!=null:return ActionResult.success({"order_id":str(existing.id),"duplicate":true})
  if visit.shopping_state!=&"requesting":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
- var order := _orders.place_order(id,visit.food_id)
+ if visit.needs_hospitality and not gift:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"hospitality_promised")
+ var order := _orders.place_order(id,visit.food_id,gift)
  if order==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
  visit.order_id=order.id
+ if visit.needs_hospitality:history.decide_hospitality(str(visit.character_id),visit.id,"accepted",order.id,_clock)
  visit.shopping_state=&"pending"
  return ActionResult.success({"order_id":str(order.id)})
 func decline_request(id: StringName) -> ActionResult:
  var visit: VisitState=visits.get(str(id))
  if visit==null or visit.shopping_state!=&"requesting":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
+ if visit.needs_hospitality:history.decide_hospitality(str(visit.character_id),visit.id,"declined",&"",_clock)
+ visit.needs_hospitality=false
  visit.food_id=&""
  visit.shopping_state=&"declined"
  _return_to_leisure(visit)

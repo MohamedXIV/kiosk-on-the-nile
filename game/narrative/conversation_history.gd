@@ -10,6 +10,12 @@ func select(encounter: StringName, definition: Dictionary, visit: VisitState, se
   if not session.conditions.permits(topic.get("requires",{}),PackedStringArray([str(visit.id)])): continue
   if session.visitors.visit_count(visit.character_id)<int(topic.get("minimum_visits",0)): continue
   if topic.get("requires_previous_service",false) and session.visitors.history.previous_service(str(visit.character_id),visit.id).is_empty(): continue
+  if topic.get("requires_hospitality_memory",false):
+   var receipt := session.visitors.history.hospitality(str(visit.character_id))
+   var served := session.visitors.history.previous_service(str(visit.character_id),visit.id)
+   var gifted := session.service.order(StringName(str(receipt.get("order_id",""))))
+   var actual_gift := gifted!=null and gifted.status==&"delivered" and gifted.settlement==&"gift" and gifted.visit_id!=visit.id
+   if not ((receipt.get("outcome")=="declined" and receipt.get("visit_id")!=str(visit.id)) or served.get("settlement")=="gift" or actual_gift):continue
   var key := _key(str(encounter),str(topic.id),str(visit.character_id))
   var previous: Dictionary = _records.get(key,{})
   var scope := "once" if topic.scope=="once" else "day_%d" % session.clock.day if topic.scope=="day" else str(visit.id)

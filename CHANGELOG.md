@@ -5,9 +5,13 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-**Save compatibility:** No format change (schema4/revision16); passage coordination reconstructs from current physical state.
+**Save compatibility:** Hospitality changes the format to schema4/revision17. Earlier pre-alpha saves require a new game and are rejected clearly; their files/backups are not silently removed. No historical migration is added. Passage coordination itself remains transient.
 
 ### Added
+
+- Deliberate paid service or hospitality, separate handover/settlement ownership and one-time financial receipts. A promised gift cannot become a paid sale.
+- An authored money-short request for Youssef on a repeat visit, three natural acceptance phrasings, humane refusal without eviction, and actual gift/refusal memory follow-up in offline Arabic/English.
+- A service-choice sheet before handover; its active recipient waits while the player decides.
 
 - NPCs coordinate a stable right of way and a bounded nearby retreat when a narrow passage stays blocked. Speaking/seated people and the player keep control of their position; traffic does not replace visit goals or consume domain fallback while coordinated.
 - Optional validated spatial JSON settings bound retreat search, route length, wait duration and retry work. If no refuge is safe, people wait and periodically reconsider rather than forcing a passage.

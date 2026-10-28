@@ -10,6 +10,7 @@ var _tuning_panel: TuningPanel
 var _fatigue_overlay: FatigueOverlay
 var _fatigue_layer: CanvasLayer
 var _visitor_panel: VisitorPanel
+var _payment_panel: PaymentPanel
 var _recipe_panel: RecipePanel
 var _modals := ModalCoordinator.new()
 var _supplier_panel: SupplierPanel
@@ -190,6 +191,10 @@ func _install(candidate: GameSession) -> void:
  _visitor_panel=VisitorPanel.new()
  _hud.add_child(_visitor_panel)
  _visitor_panel.configure(_text,_session)
+ _payment_panel=PaymentPanel.new();_hud.add_child(_payment_panel);_payment_panel.configure(_text,_session)
+ _payment_panel.completed.connect(func(result):
+  _sound.play_action(result)
+  _hud.toast.show_message(_text.text("payment_gift_done") if result.details.get("settlement")=="gift" else _text.text("payment_paid_done",{"amount":NotebookView.money(int(result.details.get("payment",0)))})))
  _hud.inventory_requested.connect(func():_inventory_panel.open())
  _journey_panel=JourneyPanel.new()
  _hud.add_child(_journey_panel)
@@ -210,7 +215,7 @@ func _install(candidate: GameSession) -> void:
  _hud.add_child(_district_panel)
  _district_panel.configure(_text,_session)
  _modals=ModalCoordinator.new()
- for entry in [["inventory",_inventory_panel],["recipes",_recipe_panel],["visitor",_visitor_panel],["tuning",_tuning_panel],["notebook",_hud.notebook],["sleep",_hud.sleep_panel]]:_modals.register(str(entry[0]),entry[1])
+ for entry in [["payment",_payment_panel],["inventory",_inventory_panel],["recipes",_recipe_panel],["visitor",_visitor_panel],["tuning",_tuning_panel],["notebook",_hud.notebook],["sleep",_hud.sleep_panel]]:_modals.register(str(entry[0]),entry[1])
  _modals.register("build",_build_panel,_end_arrange)
  _modals.register("supplier",_supplier_panel,func():_session.contact.panel_requested=false;_supplier_panel.hide())
 
@@ -311,6 +316,7 @@ func _unhandled_input(event: InputEvent) -> void:
  if event is InputEventKey and event.pressed and event.keycode==KEY_F8 and _session.config.section("tuning").dev_panel_enabled:
   _tuning_panel.open()
   return
+ if _payment_panel.visible:return
  if _visitor_panel.visible:
   if event.is_action_pressed("cancel"):_visitor_panel.hide()
   return
@@ -361,6 +367,10 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
   _busy = true
   var result := await _router.execute(event.is_action_pressed("interact_secondary"))
+  if result.ok and result.details.has("show_payment"):
+   _payment_panel.present(StringName(result.details.show_payment))
+   _busy=false
+   return
   if result.ok and result.details.has("show_visitor"):
    _visitor_panel.present(StringName(result.details.show_visitor))
    _busy=false
