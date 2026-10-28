@@ -5,6 +5,14 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Changed
+- New games begin with240EGP in finite savings (previously45EGP), giving early quiet days room for food and the first weekly rents without requiring sales. Existing saved wallets are not topped up. The initial notebook note explains ongoing costs in Arabic and English; prices, rents, needs, visit timing and cooking windows remain unchanged.
+- **Save compatibility:** this pacing increment keeps schema4/revision18 and its current state shape. Existing revision18 wallets/notes/progress remain intact; earlier incompatible pre-alpha saves still require a new game as documented below.
+
+### Development
+- Recorded a quiet early-2000s Egyptian Nile art/audio direction before new production assets; this does not claim replacement artwork, final sound mix or sustained balance acceptance.
+
+
 ### Added
 - Two quiet multi-day conversations: Youssef's exam preparation and Farid's old radio. Optional questions about an absent friend and explicitly sourced replies have durable, single-delivery receipts in Arabic and English.
 
