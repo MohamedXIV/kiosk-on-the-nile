@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `f623e5d96069bdc361b0a251cb0160cae4109708`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `00a1d95d0f324eb05d5e8d7caf6be6114f9f198d`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -28,7 +28,7 @@ Evidence: see dated delivery notes under `docs/notes/`. Delivered does not imply
 
 Integration cleanup first. Then quiet social encounters with bounded passage coordination; hospitality/payment; continuing stories/messages; combined multi-day pacing and presentation work. Player/residential seating remains a proposal until designed. No gameplay implementation starts as part of this documentation task.
 
-Current action: prepare narrow-passage coordination#3 on an isolated feature branch. The three delivered source batches were integrated through PR#12 with a merge commit and successful post-merge build. See [integration record](../notes/2026-10-27-source-integration.md). This precedes new gameplay epic #3; historical save-compatibility gates in older plans are superseded by AGENTS.md/docs/RELEASING.md.
+Current action: prepare hospitality/payment choice#4 after the approved PR#13 narrow-passage integration. Delivery and payment are still coupled in ServiceSystem; #4 implementation has not started. The three delivered source batches were integrated through PR#12 with a merge commit and successful post-merge build. See [integration record](../notes/2026-10-27-source-integration.md). PR#13 then integrated bounded passage coordination; historical save-compatibility gates in older plans are superseded by AGENTS.md/docs/RELEASING.md.
 
 ## Integration completed
 
@@ -62,4 +62,10 @@ User policy is now explicit in AGENTS.md/docs/RELEASING.md: unpublished pre-alph
 
 PR#12 merged as f623e5d with preserved source ancestry; post-merge push build40609338097 passed. Issues#2/#10/#11 are closed for their bounded delivered batches; their recorded limits remain. The later PR-event run40568964552 also passed on final source HEAD88817d4. No release/tag/archive was rewritten.
 
-Epic#3 now has an implementation on feat/narrow-passage-coordination: transient pair priority, bounded validated retreat routes, safe no-refuge waiting/retry, explicit speaker/seat/player protection and JSON limits. The local network/toolchain blocker was resolved using network-enabled commands and the tracked SHA256-pinned Godot4.7.2 installer. See [delivery record](../notes/2026-10-28-narrow-passages.md). Source PR/preview acceptance remains pending; #3 stays open. No automated test suite was added or run.
+Epic#3 now has an implementation on feat/narrow-passage-coordination: transient pair priority, bounded validated retreat routes, safe no-refuge waiting/retry, explicit speaker/seat/player protection and JSON limits. The local network/toolchain blocker was resolved using network-enabled commands and the tracked SHA256-pinned Godot4.7.2 installer. See [delivery record](../notes/2026-10-28-narrow-passages.md). PR#13 was subsequently accepted and merged as 00a1d95; see the latest checkpoint below. No automated test suite was added or run.
+
+## Passage source integration and next batch — 2026-10-28
+
+The user explicitly approved merging PR#13 if safe. Fresh RepoPilot prepare_merge reported ready=true with no blockers on0d32154, successful Web/GitGuardian checks and no stale reviews. GitHub proposed merge tree matched the locally checked source exactly. PR#13 merged with preserved commits as00a1d95d0f324eb05d5e8d7caf6be6114f9f198d. Post-merge build outcome is recorded in docs/notes/2026-10-28-narrow-passages.md and GitHub issue#3. The bounded #3 source batch is integrated; impossible-refuge/RVO limitations remain. No source branch was deleted and no release/tag/asset was rewritten.
+
+Next: #4, hospitality and payment choice. Initial code inspection confirms ServiceSystem.deliver consumes the item, credits price/tip and emits settled in one operation. OrderState/history do not yet retain a hospitality/payment disposition. The next design must separate actual handover from settlement, keep each one-time, support natural acceptance/refusal before an unaffordable order, and remember actual paid/gift/refusal outcomes. UI, Ink effects and Arabic/English content need to describe the same committed state. No #4 feature code, save migration or automated suite was added during this integration.

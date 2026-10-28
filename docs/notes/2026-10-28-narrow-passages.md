@@ -38,3 +38,9 @@ A read-only reviewer found no Critical issue. Its Important configurable arrival
 ## Acceptance status
 
 Source integration and playable preview acceptance are still pending for#3. No merge to main, source branch deletion, tag/version bump or replacement archive is part of preparing this PR. Player control and immutable `v0.1.0-prealpha.2` remain as published.
+
+## Source integration completed — 2026-10-28 (Africa/Cairo)
+
+Following the user's direct instruction to merge if safe, fresh exact-head readiness was ready=true with no blockers. Source HEAD0d321547b3f11726fe7efa2af91abb36b5aa16f0 and mainf623e5d were unchanged; Web/GitGuardian checks passed. GitHub proposed merge0d9955a matched the checked local source tree. PR#13 merged using merge commits as00a1d95d0f324eb05d5e8d7caf6be6114f9f198d, preserving both parents. The post-merge push [build40615995981](https://github.com/MohamedXIV/kiosk-on-the-nile/actions/runs/40615995981) succeeded on that exact merge commit. This completes source acceptance for the bounded #3 batch; the limitations above remain. Earlier pending statements describe preview delivery before integration.
+
+No source branches were deleted, no artifact history was merged, and no numbered release or published tag/asset was created/replaced. These subsequent documentation changes alter provenance only and receive their own CI build; they do not relabel an earlier export. Next gameplay batch is hospitality/payment#4, currently in preparation rather than implemented.
