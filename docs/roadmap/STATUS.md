@@ -1,6 +1,6 @@
 # Delivery status and roadmap
 
-Recorded 2026-10-27 (Africa/Cairo). Main baseline product: `131642326d4dfab4f1eb105411415e29c2e28e88`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integration pending). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
+Recorded 2026-10-28 (Africa/Cairo). Main source baseline: `f623e5d96069bdc361b0a251cb0160cae4109708`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
 
@@ -28,7 +28,7 @@ Evidence: see dated delivery notes under `docs/notes/`. Delivered does not imply
 
 Integration cleanup first. Then quiet social encounters with bounded passage coordination; hospitality/payment; continuing stories/messages; combined multi-day pacing and presentation work. Player/residential seating remains a proposal until designed. No gameplay implementation starts as part of this documentation task.
 
-Current action: integrate the three delivered source batches (quiet-social, Web-save acknowledgment, versioning) as one descendant chain, subject to fresh integration review/build and PR CI. See [integration record](../notes/2026-10-27-source-integration.md). This precedes new gameplay epic #3; historical save-compatibility gates in older plans are superseded by AGENTS.md/docs/RELEASING.md.
+Current action: prepare narrow-passage coordination#3 on an isolated feature branch. The three delivered source batches were integrated through PR#12 with a merge commit and successful post-merge build. See [integration record](../notes/2026-10-27-source-integration.md). This precedes new gameplay epic #3; historical save-compatibility gates in older plans are superseded by AGENTS.md/docs/RELEASING.md.
 
 ## Integration completed
 
@@ -57,3 +57,9 @@ User policy clarified: unpublished pre-alpha; do not spend routine development e
 The first published numbered baseline is v0.1.0-prealpha.2, source51c5b0d. Canonical VERSION/Godot metadata, SemVer prerelease tags, curated changelog/save-impact entries, verified actual toolchain/export provenance and reusable packaging are in place. Tagged CI passed40562637988; independent archive checks completed. Candidate1 remains a labeled validation record, with no rewritten tag.39 packages are preserved, including all37 legacy versions.
 
 User policy is now explicit in AGENTS.md/docs/RELEASING.md: unpublished pre-alpha saves do not receive routine backward-compatibility/migration work. Future resets are allowed and documented; integrity guards remain. No gameplay/save-format changes in this foundation batch. This priority precedes the next gameplay epic3; source integration/acceptance is still separate.
+
+## Passage coordination implementation — 2026-10-28
+
+PR#12 merged as f623e5d with preserved source ancestry; post-merge push build40609338097 passed. Issues#2/#10/#11 are closed for their bounded delivered batches; their recorded limits remain. The later PR-event run40568964552 also passed on final source HEAD88817d4. No release/tag/archive was rewritten.
+
+Epic#3 now has an implementation on feat/narrow-passage-coordination: transient pair priority, bounded validated retreat routes, safe no-refuge waiting/retry, explicit speaker/seat/player protection and JSON limits. The local network/toolchain blocker was resolved using network-enabled commands and the tracked SHA256-pinned Godot4.7.2 installer. See [delivery record](../notes/2026-10-28-narrow-passages.md). Source PR/preview acceptance remains pending; #3 stays open. No automated test suite was added or run.

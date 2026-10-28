@@ -28,7 +28,8 @@ func conflict(id: StringName, desired: Vector2, actors: Dictionary, navigation: 
   var relative: Vector2=desired-other.actual
   var horizon: float=0
   var lookahead := float(_settings.conflict_lookahead)
-  if actor.goal.is_finite():lookahead=minf(lookahead,actor.position.distance_to(actor.goal)/maxf(desired.length(),0.001))
+  var goal: Vector2=actor.get("motion_goal",actor.goal)
+  if goal.is_finite():lookahead=minf(lookahead,actor.position.distance_to(goal)/maxf(desired.length(),0.001))
   if relative.length_squared()>0.00001:horizon=clampf(offset.dot(relative)/relative.length_squared(),0,lookahead)
   var separation := (offset-relative*horizon).length()
   if separation>float(_settings.radius)*2.0+float(_settings.passing_margin):continue

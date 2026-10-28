@@ -49,15 +49,24 @@ func step(delta: float) -> void:
    var sitting := _service.seating.seated(visit.id)
    var stationary := sitting or _service.peers.paused(visit.id) or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id)) or visit.pose.ground.distance_to(_service.effective_goal(visit))<=float(_spatial.navigation.arrival_radius)
    var point: Vector2=_service.seating.slot_for(visit.id).anchor if sitting else visit.pose.ground
-   avoidance.sync(visit.id,point,stationary,float(_spatial.npc_speed),false,_service.effective_goal(visit))
+   var protected := sitting or _service.peers.active(visit.id) or _service.meetings.active(visit.id) or _service.busy_in_conversation(visit.id)
+   avoidance.sync(visit.id,point,stationary,float(_spatial.npc_speed),false,_service.effective_goal(visit),protected)
+  avoidance.prepare_passages(delta)
  for id in _service.visits:
   var visit: VisitState=_service.visits[id]
   var motor: ActorMotor = _motors[id]
   var follower: NpcNavigation=_followers[id]
   var sitting := _service.seating.seated(visit.id)
   var paused := sitting or _service.peers.paused(visit.id) or (visit.phase!=&"leaving" and _service.busy_in_conversation(visit.id))
-  follower.step(motor,_service.effective_goal(visit),delta,paused)
-  if follower.take_failure():
+  var destination := _service.effective_goal(visit)
+  var coordinated := avoidance!=null and avoidance.passage_active(visit.id)
+  var route := PackedVector2Array()
+  if avoidance!=null:
+   destination=avoidance.movement_target(visit.id,destination)
+   route=avoidance.movement_path(visit.id)
+   paused=paused or avoidance.passage_waiting(visit.id)
+  follower.step(motor,destination,delta,paused,route)
+  if follower.take_failure() and not coordinated:
    if _service.peers.active(visit.id):_service.finish_peer()
    if _service.meetings.active(visit.id):_service.meetings.finish(visit.id)
    elif _service.seating.reserved(visit.id):_service.seating.release(visit.id)

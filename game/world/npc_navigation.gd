@@ -23,7 +23,7 @@ func configure(navigation: KioskNavigation, settings: Dictionary) -> void:
  _settings=settings.duplicate(true)
 func invalidate() -> void:
  _has_goal=false
-func step(motor: ActorMotor, destination: Vector2, delta: float, paused: bool=false) -> void:
+func step(motor: ActorMotor, destination: Vector2, delta: float, paused: bool=false, route_override: PackedVector2Array=PackedVector2Array()) -> void:
  if not _has_goal or _goal!=destination or _revision!=_navigation.revision:
   if not _has_goal or _revision!=_navigation.revision:_fallbacks=0
   _goal=destination;_has_goal=true;_revision=_navigation.revision
@@ -46,7 +46,7 @@ func step(motor: ActorMotor, destination: Vector2, delta: float, paused: bool=fa
   return
  if _dirty:
   var started := RuntimePerformance.begin()
-  _path=_navigation.path(motor.pose.ground,_goal)
+  _path=_navigation.path(motor.pose.ground,_goal) if route_override.is_empty() else route_override
   RuntimePerformance.finish("npc_path",started)
   _dirty=false;_cursor=-1;_best=INF
   motor.reset_path()
@@ -69,7 +69,12 @@ func step(motor: ActorMotor, destination: Vector2, delta: float, paused: bool=fa
  elif distance<float(_best)-float(_settings.get("progress_distance",0.04)):
   _best=distance;_stall=0
  else:_stall+=delta
- if _settings.get("enabled",false) and _stall>=float(_settings.stall_seconds):_retry()
+ if _settings.get("enabled",false) and _stall>=float(_settings.stall_seconds):
+  # A validated retreat belongs to the coordinator. Keep its current cursor;
+  # replaying its original prefix from a later corner would invent a new segment.
+  # Pair expiry/layout/protection changes decide when to discard that route.
+  if route_override.is_empty():_retry()
+  else:_stall=0
 func _retry() -> void:
  if not _settings.get("enabled",false):return
  if _attempts>=int(_settings.max_replans):

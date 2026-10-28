@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RETREAT held at=(0.963433, 0.216431) cursor=2
+RETREAT frame=120 position=(0.963433, 0.216431) cursor=2 status={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 0, "stall_seconds": 1.55, "yield_seconds": 0.0 }
+RETREAT frame=240 position=(0.963433, 0.216431) cursor=2 status={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 0, "stall_seconds": 1.53333333333333, "yield_seconds": 0.0 }
+RETREAT frame=360 position=(0.963433, 0.216431) cursor=2 status={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 0, "stall_seconds": 1.51666666666667, "yield_seconds": 0.0 }
+RETREAT frame=480 position=(0.963433, 0.216431) cursor=2 status={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 0, "stall_seconds": 1.5, "yield_seconds": 0.0 }
+RETREAT frame=600 position=(0.963433, 0.216431) cursor=2 status={ "fallbacks": 0, "failed": false, "attempts": 0, "revision": 0, "stall_seconds": 1.48333333333333, "yield_seconds": 0.0 }
+RETREAT original_cursor=2 final_cursor=2
