@@ -1,5 +1,9 @@
 # Delivery status and roadmap
 
+## Semantic narrative architecture — 2026-10-29
+
+Next architectural work is [epic#19](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/19), with ordered tasks#20–#27. Task#20 records a [source-grounded contract and acceptance matrix](../architecture/semantic-narrative.md), [selected authoring examples](../architecture/examples/semantic-narrative-v1.json) and the [#21 runtime plan](../superpowers/plans/2026-10-29-semantic-policy-runtime.md). These documents are design, not delivered gameplay. Roles, per-knower provenance, directional history and start/continuation/commit/resume semantics are separated while existing owners retain authority. Runtime implementation follows through#21–#26; final changelog/version/save decision and one verified preview remain#27 after coherent completion, per the user's instruction. No version, changelog, save-format or release change in this documentation task. Existing first-playtest feedback on#6/#7 remains open.
+
 Recorded 2026-10-28 (Africa/Cairo). Main source baseline before the combined preview: `422adb93e3c472a22e883912040f2afadb86bccf`. Latest numbered preview: **v0.1.0-prealpha.2**, source `51c5b0de7411f3b0a74934ab0a491342144d5a7b` (source integrated through PR#12). This overview supersedes historical unchecked plan boxes as a delivery-status index, while individual notes retain evidence and limits.
 
 ## Delivered
