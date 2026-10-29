@@ -3,6 +3,8 @@ extends RefCounted
 var _facts: Dictionary = {}
 var _catalog: Array = []
 var _notes: Array[String] = []
+var assertions := KnowledgeAssertions.new()
+func query_assertions(knower: String, fact: Dictionary, kinds: Array = ["initial","heard","relayed","observed"]) -> Array[Dictionary]:return assertions.query(knower,fact,kinds)
 func _init(config: Dictionary = {}) -> void:
  _catalog = config.get("facts",[]).duplicate()
  for fact in config.get("initial_facts",[]): _facts[str(fact)] = {"source":"initial"}
@@ -24,7 +26,9 @@ func learn_from(fact: StringName, note: String, source: String, speaker: String,
 func notes() -> PackedStringArray:
  return PackedStringArray(_notes)
 func snapshot() -> Dictionary:
- return {"facts":_facts.duplicate(true),"notes":_notes.duplicate()}
+ var result := {"facts":_facts.duplicate(true),"notes":_notes.duplicate()}
+ if assertions.enabled:result["assertions"]=assertions.snapshot()
+ return result
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("facts") is Dictionary or not data.get("notes") is Array:
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_knowledge")
@@ -35,6 +39,10 @@ func restore(data: Dictionary) -> ActionResult:
    if not record.get("speaker") is String or record.speaker.is_empty() or not ContentValidation.number(record.get("at")) or record.at<0:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_fact_provenance")
  for note in data.notes:
   if not note is String: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_note")
+ if assertions.enabled:
+  var result := assertions.restore(data.get("assertions"))
+  if not result.ok:return result
+ elif data.has("assertions"):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"unsupported_knowledge_assertions")
  _facts = data.facts.duplicate(true)
  _notes.assign(data.notes)
  return ActionResult.success()

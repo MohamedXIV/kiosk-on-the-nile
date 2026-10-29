@@ -170,7 +170,7 @@ func _advance(conversation: ConversationSession) -> ActionResult:
  if _definitions[str(conversation.encounter_id)].has("semantic_topic") and not conversation.current.effects.is_empty() and speaker.is_empty():
   var invalid := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"semantic_effect_requires_speaker")
   _report_failure(conversation,invalid);_finish(conversation);return invalid
- if _definitions[str(conversation.encounter_id)].has("semantic_topic") and (conversation.current.effects.size()>1 or conversation.current.effects.any(func(e):return e.get("scope", "hearing")=="world")):
+ if _definitions[str(conversation.encounter_id)].has("semantic_topic") and (conversation.current.effects.size()>1 or conversation.current.effects.any(func(e):return e.get("scope", "hearing")=="world" or e.get("kind")!="semantic")):
   var invalid := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"semantic_transaction_adapter_pending")
   _report_failure(conversation,invalid);_finish(conversation);return invalid
  var peer_actors: Array=[]
@@ -197,14 +197,22 @@ func _advance(conversation: ConversationSession) -> ActionResult:
  changed.emit()
  return ActionResult.success()
 func _hear_current(conversation: ConversationSession) -> ActionResult:
+ var definition: Dictionary=_definitions[str(conversation.encounter_id)]
+ var semantic_effect := conversation.current.effects.any(func(e):return e.get("kind")=="semantic")
+ if semantic_effect:
+  if not definition.has("semantic_topic"):
+   var invalid := ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"semantic_context_required")
+   _report_failure(conversation,invalid);_finish(conversation);return invalid
+  var committed := _session.effects.apply_semantic(conversation)
+  if not committed.ok:_report_failure(conversation,committed);_finish(conversation);return committed
  if conversation.heard_beat==conversation.beat or not _can_hear(conversation):return ActionResult.success()
  var speaker := str(conversation.current.speaker_id)
- var definition: Dictionary=_definitions[str(conversation.encounter_id)]
- if definition.has("semantic_topic") and not conversation.current.effects.is_empty():
+ if definition.has("semantic_topic") and not semantic_effect and not conversation.current.effects.is_empty():
   if conversation.current.text.is_empty() or not _session.conditions.semantic_decision(definition,conversation.participants,"action",conversation.current.policy_action,conversation).allowed:
    var rejected := ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"semantic_action_unavailable")
    _report_failure(conversation,rejected);_finish(conversation);return rejected
  for i in range(conversation.current.effects.size()):
+  if conversation.current.effects[i].get("kind")=="semantic":continue
   if conversation.current.effects[i].get("scope","hearing")=="world":continue
   var applied := _session.effects.apply(conversation.current.effects[i],StringName("%s/%d/%d" % [conversation.id,conversation.beat,i]),speaker,conversation.participants)
   if not applied.ok:
@@ -588,6 +596,9 @@ func validate_sequences() -> ActionResult:
   var parts := str(e.id).split("/")
   if parts.size()!=3 or parts[0]!=e.chapter or parts[2]!=e.channel or not valid_sequence(parts[0],"conversation_",_next) or not parts[1].is_valid_int() or int(parts[1])<1 or parts[1]!=str(int(parts[1])) or (e.channel=="choice" and e.actor!="player"):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_journal_sequence")
  for reference in references:
+  if str(reference).contains("/semantic/"):
+   if _session.knowledge.assertions.receipt(str(reference)).is_empty():return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_semantic_knowledge")
+   continue
   var parts := str(reference).split("/")
   if parts.size()!=3 or not valid_sequence(parts[0],"conversation_",_next) or not parts[1].is_valid_int() or int(parts[1])<1 or not parts[2].is_valid_int() or int(parts[2])<0:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_effect_sequence")
  return ActionResult.success()

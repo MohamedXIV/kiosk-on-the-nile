@@ -1,0 +1,39 @@
+# Per-character knowledge foundation — #22
+
+Recorded2026-10-29, Africa/Cairo. Baseab8f886e4710375f02f139cada4429f4d0b18902; isolated `feat/per-character-knowledge`. Exact committed source, PR checks and merge identities are tracked on#22/#19/#8. This is a foundation delivery, with no production dialogue family conversion or formal release.
+
+## Delivered
+
+[Runnable API](../architecture/semantic-knowledge.md) and [validated two-section example](../architecture/examples/semantic-knowledge-v1.json) describe optional external authoring. KnowledgeBook owns canonical per-knower assertions, explicit initial sources, multiple independent paths and exact selected relay parents. Generic policy knowledge queries read the requested knower; legacy player facts remain separate. No production seeds or NPC omniscience were invented.
+
+Authored semantic actions have explicit audiences and typed assertion declarations. Actual location/distance/availability and fresh action decisions apply independently per listener. NPC-only speech can consume start evidence without player knowledge, player Journal or player heard_beat. A prepared knowledge-only batch publishes synchronously under NarrativeEffects' reentrancy guard, with revision checks and no await/signals. NarrativeEffects retains actual committed beat/frame/receipt/assertion source proofs. Save restore checks these against KnowledgeBook, catalog/story/binding identity, applied IDs and parent/time/publication order. Unsupported legacy/world/distributed mutations on semantic beats reject before mutation; existing production encounters retain legacy behavior.
+
+## Observed evidence
+
+[Evidence directory](evidence/2026-10-29-semantic-knowledge/) retains disposable inputs as `.gd.txt`/`.ink.txt`, native logs, before-correction logs, review/decision ledger and final build logs. Only terminal trailing whitespace was stripped from retained log lines; diagnostic content is unchanged. No automated suite was added or run. Commands used pinned `bash tools/godot.sh --headless --path . --script res://work/semantic-knowledge/<observation>.gd`; temporary Ink used pinned cached inklecate.
+
+- `core.log`:17 original owner checks plus malformed-record/chronology checks; preparation publishes nothing, stale tickets reject, multiple sources persist, relay parent belongs to actual speaker/exact term, bad actors/times/missing/cyclic or future sources reject without mutation. Final FAILURES0.
+- `lifecycle.log`: compiled temporary Ink in an in-memory bundle. Unheard start grants nothing; Youssef hears while player is far; intended out-of-range/other-location and nearby unintended actors do not learn. NPC receipt permits continuation after self-invalidating teaching, while a new start blocks. Actual serialized JSON checksum/text roundtrip/current restore, repeated beat, late player hearing/Journal, actual personal pause/return and exact relay/save restore succeed without replay. Missing applied IDs, changed recipient/action/speaker, future provenance and missing active metadata reject. Input save remains unchanged. Final FAILURES0.
+- `atomic.log`: a valid first declaration followed by unsupported source for the second publishes no partial knowledge/receipts. Reentrant commit and unguarded publication reject. `unsupported.log` rejects a legacy learn on a semantic beat. Final FAILURES0.
+- `authoring.log`: documented two-section example validates against actual catalogs; unknown seed actor and unknown action role reject. `legacy.log`: ordinary production serialized knowledge/effects shapes remain unchanged, current production save restores.
+- Four knower binds plus knowledge-policy evaluation over240 headless process frames: final post-guard mean0.26994583333333ms/p950.352ms. Pinned Godot4.7.2, x86_64 Intel Xeon Platinum8573C. This is a small CPU fixture, not rendering/whole-game/player-device FPS or long-session memory acceptance. Queries use per-knower/fact indexes; preparation/commit validates candidate recorded state only on actual consequences.
+
+Disposable lifecycle exits retain existing inkgd/ObjectDB resource warnings (253 objects/24 resources in final lifecycle;73/22 ordinary production fixture). Expected stopped-narrative warnings accompany rejected effects/relay sources. Final observations/import/export contain no script/parse/compile errors. Historical `core-review-before.log` deliberately records the reproduced malformed-record runtime error. No leak-free shutdown claim is made.
+
+## Review and checks
+
+One fresh read-only independent whole-branch review found four Important issues, no Critical/minors: unsupported single legacy effect bypass; malformed referenced-record crash; forged action/speaker source acceptance; later same-episode relay parent at equal time. All were reproduced before fixes, corrected in one implementation pass and verified by corresponding final observations. Source consistency uses durable owner proofs, not replayed historical Ink or cryptographic protection against editing every owner/checksum.
+
+A further direct-publication observation (`continuation-before.log`) showed that the coordinator relied on Director continuation checks. It now independently rechecks both continuation and action before preparation/publication; `continuation.log` and the complete `lifecycle-postguard.log` pass. This prevents a caller from bypassing changed domain state at the commit boundary.
+
+Actual JSON save testing additionally exposed Godot's distinct float/int Dictionary keys for publication order. The isolated `number-keys.log` probe confirmed the cause; integer normalization after numeric validation fixed it. Final comparisons across JSON serialization use canonical typed JSON, and real current-save restore succeeds.
+
+Tracked final `bash tools/build.sh --release --out /tmp/kiosk-semantic-knowledge-commit-guard-web` succeeded (`build-postguard.log`): pinned Ink compilation,377 localization references, Godot import and Web Release export. No playable archive was published. Exact-source PR/main CI is recorded live rather than predicting a future commit in this note.
+
+## Rulings and next steps
+
+Execution used the existing isolated task checkout/new branch, inline implementation and one fresh available reviewer (preferred Astra was unavailable at prior usage cap). Approved contract/repeated start/continue authorization supplied scope; no redundant design approval checkpoint. Standing no-suite instructions used bounded observations/tracked gates. Only explicit authored seeds/audiences exist. One semantic tag encapsulates an atomic knowledge-only batch; unsupported world/domain/social commands fail closed. No fake distributed rollback or legacy fact conversion was introduced. Source proofs check consistent authoritative owners, not malicious whole-save authenticity. Relay source selection is stable by publication order then ID, preserving the selected parent. Full ledger is retained in evidence.
+
+KnowledgeBook adds optional assertions only for active semantic fact catalogs; NarrativeEffects adds source proofs only after publication. Production empty catalogs retain legacy serialized shapes. Active metadata is required and strictly validated, with no silent reset/deletion or historical migration. VERSION0.2.1-prealpha.1, save schema4/revision20, CHANGELOG, published tags/releases and permanent archive history are unchanged. Final coherent save/version/changelog/new-game decision remains#26/#27.
+
+#23 now adds generalized directional introductions/shared days/history/consent. #24 converts actual invitation/relay/recipe families, message-instance scopes and presentation; #25 author tools; #26 integrated bilingual/pacing/save/performance acceptance; #27 final coherent preview. All49 current production encounters stay inventoried legacy until conversion. #6/#7 human playtest acceptance remains open.

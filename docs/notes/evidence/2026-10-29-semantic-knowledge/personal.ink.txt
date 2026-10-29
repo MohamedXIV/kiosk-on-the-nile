@@ -1,0 +1,5 @@
+VAR character_id = "farid"
+This is an attributed piece of information. # speaker:{character_id} # policy_action:personal # effect:semantic\|personal
+* [Continue # policy_choice:continue_chat]
+    We can carry on after the information was heard. # speaker:{character_id}
+    -> END

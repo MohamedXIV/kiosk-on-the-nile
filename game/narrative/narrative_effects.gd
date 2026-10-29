@@ -4,6 +4,9 @@ var supply_provider: Callable
 var finance_provider: Callable
 var service_provider: Callable
 var home_provider: Callable
+var semantic_provider: Callable
+var _committing: bool = false
+var _semantic_sources: Dictionary = {}
 var relationships: RelationshipStore
 var social_life: SocialLife
 var _knowledge: KnowledgeBook
@@ -19,6 +22,7 @@ func valid(effect: Dictionary) -> bool:
  if not scope in ["hearing","world"]:return false
  if scope=="world" and effect.get("kind")!="peer_relation":return false
  match effect.get("kind"):
+  "semantic":return scope=="hearing" and semantic_provider.is_valid() and effect.get("action_id") is String and effect.action_id.is_valid_identifier()
   "peer_relation":return scope=="world" and relationships!=null and effect.get("from") is String and effect.get("to") is String and effect.from!="player" and effect.to!="player" and effect.from!=effect.to and effect.get("axis") is String and ContentValidation.bounded(effect.get("amount"),-10,10) and relationships.can_adjust(StringName(effect.from),StringName(effect.to),StringName(effect.axis),float(effect.amount))
   "supply":return supply_provider.is_valid() and effect.get("action_id") in ["manage","emergency"]
   "finance":return finance_provider.is_valid() and effect.get("action_id") in ["pay_housing","pay_partial","repay_loan","personal","repair","accept_offer","decline_offer","offer_day_1","offer_day_3","offer_day_7","offer_loan_0","offer_loan_1","offer_loan_2"]
@@ -29,6 +33,7 @@ func valid(effect: Dictionary) -> bool:
   "learn": return effect.get("fact_id") in _facts and effect.get("note") is String
  return false
 func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "", participants: PackedStringArray = PackedStringArray()) -> ActionResult:
+ if effect.get("kind")=="semantic":return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"semantic_context_required")
  if not valid(effect): return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_narrative_effect")
  if _applied.has(str(occurrence_id)): return ActionResult.success({"duplicate":true})
  match effect.kind:
@@ -55,11 +60,42 @@ func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "", 
  _applied[str(occurrence_id)] = true
  return ActionResult.success()
 func applied(id: String) -> bool:return _applied.has(id)
+func apply_semantic(conversation: ConversationSession) -> ActionResult:
+ if _committing or not semantic_provider.is_valid():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"semantic_commit_busy")
+ _committing=true
+ var result: ActionResult=semantic_provider.call(conversation)
+ _committing=false
+ return result
+func publish_knowledge(ticket: Dictionary, receipts: Array, frame: Dictionary) -> ActionResult:
+ if not _committing:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"semantic_context_required")
+ var sources := {}
+ for receipt in receipts:
+  if _applied.has(receipt.id) or _semantic_sources.has(receipt.id) or ticket.receipts.get(receipt.id)!=receipt:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"semantic_receipt_collision")
+  var assertions: Array=[]
+  for id in receipt.assertions:
+   if not ticket.records.get(id) is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_knowledge_assertions")
+   assertions.append(ticket.records[id].duplicate(true))
+  sources[receipt.id]={"receipt":receipt.duplicate(true),"assertions":assertions,"frame":frame.duplicate(true)}
+ var result := _knowledge.assertions.commit(ticket)
+ if not result.ok:return result
+ for id in sources:
+  _applied[id]=true;_semantic_sources[id]=sources[id]
+ return ActionResult.success()
+func semantic_source(id: String) -> Dictionary:return _semantic_sources.get(id,{}).duplicate(true)
+func semantic_source_ids() -> Array:return _semantic_sources.keys()
 func snapshot() -> Dictionary:
- return {"applied":_applied.duplicate()}
+ var result := {"applied":_applied.duplicate()}
+ if not _semantic_sources.is_empty():result["semantic_sources"]=_semantic_sources.duplicate(true)
+ return result
 func restore(data: Dictionary) -> ActionResult:
  if not data.get("applied") is Dictionary: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_effect_history")
  for value in data.applied.values():
   if value != true: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_effect_history")
+ var sources: Variant=data.get("semantic_sources",{})
+ if not sources is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_semantic_source")
+ for id in sources:
+  var source: Variant=sources[id]
+  if not id is String or not data.applied.has(id) or not NarrativePolicyValidation.fields(source,["receipt","assertions","frame"]) or not source.receipt is Dictionary or not source.assertions is Array or not source.frame is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_semantic_source")
  _applied = data.applied.duplicate()
+ _semantic_sources=sources.duplicate(true)
  return ActionResult.success()

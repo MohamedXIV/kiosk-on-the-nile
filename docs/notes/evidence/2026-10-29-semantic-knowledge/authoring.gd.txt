@@ -1,0 +1,17 @@
+extends SceneTree
+func _initialize():
+ var store:=ContentStore.new();root.add_child(store)
+ var result:=store.load_directory("res://content")
+ var bundle:=store.bundle()
+ var example:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://docs/architecture/examples/semantic-knowledge-v1.json"))
+ bundle.merge(example,true)
+ result=ContentValidation.validate(bundle);print("DOCUMENTED TWO-SECTION EXAMPLE VALID ",result.ok," ",result.details)
+ var valid:bool=result.ok
+ bundle.narrative_knowledge.initial[0].knower="unknown"
+ result=ContentValidation.validate(bundle);print("UNKNOWN SEED ACTOR REJECT ",not result.ok)
+ valid=valid and not result.ok
+ bundle.narrative_knowledge.initial[0].knower="farid"
+ bundle.narrative_knowledge.actions.example.teach.assertions[0].fact.args.person={"role":"missing"}
+ result=ContentValidation.validate(bundle);print("UNKNOWN ACTION ROLE REJECT ",not result.ok)
+ valid=valid and not result.ok
+ print("FAILURES ",0 if valid else 1);store.queue_free();quit(0 if valid else 1)

@@ -1,0 +1,18 @@
+extends SceneTree
+func _initialize():call_deferred("run")
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var result:=store.load_directory("res://content")
+ if not result.ok:quit(1);return
+ var config:=SessionConfig.new(store.bundle(),store.fingerprint)
+ var session:=GameSession.new();root.add_child(session);result=session.configure(config)
+ if not result.ok:quit(1);return
+ session.start_new()
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var saved:=codec.encode(session)
+ var ordinary:bool=not saved.state.knowledge.has("assertions") and not saved.state.effects.has("semantic_sources")
+ print("PRODUCTION LEGACY SERIALIZED SHAPE UNCHANGED ",ordinary)
+ var restored:=await codec.create_candidate(saved,config)
+ print("PRODUCTION CURRENT SAVE RESTORE ",restored.ok," ",restored.message_key)
+ if restored.ok:restored.details.session.queue_free()
+ session.queue_free();codec.queue_free();store.queue_free();await process_frame;quit(0 if ordinary and restored.ok else 1)

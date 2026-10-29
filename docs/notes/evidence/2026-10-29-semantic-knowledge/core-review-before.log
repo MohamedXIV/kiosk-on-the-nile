@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONFIGURE true
+KNOWERS DIFFER NO PLAYER FALLBACK true
+PREPARATION DOES NOT PUBLISH true
+COMMIT PREPARED true
+STALE PREPARED REVISION REJECT true
+IDENTICAL DUPLICATE NO PUBLICATION true
+SECOND SOURCE COMMIT true
+INDEPENDENT SOURCES RETAINED true
+RELAY ACTUAL SPEAKER PARENT true
+UPSTREAM ID RETAINED true
+DANGLING PARENT REJECT WITHOUT MUTATION true
+WRONG PARENT KNOWER REJECT true
+FUTURE TIME REJECT true
+UNKNOWN SUBJECT REJECT true
+MISSING RECEIPT REJECT true
+WHOLE INVALID BATCH UNCHANGED true
+CURRENT OWNER RESTORE EXACT true
+SCRIPT ERROR: Invalid call. Nonexistent function 'get' in base 'int'.
+          at: KnowledgeAssertions._validate (res://game/narrative/knowledge_assertions.gd:78)
+          GDScript backtrace (most recent call first):
+              [0] _validate (res://game/narrative/knowledge_assertions.gd:78)
+              [1] restore (res://game/narrative/knowledge_assertions.gd:66)
+              [2] run (res://work/semantic-knowledge/core.gd:49)
+SCRIPT ERROR: Invalid access to property or key 'ok' on a base object of type 'Nil'.
+          at: KnowledgeAssertions.restore (res://game/narrative/knowledge_assertions.gd:67)
+          GDScript backtrace (most recent call first):
+              [0] restore (res://game/narrative/knowledge_assertions.gd:67)
+              [1] run (res://work/semantic-knowledge/core.gd:49)
+MALFORMED REFERENCED RECORD CLEAN REJECTION false
+LATER BEAT PARENT AT SAME TIME REJECT false
+FAILURES 2

@@ -1,0 +1,124 @@
+class_name NarrativeKnowledge
+extends RefCounted
+## Prepare complete heard-knowledge batches; never mutate money/domain owners.
+var _session: GameSession
+var _actions: Dictionary = {}
+var identity: String = ""
+func configure(session: GameSession) -> void:
+ _session=session
+ var data: Dictionary=session.config.data.get("narrative_knowledge",NarrativeKnowledgeValidation.empty_catalog())
+ _actions=data.actions.duplicate(true);identity=StableJson.stringify(data).sha256_text()
+func _book() -> KnowledgeAssertions:return _session.knowledge.assertions
+func _action(topic: String, id: String) -> Dictionary:return _actions.get(topic,{}).get(id,{})
+func _pose(actor: String) -> ActorPose:
+ if actor=="player":return _session.player_pose if _session.locations.is_physical(_session.location_id) else null
+ var record: Variant=_session.semantic._record(actor)
+ return record.pose if record!=null and _session.presence.is_available(record.id) else null
+func can_hear(speaker: String, listener: String, channel: String) -> bool:
+ if speaker==listener:return false
+ var source := _pose(speaker);var target := _pose(listener)
+ if source==null or target==null or source.location_id!=target.location_id:return false
+ var radius := 3.4 if channel=="personal" else float(_session.config.data.spatial.hearing_radius)
+ return source.ground.distance_to(target.ground)<=radius
+func _context(entry: Dictionary, c: ConversationSession, listener: String) -> ActionResult:
+ var declared: Array=_session.semantic.policy._compiled.topics[entry.semantic_topic].get("turn_roles",[])
+ var turn := {}
+ if "speaker" in declared:turn.speaker=str(c.current.speaker_id)
+ if "listener" in declared:turn.listener=listener
+ return _session.semantic._context(entry,c.participants,turn)
+func _authorized(entry: Dictionary, c: ConversationSession, listener: String) -> PolicyDecision:
+ var continuation := _session.semantic.decide(entry,c.participants,"continuation","",c,listener)
+ if not continuation.allowed:return continuation
+ return _session.semantic.decide(entry,c.participants,"action",c.current.policy_action,c,listener)
+func commit(c: ConversationSession) -> ActionResult:
+ var entry: Dictionary=_session.config.data.encounters[str(c.encounter_id)]
+ if not entry.has("semantic_topic") or c.current.text.is_empty() or c.current.effects.size()!=1 or c.current.effects[0].get("kind")!="semantic" or c.current.effects[0].get("action_id")!=c.current.policy_action:return _fail()
+ var action := _action(entry.semantic_topic,c.current.policy_action)
+ if action.is_empty():return _fail()
+ var speaker := str(c.current.speaker_id)
+ var bound := _context(entry,c,"player")
+ if not bound.ok:return _fail()
+ var context: NarrativeContext=bound.details.context
+ var audience: Variant=context.resolve(action.listeners)
+ if not audience is Array:return _fail()
+ var seen := {};var receipts_to_add: Array=[];var assertions_to_add: Array=[];var eligible: Array=[]
+ for listener in audience:
+  if not listener is String or seen.has(listener):return _fail()
+  seen[listener]=true
+  if not can_hear(speaker,listener,action.get("channel","hearing")):continue
+  var id := KnowledgeAssertions.receipt_id(str(c.id),c.beat,c.current.policy_action,listener)
+  var existing := _book().receipt(id)
+  if not existing.is_empty():
+   if not _receipt_source(existing,entry,context.identity(),c,speaker):return _fail()
+   continue
+  var decision := _authorized(entry,c,listener)
+  if decision.status=="invalid":return _fail()
+  if not decision.allowed:continue
+  bound=_context(entry,c,listener)
+  if not bound.ok:return _fail()
+  var resolved: Variant=bound.details.context.resolve(action.assertions)
+  if not resolved is Array:return _fail()
+  var ids: Array=[]
+  for i in range(resolved.size()):
+   var declaration: Dictionary=resolved[i]
+   var parent := ""
+   if declaration.kind=="relayed":
+    if declaration.parent!=speaker:return _fail()
+    var sources := _book().query(speaker,declaration.fact)
+    if sources.is_empty():return _fail()
+    parent=sources[0].id
+   var assertion_id := id+"/"+str(i);ids.append(assertion_id)
+   assertions_to_add.append({"id":assertion_id,"knower":listener,"fact":declaration.fact,"kind":declaration.kind,"speaker":speaker,"source":id,"at":_session.clock.world_minutes,"parent":parent})
+  var story: StoryDefinition=_session.narrative._stories[entry.story]
+  receipts_to_add.append({"id":id,"episode":str(c.id),"beat":c.beat,"topic":entry.semantic_topic,"action":c.current.policy_action,"speaker":speaker,"listener":listener,"at":_session.clock.world_minutes,"order":_book().next_order()+receipts_to_add.size(),"catalog":_session.semantic.policy.identity(),"knowledge_catalog":identity,"identity":context.identity(),"encounter":str(c.encounter_id),"participants":c.context_extra.semantic_start.actors.duplicate(),"story":str(story.id),"story_hash":story.sha256,"assertions":ids})
+  eligible.append(listener)
+ if receipts_to_add.is_empty():return ActionResult.success({"duplicate_or_unheard":true})
+ var prepared := _book().prepare(receipts_to_add,assertions_to_add)
+ if not prepared.ok:return prepared
+ # No await and no publication/signals before the whole batch is ready.
+ for listener in eligible:
+  if not can_hear(speaker,listener,action.get("channel","hearing")) or not _authorized(entry,c,listener).allowed:return _fail()
+ var result := _session.effects.publish_knowledge(prepared.details,receipts_to_add,c.current.to_dict())
+ if not result.ok:return result
+ if c.context_extra.semantic_start.receipt.is_empty():c.context_extra.semantic_start.receipt=receipts_to_add[0].id
+ return ActionResult.success()
+func _receipt_source(r: Dictionary, entry: Dictionary, bound_identity: Dictionary, c: ConversationSession, speaker: String) -> bool:
+ return r.episode==str(c.id) and r.beat==c.beat and r.action==c.current.policy_action and r.speaker==speaker and r.identity==bound_identity and r.catalog==_session.semantic.policy.identity() and r.knowledge_catalog==identity and r.encounter==str(c.encounter_id) and r.story==entry.story and r.story_hash==c.runtime._definition.sha256
+func validate_links(next_episode: int) -> ActionResult:
+ for receipt_value in _book().receipts():
+  var r: Dictionary=receipt_value
+  var source := _session.effects.semantic_source(r.id)
+  if source.is_empty() or source.receipt!=r or source.assertions.size()!=r.assertions.size() or source.frame.get("speaker_id")!=r.speaker or source.frame.get("policy_action")!=r.action or source.frame.get("effects")!=[{"kind":"semantic","action_id":r.action}] or not source.frame.get("text") is String or source.frame.text.is_empty():return _fail()
+  for i in range(r.assertions.size()):
+   if source.assertions[i]!=_book().record(r.assertions[i]):return _fail()
+  if not _session.effects.applied(r.id) or not _session.narrative.valid_sequence(r.episode,"conversation_",next_episode) or r.catalog!=_session.semantic.policy.identity() or r.knowledge_catalog!=identity or not _session.config.data.encounters.has(r.encounter):return _fail()
+  var entry: Dictionary=_session.config.data.encounters[r.encounter]
+  if entry.get("semantic_topic")!=r.topic or entry.story!=r.story or not _session.narrative._stories.has(r.story) or _session.narrative._stories[r.story].sha256!=r.story_hash:return _fail()
+  if not NarrativePolicyValidation.fields(r.identity,["topic","bindings","roles"]) or not r.identity.bindings is Dictionary or not r.identity.roles is Dictionary:return _fail()
+  var bound := _session.semantic.policy.bind(r.topic,r.identity.bindings,{}, {},r.identity.roles)
+  if not bound.ok or bound.details.context.identity()!=r.identity:return _fail()
+  for key in entry.semantic_bindings:
+   var ref: Variant=entry.semantic_bindings[key]
+   if ref is Dictionary:
+    if int(ref.participant)>=r.participants.size() or r.identity.bindings[key]!=r.participants[int(ref.participant)]:return _fail()
+   elif r.identity.bindings[key]!=ref:return _fail()
+  var action := _action(r.topic,r.action)
+  if action.is_empty():return _fail()
+  var context: NarrativeContext=bound.details.context
+  var audience: Variant=context.resolve(action.listeners)
+  if not audience is Array or not r.listener in audience or r.assertions.size()!=action.assertions.size():return _fail()
+  var declared: Array=_session.semantic.policy._compiled.topics[r.topic].get("turn_roles",[])
+  if "speaker" in declared:context.roles.speaker=r.speaker
+  if "listener" in declared:context.roles.listener=r.listener
+  var expected: Variant=context.resolve(action.assertions)
+  if not expected is Array:return _fail()
+  for i in range(expected.size()):
+   var assertion := _book().record(r.assertions[i])
+   if r.assertions[i]!=r.id+"/"+str(i) or assertion.fact!=expected[i].fact or assertion.kind!=expected[i].kind:return _fail()
+   if assertion.kind=="relayed" and expected[i].parent!=r.speaker:return _fail()
+ for id in _session.effects.snapshot().applied:
+  if str(id).contains("/semantic/") and _book().receipt(str(id)).is_empty():return _fail()
+ for id in _session.effects.semantic_source_ids():
+  if _book().receipt(str(id)).is_empty():return _fail()
+ return ActionResult.success()
+static func _fail() -> ActionResult:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_semantic_knowledge")

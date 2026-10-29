@@ -1,0 +1,6 @@
+extends SceneTree
+func _initialize():
+ var d={};d[1.0]=true
+ print("INTEGER FLOAT DICTIONARY LOOKUP ",d.has(1)," DIRECT EQUALITY ",1==1.0)
+ print("PARSED ARRAY LOOKUP ",[1.0,2.0].has(1))
+ quit()

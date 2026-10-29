@@ -1,0 +1,42 @@
+extends SceneTree
+var bad:=0
+var s:GameSession
+var config:SessionConfig
+var fact={"type":"connection","args":{"person":"farid"}}
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String,details:Variant=""):
+ print(label," ",ok," ",details)
+ if not ok:bad+=1
+func visit(actor:String,ground:Vector2,location:String="kiosk") -> VisitState:
+ var v:Variant=s.semantic._record(actor)
+ if v==null:v=s.visitors.spawn(StringName(actor))
+ v.phase=&"staying";v.pose.ground=ground;v.pose.location_id=StringName(location);v.destination=ground;v.shopping_state=&"declined"
+ return v
+func term(knower:String) -> Array:return s.knowledge.query_assertions(knower,fact)
+func reseal(data:Dictionary) -> Dictionary:
+ data.erase("checksum");data.checksum=StableJson.stringify(data).sha256_text();return data
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ check(store.load_directory("res://content").ok,"PRODUCTION CONTENT")
+ var bundle:=store.bundle()
+ var yes={"op":"time_window","start":0,"end":1440}
+ var ref_fact={"type":"connection","args":{"person":{"role":"subject"}}}
+ bundle["narrative_policies"]={"contract_version":1,"profiles":{},"policies":{},"fact_types":{"connection":{"person":"actor"}},"topics":{"demo":{"bindings":{"source_actor":"actor","student_actor":"actor","subject_actor":"actor"},"roles":{"teacher":{"binding":"source_actor"},"student":{"binding":"student_actor"},"subject":{"binding":"subject_actor"}},"turn_roles":["speaker","listener"],"stages":{"start":{"op":"not","rule":{"op":"knowledge","knower":{"role":"student"},"fact":ref_fact,"provenance_kinds":["initial","heard","relayed"]}},"continuation":yes},"choices":{"continue_chat":yes},"actions":{"teach":yes,"relay":yes,"personal":yes,"alias_teach":yes}}}}
+ bundle["narrative_knowledge"]={"initial":[{"id":"farid_source","knower":"farid","fact":fact}],"actions":{"demo":{"personal":{"listeners":[{"actor":"player"}],"assertions":[{"kind":"heard","fact":ref_fact}]},"teach":{"listeners":[{"role":"student"},{"actor":"player"},{"actor":"amgad"},{"actor":"nadia"}],"assertions":[{"kind":"heard","fact":ref_fact}]},"relay":{"listeners":[{"role":"student"}],"assertions":[{"kind":"relayed","fact":ref_fact,"parent":{"role":"speaker"}}]}}}}
+ bundle.narrative_knowledge.actions.demo["alias_teach"]=bundle.narrative_knowledge.actions.demo.teach.duplicate(true)
+ for action in ["teach","relay","personal"]:
+  bundle.encounters["semantic_"+action]={"story":"semantic_"+action,"semantic_topic":"demo","semantic_bindings":{"source_actor":{"participant":0},"student_actor":{"participant":1},"subject_actor":"farid"},"manual":true,"requires":{},"offer_requires":{},"advancement":"manual"}
+  bundle["story_semantic_"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://work/semantic-knowledge/"+action+".ink.json").replace("effect:semantic|personal","effect:learn|KNOWN_CHEAP_FAN|A legacy learned fact."))
+ bundle.encounters.semantic_personal.semantic_bindings={"source_actor":{"participant":0},"student_actor":"player","subject_actor":"amgad"}
+ check(ContentValidation.validate(bundle).ok,"AUTHORED CATALOG VALID")
+ config=SessionConfig.new(bundle,"semantic-knowledge-prototype")
+ s=GameSession.new();root.add_child(s)
+ var result:=s.configure(config);check(result.ok,"CONFIG",result.details)
+ if not result.ok:quit(1);return
+ s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var farid:=visit("farid",Vector2(8,2));var youssef:=visit("youssef",Vector2(4,2));var amgad:=visit("amgad",Vector2(-8,2));visit("nadia",Vector2(4,2),"rooftop")
+ s.player_ground=farid.pose.ground
+ var before:=s.knowledge.snapshot()
+ result=await s.narrative.start(&"semantic_personal",PackedStringArray([str(farid.id)]),{"manual_read":false})
+ check(not result.ok and s.knowledge.snapshot()==before,"LEGACY EFFECT ON SEMANTIC ENCOUNTER REJECT")
+ print("FAILURES ",bad);s.queue_free();store.queue_free();await process_frame;quit(bad)
