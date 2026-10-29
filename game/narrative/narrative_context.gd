@@ -10,7 +10,7 @@ func resolve(value: Variant) -> Variant:
  if value is Dictionary:
   if value.size()==1 and value.has("role"):return roles.get(value.role)
   if value.size()==1 and value.has("binding"):return bindings.get(value.binding)
-  if value.size()==1 and value.has("actor"):return value.actor
+  if value.size()==1 and value.has("actor") and value.actor is String:return value.actor
   var result := {}
   for key in value:
    var part: Variant=resolve(value[key])

@@ -4,6 +4,7 @@ var supply_provider: Callable
 var finance_provider: Callable
 var service_provider: Callable
 var home_provider: Callable
+var home_domain: ResidentialVisits
 var semantic_provider: Callable
 var _committing: bool = false
 var _semantic_sources: Dictionary = {}
@@ -66,7 +67,7 @@ func apply_semantic(conversation: ConversationSession) -> ActionResult:
  var result: ActionResult=semantic_provider.call(conversation)
  _committing=false
  return result
-func publish_knowledge(ticket: Dictionary, receipts: Array, frame: Dictionary, social_ticket: Dictionary = {}, relationship_ticket: Dictionary = {}, presence: Dictionary = {}) -> ActionResult:
+func publish_knowledge(ticket: Dictionary, receipts: Array, frame: Dictionary, social_ticket: Dictionary = {}, relationship_ticket: Dictionary = {}, presence: Dictionary = {}, domain_ticket: Dictionary = {}) -> ActionResult:
  if not _committing:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"semantic_context_required")
  var valid:=_knowledge.assertions.can_commit(ticket)
  if not valid.ok:return valid
@@ -76,6 +77,10 @@ func publish_knowledge(ticket: Dictionary, receipts: Array, frame: Dictionary, s
   if not valid.ok:return valid
   valid=relationships.can_commit(relationship_ticket)
   if not valid.ok:return valid
+ if not domain_ticket.is_empty():
+  if home_domain==null:return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"semantic_domain_unavailable")
+  valid=home_domain.can_commit_semantic(domain_ticket)
+  if not valid.ok:return valid
  var sources := {}
  for receipt in receipts:
   if _applied.has(receipt.id) or _semantic_sources.has(receipt.id) or ticket.receipts.get(receipt.id)!=receipt:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"semantic_receipt_collision")
@@ -84,7 +89,7 @@ func publish_knowledge(ticket: Dictionary, receipts: Array, frame: Dictionary, s
    if not ticket.records.get(id) is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_knowledge_assertions")
    assertions.append(ticket.records[id].duplicate(true))
   sources[receipt.id]={"receipt":receipt.duplicate(true),"assertions":assertions,"frame":frame.duplicate(true)}
-  if not receipt.get("social",[]).is_empty():
+  if not receipt.get("social",[]).is_empty() or receipt.has("domain"):
    if presence.size()!=receipt.participants.size():return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"ambiguous_social_presence_proof")
    for actor in receipt.participants:
     if not presence.get(actor) is String or presence[actor].is_empty():return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"missing_social_presence_proof")
@@ -97,7 +102,12 @@ func publish_knowledge(ticket: Dictionary, receipts: Array, frame: Dictionary, s
     if not social_ticket.get("events",{}).get(id) is Dictionary:return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"incomplete_social_transaction")
     rows.append(social_ticket.events[id].duplicate(true))
    sources[receipt.id]["social"]=rows
+ if not domain_ticket.is_empty():
+  var command: Dictionary=domain_ticket.record.duplicate(true);command.erase("at");command.erase("visit")
+  var source_id: String=domain_ticket.record.source
+  if not sources.has(source_id) or not NarrativePolicyValidation.equivalent(sources[source_id].receipt.get("domain"),command):return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"semantic_domain_source_mismatch")
  # All candidates are validated. These publications have no callbacks/awaits.
+ if not domain_ticket.is_empty():home_domain.publish_semantic(domain_ticket)
  _knowledge.assertions.publish(ticket)
  if not social_ticket.is_empty():
   social_life.memory.publish(social_ticket);relationships.publish(relationship_ticket)

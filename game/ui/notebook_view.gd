@@ -26,6 +26,15 @@ static func notes(session: GameSession) -> Array[Dictionary]:
    display=source(str(refs.get(candidates[0].fact,"")),display)
    if str(candidates[0].source).begins_with("conversation_"):chapter=str(candidates[0].source).get_slice("/",0)
   result.append({"text":display,"chapter":chapter})
+ # Compatibility IDs only select presentation; assertions remain the sole fact owner.
+ for fact in session.knowledge.aliases:
+  if not refs.has(fact):continue
+  var record:=session.knowledge.record(StringName(fact))
+  if record.is_empty():continue
+  var ref: String=str(refs[fact])
+  var canonical: String=str(session.config.data.get("locale_ar",{}).get("messages",{}).get(ref,""))
+  if canonical.is_empty():continue
+  result.append({"text":source(ref,canonical),"chapter":str(record.source).get_slice("/",0) if str(record.source).begins_with("conversation_") else ""})
  return result
 static func people(session: GameSession) -> Array[Dictionary]:
  var result := session.notebook_people()

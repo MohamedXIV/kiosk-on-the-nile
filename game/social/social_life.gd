@@ -14,8 +14,19 @@ func configure(session: GameSession) -> void:
  memory.configure(session)
 static func empty_state() -> Dictionary:
  return {"receipts":{},"topic_history":{},"moments":{},"daily":{},"people":{},"invitations":{},"activity":{"phase":"idle","not_before":-1.0,"start_at":-1.0,"end_at":-1.0,"clear_since":-1.0,"outcome":""}}
+func _receipt(id: String, state: Dictionary) -> Dictionary:
+ var alias: Dictionary=_data.get("semantic_introductions",{}).get(id,{})
+ if not alias.is_empty():
+  var intro:=memory.acquaintance(alias.observer,alias.other)
+  if state.has("semantic_memory"):
+   var checked:=memory.inspect(state.semantic_memory)
+   if not checked.ok:return {}
+   var raw: Dictionary=checked.details.indexes.introductions.get(SemanticSocialMemory.pair(alias.observer,alias.other),{})
+   intro={"introduced":not raw.is_empty(),"introduced_at":raw.get("at",-1),"source":raw.get("source","")}
+  return {"at":intro.introduced_at,"source":intro.source,"actor":alias.other} if intro.introduced else {}
+ return state.receipts.get(id,{})
 func done(id: String) -> bool:
- return _state.receipts.has(id)
+ return not _receipt(id,_state).is_empty()
 func available(id: String) -> bool:
  return _available(id,_state)
 func _available(id: String, state: Dictionary) -> bool:
@@ -25,9 +36,10 @@ func _available(id: String, state: Dictionary) -> bool:
  for actor in action.get("acquaintances",{}).get("actors",[]):
   if not acquainted(str(actor),str(action.acquaintances.profile),state):return false
  for required in action.needs:
-  if not state.receipts.has(required):return false
+  if _receipt(required,state).is_empty():return false
  for required in action.get("next_day_after",[]):
-  if not state.receipts.has(required) or _session.clock.day<=floori(float(state.receipts[required].at)/1440.0)+1:return false
+  var receipt:=_receipt(required,state)
+  if receipt.is_empty() or _session.clock.day<=floori(float(receipt.at)/1440.0)+1:return false
  var absent := str(action.get("absent_actor",""))
  if not absent.is_empty():
   for visit in _session.visitors.visits.values():
@@ -38,6 +50,9 @@ func _available(id: String, state: Dictionary) -> bool:
 func acquainted(actor: String, profile: String, state: Dictionary = {}) -> bool:
  if state.is_empty():state=_state
  var rule: Dictionary=_data.get("pacing",{}).get(profile,{})
+ if _data.get("semantic_introductions",{}).values().any(func(a):return a.observer=="player" and a.other==actor):
+  var history:=memory.acquaintance("player",actor)
+  return history.introduced and history.calendar_days>=int(rule.get("days",100000)) and history.shared_days>=int(rule.get("social_days",100000)) and _session.relationships.value(StringName(actor),&"player",&"familiarity")>=float(rule.get("familiarity",100000)) and _session.relationships.value(StringName(actor),&"player",&"trust")>=float(rule.get("trust",100000))
  var introduction: Dictionary=state.receipts.get("meet_"+actor,{})
  if rule.is_empty() or introduction.is_empty():return false
  if _session.clock.day-1-floori(float(introduction.at)/1440.0)<int(rule.days):return false
@@ -49,6 +64,11 @@ func acquainted(actor: String, profile: String, state: Dictionary = {}) -> bool:
  return days>=int(rule.social_days)
 func topic_available(id: String) -> bool:
  var topic: Dictionary=_data.topics.get(id,{})
+ if not topic.is_empty():
+  var entry: Dictionary=_session.config.data.encounters[topic.encounter]
+  if entry.has("semantic_topic"):
+   var person: Variant=_session.semantic._record(topic.actor)
+   return person!=null and _session.semantic.decide(entry,PackedStringArray([str(person.id)]),"offer").allowed
  if topic.is_empty() or (not topic.phases.is_empty() and not _state.activity.phase in topic.phases):return false
  return available(str(topic.action)) if topic.get("action","")!="" else int(_state.topic_history.get(id,0))!=_session.clock.day and done("consent_farid") and done("consent_youssef") and _state.activity.phase=="coordinating"
 func apply(id: String, source: String, speaker: String = "", internal: bool = false) -> ActionResult:
@@ -180,13 +200,15 @@ func _validate(data: Dictionary) -> ActionResult:
    if receipt.get("message")!=action.message or receipt.source.is_empty():return _fail("invalid_message_receipt")
   elif receipt.has("message"):return _fail("unexpected_message_receipt")
   for required in action.get("next_day_after",[]):
-   if not data.receipts.has(required) or floori(float(receipt.at)/1440.0)<=floori(float(data.receipts[required].at)/1440.0):return _fail("premature_story_followup")
+   var upstream:=_receipt(required,data)
+   if upstream.is_empty() or floori(float(receipt.at)/1440.0)<=floori(float(upstream.at)/1440.0):return _fail("premature_story_followup")
   for actor in action.get("acquaintances",{}).get("actors",[]):
-   var introduction: Dictionary=data.receipts.get("meet_"+str(actor),{})
+   var introduction:=_receipt("meet_"+str(actor),data)
    var days := int(_data.pacing[action.acquaintances.profile].days)
    if introduction.is_empty() or floori(float(receipt.at)/1440.0)-floori(float(introduction.at)/1440.0)<days:return _fail("premature_acquaintance_receipt")
   for required in _data.actions[id].needs:
-   if not data.receipts.has(required) or data.receipts[required].at>data.receipts[id].at:return _fail("invalid_social_dependency")
+   var upstream:=_receipt(required,data)
+   if upstream.is_empty() or upstream.at>data.receipts[id].at:return _fail("invalid_social_dependency")
  for actor in data.people:
   if not _session.config.section("visitors").characters.has(actor) or data.people[actor]!=true:return _fail("invalid_social_person")
  for day in data.daily:
@@ -287,7 +309,9 @@ func step_companionship(delta: float) -> void:
   invitation.elapsed=minf(float(invitation.wait),float(invitation.elapsed)+delta)
   if invitation.elapsed<float(invitation.wait):continue
   invitation.offered=true
-  _session.narrative.start(&"social_invitation",PackedStringArray([id]),{"topic_id":topics[0].id,"invitation":true})
+  var entry: Dictionary=_session.config.data.encounters[topics[0].encounter]
+  if entry.has("semantic_topic"):_session.narrative.start(StringName(topics[0].encounter),PackedStringArray([id]),{"invitation":true,"manual_read":false})
+  else:_session.narrative.start(&"social_invitation",PackedStringArray([id]),{"topic_id":topics[0].id,"invitation":true})
 func can_invite(visit_id: StringName) -> bool:
  if _session.narrative==null or not _session.narrative.sessions.is_empty() or (_session.personal!=null and _session.personal.active()):return false
  if participation_blocked.is_valid() and bool(participation_blocked.call()):return false
@@ -305,6 +329,6 @@ func dialogue_context(id: String) -> Dictionary:
  var minute := fposmod(appointment,1440.0)
  return {"topic_id":id,"trial_week":activity.outcome=="week_trial","appointment_label":"يوم %d الساعة %02d:%02d" % [floori(appointment/1440.0)+1,int(minute)/60,int(minute)%60],"localization_args":{"appointment_label":NarrativeLocalization.date(appointment)}}
 func heard_topic(id: String) -> void:
- if not _data.topics.has(id):return
+ if not _data.topics.has(id) or _session.config.data.encounters[_data.topics[id].encounter].has("semantic_topic"):return
  var action := str(_data.topics[id].action)
  if action.is_empty() or done(action):_state.topic_history[id]=_session.clock.day

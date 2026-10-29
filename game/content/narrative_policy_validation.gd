@@ -135,12 +135,12 @@ func _expand(raw: Variant, roles: Array, bindings: Dictionary, params: Dictionar
  var ok := false
  match r.op:
   "relationship":ok=fields(r,["op","from","to","axis","compare","value"]) and _ref(r.from,"actor",roles,bindings) and _ref(r.to,"actor",roles,bindings) and r.axis in _schemas.get("axes",[]) and r.compare in [">=",">","==","<=","<"] and ContentValidation.number(r.value)
-  "knowledge":
-   ok=fields(r,["op","knower","fact","provenance_kinds"]) and _ref(r.knower,"actor",roles,bindings) and fields(r.fact,["type","args"]) and _data.fact_types.has(r.fact.type) and r.fact.args is Dictionary and same_keys(r.fact.args,_data.fact_types[r.fact.type]) and r.provenance_kinds is Array and not r.provenance_kinds.is_empty()
+  "knowledge","knowledge_age":
+   ok=fields(r,["op","knower","fact","provenance_kinds"] if r.op=="knowledge" else ["op","knower","fact","calendar_days"]) and _ref(r.knower,"actor",roles,bindings) and fields(r.fact,["type","args"]) and _data.fact_types.has(r.fact.type) and r.fact.args is Dictionary and same_keys(r.fact.args,_data.fact_types[r.fact.type]) and ((r.provenance_kinds is Array and not r.provenance_kinds.is_empty()) if r.op=="knowledge" else ContentValidation.integer(r.calendar_days) and r.calendar_days>=0)
    if ok:
     for key in r.fact.args:
      if not _ref(r.fact.args[key],_data.fact_types[r.fact.type][key],roles,bindings):ok=false
-    for kind in r.provenance_kinds:
+    for kind in r.get("provenance_kinds",[]):
      if not kind in ["heard","initial","relayed","observed"]:ok=false
   "acquaintance":ok=fields(r,["op","observer","other","calendar_days","shared_days"]) and _ref(r.observer,"actor",roles,bindings) and _ref(r.other,"actor",roles,bindings) and ContentValidation.integer(r.calendar_days) and r.calendar_days>=0 and ContentValidation.integer(r.shared_days) and r.shared_days>=0
   "consent":ok=fields(r,["op","grantor","recipient","purpose","scope"]) and _ref(r.grantor,"actor",roles,bindings) and _ref(r.recipient,"actor",roles,bindings) and typed(r.purpose,"string",_schemas) and _ref(r.scope,"string",roles,bindings)

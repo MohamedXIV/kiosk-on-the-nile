@@ -1,0 +1,7 @@
+Shall we arrange it? # speaker:farid # duration:5
+* [Yes. # policy_choice:accept]
+ Agreed. # speaker:farid # duration:5 # policy_action:accept # effect:semantic\|accept
+ -> END
+* [Later. # policy_choice:leave]
+ Take your time. # speaker:farid # duration:5
+ -> END

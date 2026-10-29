@@ -1,3 +1,5 @@
+#24 implementation:22/51 encounters converted; remaining29 explicitly inventoried. Bounded observations and one material review fix complete; integration checkpoint pending. See [notes](../notes/2026-10-29-semantic-families.md). #25 author tools, #26 integrated acceptance and #27 final version/changelog/preview remain.
+
 # Delivery status and roadmap
 
 ## Semantic narrative architecture — 2026-10-29

@@ -254,6 +254,7 @@ func configure(source: SessionConfig) -> ActionResult:
  effects.relationships=relationships
  effects.social_life=social_life
  effects.home_provider=residential.action
+ effects.home_domain=residential
  effects.service_provider=_service_effect
  effects.finance_provider=financial_effect
  ink_players=InkPlayerCache.new()

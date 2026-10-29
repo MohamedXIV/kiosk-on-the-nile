@@ -243,7 +243,9 @@
       "manual_encounters": [
         "venue_comments",
         "shawarma_learning",
-        "visitors"
+        "visitors",
+        "shawarma_attempt",
+        "shawarma_result"
       ],
       "food_preferences": {
         "kebda": 4,

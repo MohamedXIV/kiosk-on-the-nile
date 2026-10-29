@@ -1,5 +1,7 @@
 # Per-character knowledge and heard consequences — #22
 
+Current activation: [#24 family conversion](semantic-families.md) supersedes the foundation-only status below:22/51 production encounters now use shared semantics. The original scope notes remain historical.
+
 This extends the [shared policy runtime](semantic-policy-runtime.md) and implements the knowledge portion of the [semantic contract](semantic-narrative.md). [Social memory#23](semantic-social.md) extends the same prepared publication to introductions/company/consent/scoped history and directional score candidates. All49 production encounters remain unconverted until#24. No actual NPC seeds or new dialogue were added to production.
 
 ## Authoring and query API

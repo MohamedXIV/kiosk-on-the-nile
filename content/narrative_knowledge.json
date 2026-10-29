@@ -1,0 +1,1434 @@
+{
+  "initial": [
+    {
+      "id": "farid_shawarma_basics",
+      "knower": "farid",
+      "fact": {
+        "type": "recipe_basics",
+        "args": {
+          "recipe": "shawarma"
+        }
+      }
+    }
+  ],
+  "actions": {
+    "introduction": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "introduction",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 4
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiet_company": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 3
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "day",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "exam_open": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "story",
+              "args": {
+                "owner": {
+                  "actor": "youssef"
+                },
+                "subject": "exam",
+                "stage": "open"
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "exam_follow": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "story",
+              "args": {
+                "owner": {
+                  "actor": "youssef"
+                },
+                "subject": "exam",
+                "stage": "follow"
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "relay_request": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "message",
+              "args": {
+                "stage": "request",
+                "sender": {
+                  "role": "sender"
+                },
+                "recipient": {
+                  "role": "recipient"
+                },
+                "thread": {
+                  "binding": "thread"
+                },
+                "subject": {
+                  "binding": "subject"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "message",
+            "stage": "request",
+            "thread": {
+              "binding": "thread"
+            },
+            "subject": {
+              "binding": "subject"
+            },
+            "sender": {
+              "role": "sender"
+            },
+            "recipient": {
+              "role": "recipient"
+            },
+            "courier": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "consent",
+            "grantor": {
+              "role": "sender"
+            },
+            "recipient": {
+              "actor": "player"
+            },
+            "purpose": "relay",
+            "scope": {
+              "binding": "thread"
+            },
+            "decision": "grant",
+            "duration": 10080
+          },
+          {
+            "kind": "consent",
+            "grantor": {
+              "actor": "player"
+            },
+            "recipient": {
+              "role": "sender"
+            },
+            "purpose": "relay",
+            "scope": {
+              "binding": "thread"
+            },
+            "decision": "grant",
+            "duration": 10080
+          }
+        ],
+        "choice": "promise"
+      }
+    },
+    "relay_reply": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "message",
+              "args": {
+                "stage": "reply",
+                "sender": {
+                  "role": "sender"
+                },
+                "recipient": {
+                  "role": "recipient"
+                },
+                "thread": {
+                  "binding": "thread"
+                },
+                "subject": {
+                  "binding": "subject"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "message",
+            "stage": "reply",
+            "thread": {
+              "binding": "thread"
+            },
+            "subject": {
+              "binding": "subject"
+            },
+            "sender": {
+              "role": "sender"
+            },
+            "recipient": {
+              "role": "recipient"
+            },
+            "courier": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "consent",
+            "grantor": {
+              "role": "recipient"
+            },
+            "recipient": {
+              "actor": "player"
+            },
+            "purpose": "relay_reply",
+            "scope": {
+              "binding": "thread"
+            },
+            "decision": "grant",
+            "duration": 10080
+          }
+        ],
+        "choice": "ask",
+        "choice_assertions": [
+          {
+            "kind": "relayed",
+            "fact": {
+              "type": "message",
+              "args": {
+                "stage": "request",
+                "sender": {
+                  "role": "sender"
+                },
+                "recipient": {
+                  "role": "recipient"
+                },
+                "thread": {
+                  "binding": "thread"
+                },
+                "subject": {
+                  "binding": "subject"
+                }
+              }
+            },
+            "parent": {
+              "actor": "player"
+            }
+          }
+        ]
+      }
+    },
+    "relay_delivered": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "message",
+            "stage": "delivered",
+            "thread": {
+              "binding": "thread"
+            },
+            "subject": {
+              "binding": "subject"
+            },
+            "sender": {
+              "role": "sender"
+            },
+            "recipient": {
+              "role": "recipient"
+            },
+            "courier": {
+              "actor": "player"
+            }
+          }
+        ],
+        "choice": "deliver",
+        "choice_assertions": [
+          {
+            "kind": "relayed",
+            "fact": {
+              "type": "message",
+              "args": {
+                "stage": "reply",
+                "sender": {
+                  "role": "sender"
+                },
+                "recipient": {
+                  "role": "recipient"
+                },
+                "thread": {
+                  "binding": "thread"
+                },
+                "subject": {
+                  "binding": "subject"
+                }
+              }
+            },
+            "parent": {
+              "actor": "player"
+            }
+          }
+        ]
+      }
+    },
+    "radio_open": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "story",
+              "args": {
+                "owner": {
+                  "actor": "farid"
+                },
+                "subject": "radio",
+                "stage": "open"
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "radio_follow": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "story",
+              "args": {
+                "owner": {
+                  "actor": "farid"
+                },
+                "subject": "radio",
+                "stage": "follow"
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "recipe_hint": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "recipe_connection",
+              "args": {
+                "teacher": {
+                  "role": "guest"
+                },
+                "recipe": {
+                  "binding": "recipe"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "recipe_basics": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "relayed",
+            "fact": {
+              "type": "recipe_basics",
+              "args": {
+                "recipe": {
+                  "binding": "recipe"
+                }
+              }
+            },
+            "parent": {
+              "role": "guest"
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "recipe_attempt": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "once",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "recipe_result": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "evidence",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ],
+            "evidence": {
+              "binding": "result"
+            }
+          }
+        ]
+      }
+    },
+    "home_invite": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consent",
+            "grantor": {
+              "role": "guest"
+            },
+            "recipient": {
+              "actor": "player"
+            },
+            "purpose": "home",
+            "scope": {
+              "binding": "invitation"
+            },
+            "decision": "grant",
+            "duration": 10080
+          },
+          {
+            "kind": "consent",
+            "grantor": {
+              "actor": "player"
+            },
+            "recipient": {
+              "role": "guest"
+            },
+            "purpose": "home",
+            "scope": {
+              "binding": "invitation"
+            },
+            "decision": "grant",
+            "duration": 10080
+          }
+        ],
+        "domain": {
+          "provider": "home",
+          "command": "invite",
+          "actor": {
+            "role": "guest"
+          },
+          "scope": {
+            "binding": "invitation"
+          }
+        },
+        "choice": "accept"
+      }
+    },
+    "home_cancel": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consent",
+            "grantor": {
+              "actor": "player"
+            },
+            "recipient": {
+              "role": "guest"
+            },
+            "purpose": "home",
+            "scope": {
+              "binding": "invitation"
+            },
+            "decision": "revoke",
+            "duration": 0
+          }
+        ],
+        "domain": {
+          "provider": "home",
+          "command": "cancel",
+          "actor": {
+            "role": "guest"
+          },
+          "scope": {
+            "binding": "invitation"
+          }
+        },
+        "choice": "accept"
+      }
+    },
+    "home_heard": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          },
+          {
+            "kind": "consume",
+            "scope": "visit",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ],
+        "domain": {
+          "provider": "home",
+          "command": "heard",
+          "actor": {
+            "role": "guest"
+          },
+          "scope": {
+            "binding": "invitation"
+          }
+        }
+      }
+    },
+    "home_goodbye": {
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "company",
+            "observer": {
+              "actor": "player"
+            },
+            "other": {
+              "role": "guest"
+            }
+          },
+          {
+            "kind": "company",
+            "observer": {
+              "role": "guest"
+            },
+            "other": {
+              "actor": "player"
+            }
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "amount": 2
+          },
+          {
+            "kind": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "amount": 1
+          }
+        ],
+        "domain": {
+          "provider": "home",
+          "command": "goodbye",
+          "actor": {
+            "role": "guest"
+          },
+          "scope": {
+            "binding": "invitation"
+          }
+        },
+        "choice": "accept"
+      }
+    }
+  },
+  "legacy_player_aliases": {
+    "KNOWN_SHAWARMA_BASICS": {
+      "type": "recipe_basics",
+      "args": {
+        "recipe": "shawarma"
+      }
+    },
+    "FARID_SHAWARMA_STORY": {
+      "type": "recipe_connection",
+      "args": {
+        "teacher": "farid",
+        "recipe": "shawarma"
+      }
+    }
+  }
+}
