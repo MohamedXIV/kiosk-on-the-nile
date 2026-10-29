@@ -26,6 +26,10 @@ func _context(entry: Dictionary, c: ConversationSession, listener: String) -> Ac
  if "speaker" in declared:turn.speaker=str(c.current.speaker_id)
  if "listener" in declared:turn.listener=listener
  return _session.semantic._context(entry,c.participants,turn)
+func _authorized(entry: Dictionary, c: ConversationSession, listener: String) -> PolicyDecision:
+ var continuation := _session.semantic.decide(entry,c.participants,"continuation","",c,listener)
+ if not continuation.allowed:return continuation
+ return _session.semantic.decide(entry,c.participants,"action",c.current.policy_action,c,listener)
 func commit(c: ConversationSession) -> ActionResult:
  var entry: Dictionary=_session.config.data.encounters[str(c.encounter_id)]
  if not entry.has("semantic_topic") or c.current.text.is_empty() or c.current.effects.size()!=1 or c.current.effects[0].get("kind")!="semantic" or c.current.effects[0].get("action_id")!=c.current.policy_action:return _fail()
@@ -47,7 +51,7 @@ func commit(c: ConversationSession) -> ActionResult:
   if not existing.is_empty():
    if not _receipt_source(existing,entry,context.identity(),c,speaker):return _fail()
    continue
-  var decision := _session.semantic.decide(entry,c.participants,"action",c.current.policy_action,c,listener)
+  var decision := _authorized(entry,c,listener)
   if decision.status=="invalid":return _fail()
   if not decision.allowed:continue
   bound=_context(entry,c,listener)
@@ -73,7 +77,7 @@ func commit(c: ConversationSession) -> ActionResult:
  if not prepared.ok:return prepared
  # No await and no publication/signals before the whole batch is ready.
  for listener in eligible:
-  if not can_hear(speaker,listener,action.get("channel","hearing")) or not _session.semantic.decide(entry,c.participants,"action",c.current.policy_action,c,listener).allowed:return _fail()
+  if not can_hear(speaker,listener,action.get("channel","hearing")) or not _authorized(entry,c,listener).allowed:return _fail()
  var result := _session.effects.publish_knowledge(prepared.details,receipts_to_add,c.current.to_dict())
  if not result.ok:return result
  if c.context_extra.semantic_start.receipt.is_empty():c.context_extra.semantic_start.receipt=receipts_to_add[0].id
