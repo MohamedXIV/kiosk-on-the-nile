@@ -1,0 +1,18 @@
+{
+  "source": "ae643b33fff2e9951deed114db47dd64a5b8ca5d",
+  "version": "0.3.0-prealpha.1",
+  "save_revision": 21,
+  "web_startup": "Chromium/SwiftShader1280x720: actual Arabic title New Day click reached gameplay HUD240EGP; pageErrors empty. Cold capture10s was still compiling;30s capture reached title. Not a device performance claim.",
+  "independent_download": {
+    "url": "https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/5aae4533c7508683470f1166531aac2ac51a0ba3/semantic-preview-ae643b3/kiosk-on-the-nile-0.3.0-prealpha.1-dev-ae643b33fff2-web.zip",
+    "bytes": 12119277,
+    "sha256": "ce4fc94b93e9264800fd62b43d6de1cb0c6b058ded3aeb78da4ef7892599920a",
+    "zip_crc": "pass",
+    "clean_source": "pass",
+    "guide_version_save": "pass"
+  },
+  "main_ci": 40973259465,
+  "main_ci_conclusion": "success",
+  "formal_tag_release": false,
+  "previous_archives_preserved": 41
+}
