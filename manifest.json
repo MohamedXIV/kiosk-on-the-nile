@@ -339,5 +339,25 @@
     },
     "save_impact": "New game required for earlier pre-alpha saves; existing files preserved.",
     "verification": "Independently downloaded immutable archive: exact bytes/SHA256, ZIP CRC, clean source provenance and Arabic guide verified."
+  },
+  {
+    "version": "playtest-correction-10143f7",
+    "game_version": "0.2.1-prealpha.1",
+    "stage": "pre-alpha",
+    "publication_state": "development",
+    "path": "playtest-correction-10143f7/kiosk-on-the-nile-0.2.1-prealpha.1-dev-10143f7973bf-web.zip",
+    "bytes": 12017688,
+    "sha256": "403fdac5a0c2a5ff8489252bec2cf3cdaf0c9211b4289ff3bcdd739a48535035",
+    "original_branch": "main",
+    "original_commit": "10143f7973bfea84332025241049621f85d13475",
+    "archive_commit": "7f4549c6d250038b6f93c4c8156c9e848c8dc187",
+    "url": "https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/7f4549c6d250038b6f93c4c8156c9e848c8dc187/playtest-correction-10143f7/kiosk-on-the-nile-0.2.1-prealpha.1-dev-10143f7973bf-web.zip",
+    "ci_run": 40796490237,
+    "save_format": {
+      "schema": 4,
+      "revision": 20
+    },
+    "save_impact": "New game required for earlier pre-alpha saves, including revision19; files preserved.",
+    "verification": "Independently downloaded immutable archive; exact bytes/SHA256, ZIP CRC, clean source/version/save format and Arabic guide verified."
   }
 ]
