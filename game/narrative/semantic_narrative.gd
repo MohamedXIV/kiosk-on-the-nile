@@ -2,6 +2,7 @@ class_name SemanticNarrative
 extends RefCounted
 ## Read-only adapters and lifecycle identity; state stays in existing owners.
 var policy := NarrativePolicy.new()
+var knowledge_actions := NarrativeKnowledge.new()
 var _session: GameSession
 static func empty_catalog() -> Dictionary:
  return {"contract_version":1,"profiles":{},"policies":{},"topics":{},"fact_types":{}}
@@ -11,6 +12,8 @@ static func schemas(bundle: Dictionary) -> Dictionary:
 static func validate(bundle: Dictionary) -> ActionResult:
  var compiled := NarrativePolicyValidation.compile(bundle.get("narrative_policies",empty_catalog()),schemas(bundle))
  if not compiled.ok:return compiled
+ var knowledge_validation := NarrativeKnowledgeValidation.validate(bundle,compiled.details)
+ if not knowledge_validation.ok:return knowledge_validation
  var fact_types: Dictionary=bundle.get("narrative_policies",{}).get("fact_types",{})
  if fact_types.has("legacy_player_fact") and fact_types.legacy_player_fact!={"id":"fact"}:return ContentValidation.fail("narrative_policies.legacy_player_fact")
  for id in bundle.get("encounters",{}):
@@ -30,6 +33,11 @@ func configure(session: GameSession) -> ActionResult:
  var compiled := validate(session.config.data)
  if not compiled.ok:return compiled
  policy.configure(compiled.details,{"relationship":_relationship,"time_window":_time_window,"available":_available,"near":_near,"domain":_domain,"knowledge":_knowledge},_resolve_handle)
+ var knowledge_config: Dictionary=session.config.data.get("narrative_knowledge",NarrativeKnowledgeValidation.empty_catalog())
+ var configured := session.knowledge.assertions.configure(compiled.details.schemas,session.config.data.get("narrative_policies",{}).get("fact_types",{}),knowledge_config.initial,session.clock)
+ if not configured.ok:return configured
+ knowledge_actions.configure(session)
+ session.effects.semantic_provider=knowledge_actions.commit
  return ActionResult.success()
 func _resolve_handle(id: String) -> Dictionary:return _session.presence.resolve(StringName(id))
 func _record(actor: String) -> Variant:
@@ -68,6 +76,9 @@ func _domain(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
   "recipe.completed":return NarrativePolicy.answer(_session.learning.context(StringName(rule.args.recipe)).completed)
  return {"status":"invalid","reason":"domain_provider_unavailable"}
 func _knowledge(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
+ if rule.fact.type!="legacy_player_fact":
+  var assertions := _session.knowledge.query_assertions(rule.knower,rule.fact,rule.provenance_kinds)
+  return NarrativePolicy.answer(not assertions.is_empty(),assertions.map(func(r):return {"assertion":r.id,"knower":r.knower,"source":r.source,"kind":r.kind,"at":r.at,"parent":r.parent}))
  # Explicit compatibility capability, never substitute player data for an NPC.
  if rule.knower!="player" or rule.fact.type!="legacy_player_fact" or not NarrativePolicyValidation.fields(rule.fact.args,["id"]):return {"status":"invalid","reason":"actor_knowledge_provider_unavailable"}
  var record: Dictionary=_session.knowledge.record(StringName(rule.fact.args.id))
@@ -104,11 +115,11 @@ func start_proof(entry: Dictionary, participants: PackedStringArray, episode: St
  var context: NarrativeContext=bound.details.context
  if not policy.evaluate(context,"start").allowed:return _fail()
  return ActionResult.success({"proof":{"identity":context.identity(),"catalog":policy.identity(),"episode":episode,"at":_session.clock.world_minutes,"receipt":"","actors":Array(participants).map(func(p):return str(_session.presence.record(p).character_id))}})
-func decide(entry: Dictionary, participants: PackedStringArray, stage: String, key: String = "", conversation: ConversationSession = null) -> PolicyDecision:
+func decide(entry: Dictionary, participants: PackedStringArray, stage: String, key: String = "", conversation: ConversationSession = null, listener: String = "player") -> PolicyDecision:
  var turn := {}
  if conversation!=null:
   if not str(conversation.current.speaker_id).is_empty():turn.speaker=str(conversation.current.speaker_id)
-  turn.listener="player"
+  turn.listener=listener
  # Only declared turn roles are supplied to the binder.
  var id := str(entry.semantic_topic)
  if not policy.has_topic(id):return PolicyDecision.make("invalid","unknown_semantic_topic")
@@ -134,7 +145,10 @@ func decide(entry: Dictionary, participants: PackedStringArray, stage: String, k
 func proof_valid(conversation: ConversationSession, context: NarrativeContext) -> bool:
  var proof: Variant=conversation.context_extra.get("semantic_start")
  if not NarrativePolicyValidation.fields(proof,["identity","catalog","episode","at","receipt","actors"]) or proof.identity!=context.identity() or proof.catalog!=policy.identity() or proof.episode!=str(conversation.id) or not ContentValidation.bounded(proof.at,0,_session.clock.world_minutes) or not proof.receipt is String or not proof.actors is Array or not proof.actors.all(func(a):return NarrativePolicyValidation.typed(a,"actor",policy._compiled.schemas)):return false
- if proof.receipt.is_empty():return not _session.journal.has_speech(str(conversation.id))
+ if proof.receipt.is_empty():return not _session.journal.has_speech(str(conversation.id)) and not _session.knowledge.assertions.has_episode(str(conversation.id))
+ var semantic_receipt := _session.knowledge.assertions.receipt(proof.receipt)
+ if not semantic_receipt.is_empty():
+  return semantic_receipt.episode==str(conversation.id) and semantic_receipt.beat<=conversation.beat and semantic_receipt.at>=proof.at and semantic_receipt.identity==context.identity() and semantic_receipt.catalog==policy.identity() and semantic_receipt.knowledge_catalog==knowledge_actions.identity and semantic_receipt.participants==proof.actors and _session.effects.applied(proof.receipt)
  var event := _session.journal.event(proof.receipt)
  var suffix: String = proof.receipt.trim_prefix(str(conversation.id)+"/").trim_suffix("/speech")
  return suffix.is_valid_int() and int(suffix)>0 and int(suffix)<=conversation.heard_beat and proof.receipt==str(conversation.id)+"/"+suffix+"/speech" and event.get("chapter")==str(conversation.id) and event.get("channel")=="speech" and float(event.get("at",-1))>=float(proof.at) and event.get("actor") in proof.actors
@@ -154,5 +168,5 @@ func validate_detached(entry: Dictionary, record: Dictionary) -> bool:
   if ref is Dictionary:
    if int(ref.participant)>=proof.actors.size() or proof.identity.bindings[key]!=proof.actors[int(ref.participant)]:return false
   elif proof.identity.bindings[key]!=ref:return false
- var c := ConversationSession.new();c.id=StringName(str(record.get("id","")));c.heard_beat=int(record.get("heard_beat",0));c.context_extra=record.context_extra
+ var c := ConversationSession.new();c.id=StringName(str(record.get("id","")));c.beat=int(record.get("beat",0));c.heard_beat=int(record.get("heard_beat",0));c.context_extra=record.context_extra
  return proof_valid(c,bound.details.context)

@@ -29,12 +29,14 @@ static func _unique_count(values: Array) -> int:
 func _ids(value: Variant) -> bool:
  return value is Array and value.all(func(v):return v is String and v.is_valid_identifier()) and value.size()==_unique_count(value)
 func _ref(value: Variant, kind: String, roles: Array, bindings: Dictionary) -> bool:
+ return reference_valid(value,kind,roles,bindings,_schemas)
+static func reference_valid(value: Variant, kind: String, roles: Array, bindings: Dictionary, schemas: Dictionary) -> bool:
  if value is Dictionary:
   if fields(value,["role"]):return kind=="actor" and value.role is String and value.role in roles
-  if fields(value,["actor"]):return kind=="actor" and typed(value.actor,kind,_schemas)
+  if fields(value,["actor"]):return kind=="actor" and typed(value.actor,kind,schemas)
   if fields(value,["binding"]):return value.binding is String and bindings.get(value.binding)==kind
   return false
- return typed(value,kind,_schemas) and kind!="actor"
+ return typed(value,kind,schemas) and kind!="actor"
 func _refs(value: Variant, roles: Array, bindings: Dictionary) -> bool:
  return value is Array and not value.is_empty() and value.size()<=16 and value.all(func(v):return _ref(v,"actor",roles,bindings))
 func _compile(data: Variant) -> ActionResult:

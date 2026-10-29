@@ -1,0 +1,39 @@
+# Per-character knowledge and heard consequences — #22
+
+This extends the [shared policy runtime](semantic-policy-runtime.md) and implements the knowledge portion of the [semantic contract](semantic-narrative.md). All49 production encounters remain unconverted until#24. No actual NPC seeds or new dialogue were added to production.
+
+## Authoring and query API
+
+An optional manifest section `narrative_knowledge` has exactly `initial` (array) and `actions` (dictionary). An absent section supplies empty collections. Fact types remain declared in `narrative_policies.fact_types`; every term is exactly `{type,args}`, with exact typed argument keys. Canonical identity uses sorted typed JSON, independently of localized dialogue text.
+
+The [validated two-section example](examples/semantic-knowledge-v1.json) can be merged into an in-memory content bundle for authoring. It is illustrative, includes no encounter/manifest opt-in and is not loaded by production. Its Farid seed is example data only.
+
+An initial seed is `{id,knower,fact}`: a unique identifier, literal catalog actor and literal typed term. It records an explicit `initial` source at configured game-start world time, never invented speech. The reserved `legacy_player_fact` type remains the separate player-only adapter and cannot be seeded/taught through this new catalog. Generic terms query the requested knower; player knowledge is never substituted for an NPC.
+
+Actions are nested `actions[topic_id][action_id]`, where topic/action already exist in the policy catalog. An action has exactly `listeners` and `assertions`, with optional `channel` (`hearing` default, or `personal`). Each array is nonempty, at most16 elements. Listeners are authored actor literals or stable actor-role/binding refs. Presence alone does not make someone an intended audience. Duplicate resolved audiences reject at runtime.
+
+An assertion declaration is `{kind:"heard",fact:Term}` or `{kind:"relayed",fact:Term,parent:ActorRef}`. Typed refs resolve through the topic context, with declared turn roles `speaker`/`listener` resolved independently for each actual listener. For a relay, parent must resolve to the actual speaker, who must already have an assertion for the exact term. The selected upstream assertion ID is stored permanently. Selection is deterministic by publication order, then ID; independent earlier sources remain available. Terms may include a bound message/event subject so different messages do not collapse into the same fact. Message request/reply/consent business scopes remain#23/#24.
+
+Ink declares matching `policy_action:action_id` and `effect:semantic|action_id`. A converted semantic beat permits exactly one such effect tag, encapsulating a complete assertion batch. Legacy learn/finance/social/home/service/mood and world effects on that route reject before mutation. Unconverted encounters retain existing effects. Mixed, unsupported distributed/domain mutations and `observed` world-event assertions have no prepared adapter yet and remain rejected. A policy can filter by observed provenance, but this task does not fabricate observations.
+
+`KnowledgeBook.query_assertions(knower, term, provenance_kinds)` returns matching attributed records. `NarrativePolicy` uses this indexed owner query for generic knowledge predicates; a valid absent assertion is blocked. Records contain `id, knower, fact, kind, speaker, source, at, parent`. Multiple source paths coexist. Existing `has/learn/notes` remain the inventoried legacy-player interface; typed notebook/dialogue presentation is authored in#24, not inferred from these records.
+
+## Hearing and atomic publication
+
+`NarrativeKnowledge` resolves intended listeners against actual current actor poses/availability and the declared distance/location channel. Every listener is checked separately; player Journal and `heard_beat` remain player-only. An NPC can learn while the player is outside hearing, or vice versa. Unheard openings/cancellation grant no assertions or consumed-start evidence. Intended listeners entering range while a beat remains active receive their own once-only occurrence; other nearby actors do not automatically learn.
+
+For each new eligible listener, continuation/action policy and exact bound source identity are checked against current owners. Declarations resolve before any mutation. Relays require an existing matching speaker-owned upstream record. The whole eligible audience/assertion batch prepares against KnowledgeAssertions' current revision; a failure publishes no partial assertions or applied/source receipts. Hearing/action preconditions are checked again synchronously before commit. NarrativeEffects supplies a reentrancy guard and coordinates publication; no await or signal occurs inside commit. Calls outside this guard, stale tickets, changed existing records and duplicate conflicting receipts reject.
+
+Occurrence identity is `episode/beat/semantic/action/listener`; assertion identity adds its declaration index. KnowledgeBook owns assertions and hearing receipts. NarrativeEffects retains applied IDs plus the actual committed beat/frame/source and assertion proof. These owners cross-check speaker, action, concrete roles/bindings, participants, policy/knowledge catalog hashes, story identity/hash, target, time and upstream lineage. This is save consistency checking, as with existing Journal links; it is not cryptographic protection against rewriting every owner and recomputing the checksum. No historical Ink replay/archived graph was introduced to prove static reachability of old speech.
+
+Receipts have a unique contiguous publication `order` and nondecreasing world time. Relay parents precede their children in publication order; within one episode, parent beat must be earlier even when world timestamps are equal. Parent chains reject unknown actors, wrong terms/knowers, cycles, missing receipts and future times. Source paths are retained, with no destructive history pruning. Preparation/commit work scales with recorded state; queries index by knower/canonical term. Long-session retention/optimization belongs to measured integrated acceptance, not an unproven performance claim.
+
+## Continuation, saves and compatibility
+
+A canonical semantic heard receipt can consume start evidence without claiming that the player heard. The episode can continue after teaching invalidates its own start-only condition. Repetition, current restore and returning-actor resume do not replay publication. New listeners' consequences still require fresh eligibility. Stable actor identity survives changing visit handles.
+
+KnowledgeBook adds `assertions:{records,receipts}` only when semantic fact types/seeds are configured. NarrativeEffects adds `semantic_sources` only after semantic publication. Empty production catalogs preserve existing legacy serialized shapes. Active catalogs require their metadata on restore; missing/malformed data rejects explicitly. SaveCodec validates cross-owner links on the candidate before accepting it. No unsupported bytes are deleted/reset, no historical migration or old-story archive is added, and no backward-compatibility promise is made for future converted content.
+
+Game VERSION0.2.1-prealpha.1, save schema4/revision20 and CHANGELOG are unchanged in this foundation. No production catalog/content change or formal release occurs. The final coherent save/version/changelog decision remains#26/#27, with any new-game requirement stated then.
+
+#23 supplies directional social history/consent/scoped message receipts; #24 converts families and presentation; #25 adds author tools; #26 verifies integrated behavior/performance; #27 delivers the one coherent preview. See the [#22 implementation plan](../superpowers/plans/2026-10-29-semantic-knowledge.md) and dated delivery evidence.

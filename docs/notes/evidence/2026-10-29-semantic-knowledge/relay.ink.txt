@@ -1,0 +1,5 @@
+VAR character_id = "youssef"
+I heard this from its source earlier. # speaker:{character_id} # policy_action:relay # effect:semantic\|relay
+* [Continue # policy_choice:continue_chat]
+    The source remains attached to the message. # speaker:{character_id}
+    -> END

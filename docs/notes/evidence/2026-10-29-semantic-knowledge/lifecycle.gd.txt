@@ -1,0 +1,141 @@
+extends SceneTree
+var bad:=0
+var s:GameSession
+var config:SessionConfig
+var fact={"type":"connection","args":{"person":"farid"}}
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String,details:Variant=""):
+ print(label," ",ok," ",details)
+ if not ok:bad+=1
+func visit(actor:String,ground:Vector2,location:String="kiosk") -> VisitState:
+ var v:Variant=s.semantic._record(actor)
+ if v==null:v=s.visitors.spawn(StringName(actor))
+ v.phase=&"staying";v.pose.ground=ground;v.pose.location_id=StringName(location);v.destination=ground;v.shopping_state=&"declined"
+ return v
+func term(knower:String) -> Array:return s.knowledge.query_assertions(knower,fact)
+func reseal(data:Dictionary) -> Dictionary:
+ data.erase("checksum");data.checksum=StableJson.stringify(data).sha256_text();return data
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ check(store.load_directory("res://content").ok,"PRODUCTION CONTENT")
+ var bundle:=store.bundle()
+ var yes={"op":"time_window","start":0,"end":1440}
+ var ref_fact={"type":"connection","args":{"person":{"role":"subject"}}}
+ bundle["narrative_policies"]={"contract_version":1,"profiles":{},"policies":{},"fact_types":{"connection":{"person":"actor"}},"topics":{"demo":{"bindings":{"source_actor":"actor","student_actor":"actor","subject_actor":"actor"},"roles":{"teacher":{"binding":"source_actor"},"student":{"binding":"student_actor"},"subject":{"binding":"subject_actor"}},"turn_roles":["speaker","listener"],"stages":{"start":{"op":"not","rule":{"op":"knowledge","knower":{"role":"student"},"fact":ref_fact,"provenance_kinds":["initial","heard","relayed"]}},"continuation":yes},"choices":{"continue_chat":yes},"actions":{"teach":yes,"relay":yes,"personal":yes,"alias_teach":yes}}}}
+ bundle["narrative_knowledge"]={"initial":[{"id":"farid_source","knower":"farid","fact":fact}],"actions":{"demo":{"personal":{"listeners":[{"actor":"player"}],"assertions":[{"kind":"heard","fact":ref_fact}]},"teach":{"listeners":[{"role":"student"},{"actor":"player"},{"actor":"amgad"},{"actor":"nadia"}],"assertions":[{"kind":"heard","fact":ref_fact}]},"relay":{"listeners":[{"role":"student"}],"assertions":[{"kind":"relayed","fact":ref_fact,"parent":{"role":"speaker"}}]}}}}
+ bundle.narrative_knowledge.actions.demo["alias_teach"]=bundle.narrative_knowledge.actions.demo.teach.duplicate(true)
+ for action in ["teach","relay","personal"]:
+  bundle.encounters["semantic_"+action]={"story":"semantic_"+action,"semantic_topic":"demo","semantic_bindings":{"source_actor":{"participant":0},"student_actor":{"participant":1},"subject_actor":"farid"},"manual":true,"requires":{},"offer_requires":{},"advancement":"manual"}
+  bundle["story_semantic_"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://work/semantic-knowledge/"+action+".ink.json"))
+ bundle.encounters.semantic_personal.semantic_bindings={"source_actor":{"participant":0},"student_actor":"player","subject_actor":"amgad"}
+ check(ContentValidation.validate(bundle).ok,"AUTHORED CATALOG VALID")
+ config=SessionConfig.new(bundle,"semantic-knowledge-prototype")
+ s=GameSession.new();root.add_child(s)
+ var result:=s.configure(config);check(result.ok,"CONFIG",result.details)
+ if not result.ok:quit(1);return
+ s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var farid:=visit("farid",Vector2(8,2));var youssef:=visit("youssef",Vector2(4,2));var amgad:=visit("amgad",Vector2(-8,2));visit("nadia",Vector2(4,2),"rooftop")
+ check(term("farid").size()==1 and term("player").is_empty(),"AUTHORED INITIAL ONLY")
+ result=await s.narrative.start(&"semantic_teach",PackedStringArray([str(farid.id),str(youssef.id),str(amgad.id)]),{"manual_read":false})
+ check(result.ok,"UNHEARD START",result.message_key)
+ check(term("youssef").is_empty() and s.knowledge.assertions.receipts().is_empty(),"UNHEARD NO ASSERTION OR CONSUMPTION")
+ s.narrative.cancel_all()
+ farid.pose.ground=Vector2(4,2)
+ result=await s.narrative.start(&"semantic_teach",PackedStringArray([str(farid.id),str(youssef.id),str(amgad.id)]),{"manual_read":false})
+ check(result.ok,"NPC ONLY HEARD START",result.message_key)
+ if not result.ok:quit(1);return
+ var c:ConversationSession=s.narrative.sessions[result.details.session_id]
+ check(term("youssef").size()==1 and term("player").is_empty(),"NPC LEARNS PLAYER DOES NOT")
+ check(term("amgad").is_empty() and term("nadia").is_empty(),"FAR AND OTHER LOCATION AUDIENCE DO NOT LEARN")
+ check(c.heard_beat==0 and not s.journal.has_speech(str(c.id)),"NO PLAYER HEARING FABRICATED")
+ check(not c.context_extra.semantic_start.receipt.is_empty() and s.narrative.available_for(c),"NPC RECEIPT CONSUMES START CONTINUATION VALID")
+ var snapshot:=s.knowledge.snapshot()
+ check(s.narrative._hear_current(c).ok and s.knowledge.snapshot()==snapshot,"SAME BEAT NO REPLAY")
+ check(not s.semantic.decide(bundle.encounters.semantic_teach,c.participants,"start").allowed,"FRESH START BLOCKED AFTER TEACHING")
+ visit("nadia",Vector2(-8,2))
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var saved:=codec.encode(s)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(saved));check(decoded.ok,"SERIALIZED JSON CHECKSUM ROUNDTRIP")
+ saved=decoded.details.data
+ var original:=saved.duplicate(true)
+ var restored:=await codec.create_candidate(saved,config)
+ check(restored.ok,"NPC ONLY CURRENT SAVE RESTORE",restored.message_key)
+ if restored.ok:
+  var other:GameSession=restored.details.session
+  check(StableJson.stringify(other.knowledge.snapshot())==StableJson.stringify(snapshot),"ASSERTIONS RESTORED WITHOUT REPLAY")
+  var active:ConversationSession=other.narrative.sessions[str(c.id)]
+  check(other.narrative._hear_current(active).ok and StableJson.stringify(other.knowledge.snapshot())==StableJson.stringify(snapshot),"RESTORED SAME BEAT NO REPLAY")
+  other.queue_free()
+ var receipt_id:String=s.knowledge.assertions.receipts()[0].id
+ var corrupt:=saved.duplicate(true);corrupt.state.effects.applied.erase(receipt_id)
+ restored=await codec.create_candidate(reseal(corrupt),config)
+ check(not restored.ok,"MISSING EFFECT RECEIPT REJECT")
+ corrupt=saved.duplicate(true)
+ var alias_id:=receipt_id.replace("/teach/","/alias_teach/")
+ var alias_receipt:Dictionary=corrupt.state.knowledge.assertions.receipts[receipt_id].duplicate(true);alias_receipt.id=alias_id;alias_receipt.action="alias_teach";alias_receipt.assertions=[alias_id+"/0"]
+ var alias_assertion:Dictionary=corrupt.state.knowledge.assertions.records[receipt_id+"/0"].duplicate(true);alias_assertion.id=alias_id+"/0";alias_assertion.source=alias_id
+ corrupt.state.knowledge.assertions.receipts.erase(receipt_id);corrupt.state.knowledge.assertions.receipts[alias_id]=alias_receipt
+ corrupt.state.knowledge.assertions.records.erase(receipt_id+"/0");corrupt.state.knowledge.assertions.records[alias_assertion.id]=alias_assertion
+ corrupt.state.effects.applied.erase(receipt_id);corrupt.state.effects.applied[alias_id]=true
+ corrupt.state.narrative.sessions[str(c.id)].context_extra.semantic_start.receipt=alias_id
+ restored=await codec.create_candidate(reseal(corrupt),config)
+ check(not restored.ok,"FORGED BEAT ACTION REJECT")
+ if restored.ok:restored.details.session.queue_free()
+ corrupt=saved.duplicate(true);corrupt.state.knowledge.assertions.receipts[receipt_id].speaker="amgad";corrupt.state.knowledge.assertions.records[receipt_id+"/0"].speaker="amgad"
+ restored=await codec.create_candidate(reseal(corrupt),config)
+ check(not restored.ok,"FORGED BEAT SPEAKER REJECT")
+ if restored.ok:restored.details.session.queue_free()
+ corrupt=saved.duplicate(true);corrupt.state.knowledge.assertions.receipts[receipt_id].listener="amgad"
+ restored=await codec.create_candidate(reseal(corrupt),config)
+ check(not restored.ok,"CHANGED RECIPIENT REJECT")
+ corrupt=saved.duplicate(true);corrupt.state.knowledge.assertions.records[receipt_id+"/0"].at=s.clock.world_minutes+10
+ restored=await codec.create_candidate(reseal(corrupt),config)
+ check(not restored.ok,"FUTURE PROVENANCE REJECT")
+ corrupt=saved.duplicate(true);corrupt.state.knowledge.erase("assertions")
+ restored=await codec.create_candidate(reseal(corrupt),config)
+ check(not restored.ok,"MISSING ACTIVE ASSERTION METADATA REJECT")
+ check(saved==original,"SOURCE SAVE INPUT PRESERVED")
+ # Player comes into range later: own receipt, independent of NPC receipt.
+ s.player_ground=farid.pose.ground
+ check(s.narrative._hear_current(c).ok and term("player").size()==1,"LATE ACTUAL PLAYER HEARING")
+ check(c.heard_beat==c.beat and s.journal.has_speech(str(c.id)),"PLAYER JOURNAL ONLY AFTER PLAYER HEARS")
+ # Separate single-person heard episode exercises actual personal pause/resume.
+ s.narrative.cancel_all()
+ result=await s.narrative.start(&"semantic_personal",PackedStringArray([str(farid.id)]),{"manual_read":true})
+ check(result.ok,"PERSONAL HEARD START",result.message_key)
+ if not result.ok:quit(1);return
+ c=s.narrative.sessions[result.details.session_id]
+ check(s.personal.holds_visit(farid.id),"ADOPT HEARD CONVERSATION")
+ s.personal.leave();check(s.personal.snapshot().paused.has("farid"),"PAUSED BY STABLE ACTOR")
+ s.visitors.clear_visits();farid=visit("farid",s.player_ground);youssef=visit("youssef",s.player_ground)
+ snapshot=s.knowledge.snapshot();result=await s.personal.open_for(farid.id)
+ check(result.ok,"ACTOR RETURN RESUME",result.message_key)
+ check(s.knowledge.snapshot()==snapshot,"RETURN DOES NOT TEACH AGAIN")
+ s.narrative.cancel_all();s.personal.leave()
+ # Relay preserves exact heard assertion parent, teaching only intended recipient.
+ amgad=visit("amgad",s.player_ground);visit("nadia",s.player_ground)
+ result=await s.narrative.start(&"semantic_relay",PackedStringArray([str(youssef.id),str(amgad.id)]),{"manual_read":false})
+ check(result.ok,"RELAY START",result.message_key)
+ check(term("amgad").size()==1 and term("amgad")[0].kind=="relayed" and term("amgad")[0].parent==term("youssef")[0].id,"EXACT RELAY LINEAGE")
+ check(term("nadia").is_empty(),"NEARBY UNINTENDED ACTOR DOES NOT LEARN")
+ saved=SaveCodec.decode_text(StableJson.stringify(codec.encode(s))).details.data;restored=await codec.create_candidate(saved,config)
+ check(restored.ok,"RELAY CURRENT SAVE RESTORE",restored.message_key)
+ if restored.ok:restored.details.session.queue_free()
+ # No source on speaker: action preparation rejects without a partial grant.
+ s.narrative.cancel_all();var nadia:=visit("nadia",s.player_ground);var samir:=visit("samir",s.player_ground)
+ var before:=s.knowledge.snapshot();var applied_before:=s.effects.snapshot()
+ result=await s.narrative.start(&"semantic_relay",PackedStringArray([str(nadia.id),str(samir.id)]),{"manual_read":false})
+ check(not result.ok and s.knowledge.snapshot()==before and s.effects.snapshot()==applied_before,"UNSUPPORTED RELAY NO PARTIAL PUBLICATION")
+ var measurements:Array=[]
+ for frame in range(240):
+  await process_frame
+  var began:=Time.get_ticks_usec()
+  for actor in ["player","youssef","amgad","nadia"]:
+   var b:=s.semantic.policy.bind("demo",{"source_actor":"farid","student_actor":actor,"subject_actor":"farid"},{})
+   s.semantic.policy.evaluate(b.details.context,"start")
+  measurements.append(float(Time.get_ticks_usec()-began)/1000.0)
+ measurements.sort();var total:=0.0
+ for value in measurements:total+=value
+ print("FOUR KNOWER BIND PLUS KNOWLEDGE POLICY 240 FRAMES mean_ms=",total/measurements.size()," p95_ms=",measurements[int(measurements.size()*0.95)])
+ print("FAILURES ",bad)
+ s.queue_free();codec.queue_free();store.queue_free();await process_frame;quit(bad)

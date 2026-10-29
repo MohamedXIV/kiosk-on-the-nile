@@ -1,0 +1,151 @@
+{
+  "narrative_policies": {
+    "contract_version": 1,
+    "profiles": {},
+    "policies": {},
+    "fact_types": {
+      "connection": {
+        "person": "actor"
+      }
+    },
+    "topics": {
+      "example": {
+        "bindings": {
+          "speaker_actor": "actor",
+          "student_actor": "actor",
+          "subject_actor": "actor"
+        },
+        "roles": {
+          "teacher": {
+            "binding": "speaker_actor"
+          },
+          "student": {
+            "binding": "student_actor"
+          },
+          "subject": {
+            "binding": "subject_actor"
+          }
+        },
+        "turn_roles": [
+          "speaker",
+          "listener"
+        ],
+        "distinct_roles": [
+          [
+            "teacher",
+            "student"
+          ]
+        ],
+        "stages": {
+          "start": {
+            "op": "not",
+            "rule": {
+              "op": "knowledge",
+              "knower": {
+                "role": "student"
+              },
+              "fact": {
+                "type": "connection",
+                "args": {
+                  "person": {
+                    "role": "subject"
+                  }
+                }
+              },
+              "provenance_kinds": [
+                "initial",
+                "heard",
+                "relayed"
+              ]
+            }
+          },
+          "continuation": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          }
+        },
+        "choices": {
+          "continue_chat": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          }
+        },
+        "actions": {
+          "teach": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          },
+          "relay": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          }
+        }
+      }
+    }
+  },
+  "narrative_knowledge": {
+    "initial": [
+      {
+        "id": "illustrative_source",
+        "knower": "farid",
+        "fact": {
+          "type": "connection",
+          "args": {
+            "person": "farid"
+          }
+        }
+      }
+    ],
+    "actions": {
+      "example": {
+        "teach": {
+          "listeners": [
+            {
+              "role": "student"
+            }
+          ],
+          "assertions": [
+            {
+              "kind": "heard",
+              "fact": {
+                "type": "connection",
+                "args": {
+                  "person": {
+                    "role": "subject"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "relay": {
+          "listeners": [
+            {
+              "role": "student"
+            }
+          ],
+          "assertions": [
+            {
+              "kind": "relayed",
+              "fact": {
+                "type": "connection",
+                "args": {
+                  "person": {
+                    "role": "subject"
+                  }
+                }
+              },
+              "parent": {
+                "role": "speaker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

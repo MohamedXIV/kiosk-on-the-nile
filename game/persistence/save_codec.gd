@@ -111,6 +111,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
  if not result.ok:
   candidate.queue_free()
   return result
+ result=candidate.semantic.knowledge_actions.validate_links(candidate.narrative._next)
+ if not result.ok:
+  candidate.queue_free()
+  return result
  result=PeerSaveLinks.validate(candidate)
  if not result.ok:
   candidate.queue_free()

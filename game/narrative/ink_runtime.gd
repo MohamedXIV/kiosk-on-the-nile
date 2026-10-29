@@ -168,6 +168,8 @@ func _advance_frame() -> NarrativeTypes.Frame:
       _frame.effects.append({"kind":"home","action_id":fields[1]})
      elif fields.size()==2 and fields[0]=="social":
       _frame.effects.append({"kind":"social","action_id":fields[1]})
+     elif fields.size()==2 and fields[0]=="semantic" and fields[1].is_valid_identifier():
+      _frame.effects.append({"kind":"semantic","action_id":fields[1]})
      elif fields.size() == 3 and fields[0] == "learn":
       _frame.effects.append({"kind":"learn","fact_id":fields[1],"note":fields[2]})
      else:
