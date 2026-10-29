@@ -2,6 +2,8 @@ class_name NarrativeKnowledgeValidation
 extends RefCounted
 static func empty_catalog() -> Dictionary:return {"initial":[],"actions":{}}
 static func validate(bundle: Dictionary, compiled: Dictionary) -> ActionResult:
+ var social_config:=SemanticSocialValidation.validate_config(bundle)
+ if not social_config.ok:return social_config
  var data: Variant=bundle.get("narrative_knowledge",empty_catalog())
  if not NarrativePolicyValidation.fields(data,["initial","actions"]) or not data.initial is Array or not data.actions is Dictionary:return _fail("catalog")
  var types: Dictionary=bundle.get("narrative_policies",{}).get("fact_types",{})
@@ -16,7 +18,9 @@ static func validate(bundle: Dictionary, compiled: Dictionary) -> ActionResult:
   for action_id in data.actions[topic_id]:
    var action: Variant=data.actions[topic_id][action_id]
    var path: String=str(topic_id)+"/"+str(action_id)
-   if not topic.actions.has(action_id) or not NarrativePolicyValidation.fields(action,["listeners","assertions"],["channel"]) or not action.get("channel","hearing") in compiled.schemas.channels or not action.listeners is Array or action.listeners.is_empty() or action.listeners.size()>16 or not action.assertions is Array or action.assertions.is_empty() or action.assertions.size()>16:return _fail(path)
+   if not topic.actions.has(action_id) or not NarrativePolicyValidation.fields(action,["listeners","assertions"],["channel","social"]) or not action.get("channel","hearing") in compiled.schemas.channels or not action.listeners is Array or action.listeners.is_empty() or action.listeners.size()>16 or not action.assertions is Array or not action.get("social",[]) is Array or (action.assertions.is_empty() and action.get("social",[]).is_empty()) or action.assertions.size()>16 or action.get("social",[]).size()>16:return _fail(path)
+   for effect in action.get("social",[]):
+    if not SemanticSocialValidation.valid(effect,compiled.schemas,roles,topic.bindings):return _fail(path+"/social")
    for listener in action.listeners:
     if not NarrativePolicyValidation.reference_valid(listener,"actor",topic.roles.keys(),topic.bindings,compiled.schemas):return _fail(path+"/listener")
    for assertion in action.assertions:

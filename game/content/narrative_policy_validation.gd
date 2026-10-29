@@ -7,6 +7,7 @@ var _error: String = ""
 var _nodes: int = 0
 static func same_keys(a: Dictionary, b: Dictionary) -> bool:
  return a.size()==b.size() and a.keys().all(func(k):return b.has(k))
+static func equivalent(a: Variant, b: Variant) -> bool:return StableJson.stringify(a)==StableJson.stringify(b)
 static func fields(value: Variant, required: Array, optional: Array = []) -> bool:
  if not value is Dictionary:return false
  for key in required:

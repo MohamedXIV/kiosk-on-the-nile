@@ -1,0 +1,78 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PRODUCTION CONTENT true
+SOCIAL AUTHORING VALID true
+CONFIG true {  }
+MISSING HISTORY AND CONSENT BLOCK true
+ACTUAL HEARD INTRODUCTION true
+INTRODUCTION IS DIRECTIONAL true
+FINITE ACTUAL SOCIAL EVENT QUERY true
+COMPANY WITHOUT COMMERCE true
+FIRST MEANINGFUL DAY true
+SAME DAY REPEAT NO EXTRA GAIN OR DAY true
+SECOND DAY SCORE CAP FILLED true
+CAPPED SCORE STILL RECORDS REAL COMPANY DAY true
+IDLE DAY ALONE DOES NOT COUNT true
+THREE SHARED DAYS MATURE AFTER CALENDAR AGE true
+ASYMMETRIC SCORES PRESERVED true
+NO SALES OR SPENDING REQUIRED true
+HIGH SCORE DOES NOT GRANT CONSENT true
+CONSENT EXACT PURPOSE SCOPE true
+REFUSAL RETAINED AND BLOCKS true
+NEW EXPLICIT GRANT true
+WITHDRAWAL BLOCKS true
+EXPIRING GRANT true
+EXPIRY BOUNDARY FRESH true
+UNUSED once true
+CONSUMED once true
+UNUSED day true
+CONSUMED day true
+UNUSED visit true
+CONSUMED visit true
+UNUSED evidence true
+CONSUMED evidence true
+RETARGETED VISIT EVIDENCE CLEAN REJECT true
+SOCIAL ONLY ACTUAL JSON SAVE RESTORE true
+SOCIAL HISTORY RESTORES EXACT true
+WARNING: Narrative stopped: invalid_semantic_social_memory ({ "encounter_id": "semantic_invalid", "session_id": "conversation_16" })
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _report_failure (res://game/narrative/narrative_director.gd:394)
+         [1] _hear_current (res://game/narrative/narrative_director.gd:207)
+         [2] _advance (res://game/narrative/narrative_director.gd:194)
+         [3] start (res://game/narrative/narrative_director.gd:103)
+         [4] open (res://game/narrative/ink_runtime.gd:56)
+         [5] _open (res://game/narrative/ink_runtime.gd:97)
+         [6] _finalise_story_creation (res://addons/inkgd/ink_player.gd:819)
+         [7] _create_and_finalize_story (res://addons/inkgd/ink_player.gd:802)
+INVALID SECOND SOCIAL EFFECT NO PARTIAL PUBLICATION true
+NEW ACTOR SAME DATA RULES true
+NPC ONLY SOCIAL HEARING true
+SOCIAL RECEIPT DOES NOT FABRICATE PLAYER HEARING OR FACTS true
+NPC PAIR SHARED HISTORY true
+NPC SOCIAL JSON SAVE RESTORE true
+MALFORMED EVENT RECORD REJECT true
+DANGLING SOCIAL SOURCE REJECT true
+MISSING SCORE RECEIPT REJECT true
+FORGED CAPPED GAIN REJECT true
+INVENTED DERIVED DAYS REJECT true
+MISSING ACTIVE SOCIAL METADATA REJECT true
+INPUT SAVE REMAINS UNCHANGED true
+STALE SCORE TICKET NO PARTIAL OWNER PUBLICATION true
+FULL KNOWLEDGE CANDIDATE FORK PRESERVED true
+FULL SUPPLIER HOUSEHOLD ACTOR REGISTRY true
+BEFORE MIDNIGHT SAME CALENDAR AGE true
+MIDNIGHT AGE WITHOUT SHARED DAY true
+NEW DAY SCOPE AVAILABLE true
+PERSONAL SOCIAL HEARD START true
+PAUSED SOCIAL EPISODE true
+RETURN SAME ACTOR NO SOCIAL REPLAY true
+NEW HANDLE ONLY REOPENS VISIT SCOPE true
+MIXED PATHS RESPECT ONE DAILY CAP false
+REAL LEGACY SOCIAL ACTION PRESERVES SEMANTIC OWNERS true
+MIXED LEGACY SEMANTIC CURRENT SAVE true
+FAILURES 1
+WARNING: 303 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

@@ -11,9 +11,9 @@ var _index: Dictionary = {}
 var _seeds: Dictionary = {}
 var _episodes: Dictionary = {}
 var _clock: GameClock
-func configure(schema: Dictionary, fact_types: Dictionary, seeds: Array, clock: GameClock) -> ActionResult:
+func configure(schema: Dictionary, fact_types: Dictionary, seeds: Array, clock: GameClock, active: bool = false) -> ActionResult:
  schemas=schema.duplicate(true);types=fact_types.duplicate(true);_clock=clock
- enabled=not types.is_empty() or not seeds.is_empty()
+ enabled=active or not types.is_empty() or not seeds.is_empty()
  _records={};_receipts={};_index={};_seeds={};revision=0
  for seed in seeds:
   var record := {"id":"seed/"+str(seed.id),"knower":seed.knower,"fact":seed.fact.duplicate(true),"kind":"initial","speaker":"","source":"seed/"+str(seed.id),"at":clock.world_minutes,"parent":""}
@@ -55,6 +55,11 @@ func prepare(receipts_to_add: Array, assertions_to_add: Array) -> ActionResult:
  if not validation.ok:return validation
  return ActionResult.success({"revision":revision,"records":records,"receipts":heard})
 func commit(ticket: Dictionary) -> ActionResult:
+ var valid:=can_commit(ticket)
+ if not valid.ok:return valid
+ publish(ticket)
+ return ActionResult.success()
+func can_commit(ticket: Dictionary) -> ActionResult:
  if ticket.get("revision")!=revision or not ticket.get("records") is Dictionary or not ticket.get("receipts") is Dictionary:return _fail()
  for id in _records:
   if ticket.records.get(id)!=_records[id]:return _fail()
@@ -62,8 +67,13 @@ func commit(ticket: Dictionary) -> ActionResult:
   if ticket.receipts.get(id)!=_receipts[id]:return _fail()
  var valid := _validate(ticket.records,ticket.receipts)
  if not valid.ok:return valid
- _records=ticket.records.duplicate(true);_receipts=ticket.receipts.duplicate(true);revision+=1;_reindex()
  return ActionResult.success()
+func publish(ticket: Dictionary) -> void:
+ _records=ticket.records.duplicate(true);_receipts=ticket.receipts.duplicate(true);revision+=1;_reindex()
+func fork() -> KnowledgeAssertions:
+ var result:=KnowledgeAssertions.new()
+ result.schemas=schemas.duplicate(true);result.types=types.duplicate(true);result.enabled=enabled;result.revision=revision;result._records=_records.duplicate(true);result._receipts=_receipts.duplicate(true);result._seeds=_seeds.duplicate(true);result._clock=_clock;result._reindex()
+ return result
 func snapshot() -> Dictionary:return {"records":_records.duplicate(true),"receipts":_receipts.duplicate(true)}
 func restore(data: Variant) -> ActionResult:
  if not NarrativePolicyValidation.fields(data,["records","receipts"]) or not data.records is Dictionary or not data.receipts is Dictionary:return _fail()
@@ -76,7 +86,11 @@ func _validate(records: Dictionary, heard: Dictionary) -> ActionResult:
   if records.get(id)!=_seeds[id]:return _fail()
  for id in heard:
   var r: Variant=heard[id]
-  if not NarrativePolicyValidation.fields(r,["id","episode","beat","topic","action","speaker","listener","at","order","catalog","knowledge_catalog","identity","encounter","participants","story","story_hash","assertions"]) or id!=r.id or not r.episode is String or not r.episode.begins_with("conversation_") or not ContentValidation.integer(r.beat) or r.beat<1 or not r.topic is String or not r.topic.is_valid_identifier() or not r.action is String or not r.action.is_valid_identifier() or not _actor(r.speaker) or not _actor(r.listener) or r.speaker==r.listener or not ContentValidation.bounded(r.at,0,_clock.world_minutes) or not ContentValidation.integer(r.order) or r.order<1 or r.order>heard.size() or not r.catalog is String or r.catalog.length()!=64 or not r.knowledge_catalog is String or not r.identity is Dictionary or not r.encounter is String or not r.participants is Array or not r.participants.all(func(a):return _actor(a)) or not r.speaker in r.participants or not r.story is String or not r.story_hash is String or r.story_hash.length()!=64 or not r.assertions is Array or r.assertions.is_empty() or id!=receipt_id(r.episode,int(r.beat),r.action,r.listener):return _fail()
+  if not r is Dictionary or not r.get("social",[]) is Array or not r.get("visits",{}) is Dictionary:return _fail()
+  if r.get("social",[]).size()>16 or not r.get("social",[]).all(func(e):return SemanticSocialValidation.valid(e,schemas,[],{},true)):return _fail()
+  if not NarrativePolicyValidation.fields(r,["id","episode","beat","topic","action","speaker","listener","at","order","catalog","knowledge_catalog","identity","encounter","participants","story","story_hash","assertions"],["social","visits"]) or id!=r.id or not r.episode is String or not r.episode.begins_with("conversation_") or not ContentValidation.integer(r.beat) or r.beat<1 or not r.topic is String or not r.topic.is_valid_identifier() or not r.action is String or not r.action.is_valid_identifier() or not _actor(r.speaker) or not _actor(r.listener) or r.speaker==r.listener or not ContentValidation.bounded(r.at,0,_clock.world_minutes) or not ContentValidation.integer(r.order) or r.order<1 or r.order>heard.size() or not r.catalog is String or r.catalog.length()!=64 or not r.knowledge_catalog is String or not r.identity is Dictionary or not r.encounter is String or not r.participants is Array or not r.participants.all(func(a):return _actor(a)) or not r.speaker in r.participants or not r.story is String or not r.story_hash is String or r.story_hash.length()!=64 or not r.assertions is Array or (r.assertions.is_empty() and r.get("social",[]).is_empty()) or id!=receipt_id(r.episode,int(r.beat),r.action,r.listener):return _fail()
+  for actor in r.get("visits",{}):
+   if not _actor(actor) or not actor in r.participants or not r.visits[actor] is String or r.visits[actor].is_empty():return _fail()
   var seen := {}
   for assertion_id in r.assertions:
    if not assertion_id is String or seen.has(assertion_id) or not records.get(assertion_id) is Dictionary or records[assertion_id].get("source")!=id:return _fail()

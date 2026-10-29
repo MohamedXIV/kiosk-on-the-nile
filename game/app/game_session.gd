@@ -512,7 +512,7 @@ func pending_financial_offer(chapter: String) -> Dictionary:return account_dialo
 func financial_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:return account_dialogue.financial_effect(action,source,participants)
 func notebook_people() -> Array[Dictionary]:
  var people := social_life.people()
- if journal.has_actor("abdul_karim"):people.append({"actor_id":"abdul_karim","name":presence.profile(&"abdul_karim").name,"score":relationships.value(&"player",&"abdul_karim",&"familiarity"),"stage":"صاحب السكن — معرفة وعلاقة مستقلة عن الحساب","connection":""})
+ if journal.has_actor("abdul_karim") and not people.any(func(person):return person.actor_id=="abdul_karim"):people.append({"actor_id":"abdul_karim","name":presence.profile(&"abdul_karim").name,"score":relationships.value(&"player",&"abdul_karim",&"familiarity"),"stage":"صاحب السكن — معرفة وعلاقة مستقلة عن الحساب","connection":""})
  return people
 
 func validate_financial_chapters() -> ActionResult:

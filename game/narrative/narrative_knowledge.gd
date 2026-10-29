@@ -1,6 +1,6 @@
 class_name NarrativeKnowledge
 extends RefCounted
-## Prepare complete heard-knowledge batches; never mutate money/domain owners.
+## Prepare heard knowledge/social batches; domain owners keep their authority.
 var _session: GameSession
 var _actions: Dictionary = {}
 var identity: String = ""
@@ -58,6 +58,8 @@ func commit(c: ConversationSession) -> ActionResult:
   if not bound.ok:return _fail()
   var resolved: Variant=bound.details.context.resolve(action.assertions)
   if not resolved is Array:return _fail()
+  var social: Variant=bound.details.context.resolve(action.get("social",[]))
+  if not social is Array:return _fail()
   var ids: Array=[]
   for i in range(resolved.size()):
    var declaration: Dictionary=resolved[i]
@@ -71,17 +73,37 @@ func commit(c: ConversationSession) -> ActionResult:
    assertions_to_add.append({"id":assertion_id,"knower":listener,"fact":declaration.fact,"kind":declaration.kind,"speaker":speaker,"source":id,"at":_session.clock.world_minutes,"parent":parent})
   var story: StoryDefinition=_session.narrative._stories[entry.story]
   receipts_to_add.append({"id":id,"episode":str(c.id),"beat":c.beat,"topic":entry.semantic_topic,"action":c.current.policy_action,"speaker":speaker,"listener":listener,"at":_session.clock.world_minutes,"order":_book().next_order()+receipts_to_add.size(),"catalog":_session.semantic.policy.identity(),"knowledge_catalog":identity,"identity":context.identity(),"encounter":str(c.encounter_id),"participants":c.context_extra.semantic_start.actors.duplicate(),"story":str(story.id),"story_hash":story.sha256,"assertions":ids})
+  if not social.is_empty():
+   receipts_to_add[-1]["social"]=social
+   receipts_to_add[-1]["visits"]=visits(bound.details.context)
   eligible.append(listener)
  if receipts_to_add.is_empty():return ActionResult.success({"duplicate_or_unheard":true})
  var prepared := _book().prepare(receipts_to_add,assertions_to_add)
  if not prepared.ok:return prepared
+ var social_ticket: Dictionary={};var relationship_ticket: Dictionary={}
+ if receipts_to_add.any(func(r):return not r.get("social",[]).is_empty()):
+  var candidate:=_session.social_life.memory.prepare(receipts_to_add)
+  if not candidate.ok:return candidate
+  social_ticket=candidate.details
+  candidate=_session.relationships.prepare_gains(social_ticket.gains)
+  if not candidate.ok:return candidate
+  relationship_ticket=candidate.details
  # No await and no publication/signals before the whole batch is ready.
  for listener in eligible:
   if not can_hear(speaker,listener,action.get("channel","hearing")) or not _authorized(entry,c,listener).allowed:return _fail()
- var result := _session.effects.publish_knowledge(prepared.details,receipts_to_add,c.current.to_dict())
+ var presence := {}
+ for participant in c.participants:
+  var actual: Variant=_session.presence.record(participant)
+  if actual==null:return _fail()
+  presence[str(actual.character_id)]=str(participant)
+ var result := _session.effects.publish_knowledge(prepared.details,receipts_to_add,c.current.to_dict(),social_ticket,relationship_ticket,presence)
  if not result.ok:return result
  if c.context_extra.semantic_start.receipt.is_empty():c.context_extra.semantic_start.receipt=receipts_to_add[0].id
  return ActionResult.success()
+static func visits(context: NarrativeContext) -> Dictionary:
+ var result := {}
+ for role in context.handles:result[context.roles[role]]=context.handles[role]
+ return result
 func _receipt_source(r: Dictionary, entry: Dictionary, bound_identity: Dictionary, c: ConversationSession, speaker: String) -> bool:
  return r.episode==str(c.id) and r.beat==c.beat and r.action==c.current.policy_action and r.speaker==speaker and r.identity==bound_identity and r.catalog==_session.semantic.policy.identity() and r.knowledge_catalog==identity and r.encounter==str(c.encounter_id) and r.story==entry.story and r.story_hash==c.runtime._definition.sha256
 func validate_links(next_episode: int) -> ActionResult:
@@ -110,8 +132,18 @@ func validate_links(next_episode: int) -> ActionResult:
   var declared: Array=_session.semantic.policy._compiled.topics[r.topic].get("turn_roles",[])
   if "speaker" in declared:context.roles.speaker=r.speaker
   if "listener" in declared:context.roles.listener=r.listener
+  if not r.get("social",[]).is_empty():
+   var presence: Variant=source.get("presence")
+   if not presence is Dictionary or presence.size()!=r.participants.size():return _fail()
+   for actor in presence:
+    if not actor in r.participants or not presence[actor] is String or presence[actor].is_empty():return _fail()
+   var expected_visits := {}
+   for actor in context.roles.values():
+    if presence.has(actor):expected_visits[actor]=presence[actor]
+   if not NarrativePolicyValidation.equivalent(r.get("visits",{}),expected_visits):return _fail()
   var expected: Variant=context.resolve(action.assertions)
   if not expected is Array:return _fail()
+  if not NarrativePolicyValidation.equivalent(r.get("social",[]),context.resolve(action.get("social",[]))):return _fail()
   for i in range(expected.size()):
    var assertion := _book().record(r.assertions[i])
    if r.assertions[i]!=r.id+"/"+str(i) or assertion.fact!=expected[i].fact or assertion.kind!=expected[i].kind:return _fail()
@@ -120,5 +152,5 @@ func validate_links(next_episode: int) -> ActionResult:
   if str(id).contains("/semantic/") and _book().receipt(str(id)).is_empty():return _fail()
  for id in _session.effects.semantic_source_ids():
   if _book().receipt(str(id)).is_empty():return _fail()
- return ActionResult.success()
+ return _session.social_life.memory.validate_links()
 static func _fail() -> ActionResult:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_semantic_knowledge")

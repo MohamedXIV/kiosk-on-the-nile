@@ -1,0 +1,61 @@
+extends SceneTree
+var bad:=0
+func _initialize():call_deferred("run")
+func check(ok: bool,label: String):
+ print(label," ",ok)
+ if not ok:bad+=1
+func run():
+ var clock:=GameClock.new({"start_minutes":0})
+ var schema={"types":{"actor":["player","farid","youssef","amgad"]}}
+ var types={"connection":{"person":"actor"}}
+ var fact={"type":"connection","args":{"person":"farid"}}
+ var book:=KnowledgeBook.new()
+ check(book.assertions.configure(schema,types,[{"id":"source","knower":"farid","fact":fact}],clock).ok,"CONFIGURE")
+ check(book.query_assertions("farid",fact).size()==1 and book.query_assertions("player",fact).is_empty(),"KNOWERS DIFFER NO PLAYER FALLBACK")
+ var id:=KnowledgeAssertions.receipt_id("conversation_1",1,"teach","youssef")
+ var r={"id":id,"episode":"conversation_1","beat":1,"topic":"demo","action":"teach","speaker":"farid","listener":"youssef","at":0,"order":1,"catalog":"a".repeat(64),"knowledge_catalog":"b".repeat(64),"identity":{"topic":"demo","bindings":{},"roles":{}},"encounter":"demo","participants":["farid","youssef"],"story":"demo","story_hash":"c".repeat(64),"assertions":[id+"/0"]}
+ var a={"id":id+"/0","knower":"youssef","fact":fact,"kind":"heard","speaker":"farid","source":id,"at":0,"parent":""}
+ var before:=book.snapshot()
+ var prepared:=book.assertions.prepare([r],[a])
+ check(prepared.ok and book.snapshot()==before,"PREPARATION DOES NOT PUBLISH")
+ check(book.assertions.commit(prepared.details).ok,"COMMIT PREPARED")
+ check(not book.assertions.commit(prepared.details).ok,"STALE PREPARED REVISION REJECT")
+ var snapshot:=book.snapshot()
+ check(book.assertions.prepare([r],[a]).ok and book.snapshot()==snapshot,"IDENTICAL DUPLICATE NO PUBLICATION")
+ var second: Dictionary=r.duplicate(true);second.id=KnowledgeAssertions.receipt_id("conversation_2",1,"teach","youssef");second.episode="conversation_2";second.order=2;second.speaker="amgad";second.participants=["amgad","youssef"];second.assertions=[second.id+"/0"]
+ var other: Dictionary=a.duplicate(true);other.id=second.id+"/0";other.source=second.id;other.speaker="amgad"
+ prepared=book.assertions.prepare([second],[other]);check(prepared.ok and book.assertions.commit(prepared.details).ok,"SECOND SOURCE COMMIT")
+ check(book.query_assertions("youssef",fact).size()==2,"INDEPENDENT SOURCES RETAINED")
+ var relay: Dictionary=r.duplicate(true);relay.id=KnowledgeAssertions.receipt_id("conversation_3",1,"relay","player");relay.action="relay";relay.episode="conversation_3";relay.order=3;relay.speaker="youssef";relay.listener="player";relay.participants=["youssef"];relay.assertions=[relay.id+"/0"]
+ var delivered: Dictionary=a.duplicate(true);delivered.id=relay.id+"/0";delivered.source=relay.id;delivered.speaker="youssef";delivered.knower="player";delivered.kind="relayed";delivered.parent=a.id
+ prepared=book.assertions.prepare([relay],[delivered]);check(prepared.ok and book.assertions.commit(prepared.details).ok,"RELAY ACTUAL SPEAKER PARENT")
+ check(book.query_assertions("player",fact)[0].parent==a.id,"UPSTREAM ID RETAINED")
+ snapshot=book.snapshot()
+ var corrupt: Dictionary=snapshot.assertions.duplicate(true);corrupt.records[delivered.id].parent="missing"
+ check(not book.assertions.restore(corrupt).ok and book.snapshot()==snapshot,"DANGLING PARENT REJECT WITHOUT MUTATION")
+ corrupt=snapshot.assertions.duplicate(true);corrupt.records[delivered.id].parent="seed/source"
+ check(not book.assertions.restore(corrupt).ok,"WRONG PARENT KNOWER REJECT")
+ corrupt=snapshot.assertions.duplicate(true);corrupt.records[a.id].at=1
+ check(not book.assertions.restore(corrupt).ok,"FUTURE TIME REJECT")
+ corrupt=snapshot.assertions.duplicate(true);corrupt.records[a.id].fact.args.person="unknown"
+ check(not book.assertions.restore(corrupt).ok,"UNKNOWN SUBJECT REJECT")
+ corrupt=snapshot.assertions.duplicate(true);corrupt.receipts.erase(id)
+ check(not book.assertions.restore(corrupt).ok,"MISSING RECEIPT REJECT")
+ var invalid: Dictionary=a.duplicate(true);invalid.knower="unknown"
+ check(not book.assertions.prepare([r],[invalid]).ok and book.snapshot()==snapshot,"WHOLE INVALID BATCH UNCHANGED")
+ check(book.restore(snapshot).ok and book.snapshot()==snapshot,"CURRENT OWNER RESTORE EXACT")
+ corrupt=snapshot.assertions.duplicate(true)
+ var malformed:Variant=corrupt.records[a.id];corrupt.records[a.id]=7
+ var malformed_result:Variant=book.assertions.restore(corrupt)
+ check(malformed_result is ActionResult and not malformed_result.ok,"MALFORMED REFERENCED RECORD CLEAN REJECTION")
+ corrupt=snapshot.assertions.duplicate(true)
+ var future_id:=KnowledgeAssertions.receipt_id("conversation_3",2,"teach","youssef")
+ var future_receipt:Dictionary=corrupt.receipts[second.id].duplicate(true);future_receipt.id=future_id;future_receipt.episode="conversation_3";future_receipt.beat=2;future_receipt.assertions=[future_id+"/0"]
+ var future_record:Dictionary=corrupt.records[other.id].duplicate(true);future_record.id=future_id+"/0";future_record.source=future_id
+ corrupt.receipts.erase(second.id);corrupt.receipts[future_id]=future_receipt
+ corrupt.records.erase(other.id);corrupt.records[future_record.id]=future_record
+ corrupt.records[delivered.id].parent=future_record.id
+ check(not book.assertions.restore(corrupt).ok,"LATER BEAT PARENT AT SAME TIME REJECT")
+ corrupt=snapshot.assertions.duplicate(true);corrupt.records[delivered.id].parent=delivered.id
+ check(not book.assertions.restore(corrupt).ok,"CYCLIC PARENT REJECT")
+ print("FAILURES ",bad);quit(bad)

@@ -1,0 +1,308 @@
+{
+  "narrative_policies": {
+    "contract_version": 1,
+    "profiles": {
+      "home_company": {
+        "familiarity": 30,
+        "trust": 6,
+        "calendar_days": 3,
+        "shared_days": 3
+      }
+    },
+    "policies": {
+      "mature_company": {
+        "roles": [
+          "host",
+          "guest"
+        ],
+        "parameters": {
+          "gate": "profile"
+        },
+        "requires": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "acquaintance",
+              "observer": {
+                "role": "host"
+              },
+              "other": {
+                "role": "guest"
+              },
+              "calendar_days": {
+                "parameter": "gate",
+                "field": "calendar_days"
+              },
+              "shared_days": {
+                "parameter": "gate",
+                "field": "shared_days"
+              }
+            },
+            {
+              "op": "relationship",
+              "from": {
+                "role": "guest"
+              },
+              "to": {
+                "role": "host"
+              },
+              "axis": "familiarity",
+              "compare": ">=",
+              "value": {
+                "parameter": "gate",
+                "field": "familiarity"
+              }
+            },
+            {
+              "op": "relationship",
+              "from": {
+                "role": "guest"
+              },
+              "to": {
+                "role": "host"
+              },
+              "axis": "trust",
+              "compare": ">=",
+              "value": {
+                "parameter": "gate",
+                "field": "trust"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "fact_types": {},
+    "topics": {
+      "company_example": {
+        "bindings": {
+          "partner_actor": "actor",
+          "invitation_id": "string"
+        },
+        "roles": {
+          "partner": {
+            "binding": "partner_actor"
+          }
+        },
+        "turn_roles": [
+          "speaker",
+          "listener"
+        ],
+        "stages": {
+          "start": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          },
+          "continuation": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          }
+        },
+        "choices": {
+          "mature": {
+            "op": "policy",
+            "id": "mature_company",
+            "roles": {
+              "guest": {
+                "role": "partner"
+              },
+              "host": {
+                "actor": "player"
+              }
+            },
+            "parameters": {
+              "gate": "home_company"
+            }
+          },
+          "consent": {
+            "op": "consent",
+            "grantor": {
+              "role": "partner"
+            },
+            "recipient": {
+              "actor": "player"
+            },
+            "purpose": "home",
+            "scope": {
+              "binding": "invitation_id"
+            }
+          }
+        },
+        "actions": {
+          "introduce": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          },
+          "company": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          },
+          "grant": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          },
+          "refuse": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          },
+          "revoke": {
+            "op": "time_window",
+            "start": 0,
+            "end": 1440
+          }
+        }
+      }
+    }
+  },
+  "narrative_knowledge": {
+    "initial": [],
+    "actions": {
+      "company_example": {
+        "introduce": {
+          "listeners": [
+            {
+              "actor": "player"
+            }
+          ],
+          "assertions": [],
+          "social": [
+            {
+              "kind": "introduction",
+              "observer": {
+                "role": "listener"
+              },
+              "other": {
+                "role": "speaker"
+              }
+            }
+          ]
+        },
+        "company": {
+          "listeners": [
+            {
+              "actor": "player"
+            }
+          ],
+          "assertions": [],
+          "social": [
+            {
+              "kind": "company",
+              "observer": {
+                "role": "listener"
+              },
+              "other": {
+                "role": "speaker"
+              }
+            },
+            {
+              "kind": "relationship",
+              "from": {
+                "role": "speaker"
+              },
+              "to": {
+                "role": "listener"
+              },
+              "axis": "familiarity",
+              "amount": 3
+            },
+            {
+              "kind": "relationship",
+              "from": {
+                "role": "speaker"
+              },
+              "to": {
+                "role": "listener"
+              },
+              "axis": "trust",
+              "amount": 1
+            }
+          ]
+        },
+        "grant": {
+          "listeners": [
+            {
+              "actor": "player"
+            }
+          ],
+          "assertions": [],
+          "social": [
+            {
+              "kind": "consent",
+              "grantor": {
+                "role": "speaker"
+              },
+              "recipient": {
+                "role": "listener"
+              },
+              "purpose": "home",
+              "scope": {
+                "binding": "invitation_id"
+              },
+              "decision": "grant",
+              "duration": 60
+            }
+          ]
+        },
+        "refuse": {
+          "listeners": [
+            {
+              "actor": "player"
+            }
+          ],
+          "assertions": [],
+          "social": [
+            {
+              "kind": "consent",
+              "grantor": {
+                "role": "speaker"
+              },
+              "recipient": {
+                "role": "listener"
+              },
+              "purpose": "home",
+              "scope": {
+                "binding": "invitation_id"
+              },
+              "decision": "refuse",
+              "duration": 0
+            }
+          ]
+        },
+        "revoke": {
+          "listeners": [
+            {
+              "actor": "player"
+            }
+          ],
+          "assertions": [],
+          "social": [
+            {
+              "kind": "consent",
+              "grantor": {
+                "role": "speaker"
+              },
+              "recipient": {
+                "role": "listener"
+              },
+              "purpose": "home",
+              "scope": {
+                "binding": "invitation_id"
+              },
+              "decision": "revoke",
+              "duration": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "narrative_social": {
+    "daily_gain_cap": 12
+  }
+}

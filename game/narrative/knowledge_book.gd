@@ -4,6 +4,10 @@ var _facts: Dictionary = {}
 var _catalog: Array = []
 var _notes: Array[String] = []
 var assertions := KnowledgeAssertions.new()
+func fork() -> KnowledgeBook:
+ var result:=KnowledgeBook.new()
+ result._facts=_facts.duplicate(true);result._catalog=_catalog.duplicate();result._notes=_notes.duplicate();result.assertions=assertions.fork()
+ return result
 func query_assertions(knower: String, fact: Dictionary, kinds: Array = ["initial","heard","relayed","observed"]) -> Array[Dictionary]:return assertions.query(knower,fact,kinds)
 func _init(config: Dictionary = {}) -> void:
  _catalog = config.get("facts",[]).duplicate()

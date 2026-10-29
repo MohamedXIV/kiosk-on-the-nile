@@ -1,0 +1,39 @@
+# Generic social history foundation — #23
+
+Recorded2026-10-29, Africa/Cairo. Basee537cbe19c8afbc03a934f5df3332f8c63e73bc5; isolated `feat/semantic-social-history`. Exact source/PR/CI/merge identifiers are tracked live on#23/#19/#8. This is the reusable foundation, with no production family conversion or formal preview release.
+
+## Delivered
+
+[Runnable API](../architecture/semantic-social.md) and [validated three-section example](../architecture/examples/semantic-social-v1.json) define authored introductions/company, explicit directional gains, exact consent/refusal/withdrawal/expiry and business consumption scopes. SocialLife owns generic memory; RelationshipStore retains the only score state. Actual meaningful dates are independent of capped score gains, with existing12 positive daily tuning retained. The compatibility bridge shares NPC→player budget with unconverted legacy moments in both orders, retaining the observed legacy baseline without recomputing historical rewards against later events.
+
+Prepared KnowledgeBook hearing receipts, SocialLife events and RelationshipStore candidates validate/revision-check before publication. No await/callback/signal occurs inside commit; stale/invalid batches publish nothing. Stable and declared turn-role actors bind actual participant handles. Source proofs retain actual committed frame/actor/presence evidence; restore checks receipt visit projections, actual declarations and capped gain proofs. Social-only NPC hearing does not create player facts, Journal speech or heard_beat.
+
+Notebook contacts merge actual generic player introductions through full presence profiles and deduplicate existing landlord projection; numeric stages remain separate from permissions. Legacy SocialLife candidate forks preserve optional typed knowledge/gain proofs and the complete visitor/household/supplier actor registry. No NPC names were added to generic policy/memory logic.
+
+## Bounded observations
+
+[Evidence directory](evidence/2026-10-29-semantic-social/) retains disposable observation inputs as `.gd.txt`, temporary Ink sources, native logs/before logs, build/toolchain and decision/review record. Only terminal trailing whitespace was stripped from log lines. No automated suite was added or run. Pinned native commands were `bash tools/godot.sh --headless --path . --script res://work/semantic-social/<observation>.gd`; each retained `.ink.txt` becomes its matching temporary `.ink` and compiles with pinned cached inklecate into the `.ink.json` paths read by the observation.
+
+- `lifecycle.log`:64 checks pass. Directional direct introduction/event query, first shared day, same-day repeat with no extra gain/day, filled cap followed by real company day, idle day with no company, three shared dates plus calendar age and existing30/6 relationship thresholds, asymmetric scores and unchanged wallet. Exact consent purpose/scope, explicit refusal/new grant/withdrawal and expiry boundary all work.
+- Once/day/visit/evidence consumption, actual social-only/NPC-only JSON save roundtrip, source input preservation, malformed event/dangling source/missing score proof/forged capped gain/invented derived days/missing active metadata reject. A stale score ticket leaves all owners unchanged. Actual personal pause/new-handle return does not replay; only a new visit scope reopens. Midnight changes calendar age without inventing company. Full supplier/household candidate registry and new authored Nadia binding work without engine-name edits.
+- Actual unconverted social speech preserves semantic owners. Both legacy-first and semantic-first daily-budget cases obey the shared cap and current JSON restore succeeds. This is bounded coexistence evidence, not completed content migration.
+- `turn-visit.log`: actual NPC listener represented only by a turn role can consume visit scope. `once-start.log`: actual consumption invalidates new starts, while current continuation/JSON restore remains valid. `authoring.log`: example validates, missing role/invalid cap reject. Retained #22 core owner observations still pass20 checks; ordinary production serialized shape/current restore remain unchanged.
+- Four actually present actors,240 headless process frames, four binds plus acquaintance/directional policy evaluation per frame: mean0.43074166666667ms/p950.55ms. Pinned Godot4.7.2, x86_64 Intel Xeon Platinum8573C. Inside the proposed ≤1/≤2ms reference CPU budget; excludes GPU, whole-game scheduling and player hardware. No device smoothness/allocation/long-session memory claim.
+
+Final lifecycle process exits retain existing inkgd/ObjectDB resource warnings (328 objects/24 resources); ordinary fixture73/22. Expected stopped-narrative warnings accompany intentionally rejected effects. Final observations/import/export contain no script/parse/compile errors. These runs do not establish leak-free shutdown.
+
+## Review and gates
+
+One fresh read-only independent review found two Important issues, no Critical/minors: missing visit handles for turn-only actual actors, and accepted visit retargeting after editing both receipt copies. Both were reproduced (`turn-visit-before.log`, `visit-proof-before.log`), then corrected in one focused pass. Final corresponding checks pass. The original visit falsely appeared unused in the retained before case; canonical independent participant evidence now rejects that corruption. This is owner-consistency checking, not cryptographic protection against rewriting every corroborating owner/checksum.
+
+An additional mixed-path observation found separate legacy/semantic budgets could exceed the existing daily cap (`mixed-cap-before.log`). Corrected with shared usage, source-backed frozen preparation baselines and total checks. Final native evidence covers both execution orders/current JSON restore. Existing legacy acquaintance adapters remain explicitly inventoried until#24; no blanket partial migration is claimed.
+
+Tracked `bash tools/build.sh --release --out /tmp/kiosk-semantic-social-web` passed pinned Ink compilation,377 localization references, Godot import and Web Release export. Exact-source PR/main CI follows in the live issue; this local development build was not published as a playable archive.
+
+## Rulings, save impact and next
+
+Execution used the existing isolated checkout/new branch, inline implementation and one available fresh reviewer (preferred Astra was unavailable at earlier usage cap). Approved contract/repeated continue authorization supplied scope; no redundant design pause. Standing no-suite instructions used bounded observations/tracked gates. SocialLife/RelationshipStore/KnowledgeBook retain their owners; complete prepared candidates publish only after validation. Direct introduction is listener→speaker; company/gains require the actual pair; consent is actual speaker→listener. No player consent is inferred from NPC speech or score. Numeric notebook stages do not imply permission. Full decision ledger is retained in evidence.
+
+Optional social-memory/gain/source metadata activates only with authored semantic actions; empty production catalogs retain legacy serialized shapes. Active metadata must be present and valid. No silent reset/deletion, historical migration, archived Ink graph or destructive provenance pruning. VERSION0.2.1-prealpha.1, schema4/revision20, CHANGELOG, published tags/releases and permanent archives are unchanged. Final coherent save/version/new-game/changelog decision remains#26/#27.
+
+All49 production encounters remain unconverted. #24 now authors complete home/relay/recipe families, actual message/request/response scopes and explicit player-choice/domain prepared adapters; unsupported world/financial/home mutations still fail closed. #25 author tools; #26 integrated bilingual/pacing/save/performance acceptance; #27 one complete verified preview. #6/#7 human playtest acceptance remains open.

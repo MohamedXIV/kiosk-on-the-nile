@@ -8,7 +8,7 @@ static func empty_catalog() -> Dictionary:
  return {"contract_version":1,"profiles":{},"policies":{},"topics":{},"fact_types":{}}
 static func schemas(bundle: Dictionary) -> Dictionary:
  var actors: Array=bundle.get("visitors",{}).get("characters",{}).keys()+bundle.get("residential_visits",{}).get("profiles",{}).keys()+bundle.get("suppliers",{}).get("profiles",{}).keys()+["player"]
- return {"types":{"actor":actors,"recipe":bundle.get("recipe_workflows",{}).keys(),"location":bundle.get("locations",{}).keys(),"fact":bundle.get("social",{}).get("facts",[])},"axes":bundle.get("social",{}).get("relationship_defaults",{}).keys(),"channels":["personal","hearing"],"queries":{"kiosk.open":{},"recipe.attempted":{"recipe":"recipe"},"recipe.completed":{"recipe":"recipe"}},"events":{}}
+ return {"types":{"actor":actors,"recipe":bundle.get("recipe_workflows",{}).keys(),"location":bundle.get("locations",{}).keys(),"fact":bundle.get("social",{}).get("facts",[]),"social_event":["introduction","company"]},"axes":bundle.get("social",{}).get("relationship_defaults",{}).keys(),"channels":["personal","hearing"],"queries":{"kiosk.open":{},"recipe.attempted":{"recipe":"recipe"},"recipe.completed":{"recipe":"recipe"}},"events":{"social.occurred":{"kind":"social_event","observer":"actor","other":"actor"}}}
 static func validate(bundle: Dictionary) -> ActionResult:
  var compiled := NarrativePolicyValidation.compile(bundle.get("narrative_policies",empty_catalog()),schemas(bundle))
  if not compiled.ok:return compiled
@@ -32,9 +32,9 @@ func configure(session: GameSession) -> ActionResult:
  _session=session
  var compiled := validate(session.config.data)
  if not compiled.ok:return compiled
- policy.configure(compiled.details,{"relationship":_relationship,"time_window":_time_window,"available":_available,"near":_near,"domain":_domain,"knowledge":_knowledge},_resolve_handle)
+ policy.configure(compiled.details,{"relationship":_relationship,"time_window":_time_window,"available":_available,"near":_near,"domain":_domain,"knowledge":_knowledge,"acquaintance":_acquaintance,"consent":_consent,"event":_event,"unused":_unused},_resolve_handle)
  var knowledge_config: Dictionary=session.config.data.get("narrative_knowledge",NarrativeKnowledgeValidation.empty_catalog())
- var configured := session.knowledge.assertions.configure(compiled.details.schemas,session.config.data.get("narrative_policies",{}).get("fact_types",{}),knowledge_config.initial,session.clock)
+ var configured := session.knowledge.assertions.configure(compiled.details.schemas,session.config.data.get("narrative_policies",{}).get("fact_types",{}),knowledge_config.initial,session.clock,not knowledge_config.actions.is_empty())
  if not configured.ok:return configured
  knowledge_actions.configure(session)
  session.effects.semantic_provider=knowledge_actions.commit
@@ -50,6 +50,19 @@ func _record(actor: String) -> Variant:
 func _relationship(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  var score := _session.relationships.value(StringName(rule.from),StringName(rule.to),StringName(rule.axis))
  return NarrativePolicy.answer(NarrativePolicy.compare(score,rule.compare,float(rule.value)),[{"value":score,"from":rule.from,"to":rule.to,"axis":rule.axis}])
+func _acquaintance(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
+ var history:=_session.social_life.memory.acquaintance(rule.observer,rule.other)
+ return NarrativePolicy.answer(history.introduced and history.calendar_days>=rule.calendar_days and history.shared_days>=rule.shared_days,[history])
+func _consent(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
+ var consent:=_session.social_life.memory.consent(rule.grantor,rule.recipient,rule.purpose,rule.scope)
+ return NarrativePolicy.answer(consent.allowed,[consent])
+func _event(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
+ if rule.id!="social.occurred":return {"status":"invalid","reason":"event_provider_unavailable"}
+ return NarrativePolicy.answer(_session.social_life.memory.occurred(rule.args.kind,rule.args.observer,rule.args.other))
+func _unused(rule: Dictionary, context: NarrativeContext) -> Dictionary:
+ var key:=SemanticSocialMemory.scope_key(context.identity(),rule.scope,rule.actors,str(rule.get("evidence","")),_session.clock.world_minutes,NarrativeKnowledge.visits(context))
+ if key.is_empty():return {"status":"invalid","reason":"missing_scope_presence"}
+ return NarrativePolicy.answer(_session.social_life.memory.unused(key))
 func _time_window(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  return NarrativePolicy.answer(_session.clock.minutes>=float(rule.start) and _session.clock.minutes<=float(rule.end))
 func _available(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
@@ -104,10 +117,10 @@ func _context(entry: Dictionary, participants: PackedStringArray, turn: Dictiona
  var bound := policy.bind(entry.semantic_topic,values,{},turn,saved)
  if not bound.ok:return bound
  var context: NarrativeContext=bound.details.context
- for role in context.stable_roles:
+ for role in context.roles:
   for participant in participants:
    var actor: Variant=_session.presence.record(participant)
-   if actor!=null and str(actor.character_id)==context.stable_roles[role]:handles[role]=str(participant)
+   if actor!=null and str(actor.character_id)==context.roles[role]:handles[role]=str(participant)
  return policy.bind(entry.semantic_topic,values,handles,turn,saved)
 func start_proof(entry: Dictionary, participants: PackedStringArray, episode: String) -> ActionResult:
  var bound := _context(entry,participants)

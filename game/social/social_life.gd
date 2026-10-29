@@ -6,10 +6,12 @@ var _session: GameSession
 var _data: Dictionary
 var _state: Dictionary
 var participation_blocked: Callable
+var memory := SemanticSocialMemory.new()
 func configure(session: GameSession) -> void:
  _session=session
  _data=session.config.section("social_life")
  _state=empty_state()
+ memory.configure(session)
 static func empty_state() -> Dictionary:
  return {"receipts":{},"topic_history":{},"moments":{},"daily":{},"people":{},"invitations":{},"activity":{"phase":"idle","not_before":-1.0,"start_at":-1.0,"end_at":-1.0,"clear_since":-1.0,"outcome":""}}
 func done(id: String) -> bool:
@@ -55,13 +57,9 @@ func apply(id: String, source: String, speaker: String = "", internal: bool = fa
  if done(id) and (action.get("repeat","")!="day" or floori(float(_state.receipts[id].at)/1440.0)==_session.clock.day-1):return ActionResult.success({"duplicate":true})
  if not _available(id,_state) or (not internal and speaker!=action.actor):return _fail("social_action_unavailable")
  var candidate := _state.duplicate(true)
- var knowledge := KnowledgeBook.new(_session.config.section("social"))
- var result := knowledge.restore(_session.knowledge.snapshot())
- if not result.ok:return result
- var actors: Array=_session.config.section("visitors").characters.keys()+["player"]
- var relationships := RelationshipStore.new(_session.config.section("social"),actors)
- result=relationships.restore(_session.relationships.snapshot())
- if not result.ok:return result
+ var knowledge := _session.knowledge.fork()
+ var relationships := _session.relationships.fork()
+ var result := ActionResult.success()
  var now := _session.clock.world_minutes
  candidate.receipts[id]={"at":now,"source":source,"actor":action.actor}
  if action.has("message"):candidate.receipts[id]["message"]=action.message.duplicate(true)
@@ -93,11 +91,14 @@ func _moment(state: Dictionary, store: RelationshipStore, key: String, actor: St
  var day := str(_session.clock.day)
  if not state.daily.has(day):state.daily[day]={}
  var used := float(state.daily[day].get(actor,0))
- var remaining := maxf(0,float(_data.relationships.daily_cap)-used)
+ var remaining := maxf(0,float(_data.relationships.daily_cap)-used-memory.positive_used(actor,"player",_session.clock.world_minutes))
  var gain := minf(familiarity,remaining)
  store.adjust(StringName(actor),&"player",&"familiarity",gain)
  store.adjust(StringName(actor),&"player",&"trust",minf(trust,remaining-gain))
  state.daily[day][actor]=used+gain+minf(trust,remaining-gain)
+func legacy_positive_used(from: String, to: String, at: float) -> float:
+ return float(_state.daily.get(str(floori(at/1440.0)+1),{}).get(from,0)) if to=="player" else 0.0
+func legacy_daily() -> Dictionary:return _state.daily.duplicate(true)
 func reserved(actor: String) -> bool:
  return actor in _data.trial.actors and _state.activity.phase in ["scheduled","waiting","active"] and _session.clock.world_minutes>=float(_state.activity.not_before)-float(_data.trial.reservation_lead_minutes)
 func _participants_absent() -> bool:
@@ -131,7 +132,10 @@ func before_time_jump() -> void:
  tick(_session.clock.frame(0))
 func people() -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
- for actor in _state.people:
+ var actors: Array=_state.people.keys()
+ for actor in memory.people("player"):
+  if not actor in actors:actors.append(actor)
+ for actor in actors:
   var score := _session.relationships.value(StringName(actor),&"player",&"familiarity")
   var label := ""
   var stage_ref := ""
@@ -139,20 +143,32 @@ func people() -> Array[Dictionary]:
    if score>=float(stage.at):label=stage.label;stage_ref=str(stage.get("text_ref",""))
   var connection := ""
   if actor in _data.trial.actors and (_session.knowledge.has(&"WORK_TRIAL_APPOINTMENT") or _session.knowledge.has(&"WORK_TRIAL_RESULT")):connection=("جرّب الشغل مع يوسف" if actor=="farid" else "جرّب الشغل مع فريد") if _session.knowledge.has(&"WORK_TRIAL_RESULT") else ("تواصل مع يوسف لترتيب تجربة" if actor=="farid" else "تواصل مع فريد لترتيب تجربة")
-  result.append({"actor_id":str(actor),"name":_session.visitors.character(StringName(actor)).name,"score":score,"stage":label,"stage_ref":stage_ref,"connection":connection})
+  result.append({"actor_id":str(actor),"name":_session.presence.profile(StringName(actor)).get("name",str(actor)),"score":score,"stage":label,"stage_ref":stage_ref,"connection":connection,"history":memory.acquaintance("player",str(actor))})
  return result
 func heard(actor: String) -> void:
  if _session.config.section("visitors").characters.has(actor):_state.people[actor]=true
 func snapshot() -> Dictionary:
- return _state.duplicate(true)
+ var result:=_state.duplicate(true)
+ if memory.enabled:result["semantic_memory"]=memory.snapshot()
+ return result
 func restore(data: Dictionary) -> ActionResult:
  var result := _validate(data)
  if not result.ok:return result
+ if memory.enabled:
+  result=memory.restore(data.get("semantic_memory"))
+  if not result.ok:return result
+ elif data.has("semantic_memory"):return _fail("unsupported_social_memory")
  _state=data.duplicate(true)
+ _state.erase("semantic_memory")
  return ActionResult.success()
 func _validate(data: Dictionary) -> ActionResult:
  for key in ["topic_history","receipts","moments","daily","people","invitations","activity"]:
   if not data.get(key) is Dictionary:return _fail("invalid_social_state")
+ var positive:=memory.positive_totals()
+ if data.has("semantic_memory"):
+  var checked:=memory.inspect(data.semantic_memory)
+  if not checked.ok:return checked
+  positive=checked.details.indexes.positive
  var now := _session.clock.world_minutes
  for id in data.receipts:
   var receipt: Variant=data.receipts[id]
@@ -187,7 +203,7 @@ func _validate(data: Dictionary) -> ActionResult:
     var day_text := str(key).trim_prefix(prefix)
     if str(key).begins_with(prefix) and day_text.is_valid_int():
      var day := int(day_text)
-     grounded=grounded or (day>=1 and day<=floori(float(data.receipts[id].at)/1440.0)+1 and float(data.daily.get(str(day),{}).get(action.actor,0))>0)
+     grounded=grounded or (day>=1 and day<=floori(float(data.receipts[id].at)/1440.0)+1 and (float(data.daily.get(str(day),{}).get(action.actor,0))>0 or float(positive.get(StableJson.stringify([str(action.actor),"player",day-1]),0))>0))
    elif action.moment==key:grounded=true
   if not grounded:return _fail("ungrounded_social_moment")
  for topic in data.topic_history:

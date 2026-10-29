@@ -1,0 +1,76 @@
+extends SceneTree
+var bad:=0
+var s:GameSession
+var config:SessionConfig
+var bundle:Dictionary
+var last:ConversationSession
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String,details:Variant=""):
+ print(label," ",ok," ",details)
+ if not ok:bad+=1
+func visit(actor:String,ground:Vector2=Vector2(-1.5,-0.5)) -> VisitState:
+ var v:Variant=s.semantic._record(actor)
+ if v==null:v=s.visitors.spawn(StringName(actor))
+ v.phase=&"staying";v.pose.ground=ground;v.destination=ground;v.shopping_state=&"declined"
+ return v
+func bind(actor:String="farid",scope_id:String="visitA") -> NarrativeContext:
+ return s.semantic.policy.bind("social",{"partner_actor":actor,"listener_actor":"player","scope_id":scope_id},{"partner":str(s.semantic._record(actor).id)}).details.context
+func allowed(key:String,actor:String="farid",scope_id:String="visitA") -> bool:return s.semantic.policy.evaluate(bind(actor,scope_id),"choice",key).allowed
+func hear(action:String,actor:String="farid",extra:Dictionary={}) -> ActionResult:
+ s.narrative.cancel_all();s.personal.leave()
+ var v:=visit(actor)
+ var result:=await s.narrative.start(StringName("semantic_"+action),PackedStringArray([str(v.id)]),extra.merged({"manual_read":false}))
+ if result.ok:last=s.narrative.sessions[result.details.session_id]
+ return result
+func reseal(data:Dictionary) -> Dictionary:
+ data.erase("checksum");data.checksum=StableJson.stringify(data).sha256_text();return data
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ check(store.load_directory("res://content").ok,"PRODUCTION CONTENT")
+ bundle=store.bundle()
+ var yes={"op":"time_window","start":0,"end":1440}
+ var speaker={"role":"speaker"};var listener={"role":"listener"};var partner={"role":"partner"};var player={"actor":"player"}
+ var intro={"kind":"introduction","observer":listener,"other":speaker}
+ var company={"kind":"company","observer":listener,"other":speaker}
+ var gains=[{"kind":"relationship","from":speaker,"to":listener,"axis":"familiarity","amount":10},{"kind":"relationship","from":speaker,"to":listener,"axis":"trust","amount":2}]
+ var choices={"continue_chat":yes,"mature":{"op":"all","rules":[{"op":"acquaintance","observer":player,"other":partner,"calendar_days":3,"shared_days":3},{"op":"relationship","from":partner,"to":player,"axis":"familiarity","compare":">=","value":30},{"op":"relationship","from":partner,"to":player,"axis":"trust","compare":">=","value":6}]},"consent":{"op":"consent","grantor":partner,"recipient":player,"purpose":"home","scope":{"binding":"scope_id"}},"wrong_purpose":{"op":"consent","grantor":partner,"recipient":player,"purpose":"relay","scope":{"binding":"scope_id"}},"intro_event":{"op":"event","id":"social.occurred","args":{"kind":"introduction","observer":player,"other":partner}}}
+ var actions={};var declarations={}
+ for action in ["greet","company","fill_cap","grant","refuse","revoke","consume_once","consume_day","consume_visit","consume_evidence","invalid"]:
+  actions[action]=yes
+  var social:Array=[]
+  match action:
+   "greet":social=[intro]
+   "company":social=[company]+gains
+   "fill_cap":social=gains
+   "grant","refuse","revoke":social=[{"kind":"consent","grantor":speaker,"recipient":listener,"purpose":"home","scope":{"binding":"scope_id"},"decision":"grant" if action=="grant" else action,"duration":30 if action=="grant" else 0}]
+   "invalid":social=[gains[0],{"kind":"introduction","observer":speaker,"other":listener}]
+   _:
+    var scope:String=action.trim_prefix("consume_")
+    var rule={"op":"unused","scope":scope,"actors":[partner,player]}
+    var consume={"kind":"consume","scope":scope,"actors":[partner,player]}
+    if scope=="evidence":rule["evidence"]={"binding":"scope_id"};consume["evidence"]={"binding":"scope_id"}
+    choices[scope]=rule;actions[action]=rule;social=[consume]
+  declarations[action]={"listeners":[{"binding":"listener_actor"}],"assertions":[],"social":social}
+  bundle.encounters["semantic_"+action]={"story":"semantic_"+action,"semantic_topic":"social","semantic_bindings":{"partner_actor":{"participant":0},"listener_actor":"player","scope_id":"visitA"},"manual":true,"requires":{},"offer_requires":{},"advancement":"manual"}
+  bundle["story_semantic_"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://work/semantic-social/"+action+".ink.json"))
+ bundle["narrative_policies"]={"contract_version":1,"profiles":{},"policies":{},"fact_types":{},"topics":{"social":{"bindings":{"partner_actor":"actor","listener_actor":"actor","scope_id":"string"},"roles":{"partner":{"binding":"partner_actor"}},"turn_roles":["speaker","listener"],"stages":{"start":yes,"continuation":yes},"choices":choices,"actions":actions}}}
+ bundle["narrative_knowledge"]={"initial":[],"actions":{"social":declarations}}
+ bundle["narrative_social"]={"daily_gain_cap":12}
+ bundle.encounters["semantic_peer"]=bundle.encounters.semantic_company.duplicate(true);bundle.encounters.semantic_peer.semantic_bindings.listener_actor={"participant":1}
+ bundle.narrative_policies.topics.social.stages.start={"op":"unused","scope":"once","actors":[{"role":"partner"},{"actor":"player"}]}
+ check(ContentValidation.validate(bundle).ok,"SOCIAL AUTHORING VALID")
+ config=SessionConfig.new(bundle,"semantic-social-prototype");s=GameSession.new();root.add_child(s)
+ var result:=s.configure(config);check(result.ok,"CONFIG",result.details)
+ if not result.ok:quit(1);return
+ s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5);var farid:=visit("farid")
+ result=await hear("consume_once")
+ check(result.ok,"ONCE START COMMITTED")
+ if not result.ok:quit(1);return
+ check(s.narrative.available_for(last),"SELF CONSUMED START CONTINUES")
+ check(not s.semantic.decide(bundle.encounters.semantic_consume_once,last.participants,"start").allowed,"NEW START BLOCKED BY CONSUMPTION")
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var saved:Dictionary=SaveCodec.decode_text(StableJson.stringify(codec.encode(s))).details.data
+ var restored:=await codec.create_candidate(saved,config)
+ check(restored.ok,"SELF CONSUMED CURRENT JSON RESTORE",restored.message_key)
+ if restored.ok:restored.details.session.queue_free()
+ print("FAILURES ",bad);s.queue_free();codec.queue_free();store.queue_free();await process_frame;quit(bad)
