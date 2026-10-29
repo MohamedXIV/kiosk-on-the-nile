@@ -1,0 +1,98 @@
+extends SceneTree
+var s: GameSession
+var config: SessionConfig
+var locale := LocaleService.new()
+var failures: int=0
+func _initialize():call_deferred("run")
+func check(ok: bool, label: String, details: Variant=""):
+ print(label," ",ok," ",details)
+ if not ok:failures+=1
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var result:=store.load_directory("res://content");check(result.ok,"CONTENT",result.details)
+ if not result.ok:quit(1);return
+ locale.configure(store.bundle());locale.set_locale("ar_EG");config=SessionConfig.new(store.bundle(),store.fingerprint)
+ s=GameSession.new();root.add_child(s);result=s.configure(config);check(result.ok,"CONFIG",result.message_key)
+ if not result.ok:quit(1);return
+ s.start_new()
+ s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var f:=person(&"farid")
+ check(not topic(f,"shawarma_learning/shawarma_basics"),"UNMET RECIPE HIDDEN")
+ await dialogue(f.id,"social:meet_farid")
+ check(not s.residential.can_invite(f.id),"FIRST DAY HOME HIDDEN")
+ check(not s.social_life.available("exam_ask"),"UNKNOWN OTHER PERSON REQUEST HIDDEN")
+ check(not s.social_life.available("hear_farid"),"SAME DAY PERSONAL HIDDEN")
+ check(not topic(f,"shawarma_learning/shawarma_basics"),"UNTOLD RECIPE HIDDEN")
+ # Even an artificial high score cannot skip elapsed days / distinct social days.
+ var old:=s.relationships.snapshot();s.relationships.adjust(&"farid",&"player",&"familiarity",90);s.relationships.adjust(&"farid",&"player",&"trust",90)
+ check(not s.residential.can_invite(f.id),"HIGH SCORE DOES NOT SKIP DAYS");s.relationships.restore(old)
+ s.clock.elapse_minutes(1440)
+ check(s.social_life.available("hear_farid"),"NEXT DAY WORK TOPIC")
+ check(s.social_life.available("shawarma_hint"),"NEUTRAL FOOD TOPIC NEXT DAY")
+ await dialogue(f.id,"social:shawarma_hint")
+ check(s.knowledge.has(&"FARID_SHAWARMA_STORY"),"HEARD RECIPE CONNECTION")
+ check(s.knowledge.snapshot().facts.FARID_SHAWARMA_STORY.speaker=="farid","CONNECTION PROVENANCE")
+ check(topic(f,"shawarma_learning/shawarma_basics"),"HEARD CONNECTION OPENS RECIPE")
+ await dialogue(f.id,"shawarma_learning/shawarma_basics",2)
+ check(s.knowledge.has(&"KNOWN_SHAWARMA_BASICS"),"ACTUAL RECIPE TAUGHT")
+ # Build only through one optional quiet conversation per day; no service/workshop.
+ for day in range(2,11):
+  if day>2:s.clock.elapse_minutes(1440)
+  await dialogue(f.id,"social:company_farid")
+  var before:=s.relationships.value(&"farid",&"player",&"familiarity")
+  check(not s.social_life.available("company_farid"),"NO SAME DAY COMPANY TOPIC")
+  s.social_life.apply("company_farid","duplicate fixture","farid")
+  check(s.relationships.value(&"farid",&"player",&"familiarity")==before,"NO SAME DAY RELATIONSHIP GRIND")
+  print("COMPANY DAY ",s.clock.day," FAMILIARITY ",before," TRUST ",s.relationships.value(&"farid",&"player",&"trust")," HOME ",s.residential.can_invite(f.id))
+ check(s.residential.can_invite(f.id),"QUIET COMPANY ALONE OPENS HOME")
+ await dialogue(f.id,"home/invite",0)
+ check(not s.residential.invitation.is_empty(),"MATURE HOME INVITATION")
+ await restored("COMPANY HISTORY AND INVITATION RESTORE")
+ var bad_daily:=s.social_life.snapshot();bad_daily.daily[str(s.clock.day)]=1
+ check(not s.social_life.restore(bad_daily).ok,"MALFORMED DAILY LEDGER CLEANLY REJECTED")
+ s.free();s=GameSession.new();root.add_child(s);check(s.configure(config).ok,"FRESH SESSION");s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5);f=person(&"farid");var y:=person(&"youssef")
+ await dialogue(f.id,"social:meet_farid");await dialogue(y.id,"social:meet_youssef")
+ s.clock.elapse_minutes(1440)
+ await dialogue(f.id,"social:hear_farid");await dialogue(y.id,"social:hear_youssef")
+ await dialogue(y.id,"social:exam_open");await dialogue(f.id,"social:radio_open")
+ check(not s.social_life.available("exam_ask"),"BOTH KNOWN BUT TOO RECENT")
+ s.clock.elapse_minutes(1440)
+ s.visitors.clear_visits();f=person(&"farid")
+ check(s.social_life.available("exam_ask"),"BOTH MATURE AND SUBJECT HEARD REQUEST")
+ await dialogue(f.id,"social:exam_ask",0)
+ s.visitors.clear_visits();y=person(&"youssef")
+ await dialogue(y.id,"social:exam_follow")
+ await dialogue(y.id,"social:exam_answer")
+ s.visitors.clear_visits();f=person(&"farid")
+ await dialogue(f.id,"social:exam_return")
+ check(s.social_life.done("exam_return"),"MATURE GROUNDED RELAY FINISHES")
+ await restored("GROUNDED RELAY RESTORE")
+ locale.set_locale("en");print("EN COMPANY ",OutingText.manual_topic({"key":"social:company_farid","label":config.section("social_life").topics.company_farid.label}))
+ print("FAILURES ",failures);s.queue_free();await process_frame;quit(1 if failures else 0)
+func person(actor: StringName) -> VisitState:
+ var v:=s.visitors.spawn(actor);v.pose.ground=s.player_ground+Vector2(0,-0.2);v.destination=v.pose.ground;v.phase=&"staying";v.shopping_state=&"declined";return v
+func topic(v: VisitState,key: String) -> bool:
+ return s.narrative.manual_topics_for(v.id).any(func(t):return t.key==key)
+func restored(label: String):
+ s.narrative.cancel_all();s.personal.leave();s.accounts.tick(s.clock.frame(0))
+ var codec:=SaveCodec.new();root.add_child(codec);var result:=await codec.create_candidate(codec.encode(s),config)
+ check(result.ok,label,result.message_key)
+ if result.ok:result.details.session.queue_free()
+ codec.queue_free()
+func dialogue(visit: StringName,key: String,choice: int=-1):
+ s.narrative.cancel_all();s.personal.leave()
+ var result:=await s.narrative.start_manual_topic(visit,key);check(result.ok,"TOPIC "+key,result.message_key)
+ if not result.ok:return
+ var id:=StringName(result.details.session_id)
+ for i in range(10):
+  var c: ConversationSession=s.narrative.sessions.get(str(id))
+  if c==null:break
+  print("INK ",LocalizedNarrative.line(c.current))
+  var options:=s.narrative.choices(c)
+  if not options.is_empty():
+   if choice<0:failures+=1;break
+   var selected:=s.narrative.choose(id,StringName(options[choice].id));check(selected.ok,"CHOICE",selected.message_key)
+  else:
+   var advanced:=s.narrative.advance_manual(id)
+   if not advanced.ok:check(false,"ADVANCE",advanced.message_key);break
+ s.narrative.cancel_all();s.personal.leave()

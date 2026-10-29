@@ -22,11 +22,22 @@ static func validate(bundle: Dictionary) -> ActionResult:
  for stage in data.relationships.stages:
   if not stage is Dictionary or not ContentValidation.bounded(stage.get("at"),0,100) or stage.at<=previous or not stage.get("label") is String:return ContentValidation.fail("social_life.stage")
   previous=stage.at
+ if not data.get("pacing") is Dictionary:return ContentValidation.fail("social_life.pacing")
+ for profile in ["personal","relay","home"]:
+  var rule: Variant=data.pacing.get(profile)
+  if not rule is Dictionary or not ContentValidation.integer(rule.get("days")) or rule.days<1 or not ContentValidation.integer(rule.get("social_days")) or rule.social_days<1 or not ContentValidation.bounded(rule.get("familiarity"),0,100) or not ContentValidation.bounded(rule.get("trust"),0,100):return ContentValidation.fail("social_life.pacing."+profile)
  for id in data.actions:
   var action: Variant=data.actions[id]
   if not id.is_valid_identifier() or not action is Dictionary or not action.get("actor") in bundle.visitors.characters.keys()+[""] or not action.get("needs") is Array or not action.get("facts") is Array or not action.get("phases") is Array or not action.get("note") is String or not action.get("moment") is String:return ContentValidation.fail("social_life.action."+id)
   for axis in ["familiarity","trust"]:
    if not ContentValidation.bounded(action.get(axis),0,100):return ContentValidation.fail("social_life.action.gain")
+  if not action.get("repeat","") in ["","day"]:return ContentValidation.fail("social_life.action.repeat")
+  if action.get("repeat","")=="day" and (action.get("learn","")!="" or action.has("message") or action.moment==""):return ContentValidation.fail("social_life.action.repeat_effect")
+  if action.has("acquaintances"):
+   var gate: Variant=action.acquaintances
+   if not gate is Dictionary or not gate.get("profile") in ["personal","relay","home"] or not gate.get("actors") is Array or gate.actors.is_empty():return ContentValidation.fail("social_life.action.acquaintances")
+   for actor in gate.actors:
+    if not actor in data.companionship.actors or not "meet_"+str(actor) in action.needs:return ContentValidation.fail("social_life.action.acquaintance_actor")
   if not action.get("learn") in bundle.social.facts+[""]:return ContentValidation.fail("social_life.action.learn")
   for fact in action.facts:
    if not fact in bundle.social.facts:return ContentValidation.fail("social_life.action.fact")

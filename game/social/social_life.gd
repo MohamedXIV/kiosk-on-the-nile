@@ -18,7 +18,10 @@ func available(id: String) -> bool:
  return _available(id,_state)
 func _available(id: String, state: Dictionary) -> bool:
  var action: Dictionary=_data.actions.get(id,{})
- if action.is_empty() or state.receipts.has(id):return false
+ if action.is_empty():return false
+ if state.receipts.has(id) and (action.get("repeat","")!="day" or floori(float(state.receipts[id].at)/1440.0)==_session.clock.day-1):return false
+ for actor in action.get("acquaintances",{}).get("actors",[]):
+  if not acquainted(str(actor),str(action.acquaintances.profile),state):return false
  for required in action.needs:
   if not state.receipts.has(required):return false
  for required in action.get("next_day_after",[]):
@@ -30,14 +33,26 @@ func _available(id: String, state: Dictionary) -> bool:
  for fact in action.facts:
   if not _session.knowledge.has(StringName(fact)):return false
  return action.phases.is_empty() or state.activity.phase in action.phases
+func acquainted(actor: String, profile: String, state: Dictionary = {}) -> bool:
+ if state.is_empty():state=_state
+ var rule: Dictionary=_data.get("pacing",{}).get(profile,{})
+ var introduction: Dictionary=state.receipts.get("meet_"+actor,{})
+ if rule.is_empty() or introduction.is_empty():return false
+ if _session.clock.day-1-floori(float(introduction.at)/1440.0)<int(rule.days):return false
+ if _session.relationships.value(StringName(actor),&"player",&"familiarity")<float(rule.familiarity) or _session.relationships.value(StringName(actor),&"player",&"trust")<float(rule.trust):return false
+ var days := 0
+ for day in state.daily:
+  if float(state.daily[day].get(actor,0))>0:days+=1
+  if days>=int(rule.social_days):return true
+ return days>=int(rule.social_days)
 func topic_available(id: String) -> bool:
  var topic: Dictionary=_data.topics.get(id,{})
  if topic.is_empty() or (not topic.phases.is_empty() and not _state.activity.phase in topic.phases):return false
  return available(str(topic.action)) if topic.get("action","")!="" else int(_state.topic_history.get(id,0))!=_session.clock.day and done("consent_farid") and done("consent_youssef") and _state.activity.phase=="coordinating"
 func apply(id: String, source: String, speaker: String = "", internal: bool = false) -> ActionResult:
  if not _data.actions.has(id) or (id=="trial_complete" and not internal):return _fail("unknown_social_action")
- if done(id):return ActionResult.success({"duplicate":true})
  var action: Dictionary=_data.actions[id]
+ if done(id) and (action.get("repeat","")!="day" or floori(float(_state.receipts[id].at)/1440.0)==_session.clock.day-1):return ActionResult.success({"duplicate":true})
  if not _available(id,_state) or (not internal and speaker!=action.actor):return _fail("social_action_unavailable")
  var candidate := _state.duplicate(true)
  var knowledge := KnowledgeBook.new(_session.config.section("social"))
@@ -53,7 +68,8 @@ func apply(id: String, source: String, speaker: String = "", internal: bool = fa
  if not str(action.actor).is_empty():candidate.people[action.actor]=true
  if not str(action.learn).is_empty() and not knowledge.has(StringName(action.learn)):
   knowledge.learn_from(StringName(action.learn),str(action.note),source,str(action.actor),now)
- _moment(candidate,relationships,str(action.moment),str(action.actor),float(action.familiarity),float(action.trust))
+ var moment := str(action.moment)+("/day_%d" % _session.clock.day if action.get("repeat","")=="day" else "")
+ _moment(candidate,relationships,moment,str(action.actor),float(action.familiarity),float(action.trust))
  if candidate.receipts.has("consent_farid") and candidate.receipts.has("consent_youssef") and candidate.activity.phase=="idle":candidate.activity.phase="coordinating"
  if id=="trial_complete":
   candidate.activity.phase="completed"
@@ -149,24 +165,33 @@ func _validate(data: Dictionary) -> ActionResult:
   elif receipt.has("message"):return _fail("unexpected_message_receipt")
   for required in action.get("next_day_after",[]):
    if not data.receipts.has(required) or floori(float(receipt.at)/1440.0)<=floori(float(data.receipts[required].at)/1440.0):return _fail("premature_story_followup")
+  for actor in action.get("acquaintances",{}).get("actors",[]):
+   var introduction: Dictionary=data.receipts.get("meet_"+str(actor),{})
+   var days := int(_data.pacing[action.acquaintances.profile].days)
+   if introduction.is_empty() or floori(float(receipt.at)/1440.0)-floori(float(introduction.at)/1440.0)<days:return _fail("premature_acquaintance_receipt")
   for required in _data.actions[id].needs:
    if not data.receipts.has(required) or data.receipts[required].at>data.receipts[id].at:return _fail("invalid_social_dependency")
- var valid_moments: Array=[]
- for action in _data.actions.values():valid_moments.append(action.moment)
- for key in data.moments:
-  if not key in valid_moments or data.moments[key]!=true:return _fail("invalid_social_moment")
-  var grounded := false
-  for id in data.receipts:
-   if _data.actions[id].moment==key:grounded=true
-  if not grounded:return _fail("ungrounded_social_moment")
- for topic in data.topic_history:
-  if not _data.topics.has(topic) or not ContentValidation.integer(data.topic_history[topic]) or data.topic_history[topic]<1 or data.topic_history[topic]>_session.clock.day:return _fail("invalid_social_topic_history")
  for actor in data.people:
   if not _session.config.section("visitors").characters.has(actor) or data.people[actor]!=true:return _fail("invalid_social_person")
  for day in data.daily:
   if not str(day).is_valid_int() or int(day)<1 or int(day)>_session.clock.day or not data.daily[day] is Dictionary:return _fail("invalid_social_cap")
   for actor in data.daily[day]:
    if not actor in data.people or not ContentValidation.bounded(data.daily[day][actor],0,_data.relationships.daily_cap):return _fail("invalid_social_cap")
+ for key in data.moments:
+  if data.moments[key]!=true:return _fail("invalid_social_moment")
+  var grounded := false
+  for id in data.receipts:
+   var action: Dictionary=_data.actions[id]
+   if action.get("repeat","")=="day":
+    var prefix := str(action.moment)+"/day_"
+    var day_text := str(key).trim_prefix(prefix)
+    if str(key).begins_with(prefix) and day_text.is_valid_int():
+     var day := int(day_text)
+     grounded=grounded or (day>=1 and day<=floori(float(data.receipts[id].at)/1440.0)+1 and float(data.daily.get(str(day),{}).get(action.actor,0))>0)
+   elif action.moment==key:grounded=true
+  if not grounded:return _fail("ungrounded_social_moment")
+ for topic in data.topic_history:
+  if not _data.topics.has(topic) or not ContentValidation.integer(data.topic_history[topic]) or data.topic_history[topic]<1 or data.topic_history[topic]>_session.clock.day:return _fail("invalid_social_topic_history")
  var activity: Dictionary=data.activity
  if not activity.get("phase") in ["idle","coordinating","scheduled","waiting","active","completed"] or not activity.get("outcome") in ["","days_pending","week_trial"]:return _fail("invalid_activity")
  for key in ["not_before","start_at","end_at","clear_since"]:

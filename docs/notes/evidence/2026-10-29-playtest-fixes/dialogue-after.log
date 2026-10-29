@@ -1,0 +1,126 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true {  }
+CONFIG true
+UNMET RECIPE HIDDEN true
+TOPIC social:meet_farid true
+INK أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة.
+INK القعدة دي نعمة والله.. أهو نتعرف واحدة واحدة.
+FIRST DAY HOME HIDDEN true
+UNKNOWN OTHER PERSON REQUEST HIDDEN true
+SAME DAY PERSONAL HIDDEN true
+UNTOLD RECIPE HIDDEN true
+HIGH SCORE DOES NOT SKIP DAYS true
+NEXT DAY WORK TOPIC true
+NEUTRAL FOOD TOPIC NEXT DAY true
+TOPIC social:shawarma_hint true
+INK بحب الشاورما، وقريبي كان شغال في محل ووراني تجهيزها. فاكر منه حبة تفاصيل، لو حبيت أرجع أحكيهالك وإحنا قاعدين.
+HEARD RECIPE CONNECTION true
+CONNECTION PROVENANCE true
+HEARD CONNECTION OPENS RECIPE true
+TOPIC shawarma_learning/shawarma_basics true
+INK قريبي كان شغال في محل شاورما. كان يقول لي: جهّز الفراخ بالتتبيلة على سطح، وبرّد الوعاء، وبعدها السيخ والتقطيع والتجميع.
+CHOICE true
+INK جرّب على مهلك، وابعد عن الحشو قبل ما يستوي. أنا هعدّي تاني وأسمع منك عملت إيه.
+ACTUAL RECIPE TAUGHT true
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 2 FAMILIARITY 9.0 TRUST 3.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 3 FAMILIARITY 12.0 TRUST 4.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 4 FAMILIARITY 15.0 TRUST 5.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 5 FAMILIARITY 18.0 TRUST 6.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 6 FAMILIARITY 21.0 TRUST 7.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 7 FAMILIARITY 24.0 TRUST 8.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 8 FAMILIARITY 27.0 TRUST 9.0 HOME false
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 9 FAMILIARITY 30.0 TRUST 10.0 HOME true
+TOPIC social:company_farid true
+INK يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.
+NO SAME DAY COMPANY TOPIC true
+NO SAME DAY RELATIONSHIP GRIND true
+COMPANY DAY 10 FAMILIARITY 33.0 TRUST 11.0 HOME true
+QUIET COMPANY ALONE OPENS HOME true
+TOPIC home/invite true
+INK إنت بتعزمني أقعد معاك بكرة بعد الضهر؟ حلوة القعدة معاك، بس نخليها من غير التزامات.
+CHOICE true
+INK حلوة القعدة معاك. أعدي بعد الضهر لحد بالليل لو لقينا بعض فاضيين، ومفيش أي استعجال.
+MATURE HOME INVITATION true
+COMPANY HISTORY AND INVITATION RESTORE true
+MALFORMED DAILY LEDGER CLEANLY REJECTED true
+ERROR: Object '<Object#663203354484>' was freed or unreferenced while a signal is being emitted from it. Try connecting to the signal using 'CONNECT_DEFERRED' flag, or use queue_free() to free the object (if this object is a Node) to avoid this error and potential crashes.
+   at: ~Object (core/object/object.cpp:2324)
+   GDScript backtrace (most recent call first):
+       [0] run (res://work/dialogue-gates-after.gd:53)
+       [1] dialogue (res://work/dialogue-gates-after.gd:98)
+       [2] start_manual_topic (res://game/narrative/narrative_director.gd:493)
+       [3] start (res://game/narrative/narrative_director.gd:100)
+       [4] open (res://game/narrative/ink_runtime.gd:37)
+       [5] _open (res://game/narrative/ink_runtime.gd:75)
+       [6] _finalise_story_creation (res://addons/inkgd/ink_player.gd:819)
+       [7] _create_and_finalize_story (res://addons/inkgd/ink_player.gd:802)
+FRESH SESSION true
+TOPIC social:meet_farid true
+INK أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة.
+INK القعدة دي نعمة والله.. أهو نتعرف واحدة واحدة.
+TOPIC social:meet_youssef true
+INK يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة.
+INK حلو إن فيه مكان ينفع تسكت فيه من غير ما حد يسألك مالك.
+TOPIC social:hear_farid true
+INK فاكر الورشة اللي حكيت لك عنها؟ محتاج حد يساعدني في ترتيب العِدد وشغل بسيط، وأعلمه واحدة واحدة.
+INK المعتاد عندي ثلاثة عصاري في الأسبوع، بس نتكلم ونشوف ظروف اللي جاي. تجربة الأول، مش وعد بشغل مضمون.
+TOPIC social:hear_youssef true
+INK بصراحة بدور على شغل جنب الدراسة. المصاريف بقت تقيلة، بس مش عايز أسيب الكلية.
+INK أقدر على يومين بعد المحاضرات، أكثر من كده المذاكرة هتضيع مني. عشان كده بسأل براحة.
+TOPIC social:exam_open true
+INK عندي امتحان قريب، وبقسم المذاكرة حتت صغيرة بدل ما أفضل قلقان من الكل. القعدة هنا بتريح دماغي وبعدين أرجع للكتب.
+TOPIC social:radio_open true
+INK عندي راديو قديم من أيام أبويا، بحاول أظبط صوته على مهلي. مش شغل ورشة ولا طلب لحد؛ حاجة بحب أقعد لها لما أروق.
+BOTH KNOWN BUT TOO RECENT true
+BOTH MATURE AND SUBJECT HEARD REQUEST true
+TOPIC social:exam_ask true
+INK مش شايف يوسف في القعدة النهارده. لو قابلته، تسأله عامل إيه؟ طمني عليه بس، مش عايز أزن عليه.
+CHOICE true
+INK تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة.
+TOPIC social:exam_follow true
+INK فاكر لما قلت لك هقسم المذاكرة؟ خلصت الجزء اللي كنت مأجله، وراجعت مع زميل. لسه الامتحان قدامي، بس بقيت أهدى؛ مش لازم أخلص الدنيا في ليلة.
+TOPIC social:exam_answer true
+INK فريد سأل عليا؟ تسلموا. قوله أنا كويس وبراجع للامتحان، وقسمت المذاكرة وبقيت أهدى. لما أفضى هعدي أسلم عليه؛ من غير ما أوعد بميعاد دلوقتي.
+TOPIC social:exam_return true
+INK إنت قابلت يوسف وقال لك كده؟ الحمد لله، طمنتني. خليه ياخد وقته في المذاكرة؛ هنتقابل لما الظروف تسمح.
+MATURE GROUNDED RELAY FINISHES true
+GROUNDED RELAY RESTORE true
+EN COMPANY Sit and chat for a while
+FAILURES 0
+WARNING: 123 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

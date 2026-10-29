@@ -5,9 +5,20 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-Current development target: **0.2.0-prealpha.1**, a combined playtest preview. An optimized development package is not a new formal tagged release.
+### Playtest correction target: 0.2.1-prealpha.1
 
-**Save compatibility:** schema4/revision19 requires a new game for earlier pre-alpha saves, including revisions16–18. Unsupported saves show the localized requirement; their primary/backup files are retained. No historical migration or archived Ink graph is added. Current revision19 restores active seats, invitations and visits.
+- Batch static kiosk floor and roof fills before line details, removing the primitive alternation introduced by the combined preview. Matched rendered kiosk observations reduced draw calls2497→235 with pixel-identical frozen scenes; user-device FPS remains to be judged in play.
+- Personal topics now require prior-day acquaintance; messages require knowing both people for multiple days and hearing the relevant story. Home invitations require familiarity/trust and meaningful company across several days.
+- Quiet optional daily company builds the existing relationship without spending, gifts or workshop participation; repeating it on the same day adds no gain.
+- Farid first mentions his shawarma connection in heard Ink speech; only that knowledge opens the recipe question, and taught basics gate its follow-ups.
+
+**Save compatibility (correction):** schema4/revision20 requires a new game for earlier pre-alpha saves (including revision19); files are preserved. No migration or archived Ink graph added.
+
+Current development target: **0.2.1-prealpha.1**, correcting the combined playtest. An optimized development package is not a new formal tagged release.
+
+The following combined-playtest features were first delivered in development preview0.2.0-prealpha.1.
+
+**Previous combined preview save impact:** schema4/revision19 required a new game for earlier pre-alpha saves, including revisions16–18. Unsupported saves show the localized requirement; their primary/backup files are retained. No historical migration or archived Ink graph is added. That revision restored active seats, invitations and visits; the current correction uses revision20 as stated above.
 
 ### Added
 
