@@ -1,0 +1,12 @@
+extends SceneTree
+func _initialize():
+ var store:=ContentStore.new();root.add_child(store);var result:=store.load_directory("res://content")
+ var bundle:=store.bundle();bundle.merge(JSON.parse_string(FileAccess.get_file_as_string("res://docs/architecture/examples/semantic-social-v1.json")),true)
+ result=ContentValidation.validate(bundle);print("DOCUMENTED THREE SECTION EXAMPLE VALID ",result.ok," ",result.details)
+ var ok:bool=result.ok
+ bundle.narrative_knowledge.actions.company_example.introduce.social[0].observer={"role":"missing"}
+ result=ContentValidation.validate(bundle);print("UNKNOWN SOCIAL ROLE REJECT ",not result.ok);ok=ok and not result.ok
+ bundle.narrative_knowledge.actions.company_example.introduce.social[0].observer={"role":"listener"}
+ bundle.narrative_social.daily_gain_cap=-1
+ result=ContentValidation.validate(bundle);print("INVALID DAILY CAP REJECT ",not result.ok);ok=ok and not result.ok
+ print("FAILURES ",0 if ok else 1);store.queue_free();quit(0 if ok else 1)

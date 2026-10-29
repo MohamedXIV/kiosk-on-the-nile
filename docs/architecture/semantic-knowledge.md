@@ -1,6 +1,6 @@
 # Per-character knowledge and heard consequences — #22
 
-This extends the [shared policy runtime](semantic-policy-runtime.md) and implements the knowledge portion of the [semantic contract](semantic-narrative.md). All49 production encounters remain unconverted until#24. No actual NPC seeds or new dialogue were added to production.
+This extends the [shared policy runtime](semantic-policy-runtime.md) and implements the knowledge portion of the [semantic contract](semantic-narrative.md). [Social memory#23](semantic-social.md) extends the same prepared publication to introductions/company/consent/scoped history and directional score candidates. All49 production encounters remain unconverted until#24. No actual NPC seeds or new dialogue were added to production.
 
 ## Authoring and query API
 
@@ -36,4 +36,4 @@ KnowledgeBook adds `assertions:{records,receipts}` only when semantic fact types
 
 Game VERSION0.2.1-prealpha.1, save schema4/revision20 and CHANGELOG are unchanged in this foundation. No production catalog/content change or formal release occurs. The final coherent save/version/changelog decision remains#26/#27, with any new-game requirement stated then.
 
-#23 supplies directional social history/consent/scoped message receipts; #24 converts families and presentation; #25 adds author tools; #26 verifies integrated behavior/performance; #27 delivers the one coherent preview. See the [#22 implementation plan](../superpowers/plans/2026-10-29-semantic-knowledge.md) and dated delivery evidence.
+#23 supplies directional social history, consent and consumption scopes; #24 converts families/presentation and actual message request/reply/player-choice/domain adapters; #25 adds author tools; #26 verifies integrated behavior/performance; #27 delivers the one coherent preview. See the [#22 implementation plan](../superpowers/plans/2026-10-29-semantic-knowledge.md) and dated delivery evidence. The #22 knowledge-only restrictions describe that foundation snapshot; supported prepared social declarations are listed in the #23 API.

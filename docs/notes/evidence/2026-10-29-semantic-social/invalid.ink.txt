@@ -1,0 +1,5 @@
+VAR character_id = "farid"
+A quiet, meaningful conversation. # speaker:{character_id} # policy_action:invalid # effect:semantic\|invalid
+* [Continue # policy_choice:continue_chat]
+    We can leave it there for today. # speaker:{character_id}
+    -> END

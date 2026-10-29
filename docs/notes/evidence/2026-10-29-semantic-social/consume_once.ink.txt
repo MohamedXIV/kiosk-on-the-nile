@@ -1,0 +1,5 @@
+VAR character_id = "farid"
+A quiet, meaningful conversation. # speaker:{character_id} # policy_action:consume_once # effect:semantic\|consume_once
+* [Continue # policy_choice:continue_chat]
+    We can leave it there for today. # speaker:{character_id}
+    -> END
