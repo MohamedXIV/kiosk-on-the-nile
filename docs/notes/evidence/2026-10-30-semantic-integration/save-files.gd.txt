@@ -1,0 +1,25 @@
+extends SceneTree
+var bad:=0
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String):
+ print(label," ",ok)
+ if not ok:bad+=1
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate();check(content.load_directory("res://content").ok,"CONTENT")
+ var config:=SessionConfig.new(content.bundle(),content.fingerprint);var s:=GameSession.new();root.add_child(s);check(s.configure(config).ok,"CONFIG");s.start_new()
+ var save:=SaveCoordinator.new();root.add_child(save);save.store=SaveStore.new("res://work/semantic-integration/save-files")
+ check(save.save_at_boundary(s).ok,"CURRENT FILE SAVE")
+ var restored:=await save.load_candidate(config);check(restored.ok,"CURRENT CONTINUE")
+ if restored.ok:restored.details.session.queue_free()
+ var old:=save.codec.encode(s);old.schema_revision=20;old.erase("checksum");old.checksum=StableJson.stringify(old).sha256_text();check(save.store.write(old).ok,"OLDER REVISION FIXTURE")
+ var path:=save.store.root.path_join("session.json");var backup:=save.store.root.path_join("previous.json")
+ # Remove only this disposable fixture's current backup, to observe strict old-save rejection.
+ var f:=FileAccess.open(backup,FileAccess.WRITE);f.store_string(StableJson.stringify(old));f.close()
+ var before:=FileAccess.get_file_as_string(path);var previous:=FileAccess.get_file_as_string(backup)
+ restored=await save.load_candidate(config)
+ check(not restored.ok and str(restored.message_key)=="complete_preview_requires_new_game","CLEAR NEW GAME REQUIREMENT")
+ check(FileAccess.get_file_as_string(path)==before and FileAccess.get_file_as_string(backup)==previous,"OLD PRIMARY AND BACKUP PRESERVED")
+ f=FileAccess.open(path,FileAccess.WRITE);f.store_string("corrupt fixture");f.close();before=FileAccess.get_file_as_string(path)
+ restored=await save.load_candidate(config);check(not restored.ok,"CORRUPT PLUS UNSUPPORTED BACKUP REJECTED")
+ check(FileAccess.get_file_as_string(path)==before and FileAccess.get_file_as_string(backup)==previous,"CORRUPT PRIMARY AND BACKUP PRESERVED")
+ print("FAILURES ",bad);s.queue_free();save.queue_free();content.queue_free();await process_frame;quit(bad)

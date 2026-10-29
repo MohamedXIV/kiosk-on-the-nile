@@ -1,0 +1,28 @@
+extends SceneTree
+var samples:Array=[]
+func _initialize():call_deferred("run")
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ if not store.load_directory("res://content").ok:quit(1);return
+ var s:=GameSession.new();root.add_child(s)
+ if not s.configure(SessionConfig.new(store.bundle(),store.fingerprint)).ok:quit(1);return
+ s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var actors:Array=["farid","youssef","nadia","amgad"];var visits:Dictionary={}
+ for actor in actors:
+  var v:=s.visitors.spawn(StringName(actor));v.phase=&"staying";v.pose.ground=s.player_ground;v.destination=v.pose.ground;v.shopping_state=&"declined";visits[actor]=str(v.id)
+ for mode in ["compatibility_facade","semantic_bound_policy"]:
+  samples=[]
+  for frame in range(260):
+   await process_frame
+   var start:=Time.get_ticks_usec()
+   for actor in actors:
+    if mode=="semantic_bound_policy":
+     var bound:=s.semantic.policy.bind("home_invite",{"guest":actor,"invitation":"home/"+actor+"/day_2"},{"guest":visits[actor]})
+     s.semantic.policy.evaluate(bound.details.context,"offer")
+    else:s.conditions.permits({"all":[{"participants_available":true},{"distance_at_most":3.4},{"acquaintance":{"actor":actor,"profile":"home"}}]},PackedStringArray([visits[actor]]))
+   if frame>=20:samples.append(float(Time.get_ticks_usec()-start)/1000.0)
+  samples.sort();var total:=0.0
+  for x in samples:total+=x
+  print("COST ",mode," four_present_actors=",s.visitors.visits.size()," samples=",samples.size()," mean_ms=",total/samples.size()," p95_ms=",samples[int(samples.size()*0.95)])
+ print("COUNTERS calls=",s.semantic.policy.calls," nodes=",s.semantic.policy.nodes)
+ s.queue_free();store.queue_free();await process_frame;quit()

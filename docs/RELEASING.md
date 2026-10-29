@@ -11,7 +11,7 @@ Current product stage: **unpublished pre-alpha**. GitHub prereleases are technic
 | Git tag v0.1.0-prealpha.1 | Annotated tag at the source commit | Immutable published source identity |
 | Git commit and source_dirty | Generated BUILD.json | Exact source provenance; dirty builds are development builds |
 | Godot4.7.2 | tools/dependencies.lock.json | Engine/toolchain identity |
-| Save schema4/revision20 (grounded conversation progression; earlier revision19 combined seating/home visits; numbered baseline revision16) | SaveCodec constants | Internal data shape, not the game's version |
+| Save schema4/revision21 (typed per-knower narrative proofs and scoped social/domain receipts; earlier revision20 grounded conversation progression) | SaveCodec constants | Internal data shape, not the game's version |
 | build_manifest_version1 | BUILD.json | Build metadata format |
 
 ## SemVer project conventions
@@ -40,7 +40,7 @@ Use prospective Conventional Commit prefixes (`feat:`, `fix:`, `perf:`, `refacto
 
 Saves may be incompatible across pre-alpha releases. Prefer a documented new-game requirement over spending routine development effort on migrations and archived narrative graphs for unpublished old saves. Add a migration only when explicitly requested or a concrete current need justifies its cost. Existing migration code is not removed as unrelated cleanup.
 
-Keep corruption detection, coherent writes/backups and truthful storage feedback. Reject an unsupported save clearly; never silently delete/reset it. Internal format identifiers decide actual acceptance, not comparisons of game version strings. This batch introduces no format change; future changes state their reset/migration impact explicitly. A later public alpha/beta support commitment requires a deliberate policy revision.
+Keep corruption detection, coherent writes/backups and truthful storage feedback. Reject an unsupported save clearly; never silently delete/reset it. Internal format identifiers decide actual acceptance, not comparisons of game version strings. The semantic narrative batch requires a new game with schema4/revision21; earlier unpublished files are preserved and no historical proof migration is provided. Future changes state their reset/migration impact explicitly. A later public alpha/beta support commitment requires a deliberate policy revision.
 
 ## Workflow
 

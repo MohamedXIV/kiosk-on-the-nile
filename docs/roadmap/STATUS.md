@@ -1,3 +1,5 @@
+#26 coherent acceptance complete locally; final candidate0.3.0-prealpha.1/save revision21/new game required. #27 clean preview packaging follows source integration. [Evidence and limits](../notes/2026-10-30-semantic-integration.md). Human feel/visual/audio acceptance#6/#7 remains open;29 owner-specific encounters remain explicitly inventoried.
+
 #24 implementation:22/51 encounters converted; remaining29 explicitly inventoried. Bounded observations and one material review fix complete; integration checkpoint pending. See [notes](../notes/2026-10-29-semantic-families.md). #25 author tools, #26 integrated acceptance and #27 final version/changelog/preview remain.
 
 # Delivery status and roadmap

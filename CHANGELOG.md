@@ -5,7 +5,20 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Playtest correction target: 0.2.1-prealpha.1
+### Semantic narrative preview target: 0.3.0-prealpha.1
+
+- Add typed shared narrative policies, directional acquaintance and meaningful shared days, per-character source-backed knowledge, scoped consent, and once-only message lineage.
+- Convert home invitations/cancellation/company/goodbye, personal check-in request/reply/delivery and recipe connection/teaching/followups onto shared rules. Explicit player choices establish promises and delivery; domain owners retain actual home/workshop/cooking outcomes.
+- Preserve teaching continuation and saved/returning choices after their own learning or consumption; restore localized notebook recipe instructions from canonical assertions.
+- Add offline author diagnostics with actual manifest paths, conservative source/contradiction warnings, explicit shared-story uncertainty and same-provider saved-state explanations.
+- Retain quiet no-commerce company, shared old/new gain caps and the prior floor/roof batching correction. The remaining29 owner-specific encounters are explicitly inventoried; full universal conversion and human pacing/visual/audio acceptance are not claimed.
+
+**Save compatibility (semantic batch):** schema4/revision21 requires a new game for all earlier unpublished revisions, including20. Current coherent saves are validated with their source proofs; unsupported/corrupt primary and backup files are retained. No historical migration or archived Ink graph added.
+
+This is a clean-source development preview candidate, not a formal tagged release. Integrated bounded observations do not establish user-device FPS or human feel.
+
+
+### Earlier playtest correction target: 0.2.1-prealpha.1
 
 - Batch static kiosk floor and roof fills before line details, removing the primitive alternation introduced by the combined preview. Matched rendered kiosk observations reduced draw calls2497→235 with pixel-identical frozen scenes; user-device FPS remains to be judged in play.
 - Personal topics now require prior-day acquaintance; messages require knowing both people for multiple days and hearing the relevant story. Home invitations require familiarity/trust and meaningful company across several days.
@@ -14,7 +27,7 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 **Save compatibility (correction):** schema4/revision20 requires a new game for earlier pre-alpha saves (including revision19); files are preserved. No migration or archived Ink graph added.
 
-Current development target: **0.2.1-prealpha.1**, correcting the combined playtest. An optimized development package is not a new formal tagged release.
+Previous development target: **0.2.1-prealpha.1**, correcting the combined playtest. An optimized development package is not a new formal tagged release.
 
 The following combined-playtest features were first delivered in development preview0.2.0-prealpha.1.
 
