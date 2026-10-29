@@ -1,0 +1,32 @@
+extends SceneTree
+var bad:=0
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String):
+ print(label," ",ok)
+ if not ok:bad+=1
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ check(store.load_directory("res://content").ok,"SHIPPED CONTENT")
+ var b:=store.bundle();var report:=NarrativeDiagnostics.inspect(b)
+ check(report.errors.is_empty() and report.warnings.all(func(w):return w.reason=="shared_story_binding_unproven"),"VALID ALTERNATE STORY ORDER LOADS")
+ var broken:=b.duplicate(true);broken.narrative_policies.topics.introduction.stages.start={"op":"available","actors":[{"role":"missing"}]}
+ report=NarrativeDiagnostics.inspect(broken)
+ check(not report.errors.is_empty() and report.errors[0].file=="content/narrative_policies.json" and str(report.errors[0].path).contains("introduction"),"ACTIONABLE UNKNOWN ROLE")
+ var relation:Dictionary={"op":"relationship","from":{"role":"guest"},"to":{"actor":"player"},"axis":"trust","compare":">","value":9}
+ var ceiling:=relation.duplicate(true);ceiling.compare="<="
+ var contradictory:Dictionary={"op":"all","rules":[relation,ceiling]}
+ broken=b.duplicate(true);broken.narrative_policies.topics.introduction.stages.start=contradictory
+ report=NarrativeDiagnostics.inspect(broken)
+ check(report.errors.is_empty() and report.warnings.any(func(w):return w.reason=="contradictory_direct_all"),"PROVEN LOCAL CONTRADICTION WARNED")
+ broken.narrative_policies.topics.introduction.stages.start={"op":"any","rules":[relation,ceiling]}
+ report=NarrativeDiagnostics.inspect(broken)
+ check(report.errors.is_empty() and report.warnings.all(func(w):return w.reason=="shared_story_binding_unproven"),"VALID ALTERNATIVES NOT REJECTED")
+ broken=b.duplicate(true);broken.narrative_policies.fact_types["unsourced"]={};broken.narrative_policies.topics.introduction.stages.start={"op":"knowledge","knower":{"actor":"player"},"fact":{"type":"unsourced","args":{}},"provenance_kinds":["heard"]}
+ report=NarrativeDiagnostics.inspect(broken)
+ check(report.errors.is_empty() and report.warnings.any(func(w):return w.reason=="no_declared_fact_source"),"MISSING SOURCE WARNING NOT FALSE REJECTION")
+ broken=b.duplicate(true)
+ var raw:=JSON.stringify(broken.story_home_company).replace("effect:semantic|record","effect:semantic|missing_action")
+ broken.story_home_company=JSON.parse_string(raw)
+ report=NarrativeDiagnostics.inspect(broken)
+ check(report.errors.any(func(e):return e.reason=="unknown_ink_action"),"UNKNOWN INK ACTION REFERENCE")
+ print("FAILURES ",bad);store.queue_free();await process_frame;quit(bad)

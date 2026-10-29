@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+{"errors":[{"details":{"path":"narrative_policies.topics.introduction/stages/start/narrative_policies.rule/1/available"},"file":"res://work/narrative-authoring/invalid/custom-rules.json","path":"narrative_policies.topics.introduction/stages/start/narrative_policies.rule/1/available","reason":"invalid_content"}],"warnings":[]}

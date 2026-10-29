@@ -1,0 +1,97 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+{
+  "decision": {
+    "allowed": false,
+    "evidence": [
+      {
+        "calendar_days": 0,
+        "introduced": false,
+        "introduced_at": -1,
+        "shared_days": 0,
+        "source": ""
+      },
+      {
+        "axis": "familiarity",
+        "from": "farid",
+        "to": "player",
+        "value": 0.0
+      },
+      {
+        "axis": "trust",
+        "from": "farid",
+        "to": "player",
+        "value": 0.0
+      }
+    ],
+    "reasons": [
+      {
+        "id": "policy_acquaintance_blocked",
+        "path": "offer/offer/1/0/0"
+      },
+      {
+        "id": "policy_relationship_blocked",
+        "path": "offer/offer/1/0/1"
+      },
+      {
+        "id": "policy_relationship_blocked",
+        "path": "offer/offer/1/0/2"
+      }
+    ],
+    "status": "blocked"
+  },
+  "errors": [],
+  "limits": [
+    "No general proof of arbitrary Ink reachability.",
+    "Source analysis matches fact types, not all possible role substitutions."
+  ],
+  "parity": true,
+  "scope": "Pure policy decision; physical lifecycle/domain transaction may separately reject an action.",
+  "warnings": [
+    {
+      "file": "res://content/stories/shawarma_learning.ink.json",
+      "message": "IDs are checked against the story catalog only; branch-to-active-topic attribution is not proven. Split stories or verify each encounter binding explicitly.",
+      "path": "shawarma_learning",
+      "reason": "shared_story_binding_unproven",
+      "topics": [
+        "recipe_basics",
+        "recipe_attempt",
+        "recipe_result"
+      ]
+    },
+    {
+      "file": "res://content/stories/companionship.ink.json",
+      "message": "IDs are checked against the story catalog only; branch-to-active-topic attribution is not proven. Split stories or verify each encounter binding explicitly.",
+      "path": "companionship",
+      "reason": "shared_story_binding_unproven",
+      "topics": [
+        "introduction",
+        "exam_open",
+        "exam_follow",
+        "relay_request",
+        "relay_reply",
+        "relay_delivered",
+        "radio_open",
+        "radio_follow",
+        "quiet_company",
+        "recipe_hint"
+      ]
+    },
+    {
+      "file": "res://content/stories/home_company.ink.json",
+      "message": "IDs are checked against the story catalog only; branch-to-active-topic attribution is not proven. Split stories or verify each encounter binding explicitly.",
+      "path": "home_company",
+      "reason": "shared_story_binding_unproven",
+      "topics": [
+        "home_heard",
+        "home_invite",
+        "home_cancel",
+        "home_goodbye"
+      ]
+    }
+  ]
+}
+WARNING: 48 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
