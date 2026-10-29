@@ -1,5 +1,7 @@
 # Generic social memory and relationship progression — #23
 
+Current activation: [#24 family conversion](semantic-families.md) supersedes the foundation-only status below:22/51 production encounters now use shared semantics. The original scope notes remain historical.
+
 This extends the [policy](semantic-policy-runtime.md) and [knowledge/publication](semantic-knowledge.md) foundations. SocialLife owns source-backed social memory; RelationshipStore remains the score owner. All49 production encounters remain on inventoried legacy routes until#24. No production dialogue, seeds or tuning were changed.
 
 ## Authoring

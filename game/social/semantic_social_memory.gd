@@ -7,7 +7,7 @@ var _session: GameSession
 var _schemas: Dictionary
 var _cap: float
 var _events: Dictionary = {}
-var _indexes: Dictionary = {"introductions":{},"days":{},"consents":{},"consumed":{},"positive":{}}
+var _indexes: Dictionary = {"introductions":{},"days":{},"consents":{},"consumed":{},"positive":{},"messages":{}}
 func configure(session: GameSession) -> void:
  _session=session;_schemas=SemanticNarrative.schemas(session.config.data)
  _cap=float(session.config.data.get("narrative_social",{}).get("daily_gain_cap",session.config.data.social_life.relationships.daily_cap))
@@ -44,6 +44,8 @@ static func scope_key(identity: Dictionary, scope: String, actors: Array, eviden
   if handles.is_empty():return ""
   key["visits"]=handles
  return StableJson.stringify(key)
+static func message_key(effect: Dictionary) -> String:return StableJson.stringify([effect.thread,effect.subject,effect.sender,effect.recipient,effect.courier])
+func message(effect: Dictionary, stage: String) -> Dictionary:return _indexes.messages.get(message_key(effect),{}).get(stage,{}).duplicate(true)
 func unused(key: String) -> bool:return not _indexes.consumed.has(key)
 func positive_used(from: String, to: String, at: float) -> float:return float(_indexes.positive.get(StableJson.stringify([from,to,floori(at/1440.0)]),0))
 func positive_totals() -> Dictionary:return _indexes.positive.duplicate()
@@ -60,6 +62,7 @@ func prepare(receipts: Array) -> ActionResult:
    var effect: Dictionary=receipt.social[i]
    var legacy_used:=_session.social_life.legacy_positive_used(effect.from,effect.to,float(receipt.at)) if effect.kind=="relationship" else 0.0
    events[id]={"id":id,"source":receipt.id,"index":i,"effect":effect.duplicate(true),"applied":0,"legacy_used":legacy_used}
+   if effect.kind=="message":events[id]["parent"]=""
  var derived := _derive(events,sources,false)
  if not derived.ok:return derived
  return ActionResult.success({"revision":revision,"events":derived.details.events,"gains":derived.details.gains,"sources":sources})
@@ -102,13 +105,14 @@ func _derive(events: Dictionary, sources: Dictionary, check_applied: bool) -> Ac
  var ordered: Array=[]
  for id in events:
   var row: Variant=events[id]
-  if not NarrativePolicyValidation.fields(row,["id","source","index","effect","applied","legacy_used"]) or row.id!=id or not row.source is String or not ContentValidation.integer(row.index) or row.index<0 or not ContentValidation.number(row.applied) or not ContentValidation.bounded(row.legacy_used,0,float(_session.config.data.social_life.relationships.daily_cap)) or not SemanticSocialValidation.valid(row.effect,_schemas,[],{},true):return _fail()
+  if not NarrativePolicyValidation.fields(row,["id","source","index","effect","applied","legacy_used"],["parent"]) or row.id!=id or not row.source is String or not ContentValidation.integer(row.index) or row.index<0 or not ContentValidation.number(row.applied) or not ContentValidation.bounded(row.legacy_used,0,float(_session.config.data.social_life.relationships.daily_cap)) or not SemanticSocialValidation.valid(row.effect,_schemas,[],{},true):return _fail()
   if row.effect.kind!="relationship" and row.legacy_used!=0:return _fail()
+  if (row.effect.kind=="message")!=row.has("parent") or (row.has("parent") and not row.parent is String):return _fail()
   var receipt: Variant=sources.get(row.source)
   if not receipt is Dictionary or not receipt.get("social") is Array or int(row.index)>=receipt.social.size() or row.effect!=receipt.social[int(row.index)] or id!=row.source+"/social/"+str(int(row.index)):return _fail()
   ordered.append(row.duplicate(true))
  ordered.sort_custom(func(a,b):return int(a.index)<int(b.index) if sources[a.source].order==sources[b.source].order else sources[a.source].order<sources[b.source].order)
- var indexes := {"introductions":{},"days":{},"consents":{},"consumed":{}};var daily := {};var gained := {};var normalized := {};var gains: Array=[]
+ var indexes := {"introductions":{},"days":{},"consents":{},"consumed":{},"messages":{}};var daily := {};var gained := {};var normalized := {};var gains: Array=[]
  for row in ordered:
   var r: Dictionary=sources[row.source];var e: Dictionary=row.effect;var applied:=0.0
   var day:=floori(float(r.at)/1440.0)
@@ -131,9 +135,25 @@ func _derive(events: Dictionary, sources: Dictionary, check_applied: bool) -> Ac
      gained[key]=true;daily[daily_key]=float(daily.get(daily_key,0))+maxf(0,applied)
     gains.append({"id":row.id,"source":row.source,"from":e.from,"to":e.to,"axis":e.axis,"amount":applied})
    "consent":
-    if e.grantor!=r.speaker or e.recipient!=r.listener:return _fail()
+    var speaker_consent: bool=e.grantor==r.speaker and e.recipient==r.listener
+    var player_consent: bool=e.grantor=="player" and r.listener=="player" and e.recipient==r.speaker and r.has("choice")
+    if not speaker_consent and not player_consent:return _fail()
     var key:=StableJson.stringify([e.grantor,e.recipient,e.purpose,e.scope])
     indexes.consents[key]={"at":r.at,"duration":e.duration,"decision":e.decision,"source":row.source}
+   "message":
+    if e.sender==e.recipient or e.sender==e.courier or e.recipient==e.courier or r.listener!=e.courier:return _fail()
+    if r.speaker!=(e.recipient if e.stage=="reply" else e.sender):return _fail()
+    if e.stage in ["request","delivered"] and not r.has("choice"):return _fail()
+    var key:=message_key(e)
+    if not indexes.messages.has(key):indexes.messages[key]={}
+    var thread: Dictionary=indexes.messages[key]
+    if thread.has(e.stage):return _fail()
+    var previous:= "request" if e.stage=="reply" else "reply" if e.stage=="delivered" else ""
+    if not previous.is_empty() and not thread.has(previous):return _fail()
+    var parent: String=thread[previous].id if not previous.is_empty() else ""
+    if not previous.is_empty() and int(sources[thread[previous].source].order)>=int(r.order):return _fail()
+    if check_applied and row.parent!=parent:return _fail()
+    row.parent=parent;thread[e.stage]={"id":row.id,"source":r.id,"at":r.at}
    "consume":
     if not e.actors.all(func(a):return a in [r.speaker,r.listener]):return _fail()
     var key:=scope_key(r.identity,e.scope,e.actors,str(e.get("evidence","")),float(r.at),r.get("visits",{}))

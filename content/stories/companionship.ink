@@ -10,21 +10,21 @@ VAR appointment_label = ""
  - "farid": الهوا هنا يفك الضهر بعد يوم في الورشة.. لو مش مشغول، نقعد ندردش؟ # speaker:farid # duration:6 # loc:story.companionship.001
  - else: الواحد ييجي هنا يسمع صوت الميه بدل صوت دماغه.. عندك حبة وقت؟ # speaker:youssef # duration:6 # loc:story.companionship.002
  }
- * [أنا سامعك، خد راحتك. # loc:story.companionship.003] -> selected
- * [معلش، محتاج أروق مع نفسي شوية. # loc:story.companionship.004]
+ * [أنا سامعك، خد راحتك. # policy_choice:listen # loc:story.companionship.003] -> selected
+ * [معلش، محتاج أروق مع نفسي شوية. # policy_choice:refuse # loc:story.companionship.004]
   ولا يهمك يا صاحبي، القعدة تساعنا كلنا. # speaker:{character_id} # duration:5 # loc:story.companionship.005
   -> END
- * [نخليها بعدين؟ # loc:story.companionship.006]
+ * [نخليها بعدين؟ # policy_choice:postpone # loc:story.companionship.006]
   براحتك خالص، مفيش حاجة مستعجلة. # speaker:{character_id} # duration:5 # loc:story.companionship.007
   -> END
 === selected ===
 {topic_id:
 - "meet_farid":
- أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة. # speaker:farid # duration:8 # effect:social\|meet_farid # loc:story.companionship.008
+ أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة. # speaker:farid # duration:8 # policy_action:record # effect:semantic\|record # loc:story.companionship.008
  القعدة دي نعمة والله.. أهو نتعرف واحدة واحدة. # speaker:farid # duration:6 # loc:story.companionship.009
  -> END
 - "meet_youssef":
- يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة. # speaker:youssef # duration:8 # effect:social\|meet_youssef # loc:story.companionship.010
+ يوسف.. في الكلية ولسه بحاول أفهم الدنيا. بحب أتمشى هنا بعد المحاضرات، بعيد عن الدوشة. # speaker:youssef # duration:8 # policy_action:record # effect:semantic\|record # loc:story.companionship.010
  حلو إن فيه مكان ينفع تسكت فيه من غير ما حد يسألك مالك. # speaker:youssef # duration:6 # loc:story.companionship.011
  -> END
 - "hear_farid":
@@ -84,53 +84,69 @@ VAR appointment_label = ""
 - "continuation_farid": -> continuation_farid
 - "continuation_youssef": -> continuation_youssef
 - "exam_open":
- عندي امتحان قريب، وبقسم المذاكرة حتت صغيرة بدل ما أفضل قلقان من الكل. القعدة هنا بتريح دماغي وبعدين أرجع للكتب. # speaker:youssef # duration:9 # effect:social\|exam_open # loc:story.companionship.exam_open
+ عندي امتحان قريب، وبقسم المذاكرة حتت صغيرة بدل ما أفضل قلقان من الكل. القعدة هنا بتريح دماغي وبعدين أرجع للكتب. # speaker:youssef # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.exam_open
  -> END
 - "exam_follow":
- فاكر لما قلت لك هقسم المذاكرة؟ خلصت الجزء اللي كنت مأجله، وراجعت مع زميل. لسه الامتحان قدامي، بس بقيت أهدى؛ مش لازم أخلص الدنيا في ليلة. # speaker:youssef # duration:9 # effect:social\|exam_follow # loc:story.companionship.exam_follow
+ فاكر لما قلت لك هقسم المذاكرة؟ خلصت الجزء اللي كنت مأجله، وراجعت مع زميل. لسه الامتحان قدامي، بس بقيت أهدى؛ مش لازم أخلص الدنيا في ليلة. # speaker:youssef # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.exam_follow
  -> END
 - "exam_ask":
  مش شايف يوسف في القعدة النهارده. لو قابلته، تسأله عامل إيه؟ طمني عليه بس، مش عايز أزن عليه. # speaker:farid # duration:9 # loc:story.companionship.exam_ask
- * [لو قابلته هسأله وأوصل لك كلامه. # loc:story.companionship.exam_ask.yes]
-  تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة. # speaker:farid # duration:5 # effect:social\|exam_ask # loc:story.companionship.exam_ask.confirm
+ * [لو قابلته هسأله وأوصل لك كلامه. # policy_choice:promise # loc:story.companionship.exam_ask.yes]
+  تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة. # speaker:farid # duration:5 # policy_action:record # effect:semantic\|record # loc:story.companionship.exam_ask.confirm
   -> END
- * [مش هقدر أوعدك، خلينا على راحتنا. # loc:story.companionship.exam_ask.later]
+ * [مش هقدر أوعدك، خلينا على راحتنا. # policy_choice:postpone # loc:story.companionship.exam_ask.later]
   ولا يهمك، نتقابل على خير. # speaker:farid # duration:5 # loc:story.companionship.exam_ask.okay
   -> END
 - "exam_answer":
- فريد سأل عليا؟ تسلموا. قوله أنا كويس وبراجع للامتحان، وقسمت المذاكرة وبقيت أهدى. لما أفضى هعدي أسلم عليه؛ من غير ما أوعد بميعاد دلوقتي. # speaker:youssef # duration:9 # effect:social\|exam_answer # loc:story.companionship.exam_answer
- -> END
+ في حاجة حابب تسألني عنها؟ # speaker:youssef # duration:5 # loc:story.companionship.exam_answer.prompt
+ * [صاحبنا بيسأل عليك، تحب أبلغه إيه؟ # policy_choice:ask # loc:story.companionship.exam_answer.ask]
+  فريد سأل عليا؟ تسلموا. قوله أنا كويس وبراجع للامتحان، وقسمت المذاكرة وبقيت أهدى. لما أفضى هعدي أسلم عليه؛ من غير ما أوعد بميعاد دلوقتي. # speaker:youssef # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.exam_answer
+  -> END
+ * [نكمّل بعدين على رواقة. # policy_choice:postpone # loc:story.companionship.exam_answer.later]
+  -> END
 - "exam_return":
- إنت قابلت يوسف وقال لك كده؟ الحمد لله، طمنتني. خليه ياخد وقته في المذاكرة؛ هنتقابل لما الظروف تسمح. # speaker:farid # duration:9 # effect:social\|exam_return # loc:story.companionship.exam_return
- -> END
+ معاك كلام حابب توصله لي؟ # speaker:farid # duration:5 # loc:story.companionship.exam_return.prompt
+ * [أوصل لك الرد اللي سمعته منه. # policy_choice:deliver # loc:story.companionship.exam_return.deliver]
+  إنت قابلت يوسف وقال لك كده؟ الحمد لله، طمنتني. خليه ياخد وقته في المذاكرة؛ هنتقابل لما الظروف تسمح. # speaker:farid # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.exam_return
+  -> END
+ * [نكمّل بعدين على رواقة. # policy_choice:postpone # loc:story.companionship.exam_return.later]
+  -> END
 - "radio_open":
- عندي راديو قديم من أيام أبويا، بحاول أظبط صوته على مهلي. مش شغل ورشة ولا طلب لحد؛ حاجة بحب أقعد لها لما أروق. # speaker:farid # duration:9 # effect:social\|radio_open # loc:story.companionship.radio_open
+ عندي راديو قديم من أيام أبويا، بحاول أظبط صوته على مهلي. مش شغل ورشة ولا طلب لحد؛ حاجة بحب أقعد لها لما أروق. # speaker:farid # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.radio_open
  -> END
 - "radio_follow":
- الراديو اللي حكيت لك عنه؟ نضفت الوصلات واشتغل صوته تاني. لسه فيه وش خفيف، بس سمعت عليه أغنية قديمة وقعدت مبسوط. مش كل حاجة لازم ترجع جديدة. # speaker:farid # duration:9 # effect:social\|radio_follow # loc:story.companionship.radio_follow
+ الراديو اللي حكيت لك عنه؟ نضفت الوصلات واشتغل صوته تاني. لسه فيه وش خفيف، بس سمعت عليه أغنية قديمة وقعدت مبسوط. مش كل حاجة لازم ترجع جديدة. # speaker:farid # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.radio_follow
  -> END
 - "radio_ask":
  هو فريد ما جاش النهارده؟ لو شفته، اسأله أخباره إيه. بقالي شوية ما قعدتش معاه، ونفسي أطمن عليه. # speaker:youssef # duration:9 # loc:story.companionship.radio_ask
- * [لو قابلته هسأله وأوصل لك كلامه. # loc:story.companionship.radio_ask.yes]
-  تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة. # speaker:youssef # duration:5 # effect:social\|radio_ask # loc:story.companionship.radio_ask.confirm
+ * [لو قابلته هسأله وأوصل لك كلامه. # policy_choice:promise # loc:story.companionship.radio_ask.yes]
+  تسلم، لما تلاقوا وقت بس؛ مفيش حاجة مستعجلة. # speaker:youssef # duration:5 # policy_action:record # effect:semantic\|record # loc:story.companionship.radio_ask.confirm
   -> END
- * [مش هقدر أوعدك، خلينا على راحتنا. # loc:story.companionship.radio_ask.later]
+ * [مش هقدر أوعدك، خلينا على راحتنا. # policy_choice:postpone # loc:story.companionship.radio_ask.later]
   ولا يهمك، نتقابل على خير. # speaker:youssef # duration:5 # loc:story.companionship.radio_ask.okay
   -> END
 - "radio_answer":
- يوسف بيسأل؟ قوله أنا بخير، والراديو القديم رجع يغني. لو قابلني نقعد نحكي؛ من غير مواعيد شغل ولا التزامات. # speaker:farid # duration:9 # effect:social\|radio_answer # loc:story.companionship.radio_answer
- -> END
+ في حاجة حابب تسألني عنها؟ # speaker:farid # duration:5 # loc:story.companionship.radio_answer.prompt
+ * [صاحبنا بيسأل عليك، تحب أبلغه إيه؟ # policy_choice:ask # loc:story.companionship.radio_answer.ask]
+  يوسف بيسأل؟ قوله أنا بخير، والراديو القديم رجع يغني. لو قابلني نقعد نحكي؛ من غير مواعيد شغل ولا التزامات. # speaker:farid # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.radio_answer
+  -> END
+ * [نكمّل بعدين على رواقة. # policy_choice:postpone # loc:story.companionship.radio_answer.later]
+  -> END
 - "radio_return":
- حلو إنك قابلت فريد وطمنتني. والراديو ده أكيد وراه حكايات؛ لما أشوفه أبقى أسمع منه. تسلم إنك وصلت الكلام. # speaker:youssef # duration:9 # effect:social\|radio_return # loc:story.companionship.radio_return
- -> END
+ معاك كلام حابب توصله لي؟ # speaker:youssef # duration:5 # loc:story.companionship.radio_return.prompt
+ * [أوصل لك الرد اللي سمعته منه. # policy_choice:deliver # loc:story.companionship.radio_return.deliver]
+  حلو إنك قابلت فريد وطمنتني. والراديو ده أكيد وراه حكايات؛ لما أشوفه أبقى أسمع منه. تسلم إنك وصلت الكلام. # speaker:youssef # duration:9 # policy_action:record # effect:semantic\|record # loc:story.companionship.radio_return
+  -> END
+ * [نكمّل بعدين على رواقة. # policy_choice:postpone # loc:story.companionship.radio_return.later]
+  -> END
 - "company_farid":
- يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام. # speaker:farid # duration:7 # effect:social\|company_farid # loc:story.companionship.company_farid
+ يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام. # speaker:farid # duration:7 # policy_action:record # effect:semantic\|record # loc:story.companionship.company_farid
  -> END
 - "company_youssef":
- مفيش أخبار كبيرة النهارده. بس حلو إني أقعد مع حد بقيت أعرفه، من غير ما نكون مستعجلين على حاجة. # speaker:youssef # duration:8 # effect:social\|company_youssef # loc:story.companionship.company_youssef
+ مفيش أخبار كبيرة النهارده. بس حلو إني أقعد مع حد بقيت أعرفه، من غير ما نكون مستعجلين على حاجة. # speaker:youssef # duration:8 # policy_action:record # effect:semantic\|record # loc:story.companionship.company_youssef
  -> END
 - "shawarma_hint":
- بحب الشاورما، وقريبي كان شغال في محل ووراني تجهيزها. فاكر منه حبة تفاصيل، لو حبيت أرجع أحكيهالك وإحنا قاعدين. # speaker:farid # duration:8 # effect:social\|shawarma_hint # loc:story.companionship.shawarma_hint
+ بحب الشاورما، وقريبي كان شغال في محل ووراني تجهيزها. فاكر منه حبة تفاصيل، لو حبيت أرجع أحكيهالك وإحنا قاعدين. # speaker:farid # duration:8 # policy_action:record # effect:semantic\|record # loc:story.companionship.shawarma_hint
  -> END
 - else: -> END
 }

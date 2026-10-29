@@ -254,7 +254,8 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
  if automatic and conversation.optional and not definition.has("semantic_topic"): candidates = conversation.current.choices.map(func(choice):return {"id":str(conversation.choice_id(choice)),"index":choice.index})
  for choice in candidates:
   if choice.id != str(choice_id): continue
-  var becomes_manual := manual(conversation) or (conversation.encounter_id==&"social_invitation" and int(choice.index)==0)
+  var semantic_personal: bool=definition.has("semantic_topic") and not automatic and str(choice.get("semantic_id",""))==str(definition.get("personal_choice",""))
+  var becomes_manual := semantic_personal or manual(conversation) or (conversation.encounter_id==&"social_invitation" and int(choice.index)==0)
   if conversation.encounter_id==&"social_invitation" and int(choice.index)==0 and not _session.actions.preview(&"personal_focus").ok:
    if automatic:_finish(conversation,&"cancelled")
    return _session.actions.preview(&"personal_focus")
@@ -264,9 +265,16 @@ func choose(session_id: StringName, choice_id: StringName, automatic: bool = fal
   conversation.runtime.set_context(_context_for(conversation))
   var result := conversation.runtime.choose(int(choice.index))
   if not result.ok: return result
-  if _can_hear(conversation) and not automatic:
+  if definition.has("semantic_topic"):
+   conversation.context_extra.erase("semantic_choice")
+   if not automatic and _can_hear(conversation):
+    var captured:=NarrativeChoice.capture(_session,conversation,choice)
+    if not captured.ok:_finish(conversation,&"cancelled");return captured
+  if not definition.has("semantic_topic") and _can_hear(conversation) and not automatic:
    _pending_choices[str(conversation.id)]={"id":"%s/%d/choice" % [conversation.id,conversation.beat],"chapter":str(conversation.id),"actor":"player","name":LocalizedNarrative.speaker("player",_session.tuning.display_name("player",str(_session.config.section("ui").get("player_name","أنا")))),"text":LocalizedNarrative.choice(conversation.current.choices[int(choice.index)],conversation.current),"channel":"choice","at":_session.clock.world_minutes}
    _pending_choices[str(conversation.id)].merge(LocalizedNarrative.metadata(str(conversation.current.choices[int(choice.index)].get("loc_id","")),conversation.current.loc_args,str(conversation.current.choices[int(choice.index)].text)))
+  if semantic_personal:
+   conversation.optional=false;conversation.context_extra["manual_read"]=true
   if conversation.encounter_id==&"social_invitation":
    conversation.optional=false
    conversation.context_extra["invitation_answered"]=true
@@ -396,6 +404,7 @@ func _report_failure(conversation: ConversationSession, result: ActionResult) ->
 
 func _context_for(conversation: ConversationSession) -> Dictionary:
  var inputs := conversation.context_extra.duplicate(true)
+ inputs.merge(_definitions[str(conversation.encounter_id)].get("story_context",{}),true)
  inputs["chapter_id"]=str(conversation.id)
  var projected := context(conversation.participants,inputs)
  var social_topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
@@ -408,7 +417,8 @@ func _context_for(conversation: ConversationSession) -> Dictionary:
  var learning_recipe := str(_definitions[str(conversation.encounter_id)].get("learning_recipe",""))
  if not learning_recipe.is_empty():
   var knowledge := _session.learning.context(StringName(learning_recipe))
-  var source := _session.learning.result_evidence(StringName(str(conversation.context_extra.get("source_item_id",""))))
+  var evidence: String=str(conversation.context_extra.get("semantic_start",{}).get("identity",{}).get("bindings",{}).get(_definitions[str(conversation.encounter_id)].get("learning_evidence_binding",""),conversation.context_extra.get("source_item_id","")))
+  var source := _session.learning.result_evidence(StringName(evidence))
   projected.merge({"shawarma_attempted":knowledge.attempted,"shawarma_completed":knowledge.completed,"shawarma_quality":int(source.get("quality",knowledge.last_quality))},true)
  for key in _definitions[str(conversation.encounter_id)].get("context_conditions",{}):
   projected[key] = _session.conditions.permits(_definitions[str(conversation.encounter_id)].context_conditions[key],conversation.participants)
@@ -509,9 +519,10 @@ func manual_topics_for(visit_id: StringName) -> Array[Dictionary]:
  if visit.character_id==&"fathi":return [{"key":"supplier","label":"نتكلم عن التوريد والحساب","encounter":"supplier","topic":""}]
  if visit.character_id==&"abdul_karim":return [{"key":"landlord","label":"نتكلم على حسابنا وأحوالنا","encounter":"landlord","topic":""}]
  if visit is ResidentialRecord:
-  return [{"key":"home/visit","label":str(_session.config.section("ui").home_visit),"encounter":"home_company","topic":""},{"key":"home/goodbye","label":str(_session.config.section("ui").home_goodbye),"encounter":"home_goodbye","topic":""}]
- if _session.residential.can_invite(visit_id):result.append({"key":"home/invite","label":str(_session.config.section("ui").home_invite),"encounter":"home_invite","topic":""})
- if _session.residential.invitation.get("actor","")==str(visit.character_id):result.append({"key":"home/cancel","label":str(_session.config.section("ui").home_cancel),"encounter":"home_cancel","topic":""})
+  var home_topics: Array[Dictionary]= [{"key":"home/visit","label":str(_session.config.section("ui").home_visit),"encounter":"home_company","topic":""},{"key":"home/goodbye","label":str(_session.config.section("ui").home_goodbye),"encounter":"home_goodbye","topic":""}]
+  return home_topics.filter(func(t):return not _definitions[t.encounter].has("semantic_topic") or _session.semantic.decide(_definitions[t.encounter],PackedStringArray([str(visit_id)]),"offer").allowed)
+ if (_session.semantic.decide(_definitions.home_invite,PackedStringArray([str(visit_id)]),"offer").allowed if _definitions.home_invite.has("semantic_topic") else _session.residential.can_invite(visit_id)):result.append({"key":"home/invite","label":str(_session.config.section("ui").home_invite),"encounter":"home_invite","topic":""})
+ if (_session.semantic.decide(_definitions.home_cancel,PackedStringArray([str(visit_id)]),"offer").allowed if _definitions.home_cancel.has("semantic_topic") else _session.residential.invitation.get("actor","")==str(visit.character_id)):result.append({"key":"home/cancel","label":str(_session.config.section("ui").home_cancel),"encounter":"home_cancel","topic":""})
  for topic in _session.social_life.topics_for(visit_id):result.append({"key":"social:"+str(topic.id),"label":str(topic.label),"encounter":str(topic.encounter),"topic":""})
  var ids: Array=_session.presence.profile(visit.character_id).get("manual_encounters",["amgad"] if visit.character_id==&"amgad" else ["visitors"])
  for encounter in ids:

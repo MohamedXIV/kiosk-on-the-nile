@@ -1,0 +1,72 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PRODUCTION CONTENT true {  }
+CONFIG true
+UNKNOWN RECIPE HIDDEN true
+FIRST DAY HOME HIDDEN true
+INTRO youssef true
+INTRO farid true
+WORKSHOP READS CANONICAL INTRODUCTIONS true
+FIRST DAY PERSONAL HIDDEN true
+SAME DAY COMPANY CANNOT GRIND true
+INTRO CURRENT JSON true
+DAY TWO COMPANY farid true
+DAY TWO COMPANY youssef true
+EXAM DISCLOSURE true
+RADIO DISCLOSURE true
+FOLLOWUP NOT SAME DAY true
+HEARD RECIPE CONNECTION true
+RECIPE NOW REACHABLE true
+TEACHING true
+BASICS ONE AUTHORITY true
+OWN TEACHING CONTINUES true
+TAUGHT CURRENT JSON true
+EXAM FOLLOWUP NEXT DAY true
+RADIO FOLLOWUP NEXT DAY true
+REQUEST POSTPONED true
+POSTPONING DOES NOT CONSUME REQUEST true
+WARNING: Narrative stopped: invalid_semantic_knowledge ({ "encounter_id": "social_exam_ask", "session_id": "conversation_12" })
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _report_failure (res://game/narrative/narrative_director.gd:402)
+         [1] _hear_current (res://game/narrative/narrative_director.gd:207)
+         [2] _advance (res://game/narrative/narrative_director.gd:194)
+         [3] choose (res://game/narrative/narrative_director.gd:290)
+         [4] run (res://work/semantic-families/negative.gd:78)
+         [5] save_roundtrip (res://work/semantic-families/negative.gd:43)
+         [6] create_candidate (res://game/persistence/save_codec.gd:130)
+         [7] restore (res://game/narrative/narrative_director.gd:393)
+         [8] open (res://game/narrative/ink_runtime.gd:39)
+         [9] _open (res://game/narrative/ink_runtime.gd:83)
+         [10] _finalise_story_creation (res://addons/inkgd/ink_player.gd:819)
+         [11] _create_and_finalize_story (res://addons/inkgd/ink_player.gd:802)
+AUTOMATIC PROMISE CANNOT GRANT CONSENT true
+ACTUAL REQUEST PROMISE true
+REQUEST ONCE true
+REQUEST CURRENT JSON true
+RECIPIENT REPLY true
+ACTUAL RECIPIENT LEARNED REQUEST true
+SENDER DOES NOT KNOW REPLY BEFORE DELIVERY true
+DELIVERY OFFER true
+OPENING IS NOT DELIVERY true
+ACTUAL DELIVERY true
+DELIVERY ONCE true
+SENDER LEARNS EXACT REPLY ON DELIVERY true
+DELIVERY CURRENT JSON true
+CORRUPT SOURCE REJECTED missing_choice true invalid_semantic_knowledge
+CORRUPT SOURCE REJECTED changed_party true invalid_knowledge_assertions
+CORRUPT SOURCE REJECTED message_parent true invalid_semantic_social_memory
+MATURE HOME REACHABLE true
+EXPLICIT HOME BOOKING true
+CANONICAL HOME OWNER BOOKED true
+PREPARED CANCELLATION true
+STALE OWNER TICKET PRESERVES BOOKING true
+HOME CURRENT JSON true
+HOME CANCELLATION true
+BOOKING ACTUALLY CANCELLED true
+CANCEL CURRENT JSON true
+FAILURES 0
+WARNING: 278 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

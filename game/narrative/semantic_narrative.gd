@@ -8,7 +8,7 @@ static func empty_catalog() -> Dictionary:
  return {"contract_version":1,"profiles":{},"policies":{},"topics":{},"fact_types":{}}
 static func schemas(bundle: Dictionary) -> Dictionary:
  var actors: Array=bundle.get("visitors",{}).get("characters",{}).keys()+bundle.get("residential_visits",{}).get("profiles",{}).keys()+bundle.get("suppliers",{}).get("profiles",{}).keys()+["player"]
- return {"types":{"actor":actors,"recipe":bundle.get("recipe_workflows",{}).keys(),"location":bundle.get("locations",{}).keys(),"fact":bundle.get("social",{}).get("facts",[]),"social_event":["introduction","company"]},"axes":bundle.get("social",{}).get("relationship_defaults",{}).keys(),"channels":["personal","hearing"],"queries":{"kiosk.open":{},"recipe.attempted":{"recipe":"recipe"},"recipe.completed":{"recipe":"recipe"}},"events":{"social.occurred":{"kind":"social_event","observer":"actor","other":"actor"}}}
+ return {"types":{"actor":actors,"recipe":bundle.get("recipe_workflows",{}).keys()+bundle.get("learning",{}).get("families",{}).values(),"location":bundle.get("locations",{}).keys(),"fact":bundle.get("social",{}).get("facts",[]),"social_event":["introduction","company"],"message_stage":["request","reply","delivered"]},"axes":bundle.get("social",{}).get("relationship_defaults",{}).keys(),"channels":["personal","hearing"],"queries":{"home.invite":{"actor":"actor"},"home.cancel":{"actor":"actor"},"home.heard":{"actor":"actor"},"home.goodbye":{"actor":"actor"},"kiosk.open":{},"recipe.attempted":{"recipe":"recipe"},"recipe.completed":{"recipe":"recipe"}},"events":{"message.stage":{"thread":"string","subject":"string","sender":"actor","recipient":"actor","courier":"actor","stage":"message_stage"},"social.occurred":{"kind":"social_event","observer":"actor","other":"actor"}}}
 static func validate(bundle: Dictionary) -> ActionResult:
  var compiled := NarrativePolicyValidation.compile(bundle.get("narrative_policies",empty_catalog()),schemas(bundle))
  if not compiled.ok:return compiled
@@ -20,11 +20,21 @@ static func validate(bundle: Dictionary) -> ActionResult:
   var entry: Dictionary=bundle.encounters[id]
   if not entry.has("semantic_topic"):continue
   if not entry.semantic_topic is String or not compiled.details.topics.has(entry.semantic_topic) or not entry.get("semantic_bindings") is Dictionary or entry.has("topics") or entry.has("social_topic") or not entry.get("requires",{}).is_empty() or not entry.get("offer_requires",{}).is_empty() or not entry.get("choice_conditions",{}).is_empty():return ContentValidation.fail("encounters."+id+".semantic_contract")
+  if entry.has("semantic_actor") and not NarrativePolicyValidation.typed(entry.semantic_actor,"actor",compiled.details.schemas):return ContentValidation.fail("encounters."+id+".semantic_actor")
+  if not entry.get("story_context",{}) is Dictionary:return ContentValidation.fail("encounters."+id+".story_context")
+  for key in entry.get("story_context",{}):
+   if not key in ["topic_id","home_mode"] or not NarrativePolicyValidation.typed(entry.story_context[key],"string",compiled.details.schemas):return ContentValidation.fail("encounters."+id+".story_context")
   var topic: Dictionary=compiled.details.topics[entry.semantic_topic]
+  if entry.has("personal_choice") and (not entry.personal_choice is String or not topic.choices.has(entry.personal_choice)):return ContentValidation.fail("encounters."+id+".personal_choice")
+  if entry.has("learning_evidence_binding") and (not entry.learning_evidence_binding is String or not entry.semantic_bindings.get(entry.learning_evidence_binding,{}) is Dictionary or entry.semantic_bindings[entry.learning_evidence_binding].get("query")!="recipe.latest_result"):return ContentValidation.fail("encounters."+id+".learning_evidence_binding")
   if not NarrativePolicyValidation.same_keys(entry.semantic_bindings,topic.bindings):return ContentValidation.fail("encounters."+id+".semantic_bindings")
   for key in entry.semantic_bindings:
    var ref: Variant=entry.semantic_bindings[key]
    if ref is Dictionary:
+    if ref.has("query"):
+     if ref.query=="home.invitation" and NarrativePolicyValidation.fields(ref,["query"]) and topic.bindings[key]=="string":continue
+     if not NarrativePolicyValidation.fields(ref,["query","recipe"]) or ref.query!="recipe.latest_result" or not ref.recipe in compiled.details.schemas.types.recipe or topic.bindings[key]!="string":return ContentValidation.fail("encounters."+id+".evidence_binding")
+     continue
     if not NarrativePolicyValidation.fields(ref,["participant"]) or not ContentValidation.integer(ref.participant) or ref.participant<0 or ref.participant>=16 or topic.bindings[key]!="actor":return ContentValidation.fail("encounters."+id+".participant_binding")
    elif not NarrativePolicyValidation.typed(ref,topic.bindings[key],compiled.details.schemas):return ContentValidation.fail("encounters."+id+".literal_binding")
  return compiled
@@ -32,10 +42,11 @@ func configure(session: GameSession) -> ActionResult:
  _session=session
  var compiled := validate(session.config.data)
  if not compiled.ok:return compiled
- policy.configure(compiled.details,{"relationship":_relationship,"time_window":_time_window,"available":_available,"near":_near,"domain":_domain,"knowledge":_knowledge,"acquaintance":_acquaintance,"consent":_consent,"event":_event,"unused":_unused},_resolve_handle)
+ policy.configure(compiled.details,{"relationship":_relationship,"time_window":_time_window,"available":_available,"near":_near,"domain":_domain,"knowledge":_knowledge,"knowledge_age":_knowledge_age,"acquaintance":_acquaintance,"consent":_consent,"event":_event,"unused":_unused},_resolve_handle)
  var knowledge_config: Dictionary=session.config.data.get("narrative_knowledge",NarrativeKnowledgeValidation.empty_catalog())
  var configured := session.knowledge.assertions.configure(compiled.details.schemas,session.config.data.get("narrative_policies",{}).get("fact_types",{}),knowledge_config.initial,session.clock,not knowledge_config.actions.is_empty())
  if not configured.ok:return configured
+ session.knowledge.aliases=session.config.data.get("narrative_knowledge",{}).get("legacy_player_aliases",{}).duplicate(true)
  knowledge_actions.configure(session)
  session.effects.semantic_provider=knowledge_actions.commit
  return ActionResult.success()
@@ -57,6 +68,7 @@ func _consent(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  var consent:=_session.social_life.memory.consent(rule.grantor,rule.recipient,rule.purpose,rule.scope)
  return NarrativePolicy.answer(consent.allowed,[consent])
 func _event(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
+ if rule.id=="message.stage":return NarrativePolicy.answer(not _session.social_life.memory.message(rule.args,rule.args.stage).is_empty())
  if rule.id!="social.occurred":return {"status":"invalid","reason":"event_provider_unavailable"}
  return NarrativePolicy.answer(_session.social_life.memory.occurred(rule.args.kind,rule.args.observer,rule.args.other))
 func _unused(rule: Dictionary, context: NarrativeContext) -> Dictionary:
@@ -84,10 +96,14 @@ func _near(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  return NarrativePolicy.answer(true)
 func _domain(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  match rule.id:
+  "home.invite","home.cancel","home.heard","home.goodbye":return NarrativePolicy.answer(_session.residential.semantic_available(rule.id.trim_prefix("home."),rule.args.actor))
   "kiosk.open":return NarrativePolicy.answer(_session.kiosk_open)
   "recipe.attempted":return NarrativePolicy.answer(_session.learning.context(StringName(rule.args.recipe)).attempted)
   "recipe.completed":return NarrativePolicy.answer(_session.learning.context(StringName(rule.args.recipe)).completed)
  return {"status":"invalid","reason":"domain_provider_unavailable"}
+func _knowledge_age(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
+ var rows:=_session.knowledge.query_assertions(rule.knower,rule.fact,["heard","relayed"])
+ return NarrativePolicy.answer(rows.any(func(r):return floori(_session.clock.world_minutes/1440.0)-floori(float(r.at)/1440.0)>=int(rule.calendar_days)))
 func _knowledge(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  if rule.fact.type!="legacy_player_fact":
   var assertions := _session.knowledge.query_assertions(rule.knower,rule.fact,rule.provenance_kinds)
@@ -104,11 +120,21 @@ func _knowledge(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
    if heard.get("chapter")==parts[0] and heard.get("channel")=="speech":kind="heard"
  if kind.is_empty():return {"status":"invalid","reason":"knowledge_provenance_unavailable"}
  return NarrativePolicy.answer(kind in rule.provenance_kinds,[{"source":record.source,"kind":kind}])
-func _context(entry: Dictionary, participants: PackedStringArray, turn: Dictionary = {}, saved: Dictionary = {}) -> ActionResult:
+func _context(entry: Dictionary, participants: PackedStringArray, turn: Dictionary = {}, saved: Dictionary = {}, fixed: Dictionary = {}) -> ActionResult:
  var values := {};var handles := {}
+ if entry.has("semantic_actor"):
+  if participants.is_empty():return _fail()
+  var person: Variant=_session.presence.record(participants[0])
+  if person==null or str(person.character_id)!=entry.semantic_actor:return _fail()
  for key in entry.semantic_bindings:
   var ref: Variant=entry.semantic_bindings[key]
   if ref is Dictionary:
+   if ref.has("query"):
+    var fallback: String=_session.residential.invitation_scope(str(_session.presence.record(participants[0]).character_id)) if ref.query=="home.invitation" and not participants.is_empty() else str(_session.learning.context(StringName(ref.get("recipe",""))).last_item_id)
+    var value: String=str(fixed.get(key,fallback))
+    if value.is_empty():value="none"
+    if not evidence_binding_valid(ref,value):return _fail()
+    values[key]=value;continue
    if int(ref.participant)>=participants.size():return _fail()
    var actor: Variant=_session.presence.record(participants[int(ref.participant)])
    if actor==null:return _fail()
@@ -139,7 +165,8 @@ func decide(entry: Dictionary, participants: PackedStringArray, stage: String, k
  var declared: Array=policy._compiled.topics[id].get("turn_roles",[])
  for role in turn.keys():
   if not role in declared:turn.erase(role)
- var bound := _context(entry,participants,turn)
+ var fixed: Dictionary=conversation.context_extra.get("semantic_start",{}).get("identity",{}).get("bindings",{}) if conversation!=null else {}
+ var bound := _context(entry,participants,turn,{},fixed)
  if not bound.ok:return PolicyDecision.make("invalid","invalid_policy_bindings")
  var context: NarrativeContext=bound.details.context
  if conversation!=null:
@@ -174,12 +201,24 @@ static func _fail() -> ActionResult:return ActionResult.failure(ActionResult.Cod
 func validate_detached(entry: Dictionary, record: Dictionary) -> bool:
  var proof: Variant=record.get("context_extra",{}).get("semantic_start")
  if not proof is Dictionary or not proof.get("identity") is Dictionary or not NarrativePolicyValidation.fields(proof.identity,["topic","bindings","roles"]) or proof.identity.topic!=entry.semantic_topic or not proof.identity.bindings is Dictionary or not proof.identity.roles is Dictionary or not proof.get("actors") is Array or not record.get("participants") is Array or proof.actors.size()!=record.participants.size():return false
+ if entry.has("semantic_actor") and (proof.actors.is_empty() or proof.actors[0]!=entry.semantic_actor):return false
  var bound := policy.bind(entry.semantic_topic,proof.identity.bindings,{}, {},proof.identity.roles)
  if not bound.ok:return false
  for key in entry.semantic_bindings:
   var ref: Variant=entry.semantic_bindings[key]
   if ref is Dictionary:
+   if ref.has("query"):
+    if not evidence_binding_valid(ref,str(proof.identity.bindings[key])):return false
+    continue
    if int(ref.participant)>=proof.actors.size() or proof.identity.bindings[key]!=proof.actors[int(ref.participant)]:return false
   elif proof.identity.bindings[key]!=ref:return false
  var c := ConversationSession.new();c.id=StringName(str(record.get("id","")));c.beat=int(record.get("beat",0));c.heard_beat=int(record.get("heard_beat",0));c.context_extra=record.context_extra
  return proof_valid(c,bound.details.context)
+
+func evidence_binding_valid(ref: Dictionary, value: String) -> bool:
+ if ref.query=="home.invitation":
+  var parts:=value.split("/")
+  return parts.size()==3 and parts[0]=="home" and parts[1] in policy._compiled.schemas.types.actor and parts[2].begins_with("day_") and parts[2].trim_prefix("day_").is_valid_int() and int(parts[2].trim_prefix("day_"))>=2 and int(parts[2].trim_prefix("day_"))<=_session.clock.day+1
+ if value=="none":return true
+ var record:=_session.learning.result_evidence(StringName(value))
+ return not record.is_empty() and record.get("family")==_session.learning._family(str(ref.recipe))

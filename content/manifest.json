@@ -72,6 +72,8 @@
     "archive_visitors_ec15550504e6": "archive/visitors-ec15550504e6.ink.json",
     "archive_football_7bce28b3e7b9": "archive/football-7bce28b3e7b9.ink.json",
     "story_river_company": "stories/river_company.ink.json",
-    "story_home_company": "stories/home_company.ink.json"
+    "story_home_company": "stories/home_company.ink.json",
+    "narrative_policies": "narrative_policies.json",
+    "narrative_knowledge": "narrative_knowledge.json"
   }
 }

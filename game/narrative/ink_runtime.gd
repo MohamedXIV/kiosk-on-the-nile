@@ -13,23 +13,6 @@ var _error: String = ""
 var _context: Dictionary={}
 var _policy_choices: Dictionary={}
 var _policy_map_valid: bool=true
-func _scan_policy_choices(value: Variant, depth: int = 0) -> void:
- if depth>128:_policy_map_valid=false;return
- if value is Array:
-  var pending := ""
-  for part in value:
-   if part is String and part.begins_with("^policy_choice:"):
-    var id: String = part.trim_prefix("^policy_choice:").strip_edges()
-    if not pending.is_empty() or not id.is_valid_identifier():_policy_map_valid=false
-    pending=id
-   elif part is Dictionary and part.has("*") and not pending.is_empty():
-    if not part["*"] is String or (_policy_choices.has(part["*"]) and _policy_choices[part["*"]]!=pending):_policy_map_valid=false
-    else:_policy_choices[part["*"]]=pending
-    pending=""
-   _scan_policy_choices(part,depth+1)
-  if not pending.is_empty():_policy_map_valid=false
- elif value is Dictionary:
-  for part in value.values():_scan_policy_choices(part,depth+1)
 static func valid_autonomous_story(compiled: Dictionary, fallback: Variant) -> bool:
  # Compiled Ink details stay within this adapter. Check declarations before activation.
  var containers: Variant=compiled.get("root")
@@ -58,7 +41,10 @@ func _open(definition: StoryDefinition, context: Dictionary, cache: InkPlayerCac
  close()
  _definition = definition
  _policy_choices={};_policy_map_valid=true
- if definition.raw_json.contains("policy_choice:"):_scan_policy_choices(JSON.parse_string(definition.raw_json))
+ if definition.raw_json.contains("policy_choice:"):
+  var mapped:=InkChoiceMap.compile(JSON.parse_string(definition.raw_json))
+  _policy_map_valid=mapped.ok
+  if mapped.ok:_policy_choices=mapped.details.choices
  if not _policy_map_valid:return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_policy_choice_map")
  var json := definition.raw_json if not definition.raw_json.is_empty() else FileAccess.get_file_as_string(definition.compiled_path)
  if not JSON.parse_string(json) is Dictionary or json.sha256_text() != definition.sha256:
@@ -191,6 +177,7 @@ func _advance_frame() -> NarrativeTypes.Frame:
   var mapped: String=str(_policy_choices.get(choice.path_string_on_choice,""))
   if record.get("semantic_id","")!=mapped:
    _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_policy_choice_map");return _frame
+  if not mapped.is_empty():record["semantic_path"]=choice.path_string_on_choice
   _frame.choices.append(record)
  if not _frame.autonomous.is_empty() and (not _valid_autonomous_path(_frame.autonomous) or _frame.choices.is_empty()):
   _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
@@ -256,7 +243,7 @@ func restore(data: Dictionary) -> ActionResult:
   _player.set_state(previous);return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_policy_action")
  for i in range(_player.current_choices.size()):
   var actual_choice: String=str(_policy_choices.get(_player.current_choices[i].path_string_on_choice,""))
-  if displayed.choices[i].get("semantic_id","")!=actual_choice:
+  if displayed.choices[i].get("semantic_id","")!=actual_choice or (not actual_choice.is_empty() and displayed.choices[i].get("semantic_path")!=_player.current_choices[i].path_string_on_choice):
    _player.set_state(previous);return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_policy_choice")
   if _player.current_choices[i].text.strip_edges()!=displayed.choices[i].text or _player.current_choices[i].index!=int(displayed.choices[i].index):
    _player.set_state(previous)

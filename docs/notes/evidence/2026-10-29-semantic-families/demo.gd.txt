@@ -1,0 +1,98 @@
+extends SceneTree
+var s:GameSession
+var cfg:SessionConfig
+var bad:=0
+var last:ConversationSession
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String,detail:Variant=""):
+ print(label," ",ok," ",detail)
+ if not ok:bad+=1
+func visit(actor:String) -> VisitState:
+ var v:Variant=s.semantic._record(actor)
+ if v==null:v=s.visitors.spawn(StringName(actor))
+ v.phase=&"staying";v.pose.ground=Vector2(-1.5,-0.5);v.destination=v.pose.ground;v.shopping_state=&"declined"
+ return v
+func stop():s.personal.leave();s.narrative.cancel_all();s.personal._paused.clear()
+func next_day():
+ stop();s.visitors.clear_visits();s.social_life._state.invitations.clear();s.clock.elapse_minutes(1440);s.accounts.tick(s.clock.frame(0))
+func available(id:String,actor:String) -> bool:return s.semantic.decide(cfg.data.encounters[id],PackedStringArray([str(visit(actor).id)]),"offer").allowed
+func open(id:String,actor:String,choices:Array=[]) -> ActionResult:
+ stop();var v:=visit(actor)
+ var r:=await s.narrative.start(StringName(id),PackedStringArray([str(v.id)]),{"manual_read":true,"demo_mode":id.trim_prefix("demo_")})
+ if not r.ok:
+  var decision:=s.semantic.decide(cfg.data.encounters[id],PackedStringArray([str(v.id)]),"start")
+  print("DENIED ",id," ",decision.status," ",decision.reasons," ",v.pose.snapshot()," ",s.player_pose.snapshot())
+  return r
+ last=s.narrative.sessions[r.details.session_id]
+ for i in range(10):
+  if not last.current.choices.is_empty():
+   if choices.is_empty():return r
+   var key:String=choices.pop_front();var offered:=s.narrative.choices(last).filter(func(c):return c.get("semantic_id")==key)
+   if offered.is_empty():return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"missing_observed_choice")
+   r=s.narrative.choose(last.id,StringName(offered[0].id))
+  elif last.current.ended:return r
+  else:r=s.narrative.advance_manual(last.id)
+  if not r.ok:return r
+ return r
+func save_roundtrip(label:String):
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var data:Dictionary=SaveCodec.decode_text(StableJson.stringify(codec.encode(s))).details.data
+ var r:=await codec.create_candidate(data,cfg)
+ check(r.ok,label,r.message_key)
+ if r.ok:r.details.session.queue_free()
+ codec.queue_free()
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var r:=store.load_directory("res://content");check(r.ok,"PRODUCTION CONTENT",r.details)
+ if not r.ok:quit(1);return
+ var b:=store.bundle()
+ b.residential_visits.social_guests=["nadia","youssef"]
+ b["story_demo"]=JSON.parse_string(FileAccess.get_file_as_string("res://work/semantic-families/demo.ink.json"))
+ b.narrative_knowledge.initial.append({"id":"demo_nadia_tea","knower":"nadia","fact":{"type":"recipe_basics","args":{"recipe":"tea"}}})
+ # Authored high-but-capped company for this short disposable demonstration.
+ for effect in b.narrative_knowledge.actions.quiet_company.record.social:
+  if effect.kind=="relationship":effect.amount=10 if effect.axis=="familiarity" else 2
+ for id in ["meet","company","hint","basics","attempt","result","request","reply","delivered","subject"]:
+  var topic:String={"meet":"introduction","company":"quiet_company","hint":"recipe_hint","basics":"recipe_basics","attempt":"recipe_attempt","result":"recipe_result","request":"relay_request","reply":"relay_reply","delivered":"relay_delivered","subject":"demo_subject"}[id]
+  var bindings:Dictionary={"guest":{"participant":0}}
+  if id in ["hint","basics","attempt","result"]:bindings["recipe"]="tea"
+  if id=="result":bindings["result"]={"query":"recipe.latest_result","recipe":"tea"}
+  if id in ["request","reply","delivered"]:bindings.merge({"sender":"nadia","recipient":"youssef","subject":"demo","thread":"demo_first_checkin"})
+  b.encounters["demo_"+id]={"story":"demo","manual":true,"requires":{},"offer_requires":{},"advancement":"manual","semantic_topic":topic,"semantic_bindings":bindings,"story_context":{}}
+ b.narrative_policies.topics["demo_subject"]={"bindings":{"guest":"actor"},"roles":{"guest":{"binding":"guest"}},"stages":{"start":{"op":"time_window","start":0,"end":1440},"continuation":{"op":"time_window","start":0,"end":1440}},"actions":{"record":{"op":"time_window","start":0,"end":1440}}}
+ var statements:Array=[]
+ for stage in ["open","follow"]:statements.append({"kind":"heard","fact":{"type":"story","args":{"owner":{"role":"guest"},"subject":"demo","stage":stage}}})
+ b.narrative_knowledge.actions["demo_subject"]={"record":{"listeners":[{"actor":"player"}],"assertions":statements}}
+ var validation:=ContentValidation.validate(b)
+ check(validation.ok,"DATA ONLY DEMO VALID",[validation.message_key,validation.details])
+ if not validation.ok:quit(1);return
+ cfg=SessionConfig.new(b,"semantic-families-demo");s=GameSession.new();root.add_child(s);check(s.configure(cfg).ok,"CONFIG");s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ for actor in ["nadia","youssef"]:
+  r=await open("demo_meet",actor);check(r.ok,"DEMO INTRO "+actor,r.message_key)
+ for day in range(3):
+  next_day()
+  for actor in ["nadia","youssef"]:
+   r=await open("demo_company",actor);check(r.ok,"DEMO COMPANY "+actor,r.message_key)
+ r=await open("demo_hint","nadia");check(r.ok,"DEMO RECIPE CONNECTION",r.message_key)
+ r=await open("demo_basics","nadia");check(r.ok,"DEMO HEARD TEACHING",r.message_key)
+ check(not s.knowledge.query_assertions("player",{"type":"recipe_basics","args":{"recipe":"tea"}}).is_empty(),"DEMO ACTUAL STUDENT LEARNING")
+ stop()
+ r=s.workflow.start(&"tea",&"kiosk",PackedStringArray(["tea"]),true)
+ check(r.ok,"REAL COOKING ATTEMPT",r.message_key)
+ if r.ok:
+  var job:=StringName(r.details.job_id)
+  r=await open("demo_attempt","nadia");check(r.ok,"ATTEMPT FOLLOWUP FROM OWNER",r.message_key)
+  stop();s.clock.advance(4);s.workflow.tick(s.clock.frame(4));r=s.workflow.act(job,&"add_tea");check(r.ok,"ACTUAL ADD TEA",r.message_key)
+  s.clock.advance(3);s.workflow.tick(s.clock.frame(3));r=s.workflow.act(job,&"pour");check(r.ok,"ACTUAL COOKING RESULT",r.message_key)
+  r=await open("demo_result","nadia");check(r.ok,"RESULT FOLLOWUP FROM OWNER",r.message_key)
+  check(not available("demo_result","nadia"),"SAME RESULT NOT REPEATED")
+  await save_roundtrip("REAL COOKING EVIDENCE JSON")
+ r=await open("demo_subject","youssef");check(r.ok,"DEMO ACTUAL SUBJECT HEARD",r.message_key)
+ stop();s.visitors.clear_visits();s.social_life._state.invitations.clear()
+ r=await open("demo_request","nadia",["promise"]);check(r.ok,"DEMO REQUEST",r.message_key)
+ r=await open("demo_reply","youssef",["ask"]);check(r.ok,"DEMO REPLY",r.message_key)
+ r=await open("demo_delivered","nadia",["deliver"]);check(r.ok,"DEMO DELIVERY",r.message_key)
+ r=await open("home_invite","nadia",["accept"]);check(r.ok,"DEMO HOME INVITATION",r.message_key)
+ check(s.residential.invitation.get("actor")=="nadia","DEMO OWNER BOOKING")
+ await save_roundtrip("DEMO FULL CURRENT JSON")
+ print("FAILURES ",bad);s.queue_free();store.queue_free();await process_frame;quit(bad)

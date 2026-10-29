@@ -1147,6 +1147,21 @@
     "story.companionship.shawarma_hint": "I like shawarma. A relative who worked in a shop showed me how to prepare it. I remember a few details, if you ever want to hear them while we sit.",
     "topic.company_farid": "Sit and chat for a while",
     "topic.company_youssef": "Sit and chat for a while",
-    "topic.shawarma_hint": "What do you like making?"
+    "topic.shawarma_hint": "What do you like making?",
+    "story.companionship.exam_return.deliver": "I'll pass on the reply I heard from him.",
+    "story.companionship.exam_return.later": "Let's leave this for another time.",
+    "story.companionship.radio_return.deliver": "I'll pass on the reply I heard from him.",
+    "story.companionship.radio_return.later": "Let's leave this for another time.",
+    "story.companionship.exam_return.prompt": "Was there something you wanted to pass on to me?",
+    "story.companionship.radio_return.prompt": "Was there something you wanted to pass on to me?",
+    "story.companionship.exam_answer.prompt": "Was there something you wanted to ask me?",
+    "story.companionship.exam_answer.ask": "Our friend asked after you. What would you like me to tell him?",
+    "story.companionship.exam_answer.later": "Let's leave this for another time.",
+    "story.companionship.radio_answer.prompt": "Was there something you wanted to ask me?",
+    "story.companionship.radio_answer.ask": "Our friend asked after you. What would you like me to tell him?",
+    "story.companionship.radio_answer.later": "Let's leave this for another time.",
+    "manual_topic.semantic/shawarma_learning": "Tell me about making shawarma.",
+    "manual_topic.semantic/shawarma_attempt": "I tried what you told me about.",
+    "manual_topic.semantic/shawarma_result": "Let me tell you about my latest attempt."
   }
 }

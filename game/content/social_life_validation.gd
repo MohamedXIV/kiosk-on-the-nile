@@ -26,6 +26,10 @@ static func validate(bundle: Dictionary) -> ActionResult:
  for profile in ["personal","relay","home"]:
   var rule: Variant=data.pacing.get(profile)
   if not rule is Dictionary or not ContentValidation.integer(rule.get("days")) or rule.days<1 or not ContentValidation.integer(rule.get("social_days")) or rule.social_days<1 or not ContentValidation.bounded(rule.get("familiarity"),0,100) or not ContentValidation.bounded(rule.get("trust"),0,100):return ContentValidation.fail("social_life.pacing."+profile)
+ var aliases: Variant=data.get("semantic_introductions",{})
+ if not aliases is Dictionary:return ContentValidation.fail("social_life.semantic_introductions")
+ for id in aliases:
+  if not id is String or not id.is_valid_identifier() or data.actions.has(id) or not NarrativePolicyValidation.fields(aliases[id],["observer","other"]) or aliases[id].observer!="player" or not aliases[id].other in bundle.visitors.characters:return ContentValidation.fail("social_life.semantic_introduction_alias")
  for id in data.actions:
   var action: Variant=data.actions[id]
   if not id.is_valid_identifier() or not action is Dictionary or not action.get("actor") in bundle.visitors.characters.keys()+[""] or not action.get("needs") is Array or not action.get("facts") is Array or not action.get("phases") is Array or not action.get("note") is String or not action.get("moment") is String:return ContentValidation.fail("social_life.action."+id)
@@ -42,13 +46,13 @@ static func validate(bundle: Dictionary) -> ActionResult:
   for fact in action.facts:
    if not fact in bundle.social.facts:return ContentValidation.fail("social_life.action.fact")
   for required in action.needs:
-   if not required in data.actions or required==id:return ContentValidation.fail("social_life.action.dependency")
+   if (not required in data.actions and not aliases.has(required)) or required==id:return ContentValidation.fail("social_life.action.dependency")
   for phase in action.phases:
    if not phase in ["idle","coordinating","scheduled","waiting","active","completed"]:return ContentValidation.fail("social_life.action.phase")
  var message_validation := StoryMessageValidation.validate(data,bundle.visitors.characters)
  if not message_validation.ok:return message_validation
  for required in ["meet_farid","meet_youssef","hear_farid","hear_youssef","refer_farid","refer_youssef","consent_farid","consent_youssef","days_farid","days_youssef","trial_complete"]:
-  if not data.actions.has(required):return ContentValidation.fail("social_life.required_action")
+  if not data.actions.has(required) and not aliases.has(required):return ContentValidation.fail("social_life.required_action")
  for id in data.topics:
   var topic: Variant=data.topics[id]
   if not topic is Dictionary or not topic.get("actor") in data.companionship.actors or not topic.get("phases") is Array or not topic.get("automatic") is bool or not topic.get("label") is String or not topic.get("action") in data.actions.keys()+[""] or not topic.get("encounter") is String or not bundle.get("encounters",{}).has(topic.encounter):return ContentValidation.fail("social_life.topic")

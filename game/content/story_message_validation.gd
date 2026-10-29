@@ -20,7 +20,7 @@ static func validate(data: Dictionary, actors: Dictionary) -> ActionResult:
    elif previous.kind!="reply" or message.from!=previous.from or message.to!=previous.to or action.actor!=message.to:return ContentValidation.fail("social_life.message_delivery")
  # Reject cycles in authored action prerequisites without recursion on untrusted data.
  var remaining: Array=data.actions.keys()
- var resolved: Array=[]
+ var resolved: Array=data.get("semantic_introductions",{}).keys()
  while not remaining.is_empty():
   var progress := false
   for id in remaining.duplicate():

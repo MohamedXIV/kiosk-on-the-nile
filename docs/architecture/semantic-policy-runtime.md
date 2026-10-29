@@ -1,5 +1,7 @@
 # Semantic policy runtime — foundation #21
 
+Current activation: [#24 family conversion](semantic-families.md) supersedes the foundation-only status below:22/51 production encounters now use shared semantics. The original scope notes remain historical.
+
 This is the runnable API for the foundation described by the [design contract](semantic-narrative.md), extended by [per-character knowledge#22](semantic-knowledge.md). The selected design examples include commentary, future actions and instances; they are not a runnable catalog. Production content conversion belongs to #24. All49 current production encounters retain their existing eligibility paths.
 
 ## Loading and compilation

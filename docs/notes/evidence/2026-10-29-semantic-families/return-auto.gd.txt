@@ -1,0 +1,129 @@
+extends SceneTree
+var s:GameSession
+var cfg:SessionConfig
+var bad:=0
+var last:ConversationSession
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String,detail:Variant=""):
+ print(label," ",ok," ",detail)
+ if not ok:bad+=1
+func visit(actor:String) -> VisitState:
+ var v:Variant=s.semantic._record(actor)
+ if v==null:v=s.visitors.spawn(StringName(actor))
+ v.phase=&"staying";v.pose.ground=Vector2(-1.5,-0.5);v.destination=v.pose.ground;v.shopping_state=&"declined"
+ return v
+func stop():s.personal.leave();s.narrative.cancel_all();s.personal._paused.clear()
+func next_day():
+ stop();s.visitors.clear_visits();s.social_life._state.invitations.clear();s.clock.elapse_minutes(1440);s.accounts.tick(s.clock.frame(0))
+func available(id:String,actor:String) -> bool:return s.semantic.decide(cfg.data.encounters[id],PackedStringArray([str(visit(actor).id)]),"offer").allowed
+func open(id:String,actor:String,choices:Array=[]) -> ActionResult:
+ stop();var v:=visit(actor)
+ var r:=await s.narrative.start(StringName(id),PackedStringArray([str(v.id)]),{"manual_read":true})
+ if not r.ok:
+  var decision:=s.semantic.decide(cfg.data.encounters[id],PackedStringArray([str(v.id)]),"start")
+  print("DENIED ",id," ",decision.status," ",decision.reasons," ",v.pose.snapshot()," ",s.player_pose.snapshot())
+  return r
+ last=s.narrative.sessions[r.details.session_id]
+ for i in range(10):
+  if not last.current.choices.is_empty():
+   if choices.is_empty():return r
+   var key:String=choices.pop_front();var offered:=s.narrative.choices(last).filter(func(c):return c.get("semantic_id")==key)
+   if offered.is_empty():return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"missing_observed_choice")
+   r=s.narrative.choose(last.id,StringName(offered[0].id))
+  elif last.current.ended:return r
+  else:r=s.narrative.advance_manual(last.id)
+  if not r.ok:return r
+ return r
+func save_roundtrip(label:String):
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var data:Dictionary=SaveCodec.decode_text(StableJson.stringify(codec.encode(s))).details.data
+ var r:=await codec.create_candidate(data,cfg)
+ check(r.ok,label,r.message_key)
+ if r.ok:r.details.session.queue_free()
+ codec.queue_free()
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var r:=store.load_directory("res://content");check(r.ok,"PRODUCTION CONTENT",r.details)
+ if not r.ok:quit(1);return
+ cfg=SessionConfig.new(store.bundle(),"semantic-families");s=GameSession.new();root.add_child(s);check(s.configure(cfg).ok,"CONFIG");s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ check(not available("shawarma_learning","farid"),"UNKNOWN RECIPE HIDDEN")
+ check(not available("home_invite","farid"),"FIRST DAY HOME HIDDEN")
+ for actor in ["youssef","farid"]:
+  r=await open("social_meet_"+actor,actor);check(r.ok,"INTRO "+actor,r.message_key)
+ check(s.social_life.done("meet_farid") and s.social_life.done("meet_youssef"),"WORKSHOP READS CANONICAL INTRODUCTIONS")
+ check(not available("social_exam_open","youssef"),"FIRST DAY PERSONAL HIDDEN")
+ check(not available("social_company_farid","farid"),"SAME DAY COMPANY CANNOT GRIND")
+ await save_roundtrip("INTRO CURRENT JSON")
+ next_day()
+ for actor in ["farid","youssef"]:
+  r=await open("social_company_"+actor,actor);check(r.ok,"DAY TWO COMPANY "+actor,r.message_key)
+ r=await open("social_exam_open","youssef");check(r.ok,"EXAM DISCLOSURE",r.message_key)
+ r=await open("social_radio_open","farid");check(r.ok,"RADIO DISCLOSURE",r.message_key)
+ check(not available("social_exam_follow","youssef"),"FOLLOWUP NOT SAME DAY")
+ r=await open("social_shawarma_hint","farid");check(r.ok,"HEARD RECIPE CONNECTION",r.message_key)
+ check(available("shawarma_learning","farid"),"RECIPE NOW REACHABLE")
+ r=await open("shawarma_learning","farid");check(r.ok,"TEACHING",r.message_key)
+ check(s.knowledge.has(&"KNOWN_SHAWARMA_BASICS") and not available("shawarma_learning","farid"),"BASICS ONE AUTHORITY")
+ check(s.narrative.available_for(last),"OWN TEACHING CONTINUES")
+ var expected: String=cfg.data.locale_ar.messages["notebook.note.KNOWN_SHAWARMA_BASICS"]
+ check(NotebookView.notes(s).any(func(n):return n.text==expected and not n.chapter.is_empty()),"SEMANTIC RECIPE NOTE AND SOURCE VISIBLE")
+ await save_roundtrip("TAUGHT CURRENT JSON")
+ var source_id:=str(last.id);var old_handle:=last.participants[0];var before_return:=s.knowledge.snapshot()
+ s.personal.leave();s.visitors.clear_visits();s.social_life._state.invitations.clear()
+ var returning:=visit("farid")
+ r=await s.personal.open_for(returning.id)
+ check(r.ok and str(returning.id)!=old_handle and s.personal.view().get("conversation")!=null,"RETURNING ACTOR RESUMES TEACHING",r.message_key)
+ var resumed:ConversationSession=s.personal.view().get("conversation")
+ if resumed!=null:
+  check(str(resumed.id)==source_id and s.knowledge.snapshot()==before_return,"RETURN DOES NOT REPLAY TEACHING")
+  var replies:=s.narrative.choices(resumed)
+  check(replies.size()==3,"RESTORED STABLE CHOICE IDENTITIES")
+  if not replies.is_empty():check(s.narrative.choose(resumed.id,StringName(replies[0].id)).ok,"RESUMED REPLY EXECUTES")
+ var locale:=LocaleService.new();check(locale.configure(cfg.data).ok,"BILINGUAL CATALOG")
+ for language in ["en","ar_EG"]:
+  locale.locale=language
+  check(NotebookView.notes(s).any(func(n):return n.text==cfg.data["locale_en" if language=="en" else "locale_ar"].messages["notebook.note.KNOWN_SHAWARMA_BASICS"]),"SEMANTIC NOTE "+language)
+ LocaleService.current=null
+ next_day()
+ r=await open("social_exam_follow","youssef");check(r.ok,"EXAM FOLLOWUP NEXT DAY",r.message_key)
+ r=await open("social_radio_follow","farid");check(r.ok,"RADIO FOLLOWUP NEXT DAY",r.message_key)
+ stop();s.visitors.clear_visits();s.social_life._state.invitations.clear();visit("farid")
+ r=await open("social_exam_ask","farid",["postpone"]);check(r.ok,"REQUEST POSTPONED",r.message_key)
+ check(available("social_exam_ask","farid"),"POSTPONING DOES NOT CONSUME REQUEST")
+ r=await open("social_exam_ask","farid",["promise"]);check(r.ok,"ACTUAL REQUEST PROMISE",r.message_key)
+ check(not available("social_exam_ask","farid"),"REQUEST ONCE")
+ await save_roundtrip("REQUEST CURRENT JSON")
+ r=await open("social_exam_answer","youssef",["ask"]);check(r.ok,"RECIPIENT REPLY",r.message_key)
+ r=await open("social_exam_return","farid");check(r.ok,"DELIVERY OFFER",r.message_key)
+ check(available("social_exam_return","farid"),"OPENING IS NOT DELIVERY")
+ r=await open("social_exam_return","farid",["deliver"]);check(r.ok,"ACTUAL DELIVERY",r.message_key)
+ check(not available("social_exam_return","farid"),"DELIVERY ONCE")
+ await save_roundtrip("DELIVERY CURRENT JSON")
+ for i in range(10):
+  next_day()
+  r=await open("social_company_farid","farid")
+  if not r.ok:check(false,"MATURE COMPANY",r.message_key)
+ check(available("home_invite","farid"),"MATURE HOME REACHABLE")
+ r=await open("home_invite","farid",["accept"]);check(r.ok,"EXPLICIT HOME BOOKING",r.message_key)
+ check(s.residential.invitation.get("actor")=="farid","CANONICAL HOME OWNER BOOKED")
+ await save_roundtrip("HOME CURRENT JSON")
+ r=await open("home_cancel","farid",["accept"]);check(r.ok,"HOME CANCELLATION",r.message_key)
+ check(s.residential.invitation.is_empty(),"BOOKING ACTUALLY CANCELLED")
+ await save_roundtrip("CANCEL CURRENT JSON")
+ stop()
+ var auto_s:=GameSession.new();root.add_child(auto_s);check(auto_s.configure(cfg).ok,"AUTONOMOUS CONFIG");auto_s.start_new();auto_s.location_id=&"kiosk";auto_s.player_ground=Vector2(-1.5,-0.5)
+ var av:=auto_s.visitors.spawn(&"farid");av.phase=&"staying";av.pose.ground=auto_s.player_ground;av.destination=av.pose.ground;av.shopping_state=&"declined"
+ r=await auto_s.narrative.start(&"social_meet_farid",PackedStringArray([str(av.id)]),{"invitation":true,"manual_read":false})
+ check(r.ok,"AUTONOMOUS INTRO OFFER",r.message_key)
+ for i in range(20):auto_s.narrative.tick(1)
+ check(not auto_s.social_life.memory.acquaintance("player","farid").introduced,"SILENT FALLBACK DOES NOT FORCE INTRO")
+ auto_s.narrative.cancel_all()
+ r=await auto_s.narrative.start(&"social_meet_farid",PackedStringArray([str(av.id)]),{"invitation":true,"manual_read":false})
+ if r.ok:
+  var ac:ConversationSession=auto_s.narrative.sessions[r.details.session_id]
+  if ac.current.choices.is_empty():auto_s.narrative.tick(8)
+  var listen:=auto_s.narrative.choices(ac).filter(func(c):return c.get("semantic_id")=="listen")
+  check(not listen.is_empty(),"AUTONOMOUS GUARDED LISTEN OFFER")
+  if not listen.is_empty():r=auto_s.narrative.choose(ac.id,StringName(listen[0].id));check(r.ok and auto_s.social_life.memory.acquaintance("player","farid").introduced,"ACTUAL LISTEN JOINS PERSONAL CONVERSATION",r.message_key)
+ auto_s.queue_free()
+ print("FAILURES ",bad);s.queue_free();store.queue_free();await process_frame;quit(bad)

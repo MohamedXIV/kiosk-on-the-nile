@@ -286,124 +286,26 @@
   "shawarma_learning": {
     "story": "shawarma_learning",
     "manual": true,
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "choice_conditions": {},
+    "advancement": "manual",
+    "semantic_topic": "recipe_basics",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "recipe": "shawarma"
+    },
+    "story_context": {
+      "topic_id": "shawarma_basics"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
     "learning_recipe": "shawarma",
-    "topics": [
-      {
-        "id": "shawarma_result",
-        "scope": "evidence",
-        "modes": [
-          0
-        ],
-        "variants": 1,
-        "characters": [
-          "farid"
-        ],
-        "requires": {
-          "all": [
-            {
-              "recipe_completed": "shawarma"
-            },
-            {
-              "fact_known": "FARID_SHAWARMA_STORY"
-            },
-            {
-              "acquaintance": {
-                "actor": "farid",
-                "profile": "personal"
-              }
-            },
-            {
-              "fact_known": "KNOWN_SHAWARMA_BASICS"
-            }
-          ]
-        },
-        "recipe_id": "shawarma",
-        "label": "أحكيلك عن آخر طبخة"
-      },
-      {
-        "id": "shawarma_attempt",
-        "scope": "once",
-        "modes": [
-          0
-        ],
-        "variants": 1,
-        "characters": [
-          "farid"
-        ],
-        "requires": {
-          "all": [
-            {
-              "all": [
-                {
-                  "recipe_attempted": "shawarma"
-                },
-                {
-                  "not": {
-                    "recipe_completed": "shawarma"
-                  }
-                }
-              ]
-            },
-            {
-              "fact_known": "FARID_SHAWARMA_STORY"
-            },
-            {
-              "acquaintance": {
-                "actor": "farid",
-                "profile": "personal"
-              }
-            },
-            {
-              "fact_known": "KNOWN_SHAWARMA_BASICS"
-            }
-          ]
-        },
-        "label": "جربت اللي حكيت لي عليه"
-      },
-      {
-        "id": "shawarma_basics",
-        "scope": "once",
-        "modes": [
-          0
-        ],
-        "variants": 1,
-        "characters": [
-          "farid"
-        ],
-        "requires": {
-          "all": [
-            {
-              "not": {
-                "fact_known": "KNOWN_SHAWARMA_BASICS"
-              }
-            },
-            {
-              "fact_known": "FARID_SHAWARMA_STORY"
-            },
-            {
-              "acquaintance": {
-                "actor": "farid",
-                "profile": "personal"
-              }
-            }
-          ]
-        },
-        "label": "احكيلي عن الشاورما"
-      }
-    ],
-    "advancement": "manual"
+    "semantic_label": "احكيلي عن الشاورما",
+    "semantic_actor": "farid"
   },
   "venue_comments": {
     "story": "venue_comments",
@@ -730,36 +632,44 @@
   "social_meet_farid": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "meet_farid",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "introduction",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "meet_farid"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_meet_youssef": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "meet_youssef",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "introduction",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "meet_youssef"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "social_pending_farid": {
     "story": "companionship",
@@ -891,292 +801,444 @@
   "social_exam_open": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "exam_open",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "exam_open",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "exam_open"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "social_exam_follow": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "exam_follow",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "exam_follow",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "exam_follow"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "social_exam_ask": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "exam_ask",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "relay_request",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "sender": "farid",
+      "recipient": "youssef",
+      "subject": "exam",
+      "thread": "exam_first_checkin"
+    },
+    "story_context": {
+      "topic_id": "exam_ask"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_exam_answer": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "exam_answer",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "relay_reply",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "sender": "farid",
+      "recipient": "youssef",
+      "subject": "exam",
+      "thread": "exam_first_checkin"
+    },
+    "story_context": {
+      "topic_id": "exam_answer"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "social_exam_return": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "exam_return",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "relay_delivered",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "sender": "farid",
+      "recipient": "youssef",
+      "subject": "exam",
+      "thread": "exam_first_checkin"
+    },
+    "story_context": {
+      "topic_id": "exam_return"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_radio_open": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "radio_open",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "radio_open",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "radio_open"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_radio_follow": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "radio_follow",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "radio_follow",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "radio_follow"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_radio_ask": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "radio_ask",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "relay_request",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "sender": "youssef",
+      "recipient": "farid",
+      "subject": "radio",
+      "thread": "radio_first_checkin"
+    },
+    "story_context": {
+      "topic_id": "radio_ask"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "social_radio_answer": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "radio_answer",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "relay_reply",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "sender": "youssef",
+      "recipient": "farid",
+      "subject": "radio",
+      "thread": "radio_first_checkin"
+    },
+    "story_context": {
+      "topic_id": "radio_answer"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_radio_return": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "radio_return",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "relay_delivered",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "sender": "youssef",
+      "recipient": "farid",
+      "subject": "radio",
+      "thread": "radio_first_checkin"
+    },
+    "story_context": {
+      "topic_id": "radio_return"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "home_company": {
     "story": "home_company",
     "manual": true,
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "home_heard",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "invitation": {
+        "query": "home.invitation"
+      }
+    },
+    "story_context": {
+      "home_mode": "visit"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen"
   },
   "home_invite": {
     "story": "home_company",
     "manual": true,
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        },
-        {
-          "acquaintance": {
-            "actor": "participant",
-            "profile": "home"
-          }
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "home_invite",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "invitation": {
+        "query": "home.invitation"
+      }
+    },
+    "story_context": {
+      "home_mode": "invite"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen"
   },
   "home_cancel": {
     "story": "home_company",
     "manual": true,
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "home_cancel",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "invitation": {
+        "query": "home.invitation"
+      }
+    },
+    "story_context": {
+      "home_mode": "cancel"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen"
   },
   "home_goodbye": {
     "story": "home_company",
     "manual": true,
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "home_goodbye",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "invitation": {
+        "query": "home.invitation"
+      }
+    },
+    "story_context": {
+      "home_mode": "goodbye"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen"
   },
   "social_company_farid": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "company_farid",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "quiet_company",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "company_farid"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
   },
   "social_company_youssef": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "company_youssef",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "quiet_company",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      }
+    },
+    "story_context": {
+      "topic_id": "company_youssef"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "youssef"
   },
   "social_shawarma_hint": {
     "story": "companionship",
     "manual": true,
-    "social_topic": "shawarma_hint",
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "advancement": "manual"
+    "advancement": "manual",
+    "semantic_topic": "recipe_hint",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "recipe": "shawarma"
+    },
+    "story_context": {
+      "topic_id": "shawarma_hint"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_actor": "farid"
+  },
+  "shawarma_attempt": {
+    "story": "shawarma_learning",
+    "manual": true,
+    "requires": {},
+    "offer_requires": {},
+    "advancement": "manual",
+    "semantic_topic": "recipe_attempt",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "recipe": "shawarma"
+    },
+    "story_context": {
+      "topic_id": "shawarma_attempt"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "learning_recipe": "shawarma",
+    "semantic_label": "جربت اللي حكيت لي عليه",
+    "semantic_actor": "farid"
+  },
+  "shawarma_result": {
+    "story": "shawarma_learning",
+    "manual": true,
+    "requires": {},
+    "offer_requires": {},
+    "advancement": "manual",
+    "semantic_topic": "recipe_result",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "recipe": "shawarma",
+      "result": {
+        "query": "recipe.latest_result",
+        "recipe": "shawarma"
+      }
+    },
+    "story_context": {
+      "topic_id": "shawarma_result"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "learning_recipe": "shawarma",
+    "semantic_label": "أحكيلك عن آخر طبخة",
+    "semantic_actor": "farid",
+    "learning_evidence_binding": "result"
   }
 }

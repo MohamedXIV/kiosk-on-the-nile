@@ -1,0 +1,28 @@
+VAR character_id = "nadia"
+VAR demo_mode = "company"
+{demo_mode:
+- "request":
+ Could you ask our friend how things are going? # speaker:{character_id} # duration:5
+ * [I will ask when we meet. # policy_choice:promise]
+  Thank you; whenever you have time. # speaker:{character_id} # duration:5 # policy_action:record # effect:semantic\|record
+  -> END
+ * [Another time. # policy_choice:postpone]
+  -> END
+- "reply":
+ Was there something you wanted to ask? # speaker:{character_id} # duration:5
+ * [Our friend asked after you. # policy_choice:ask]
+  Tell them that everything went well. # speaker:{character_id} # duration:5 # policy_action:record # effect:semantic\|record
+  -> END
+ * [Another time. # policy_choice:postpone]
+  -> END
+- "delivered":
+ Was there something you wanted to tell me? # speaker:{character_id} # duration:5
+ * [Our friend said everything went well. # policy_choice:deliver]
+  Thank you for passing that on. # speaker:{character_id} # duration:5 # policy_action:record # effect:semantic\|record
+  -> END
+ * [Another time. # policy_choice:postpone]
+  -> END
+- else:
+ It is good to sit here and talk. # speaker:{character_id} # duration:5 # policy_action:record # effect:semantic\|record
+ -> END
+}

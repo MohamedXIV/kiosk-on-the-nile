@@ -1147,6 +1147,21 @@
     "story.companionship.shawarma_hint": "بحب الشاورما، وقريبي كان شغال في محل ووراني تجهيزها. فاكر منه حبة تفاصيل، لو حبيت أرجع أحكيهالك وإحنا قاعدين.",
     "topic.company_farid": "نقعد وندردش شوية",
     "topic.company_youssef": "نقعد وندردش شوية",
-    "topic.shawarma_hint": "إيه الأكل اللي بتحب تعمله؟"
+    "topic.shawarma_hint": "إيه الأكل اللي بتحب تعمله؟",
+    "story.companionship.exam_return.deliver": "أوصل لك الرد اللي سمعته منه.",
+    "story.companionship.exam_return.later": "نكمّل بعدين على رواقة.",
+    "story.companionship.radio_return.deliver": "أوصل لك الرد اللي سمعته منه.",
+    "story.companionship.radio_return.later": "نكمّل بعدين على رواقة.",
+    "story.companionship.exam_return.prompt": "معاك كلام حابب توصله لي؟",
+    "story.companionship.radio_return.prompt": "معاك كلام حابب توصله لي؟",
+    "story.companionship.exam_answer.prompt": "في حاجة حابب تسألني عنها؟",
+    "story.companionship.exam_answer.ask": "صاحبنا بيسأل عليك، تحب أبلغه إيه؟",
+    "story.companionship.exam_answer.later": "نكمّل بعدين على رواقة.",
+    "story.companionship.radio_answer.prompt": "في حاجة حابب تسألني عنها؟",
+    "story.companionship.radio_answer.ask": "صاحبنا بيسأل عليك، تحب أبلغه إيه؟",
+    "story.companionship.radio_answer.later": "نكمّل بعدين على رواقة.",
+    "manual_topic.semantic/shawarma_learning": "احكيلي عن الشاورما",
+    "manual_topic.semantic/shawarma_attempt": "جربت اللي حكيت لي عليه",
+    "manual_topic.semantic/shawarma_result": "أحكيلك عن آخر طبخة"
   }
 }
