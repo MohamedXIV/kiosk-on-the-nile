@@ -1,0 +1,89 @@
+extends SceneTree
+var s:GameSession
+var cfg:SessionConfig
+var bad:=0
+var last:ConversationSession
+func _initialize():call_deferred("run")
+func check(ok:bool,label:String,detail:Variant=""):
+ print(label," ",ok," ",detail)
+ if not ok:bad+=1
+func visit(actor:String) -> VisitState:
+ var v:Variant=s.semantic._record(actor)
+ if v==null:v=s.visitors.spawn(StringName(actor))
+ v.phase=&"staying";v.pose.ground=Vector2(-1.5,-0.5);v.destination=v.pose.ground;v.shopping_state=&"declined"
+ return v
+func stop():s.personal.leave();s.narrative.cancel_all();s.personal._paused.clear()
+func next_day():
+ stop();s.visitors.clear_visits();s.social_life._state.invitations.clear();s.clock.elapse_minutes(1440);s.accounts.tick(s.clock.frame(0))
+func available(id:String,actor:String) -> bool:return s.semantic.decide(cfg.data.encounters[id],PackedStringArray([str(visit(actor).id)]),"offer").allowed
+func open(id:String,actor:String,choices:Array=[]) -> ActionResult:
+ stop();var v:=visit(actor)
+ var r:=await s.narrative.start(StringName(id),PackedStringArray([str(v.id)]),{"manual_read":true})
+ if not r.ok:
+  var decision:=s.semantic.decide(cfg.data.encounters[id],PackedStringArray([str(v.id)]),"start")
+  print("DENIED ",id," ",decision.status," ",decision.reasons," ",v.pose.snapshot()," ",s.player_pose.snapshot())
+  return r
+ last=s.narrative.sessions[r.details.session_id]
+ for i in range(10):
+  if not last.current.choices.is_empty():
+   if choices.is_empty():return r
+   var key:String=choices.pop_front();var offered:=s.narrative.choices(last).filter(func(c):return c.get("semantic_id")==key)
+   if offered.is_empty():return ActionResult.failure(ActionResult.Code.INVALID_CHOICE,&"missing_observed_choice")
+   r=s.narrative.choose(last.id,StringName(offered[0].id))
+  elif last.current.ended:return r
+  else:r=s.narrative.advance_manual(last.id)
+  if not r.ok:return r
+ return r
+func save_roundtrip(label:String):
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var data:Dictionary=SaveCodec.decode_text(StableJson.stringify(codec.encode(s))).details.data
+ var r:=await codec.create_candidate(data,cfg)
+ check(r.ok,label,r.message_key)
+ if r.ok:r.details.session.queue_free()
+ codec.queue_free()
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var r:=store.load_directory("res://content");check(r.ok,"PRODUCTION CONTENT",r.details)
+ if not r.ok:quit(1);return
+ cfg=SessionConfig.new(store.bundle(),"semantic-families");s=GameSession.new();root.add_child(s);check(s.configure(cfg).ok,"CONFIG");s.start_new();s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ check(not available("shawarma_learning","farid"),"UNKNOWN RECIPE HIDDEN")
+ check(not available("home_invite","farid"),"FIRST DAY HOME HIDDEN")
+ for actor in ["youssef","farid"]:
+  r=await open("social_meet_"+actor,actor);check(r.ok,"INTRO "+actor,r.message_key)
+ check(s.social_life.done("meet_farid") and s.social_life.done("meet_youssef"),"WORKSHOP READS CANONICAL INTRODUCTIONS")
+ check(not available("social_exam_open","youssef"),"FIRST DAY PERSONAL HIDDEN")
+ check(not available("social_company_farid","farid"),"SAME DAY COMPANY CANNOT GRIND")
+ await save_roundtrip("INTRO CURRENT JSON")
+ next_day()
+ for actor in ["farid","youssef"]:
+  r=await open("social_company_"+actor,actor);check(r.ok,"DAY TWO COMPANY "+actor,r.message_key)
+ r=await open("social_exam_open","youssef");check(r.ok,"EXAM DISCLOSURE",r.message_key)
+ r=await open("social_radio_open","farid");check(r.ok,"RADIO DISCLOSURE",r.message_key)
+ check(not available("social_exam_follow","youssef"),"FOLLOWUP NOT SAME DAY")
+ r=await open("social_shawarma_hint","farid");check(r.ok,"HEARD RECIPE CONNECTION",r.message_key)
+ check(available("shawarma_learning","farid"),"RECIPE NOW REACHABLE")
+ r=await open("shawarma_learning","farid");check(r.ok,"TEACHING",r.message_key)
+ check(s.knowledge.has(&"KNOWN_SHAWARMA_BASICS") and not available("shawarma_learning","farid"),"BASICS ONE AUTHORITY")
+ check(s.narrative.available_for(last),"OWN TEACHING CONTINUES")
+ await save_roundtrip("TAUGHT CURRENT JSON")
+ next_day()
+ r=await open("social_exam_follow","youssef");check(r.ok,"EXAM FOLLOWUP NEXT DAY",r.message_key)
+ r=await open("social_radio_follow","farid");check(r.ok,"RADIO FOLLOWUP NEXT DAY",r.message_key)
+ for actor in ["farid","youssef"]:
+  r=await open("social_hear_"+actor,actor);check(r.ok,"LEGACY WORK DISCLOSURE FROM SEMANTIC INTRO "+actor,r.message_key)
+ for actor in ["farid","youssef"]:
+  r=await open("social_refer_"+actor,actor);check(r.ok,"ACTUAL WORK REFERRAL "+actor,r.message_key)
+  var replies:=s.narrative.choices(last)
+  if not replies.is_empty():r=s.narrative.choose(last.id,StringName(replies[0].id));check(r.ok,"ACTUAL WORK CONSENT "+actor,r.message_key)
+ check(s.social_life.snapshot().activity.phase=="coordinating","WORKSHOP NOT CLAIMED COMPLETE BY SPEECH")
+ await save_roundtrip("WORKSHOP CONSENT CURRENT JSON")
+ stop();s.visitors.clear_visits();s.social_life._state.invitations.clear()
+ s.social_life.tick(s.clock.frame(0))
+ check(s.social_life.snapshot().activity.phase=="scheduled","WORKSHOP SCHEDULED ONLY WHEN ACTORS ABSENT")
+ var appointment:float=s.social_life.snapshot().activity.not_before
+ s.clock.elapse_minutes(appointment-s.clock.world_minutes);s.accounts.tick(s.clock.frame(0));s.social_life.tick(s.clock.frame(0))
+ check(s.social_life.snapshot().activity.phase=="active" and s.social_life.reserved("farid") and s.social_life.reserved("youssef"),"ACTUAL WORKSHOP OWNERSHIP EXCLUSIVE")
+ s.clock.elapse_minutes(float(cfg.data.social_life.trial.duration_minutes));s.accounts.tick(s.clock.frame(0));r=s.social_life.tick(s.clock.frame(0))
+ check(r.ok and s.social_life.snapshot().activity.phase=="completed","ACTUAL WORKSHOP COMPLETION",r.message_key)
+ await save_roundtrip("WORKSHOP RESULT CURRENT JSON")
+ print("FAILURES ",bad);s.queue_free();store.queue_free();await process_frame;quit(bad)

@@ -1,0 +1,2461 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+SCRIPT ERROR: Parse Error: Class "WorldFloor" hides a global script class.
+          at: GDScript::reload (res://work/semantic-integration/polish_world_floor.gd:1)
+          GDScript backtrace (most recent call first):
+              [0] _baseline_geometry (res://work/semantic-integration/render.gd:112)
+              [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+              [2] observe (res://work/semantic-integration/render.gd:41)
+ERROR: Failed to load script "res://work/semantic-integration/polish_world_floor.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] _baseline_geometry (res://work/semantic-integration/render.gd:112)
+       [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+       [2] observe (res://work/semantic-integration/render.gd:41)
+SCRIPT ERROR: Invalid call. Nonexistent function 'configure' in base 'Node2D'.
+          at: _baseline_geometry (res://work/semantic-integration/render.gd:113)
+          GDScript backtrace (most recent call first):
+              [0] _baseline_geometry (res://work/semantic-integration/render.gd:113)
+              [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+              [2] observe (res://work/semantic-integration/render.gd:41)
+SCRIPT ERROR: Parse Error: Class "BuildingView" hides a global script class.
+          at: GDScript::reload (res://work/semantic-integration/polish_building_view.gd:1)
+          GDScript backtrace (most recent call first):
+              [0] _baseline_geometry (res://work/semantic-integration/render.gd:118)
+              [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+              [2] observe (res://work/semantic-integration/render.gd:41)
+ERROR: Failed to load script "res://work/semantic-integration/polish_building_view.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] _baseline_geometry (res://work/semantic-integration/render.gd:118)
+       [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+       [2] observe (res://work/semantic-integration/render.gd:41)
+SCRIPT ERROR: Invalid call. Nonexistent function 'configure' in base 'Node2D'.
+          at: _baseline_geometry (res://work/semantic-integration/render.gd:119)
+          GDScript backtrace (most recent call first):
+              [0] _baseline_geometry (res://work/semantic-integration/render.gd:119)
+              [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+              [2] observe (res://work/semantic-integration/render.gd:41)
+SCRIPT ERROR: Invalid call. Nonexistent function 'configure' in base 'Node2D'.
+          at: _baseline_geometry (res://work/semantic-integration/render.gd:113)
+          GDScript backtrace (most recent call first):
+              [0] _baseline_geometry (res://work/semantic-integration/render.gd:113)
+              [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+              [2] observe (res://work/semantic-integration/render.gd:41)
+SCRIPT ERROR: Invalid call. Nonexistent function 'configure' in base 'Node2D'.
+          at: _baseline_geometry (res://work/semantic-integration/render.gd:119)
+          GDScript backtrace (most recent call first):
+              [0] _baseline_geometry (res://work/semantic-integration/render.gd:119)
+              [1] _baseline_geometry (res://work/semantic-integration/render.gd:120)
+              [2] observe (res://work/semantic-integration/render.gd:41)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+STATE kiosk (-4.0, 1.8) visits 4
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+SCRIPT ERROR: Invalid call. Nonexistent function 'present' in base 'Node2D'.
+          at: LocationView._process (res://game/world/location_view.gd:123)
+          GDScript backtrace (most recent call first):
+              [0] _process (res://game/world/location_view.gd:123)
+OBSERVATION {"draw_calls":229.0,"mean_ms":28.0078583333333,"median_ms":23.489,"objects":1181.0,"p95_ms":45.391}
+CPU_SPANS {}
+VISITS 4
+WARNING: 48 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

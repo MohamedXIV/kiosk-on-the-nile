@@ -1,0 +1,120 @@
+extends SceneTree
+var main: Node
+var times: Array[float]=[]
+var draws: Array[float]=[]
+var objects: Array[float]=[]
+func _initialize() -> void:call_deferred("observe")
+func observe() -> void:
+ root.size=Vector2i(1280,720)
+ DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+ main=load("res://game/app/main.tscn").instantiate()
+ root.add_child(main)
+ await process_frame
+ main.begin_new_game()
+ await process_frame
+ main._session.location_id=&"kiosk"
+ main._session.player_ground=Vector2(-4,1.8)
+ main._travel_changed()
+ main._session.running=false
+ if "--populated" in OS.get_cmdline_user_args():
+  main._motor.teleport(&"kiosk",Vector2(-4,1.8))
+  var n:=0
+  for actor in [&"farid",&"youssef",&"amgad",&"samir"]:
+   var visit: VisitState=main._session.visitors.spawn(actor)
+   if visit==null:continue
+   visit.phase=&"staying"
+   visit.pose.ground=Vector2(-3.5+float(n)*0.1,1.8)
+   visit.destination=visit.pose.ground
+   n+=1
+  main._physical.step(0)
+ if "--rooftop" in OS.get_cmdline_user_args():
+  main._session.location_id=&"rooftop"
+  main._session.player_ground=Vector2(0,0.5)
+  main._travel_changed()
+
+ if "--hide-floor" in OS.get_cmdline_user_args():
+  _hide_kind(main._rooms.kiosk,"floor")
+ if "--hide-roof" in OS.get_cmdline_user_args():
+  main._rooms.kiosk._buildings.clear()
+  _hide_kind(main._rooms.kiosk,"roof")
+ if "--old-visuals" in OS.get_cmdline_user_args() or "--polish-baseline" in OS.get_cmdline_user_args():
+  for room in main._rooms.values():_baseline_geometry(room)
+ for i in range(60):await process_frame
+ if "--capture" in OS.get_cmdline_user_args():
+  await _capture_pair()
+  main.free()
+  quit()
+  return
+ print("STATE ",main._session.location_id," ",main._session.player_ground," visits ",main._session.visitors.visits.size())
+ for i in range(240):
+  var start := Time.get_ticks_usec()
+  await process_frame
+  times.append(float(Time.get_ticks_usec()-start)/1000)
+  draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+  objects.append(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME))
+ times.sort();draws.sort();objects.sort()
+ print("OBSERVATION ",JSON.stringify({"mean_ms":_mean(times),"median_ms":times[times.size()/2],"p95_ms":times[int(times.size()*0.95)],"draw_calls":draws[draws.size()/2],"objects":objects[objects.size()/2]}))
+ print("CPU_SPANS ",JSON.stringify(RuntimePerformance._spans))
+ print("VISITS ",main._session.visitors.visits.size())
+ main.free()
+ quit()
+func _mean(values: Array[float]) -> float:
+ var total:=0.0
+ for value in values:total+=value
+ return total/values.size()
+
+func _old_visuals(node: Node) -> void:
+ if node is WorldFloor:
+  var data: Dictionary=node._config
+  var mapping: SpatialMapping=node._mapping
+  node.set_script(load("res://work/semantic-integration/"+_prefix()+"_world_floor.gd"))
+  node.configure(data,mapping,"res://assets/fonts/Cairo.ttf")
+ elif node is BuildingView:
+  var data: Dictionary=node._space
+  var building: Dictionary=node._building
+  var mapping: SpatialMapping=node._mapping
+  node.set_script(load("res://work/semantic-integration/"+_prefix()+"_building_view.gd"))
+  node.configure(data,building,mapping)
+ elif node is ObliqueProp:
+  var data: Dictionary=node.definition
+  var mapping: SpatialMapping=node.mapping
+  node.set_script(load("res://work/semantic-integration/"+_prefix()+"_oblique_prop.gd"))
+  node.configure(data,mapping)
+ elif node is RiverView or node is BoatView:
+  var path: String=_prefix()+"_river_view" if node is RiverView else _prefix()+"_boat_view"
+  var data: Dictionary=node._config
+  var mapping: SpatialMapping=node._mapping
+  node.set_script(load("res://work/semantic-integration/"+path+".gd"))
+  node.configure(data,mapping)
+ for child in node.get_children():_old_visuals(child)
+
+func _hide_kind(node: Node,kind: String) -> void:
+ if (kind=="floor" and node is WorldFloor) or (kind=="roof" and node is BuildingView):node.hide()
+ for child in node.get_children():_hide_kind(child,kind)
+
+func _prefix() -> String:return "polish" if "--polish-baseline" in OS.get_cmdline_user_args() else "old"
+
+func _capture_pair() -> void:
+ main.process_mode=Node.PROCESS_MODE_DISABLED
+ for i in range(2):await process_frame
+ await RenderingServer.frame_post_draw
+ var room: String="rooftop" if "--rooftop" in OS.get_cmdline_user_args() else "kiosk"
+ root.get_texture().get_image().save_png("res://work/semantic-integration/"+room+"-fixed.png")
+ _baseline_geometry(main._rooms[room])
+ for i in range(2):await process_frame
+ await RenderingServer.frame_post_draw
+ root.get_texture().get_image().save_png("res://work/semantic-integration/"+room+"-baseline.png")
+ print("CAPTURED ",room)
+func _baseline_geometry(node: Node) -> void:
+ if node is WorldFloor:
+  var data: Dictionary=node._config
+  var mapping: SpatialMapping=node._mapping
+  node.set_script(load("res://work/semantic-integration/polish_world_floor.gd"))
+  node.configure(data,mapping,"res://assets/fonts/Cairo.ttf")
+ elif node is BuildingView:
+  var data: Dictionary=node._space
+  var building: Dictionary=node._building
+  var mapping: SpatialMapping=node._mapping
+  node.set_script(load("res://work/semantic-integration/polish_building_view.gd"))
+  node.configure(data,building,mapping)
+ for child in node.get_children():_baseline_geometry(child)
