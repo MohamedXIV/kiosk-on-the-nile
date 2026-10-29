@@ -1,0 +1,695 @@
+{
+  "contract_version": 1,
+  "status": "design examples; not loaded by the current game",
+  "notation": "Each example is a selected topic/action fragment. Shared policy/profile references are listed below; domain queries and commands require typed registered adapters. Ref objects are resolved, never interpolated.",
+  "profiles": {
+    "home_company": {
+      "familiarity": 30,
+      "trust": 6,
+      "calendar_days": 3,
+      "shared_days": 3
+    },
+    "relay_company": {
+      "familiarity": 8,
+      "trust": 2,
+      "calendar_days": 2,
+      "shared_days": 2
+    }
+  },
+  "fact_types": {
+    "recipe_connection": {
+      "person": "actor",
+      "recipe": "recipe"
+    },
+    "recipe_basics": {
+      "recipe": "recipe"
+    },
+    "study_plan": {
+      "person": "actor"
+    }
+  },
+  "policies": {
+    "company": {
+      "roles": [
+        "observer",
+        "other"
+      ],
+      "parameters": {
+        "profile": "profile"
+      },
+      "requires": {
+        "op": "all",
+        "rules": [
+          {
+            "op": "relationship",
+            "from": {
+              "role": "other"
+            },
+            "to": {
+              "role": "observer"
+            },
+            "axis": "familiarity",
+            "compare": ">=",
+            "value": {
+              "parameter": "profile",
+              "field": "familiarity"
+            }
+          },
+          {
+            "op": "relationship",
+            "from": {
+              "role": "other"
+            },
+            "to": {
+              "role": "observer"
+            },
+            "axis": "trust",
+            "compare": ">=",
+            "value": {
+              "parameter": "profile",
+              "field": "trust"
+            }
+          },
+          {
+            "op": "acquaintance",
+            "observer": {
+              "role": "observer"
+            },
+            "other": {
+              "role": "other"
+            },
+            "calendar_days": {
+              "parameter": "profile",
+              "field": "calendar_days"
+            },
+            "shared_days": {
+              "parameter": "profile",
+              "field": "shared_days"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "home_offer",
+      "kind": "home_invitation",
+      "bindings": {
+        "host_actor": "actor",
+        "guest_actor": "actor"
+      },
+      "roles": {
+        "host": {
+          "binding": "host_actor"
+        },
+        "guest": {
+          "binding": "guest_actor"
+        }
+      },
+      "distinct_roles": [
+        [
+          "host",
+          "guest"
+        ]
+      ],
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "policy",
+              "id": "company",
+              "roles": {
+                "observer": {
+                  "role": "host"
+                },
+                "other": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "profile": "home_company"
+              }
+            },
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "host"
+                },
+                {
+                  "role": "guest"
+                }
+              ]
+            },
+            {
+              "op": "domain",
+              "id": "home.can_offer",
+              "args": {
+                "host": {
+                  "role": "host"
+                },
+                "guest": {
+                  "role": "guest"
+                }
+              }
+            }
+          ]
+        },
+        "continuation": {
+          "op": "near",
+          "actors": [
+            {
+              "role": "host"
+            },
+            {
+              "role": "guest"
+            }
+          ],
+          "channel": "personal"
+        }
+      },
+      "choices": {
+        "accept": {
+          "requires": {
+            "op": "all",
+            "rules": [
+              {
+                "op": "policy",
+                "id": "company",
+                "roles": {
+                  "observer": {
+                    "role": "host"
+                  },
+                  "other": {
+                    "role": "guest"
+                  }
+                },
+                "parameters": {
+                  "profile": "home_company"
+                }
+              },
+              {
+                "op": "domain",
+                "id": "home.can_offer",
+                "args": {
+                  "host": {
+                    "role": "host"
+                  },
+                  "guest": {
+                    "role": "guest"
+                  }
+                }
+              }
+            ]
+          },
+          "heard_action": "accept_home"
+        },
+        "later": {
+          "outcome": "postponed; no invitation/consent receipt"
+        },
+        "decline": {
+          "outcome": "declined; no invitation/consent receipt"
+        }
+      },
+      "action": {
+        "id": "accept_home",
+        "principal": {
+          "role": "guest"
+        },
+        "source": {
+          "kind": "heard",
+          "speaker": {
+            "role": "guest"
+          },
+          "listener": {
+            "role": "host"
+          }
+        },
+        "requires": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "policy",
+              "id": "company",
+              "roles": {
+                "observer": {
+                  "role": "host"
+                },
+                "other": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "profile": "home_company"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "home.can_offer",
+              "args": {
+                "host": {
+                  "role": "host"
+                },
+                "guest": {
+                  "role": "guest"
+                }
+              }
+            }
+          ]
+        },
+        "effects": [
+          {
+            "kind": "consent_granted",
+            "grantor": {
+              "role": "guest"
+            },
+            "recipient": {
+              "role": "host"
+            },
+            "purpose": "home_invitation",
+            "scope": "this_invitation"
+          },
+          {
+            "kind": "domain_command",
+            "id": "home.book",
+            "args": {
+              "host": {
+                "role": "host"
+              },
+              "guest": {
+                "role": "guest"
+              },
+              "consent": "prepared:this_invitation"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "friend_request",
+      "kind": "relay_request",
+      "bindings": {
+        "sender_actor": "actor",
+        "recipient_actor": "actor",
+        "courier_actor": "actor"
+      },
+      "roles": {
+        "sender": {
+          "binding": "sender_actor"
+        },
+        "recipient": {
+          "binding": "recipient_actor"
+        },
+        "courier": {
+          "binding": "courier_actor"
+        },
+        "subject": {
+          "binding": "recipient_actor"
+        }
+      },
+      "distinct_roles": [
+        [
+          "sender",
+          "recipient"
+        ],
+        [
+          "sender",
+          "courier"
+        ],
+        [
+          "recipient",
+          "courier"
+        ]
+      ],
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "policy",
+              "id": "company",
+              "roles": {
+                "observer": {
+                  "role": "courier"
+                },
+                "other": {
+                  "role": "sender"
+                }
+              },
+              "parameters": {
+                "profile": "relay_company"
+              }
+            },
+            {
+              "op": "policy",
+              "id": "company",
+              "roles": {
+                "observer": {
+                  "role": "courier"
+                },
+                "other": {
+                  "role": "recipient"
+                }
+              },
+              "parameters": {
+                "profile": "relay_company"
+              }
+            },
+            {
+              "op": "knowledge",
+              "knower": {
+                "role": "courier"
+              },
+              "fact": {
+                "type": "study_plan",
+                "args": {
+                  "person": {
+                    "role": "subject"
+                  }
+                }
+              },
+              "provenance_kinds": [
+                "heard",
+                "relayed"
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "sender"
+                },
+                {
+                  "role": "courier"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        },
+        "continuation": {
+          "op": "near",
+          "actors": [
+            {
+              "role": "sender"
+            },
+            {
+              "role": "courier"
+            }
+          ],
+          "channel": "personal"
+        }
+      },
+      "action": {
+        "id": "record_request",
+        "principal": {
+          "role": "sender"
+        },
+        "source": {
+          "kind": "heard",
+          "speaker": {
+            "role": "sender"
+          },
+          "listener": {
+            "role": "courier"
+          }
+        },
+        "requires": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "policy",
+              "id": "company",
+              "roles": {
+                "observer": {
+                  "role": "courier"
+                },
+                "other": {
+                  "role": "sender"
+                }
+              },
+              "parameters": {
+                "profile": "relay_company"
+              }
+            },
+            {
+              "op": "policy",
+              "id": "company",
+              "roles": {
+                "observer": {
+                  "role": "courier"
+                },
+                "other": {
+                  "role": "recipient"
+                }
+              },
+              "parameters": {
+                "profile": "relay_company"
+              }
+            },
+            {
+              "op": "knowledge",
+              "knower": {
+                "role": "courier"
+              },
+              "fact": {
+                "type": "study_plan",
+                "args": {
+                  "person": {
+                    "role": "subject"
+                  }
+                }
+              },
+              "provenance_kinds": [
+                "heard",
+                "relayed"
+              ]
+            },
+            {
+              "op": "event",
+              "id": "choice.accept_relay",
+              "roles": {
+                "actor": {
+                  "role": "courier"
+                }
+              },
+              "scope": "this_episode"
+            }
+          ]
+        },
+        "effects": [
+          {
+            "kind": "relay_request",
+            "sender": {
+              "role": "sender"
+            },
+            "recipient": {
+              "role": "recipient"
+            },
+            "courier": {
+              "role": "courier"
+            },
+            "subject": {
+              "role": "subject"
+            },
+            "purpose": "ask_wellbeing",
+            "consent_scope": "this_request"
+          }
+        ],
+        "followup_contract": "reply requires this exact request; delivery requires that exact reply, original roles and actual hearing. Neither stage is granted by selecting this request."
+      }
+    },
+    {
+      "id": "teach_recipe",
+      "kind": "recipe_teaching",
+      "bindings": {
+        "teacher_actor": "actor",
+        "student_actor": "actor",
+        "recipe_id": "recipe"
+      },
+      "roles": {
+        "teacher": {
+          "binding": "teacher_actor"
+        },
+        "student": {
+          "binding": "student_actor"
+        }
+      },
+      "distinct_roles": [
+        [
+          "teacher",
+          "student"
+        ]
+      ],
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "knowledge",
+              "knower": {
+                "role": "student"
+              },
+              "fact": {
+                "type": "recipe_connection",
+                "args": {
+                  "person": {
+                    "role": "teacher"
+                  },
+                  "recipe": {
+                    "binding": "recipe_id"
+                  }
+                }
+              },
+              "provenance_kinds": [
+                "heard"
+              ]
+            },
+            {
+              "op": "knowledge",
+              "knower": {
+                "role": "teacher"
+              },
+              "fact": {
+                "type": "recipe_basics",
+                "args": {
+                  "recipe": {
+                    "binding": "recipe_id"
+                  }
+                }
+              },
+              "provenance_kinds": [
+                "initial",
+                "heard",
+                "observed"
+              ]
+            },
+            {
+              "op": "not",
+              "rule": {
+                "op": "knowledge",
+                "knower": {
+                  "role": "student"
+                },
+                "fact": {
+                  "type": "recipe_basics",
+                  "args": {
+                    "recipe": {
+                      "binding": "recipe_id"
+                    }
+                  }
+                },
+                "provenance_kinds": [
+                  "initial",
+                  "heard",
+                  "relayed",
+                  "observed"
+                ]
+              }
+            }
+          ]
+        },
+        "continuation": {
+          "op": "near",
+          "actors": [
+            {
+              "role": "teacher"
+            },
+            {
+              "role": "student"
+            }
+          ],
+          "channel": "personal"
+        }
+      },
+      "action": {
+        "id": "teach_basics",
+        "principal": {
+          "role": "teacher"
+        },
+        "source": {
+          "kind": "heard",
+          "speaker": {
+            "role": "teacher"
+          },
+          "listener": {
+            "role": "student"
+          }
+        },
+        "requires": {
+          "op": "knowledge",
+          "knower": {
+            "role": "teacher"
+          },
+          "fact": {
+            "type": "recipe_basics",
+            "args": {
+              "recipe": {
+                "binding": "recipe_id"
+              }
+            }
+          },
+          "provenance_kinds": [
+            "initial",
+            "heard",
+            "observed"
+          ]
+        },
+        "effects": [
+          {
+            "kind": "learn",
+            "knower": {
+              "role": "student"
+            },
+            "fact": {
+              "type": "recipe_basics",
+              "args": {
+                "recipe": {
+                  "binding": "recipe_id"
+                }
+              }
+            },
+            "provenance": "current_hearing_receipt"
+          }
+        ],
+        "repeat_scope": "student+recipe_basics; later lines in the same episode use continuity, not the start rule"
+      }
+    }
+  ],
+  "instances": [
+    {
+      "example": "home_offer",
+      "bindings": {
+        "host_actor": "player",
+        "guest_actor": "farid"
+      }
+    },
+    {
+      "example": "friend_request",
+      "bindings": {
+        "sender_actor": "farid",
+        "recipient_actor": "youssef",
+        "courier_actor": "player"
+      }
+    },
+    {
+      "example": "teach_recipe",
+      "bindings": {
+        "teacher_actor": "farid",
+        "student_actor": "player",
+        "recipe_id": "shawarma"
+      }
+    },
+    {
+      "example": "teach_recipe",
+      "bindings": {
+        "teacher_actor": "nadia",
+        "student_actor": "player",
+        "recipe_id": "shawarma"
+      },
+      "note": "Disposable future authoring demonstration only: explicitly seed Nadia's knowledge and author/hear her connection first; this binding alone grants no knowledge."
+    }
+  ]
+}
