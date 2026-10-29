@@ -359,5 +359,24 @@
     },
     "save_impact": "New game required for earlier pre-alpha saves, including revision19; files preserved.",
     "verification": "Independently downloaded immutable archive; exact bytes/SHA256, ZIP CRC, clean source/version/save format and Arabic guide verified."
+  },
+  {
+    "version": "semantic-preview-ae643b3",
+    "game_version": "0.3.0-prealpha.1",
+    "stage": "pre-alpha",
+    "publication_state": "development",
+    "path": "semantic-preview-ae643b3/kiosk-on-the-nile-0.3.0-prealpha.1-dev-ae643b33fff2-web.zip",
+    "bytes": 12119277,
+    "sha256": "ce4fc94b93e9264800fd62b43d6de1cb0c6b058ded3aeb78da4ef7892599920a",
+    "original_branch": "main",
+    "original_commit": "ae643b33fff2e9951deed114db47dd64a5b8ca5d",
+    "archive_commit": "5aae4533c7508683470f1166531aac2ac51a0ba3",
+    "url": "https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/5aae4533c7508683470f1166531aac2ac51a0ba3/semantic-preview-ae643b3/kiosk-on-the-nile-0.3.0-prealpha.1-dev-ae643b33fff2-web.zip",
+    "save_format": {
+      "schema": 4,
+      "revision": 21
+    },
+    "save_impact": "New game required for all earlier unpublished revisions, including20; primary and backup files preserved.",
+    "verification": "Independently downloaded immutable archive: exact bytes/SHA256, ZIP CRC, clean source/version/save format and Arabic guide verified. Native integrated and matched performance evidence remains bounded; human feel acceptance pending."
   }
 ]

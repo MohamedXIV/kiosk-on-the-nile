@@ -1,6 +1,6 @@
 # Preserved playable Web archives
 
-41 verified archives; original commits remain reachable. Do not merge artifact history into source. Extract complete ZIP and use local HTTP. SHA256/provenance: manifest.json.
+42 verified archives; original commits remain reachable. Do not merge artifact history into source. Extract complete ZIP and use local HTTP. SHA256/provenance: manifest.json.
 
 - [accounts-930c928](accounts-930c928/kiosk-on-the-nile-accounts.zip)
 - [body-clock-2fd6048](body-clock-2fd6048/kiosk-on-the-nile-body-clock.zip)
@@ -57,3 +57,5 @@ This retained development preview includes all agreed remaining/deferred batches
 - [Arabic guide](playtest-correction-10143f7/PLAYTEST_GUIDE_AR.md)
 
 Fixes rendering-batch fragmentation and premature/unheard conversation topics. Start a new game (revision20). This development preview preserves all prior archive bytes; hardware/browser smoothness remains for player feedback.
+- [semantic-preview-ae643b3](semantic-preview-ae643b3/kiosk-on-the-nile-0.3.0-prealpha.1-dev-ae643b33fff2-web.zip) — 0.3.0-prealpha.1, new game required (revision21); source ae643b33fff2e9951deed114db47dd64a5b8ca5d.
+
