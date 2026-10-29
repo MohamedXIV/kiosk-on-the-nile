@@ -1,0 +1,25 @@
+{
+  "name": "Godot",
+  "version": "4.7.2",
+  "reported_version": "4.7.2.stable.official.ed1daf0bf",
+  "editor_sha256": "8d106cbe6144c2dc7e881d61d2429c1a8a76e6b22ef48bd5e48dcf934953f71e",
+  "templates_sha256": {
+    "version.txt": "38885c88f75abbc797a1db7559719800279a00cfb9fa8b2e2868a7f6f84bad2e",
+    "web_debug.zip": "5e6696b42ce07f908fce1698cc227e11807399456b6ab986e69a125eae3596ee",
+    "web_dlink_debug.zip": "4238f2d660ed2f0ffc8323b160ca2dbca0a4161345164385dceb9aade32be3ed",
+    "web_dlink_nothreads_debug.zip": "2e7256717078c829ec7b02dadf9e20c490d7ae861b12903b8c7637ba50da554c",
+    "web_dlink_nothreads_release.zip": "555acaddcfde759a431f326a244cb7e20209ef534f7d221b3e2f10879821d8ee",
+    "web_dlink_release.zip": "6e1a1d21032ec35d7c4bf9e3a5c9892ef6795ecc5b22f6fa92f50a820523544e",
+    "web_nothreads_debug.zip": "08962aefef811b603541d7951ac67ef00413aad2d978855183c28adee98f626a",
+    "web_nothreads_release.zip": "d3ee2f08cef0cf3cf6678a6355a92a8db48ccdd35cbd2e8bfd5f0e8a0b4032a0",
+    "web_release.zip": "02f0dca13ed3d8343fa68f8f88ac80295562408d71aa67157e8b96ddebaa67a3"
+  },
+  "web_wasm_sha256": {
+    "debug": "11ea19645368f8e73cf337b59cfd7ceeb4ebb51f7a3bbf77d1a5c3ddfedbc522",
+    "release": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0"
+  },
+  "pinned_archives": {
+    "godot": "cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4",
+    "templates": "f298490b8d44d934be425a5a65a51bf15f422428b229a06a6e11d9ffea248011"
+  }
+}

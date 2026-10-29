@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REAL PROVIDER PARITY true { "status": "blocked", "allowed": false, "reasons": [{ "id": "policy_acquaintance_blocked", "path": "offer/offer/1/0/0" }, { "id": "policy_relationship_blocked", "path": "offer/offer/1/0/1" }, { "id": "policy_relationship_blocked", "path": "offer/offer/1/0/2" }], "evidence": [{ "introduced": false, "introduced_at": -1, "calendar_days": 0, "shared_days": 0, "source": "" }, { "value": 0.0, "from": "farid", "to": "player", "axis": "familiarity" }, { "value": 0.0, "from": "farid", "to": "player", "axis": "trust" }] }
+PARTICIPANT visit_1
+WARNING: 48 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
