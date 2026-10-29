@@ -1,0 +1,53 @@
+extends SceneTree
+var bad: int=0
+func _initialize():call_deferred("run")
+func check(ok: bool,label: String):
+ print(label," ",ok)
+ if not ok:bad+=1
+func run():
+ var schemas: Dictionary={"types":{"actor":["a","b","player"],"recipe":["shawarma"],"fact":["f"]},"axes":["familiarity"],"channels":["personal"],"queries":{"gate":{}},"events":{}}
+ var always={"op":"time_window","start":0,"end":1440}
+ var cat={"contract_version":1,"profiles":{},"policies":{},"fact_types":{},"topics":{"demo":{"bindings":{"person":"actor"},"roles":{"partner":{"binding":"person"}},"turn_roles":["speaker"],"stages":{"start":always,"continuation":always},"choices":{"yes":{"op":"not","rule":{"op":"relationship","from":{"role":"speaker"},"to":{"actor":"player"},"axis":"familiarity","compare":">=","value":4}}},"actions":{}}}}
+ var c:=NarrativePolicyValidation.compile(cat,schemas);check(c.ok,"COMPILE")
+ if not c.ok:print(c.details);quit(1);return
+ var p:=NarrativePolicy.new();p.configure(c.details,{"time_window":func(_r,_c):return NarrativePolicy.answer(true),"relationship":func(_r,_c):return NarrativePolicy.answer(false)},Callable())
+ var bound:=p.bind("demo",{"person":"a"},{})
+ check(bound.ok,"BIND")
+ check(p.evaluate(bound.details.context,"choice","yes").status=="invalid","MISSING ROLE UNDER NOT INVALID")
+ check(not p.bind("demo",{"person":"unknown"},{}).ok,"UNKNOWN ACTOR REJECT")
+ check(not p.bind("demo",{"person":"a","extra":"b"},{}).ok,"EXTRA BINDING REJECT")
+ check(not p.bind("demo",{"person":"b"},{},{},{"partner":"a"}).ok,"SAVED ACTOR SWAP REJECT")
+ cat.topics.demo.stages.start={"op":"any","rules":[always,{"op":"domain","id":"gate","args":{}}]}
+ c=NarrativePolicyValidation.compile(cat,schemas);check(c.ok,"COMPILE ANY")
+ p.configure(c.details,{"time_window":func(_r,_c):return NarrativePolicy.answer(true)},Callable())
+ bound=p.bind("demo",{"person":"a"},{})
+ check(p.evaluate(bound.details.context,"start").status=="invalid","ANY ALLOWED PLUS MISSING PROVIDER INVALID")
+ check(p.evaluate(bound.details.context,"start", "", true).status==p.evaluate(bound.details.context,"start").status,"EXPLAIN SAME PERMISSION")
+ cat.topics.demo.stages.start={"op":"not","rule":{"op":"arbitrary_code"}}
+ check(not NarrativePolicyValidation.compile(cat,schemas).ok,"UNKNOWN OP REJECT")
+ var nested: Dictionary=always
+ for i in range(30):nested={"op":"not","rule":nested}
+ cat.topics.demo.stages.start=nested
+ check(not NarrativePolicyValidation.compile(cat,schemas).ok,"DEEP RULE REJECT")
+ cat.topics.demo.stages.start={"op":"all","rules":[]}
+ for i in range(257):cat.topics.demo.stages.start.rules.append(always)
+ check(not NarrativePolicyValidation.compile(cat,schemas).ok,"EXPANSION LIMIT REJECT")
+ cat.topics.demo.stages.start=always
+ cat.policies={"cycle":{"roles":[],"parameters":{},"requires":{"op":"policy","id":"cycle","roles":{},"parameters":{}}}}
+ check(not NarrativePolicyValidation.compile(cat,schemas).ok,"POLICY CYCLE REJECT")
+ cat.policies={"close":{"roles":["a"],"parameters":{"gate":"profile"},"requires":{"op":"relationship","from":{"role":"a"},"to":{"actor":"player"},"axis":"familiarity","compare":">=","value":{"parameter":"gate","field":"familiarity"}}}}
+ cat.profiles={"unrelated":{"trust":7},"close":{"familiarity":8}}
+ cat.topics.demo.stages.start={"op":"policy","id":"close","roles":{"a":{"binding":"person"}},"parameters":{"gate":"close"}}
+ var profile_result:=NarrativePolicyValidation.compile(cat,schemas)
+ check(profile_result.ok,"ACTUAL NAMED PROFILE INDEPENDENT OF DICTIONARY ORDER")
+ cat.topics.demo.stages.start.parameters.gate="unrelated"
+ check(not NarrativePolicyValidation.compile(cat,schemas).ok,"ACTUAL PROFILE MISSING FIELD REJECT")
+ cat.topics.demo.stages.start.parameters.gate="close"
+ cat.topics.demo.roles["observer"]={"actor":"player"};cat.topics.demo.distinct_roles=[["partner","observer"]]
+ c=NarrativePolicyValidation.compile(cat,schemas);check(c.ok,"DISTINCT ROLES COMPILE")
+ p.configure(c.details,{},Callable())
+ check(not p.bind("demo",{"person":"player"},{}).ok,"CONFLICTING DISTINCT ROLE BINDING REJECT")
+ cat.topics.demo.stages.start.unrecognized=true
+ var malformed:=NarrativePolicyValidation.compile(cat,schemas)
+ check(not malformed.ok and str(malformed.details).contains("demo"),"UNKNOWN FIELD REJECT WITH TOPIC DIAGNOSTIC")
+ print("FAILURES ",bad);quit(bad)

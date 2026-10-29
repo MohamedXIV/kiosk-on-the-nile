@@ -1,6 +1,6 @@
 # Shared semantic policy runtime — implementation plan for #21
 
-> Implementer: read AGENTS.md, docs/RELEASING.md and the contract below. This is a future implementation plan; no runtime is implemented by this document. The user's standing no-automated-suites constraint overrides generic test-suite workflow instructions.
+> Implementer: read AGENTS.md, docs/RELEASING.md and the contract below. Execution completed in the #21 source batch; see the dated delivery record and runnable API. The user's standing no-automated-suites constraint overrides generic test-suite workflow instructions.
 
 **Goal:** Add reusable typed role binding, compiled pure decisions and phase-aware entry points, ready for the knowledge/history adapters and content conversion in #22–#24.
 
@@ -21,9 +21,9 @@ Files: create `game/content/narrative_policy_validation.gd`, `game/narrative/nar
 
 Interfaces: `compile(catalogs, schemas) -> ActionResult`; `bind(topic_id, bindings, presence_handles, stage) -> ActionResult {context}`. Context exposes stable actor roles and typed values separately from ephemeral presence. Decision has allowed/blocked/invalid status, reasons and evidence; it never mutates owners.
 
-- [ ] Implement strict schemas and bounded named-policy/AST expansion (24 levels/256 expanded nodes/8 named levels), reference/role/parameter validation and cycle rejection.
-- [ ] Resolve explicit actor/role/binding refs; reject unknown actors, wrong value types, unavailable turn-local roles and substitutions of persisted actor identity.
-- [ ] Bounded observations: valid instances resolve; missing/extra bindings, unknown fields, cyclic policies, conflicting role constraints and oversized expansion reject with source/topic/reason information. JSON examples are selected fragments; do not silently accept commentary fields as runtime schema.
+- [x] Implement strict schemas and bounded named-policy/AST expansion (24 levels/256 expanded nodes/8 named levels), reference/role/parameter validation and cycle rejection.
+- [x] Resolve explicit actor/role/binding refs; reject unknown actors, wrong value types, unavailable turn-local roles and substitutions of persisted actor identity.
+- [x] Bounded observations: valid instances resolve; missing/extra bindings, unknown fields, cyclic policies, conflicting role constraints and oversized expansion reject with source/topic/reason information. JSON examples are selected fragments; do not silently accept commentary fields as runtime schema.
 
 ## Task B — pure evaluation
 
@@ -31,9 +31,9 @@ File: create `game/narrative/narrative_policy.gd`; adapt `condition_evaluator.gd
 
 Interface: `evaluate(policy_id, context, stage, explain=false) -> PolicyDecision`. Provider capabilities are explicit. An absent per-NPC knowledge/history provider remains invalid/blocked until #22/#23; it never substitutes player knowledge. Initial providers for generic relationship, world clock, presence/channel and existing domain evidence read their current owners.
 
-- [ ] Implement all/any/not with invalid propagation; typed predicates and explicit role/parameter maps; stable ordered reason IDs and evidence refs.
-- [ ] Keep compilation out of queries. Begin with indexed reads and no cross-frame Boolean cache. Record call counts/allocations before considering memoization.
-- [ ] Bounded observations: a valid absent fact is false, missing role under not is invalid, asymmetric relation differs by direction, clock boundaries and moved actors update decisions, explain and normal modes agree on permission.
+- [x] Implement all/any/not with invalid propagation; typed predicates and explicit role/parameter maps; stable ordered reason IDs and evidence refs.
+- [x] Keep compilation out of queries. Begin with indexed reads and no cross-frame Boolean cache. Record call counts/allocations before considering memoization.
+- [x] Bounded observations: a valid absent fact is false, missing role under not is invalid, asymmetric relation differs by direction, clock boundaries and moved actors update decisions, explain and normal modes agree on permission.
 
 ## Task C — lifecycle routing without partial content migration
 
@@ -41,15 +41,17 @@ Files: adapt `narrative_director.gd`, `conversation_session.gd`, `personal_conve
 
 Interfaces: stage-aware offer/start/choice/continuation/action authorization; stable authored choice IDs; stable binding/start-evidence storage. Transactional effect preparation/knowledge/social implementation remains #22/#23, and actual family conversion #24.
 
-- [ ] Route an explicitly authored disposable converted topic through menu/direct start/automatic offer/manual and automatic choices/resume using the same decision contract. Keep a recorded compatibility list for unconverted paths; never evaluate two conflicting authorities for the same converted topic.
-- [ ] Start checks grant no effects. Continuation checks do not rerun consumed start-only predicates; resume verifies role/content/source identity and uncommitted current requirements without replay.
-- [ ] No automatic fallback bypasses the converted choice guard. Safe wait/stop when every authored candidate is blocked. Keep refusal/leaving paths available where authored.
-- [ ] Bounded compiled-Ink observations: open-unheard-cancel, stale offer/choice, teaching-like start condition changed by its own heard result, current save/load and actor-return resume, wrong-actor binding, repeated effect identity and automatic filtered choice. Any save representation change is explicit, preserving unsupported bytes; no historical migration by default.
+- [x] Route an explicitly authored disposable converted topic through menu/direct start/automatic offer/manual and automatic choices/resume using the same decision contract. Keep a recorded compatibility list for unconverted paths; never evaluate two conflicting authorities for the same converted topic.
+- [x] Start checks grant no effects. Continuation checks do not rerun consumed start-only predicates; resume verifies role/content/source identity and uncommitted current requirements without replay.
+- [x] No automatic fallback bypasses the converted choice guard. Safe wait/stop when every authored candidate is blocked. Keep refusal/leaving paths available where authored.
+- [x] Bounded compiled-Ink observations: open-unheard-cancel, stale offer/choice, teaching-like start condition changed by its own heard result, current save/load and actor-return resume, wrong-actor binding, repeated effect identity and automatic filtered choice. Any save representation change is explicit, preserving unsupported bytes; no historical migration by default.
 
 ## Task D — review and dependency handoff
 
-- [ ] Independently review compiled schema/evaluation and lifecycle routing against the contract matrix; correct material findings with focused observations.
-- [ ] Run tracked content/Ink/localization/import/build checks appropriate to actual code changes. Observe aggregate policy work on a recorded four-actor reference fixture; compare against the proposed ≤1ms mean/≤2ms p95 evaluation budget without claiming user-device FPS.
-- [ ] Publish exact-source evidence and API/provider handoff for #22/#23; mark remaining knowledge/history/content adapters and diagnostics explicitly. Do not close #24/#26 or produce a release just because the evaluator compiles.
+- [x] Independently review compiled schema/evaluation and lifecycle routing against the contract matrix; correct material findings with focused observations.
+- [x] Run tracked content/Ink/localization/import/build checks appropriate to actual code changes. Observe aggregate policy work on a recorded four-actor reference fixture; compare against the proposed ≤1ms mean/≤2ms p95 evaluation budget without claiming user-device FPS.
+- [x] Publish exact-source evidence and API/provider handoff for #22/#23; mark remaining knowledge/history/content adapters and diagnostics explicitly. Do not close #24/#26 or produce a release just because the evaluator compiles.
 
 The plan deliberately does not prescribe future NPC knowledge seeds or rewrite finances/workshop simulation. Those are authored/provider decisions tracked by the corresponding issues and the contract's open-decision register.
+
+Execution record: [foundation delivery](../../notes/2026-10-29-semantic-policy-runtime.md), [runnable API](../../architecture/semantic-policy-runtime.md). Checkmarks describe this bounded foundation, not future owner adapters/content migration.

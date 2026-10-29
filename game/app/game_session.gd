@@ -50,6 +50,7 @@ var service: ServiceSystem
 var visitors: VisitorService
 var social_life: SocialLife
 var relationships: RelationshipStore
+var semantic: SemanticNarrative
 var conditions: ConditionEvaluator
 var effects: NarrativeEffects
 var inner: InnerMonologue
@@ -268,6 +269,10 @@ func configure(source: SessionConfig) -> ActionResult:
   story.raw_json = JSON.stringify(source.section("story_"+id),"",true)
   story.sha256 = story.raw_json.sha256_text()
   stories[id] = story
+ semantic=SemanticNarrative.new()
+ var semantic_result := semantic.configure(self)
+ if not semantic_result.ok:return semantic_result
+ conditions.semantic=semantic
  var narrative_result := narrative.configure(self,source.section("encounters"),stories)
  if not narrative_result.ok: return narrative_result
  visitors.peer_available=func(id,own):

@@ -1,0 +1,108 @@
+extends SceneTree
+var s: GameSession
+var config: SessionConfig
+var bad: int=0
+var locale := LocaleService.new()
+func _initialize():call_deferred("run")
+func check(ok: bool,label: String,details: Variant=""):
+ print(label," ",ok," ",details)
+ if not ok:bad+=1
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var loaded:=store.load_directory("res://content");check(loaded.ok,"PRODUCTION CONTENT")
+ var bundle:=store.bundle();locale.configure(bundle)
+ var yes={"op":"time_window","start":0,"end":1440};var no={"op":"not","rule":yes}
+ var knows={"op":"knowledge","knower":{"actor":"player"},"fact":{"type":"legacy_player_fact","args":{"id":"KNOWN_CHEAP_FAN"}},"provenance_kinds":["heard","initial"]}
+ bundle.narrative_policies={"contract_version":1,"profiles":{},"policies":{},"fact_types":{"legacy_player_fact":{"id":"fact"}},"topics":{"demo":{"bindings":{"person":"actor"},"roles":{"partner":{"binding":"person"},"observer":{"actor":"player"}},"stages":{"start":{"op":"all","rules":[{"op":"not","rule":knows},{"op":"domain","id":"kiosk.open","args":{}}]},"continuation":yes},"choices":{"blocked":no,"continue_chat":{"op":"domain","id":"kiosk.open","args":{}}},"actions":{"teach":yes}}}}
+ bundle.encounters.semantic_demo={"story":"semantic_demo","semantic_topic":"demo","semantic_bindings":{"person":{"participant":0}},"manual":true,"optional":true,"choice_expiry":8,"listen_choice":1,"requires":{},"offer_requires":{},"advancement":"manual"}
+ bundle.story_semantic_demo=JSON.parse_string(FileAccess.get_file_as_string("res://work/semantic-runtime/demo.ink.json"))
+ bundle.visitors.characters.farid.manual_encounters=["semantic_demo"];bundle.visitors.characters.youssef.manual_encounters=["semantic_demo"]
+ config=SessionConfig.new(bundle,"semantic-prototype")
+ check(ContentValidation.validate(bundle).ok,"OPT IN CONTENT VALIDATION")
+ s=GameSession.new();root.add_child(s);var result:=s.configure(config);check(result.ok,"CONFIG",result.details)
+ if not result.ok:quit(1);return
+ s.start_new();s.kiosk_open=true;s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var v:=s.visitors.spawn(&"farid");v.phase=&"staying";v.pose.ground=s.player_ground;v.destination=v.pose.ground;v.shopping_state=&"declined"
+ check(s.narrative.manual_topics_for(v.id).any(func(t):return t.key=="semantic/semantic_demo"),"MENU OFFER")
+ s.kiosk_open=false
+ result=await s.narrative.start_manual_topic(v.id,"semantic/semantic_demo")
+ check(not result.ok,"STALE OFFER RECHECK")
+ s.kiosk_open=true
+ # Start out of hearing, cancel without acquiring knowledge.
+ var peer:=s.visitors.spawn(&"youssef");peer.phase=&"staying";peer.pose.ground=s.player_ground;peer.destination=peer.pose.ground;peer.shopping_state=&"declined"
+ v.pose.ground=s.player_ground+Vector2(15,0)
+ result=await s.narrative.start(&"semantic_demo",PackedStringArray([str(v.id),str(peer.id)]),{"manual_read":false})
+ check(result.ok,"AUTOMATIC OPEN UNHEARD",result.message_key)
+ check(not s.knowledge.has(&"KNOWN_CHEAP_FAN"),"NEAR BYSTANDER DOES NOT TEACH FAR SPEECH")
+ s.narrative.cancel_all();s.personal.leave();v.pose.ground=s.player_ground
+ result=await s.narrative.start_manual_topic(v.id,"semantic/semantic_demo")
+ check(result.ok,"MANUAL START",result.message_key)
+ if not result.ok:quit(1);return
+ var c:ConversationSession=s.narrative.sessions[result.details.session_id]
+ check(s.knowledge.has(&"KNOWN_CHEAP_FAN"),"ACTUAL HEARD EFFECT")
+ check(s.semantic.decide(bundle.encounters.semantic_demo,PackedStringArray([str(peer.id)]),"continuation","",c).status=="invalid","WRONG ACTOR CANNOT RESUME")
+ check(not s.narrative.manual_topics_for(v.id).any(func(t):return t.key=="semantic/semantic_demo"),"FRESH START NOW BLOCKED")
+ var choices:=s.narrative.choices(c)
+ check(choices.size()==1 and choices[0].semantic_id=="continue_chat","STABLE CHOICE FILTER")
+ check(not s.narrative.choose(c.id,c.choice_id(c.current.choices[0]),true).ok,"AUTO DOES NOT BYPASS FILTER")
+ s.kiosk_open=false
+ check(s.narrative.choices(c).is_empty(),"ALL CHOICES BLOCKED SAFE EMPTY")
+ check(not s.narrative.choose(c.id,StringName(choices[0].id)).ok,"STALE CHOICE RECHECK")
+ s.kiosk_open=true
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var snapshot:=codec.encode(s);var restored:=await codec.create_candidate(snapshot,config)
+ check(restored.ok,"SELF INVALIDATING CURRENT SAVE RESTORE",restored.message_key)
+ if restored.ok:
+  var other:GameSession=restored.details.session
+  var saved:ConversationSession=other.narrative.sessions[str(c.id)]
+  check(other.narrative.choices(saved).size()==1,"RESTORED CHOICE FILTER")
+  other.queue_free()
+ var identity:=s.knowledge.snapshot();s.personal.leave();check(s.personal.snapshot().paused.has("farid"),"PAUSED BY ACTOR")
+ var paused: Dictionary=s.personal.snapshot().paused.farid
+ var changed_proof: Dictionary=paused.duplicate(true)
+ changed_proof.context_extra.semantic_start.identity.roles.partner="youssef"
+ check(not s.semantic.validate_detached(bundle.encounters.semantic_demo,changed_proof),"PAUSED ROLE SWAP REJECT")
+ s.visitors.clear_visits();v=s.visitors.spawn(&"farid");v.phase=&"staying";v.pose.ground=s.player_ground;v.destination=v.pose.ground;v.shopping_state=&"declined"
+ result=await s.personal.open_for(v.id);check(result.ok,"RETURNING ACTOR RESUME",result.message_key)
+ check(s.knowledge.snapshot()==identity,"NO HEARING REPLAY")
+ if not result.ok:quit(1);return
+ var active:ConversationSession=s.narrative.sessions[str(c.id)]
+ choices=s.narrative.choices(active)
+ if not choices.is_empty():check(s.narrative.choose(active.id,StringName(choices[0].id)).ok,"CONTINUATION AFTER LEARNING")
+ s.narrative.cancel_all();s.personal.leave()
+ # Populated four-actor reference fixture, five actual read-only providers.
+ var actors=["farid","youssef","amgad","nadia"]
+ var rules=[{"op":"available","actors":[{"role":"partner"}]},{"op":"near","actors":[{"role":"partner"},{"actor":"player"}],"channel":"personal"},{"op":"relationship","from":{"role":"partner"},"to":{"actor":"player"},"axis":"familiarity","compare":">=","value":0},{"op":"time_window","start":900,"end":960},{"op":"domain","id":"kiosk.open","args":{}}]
+ s.config.data.narrative_policies.topics.demo.stages.continuation={"op":"all","rules":rules}
+ check(s.semantic.configure(s).ok,"REFERENCE RECOMPILE")
+ s.clock.minutes=930;s.kiosk_open=true
+ for actor in actors:
+  var visit=s.semantic._record(actor)
+  if visit==null:visit=s.visitors.spawn(StringName(actor))
+  visit.phase=&"staying";visit.pose.ground=s.player_ground;visit.pose.location_id=s.player_pose.location_id;visit.destination=visit.pose.ground;visit.shopping_state=&"declined"
+ var bound=s.semantic.policy.bind("demo",{"person":"farid"},{})
+ check(s.semantic.policy.evaluate(bound.details.context,"continuation").allowed,"FIVE PROVIDER BASELINE")
+ s.clock.minutes=960;check(s.semantic.policy.evaluate(bound.details.context,"continuation").allowed,"CLOCK END INCLUSIVE")
+ s.clock.minutes=960.01;check(not s.semantic.policy.evaluate(bound.details.context,"continuation").allowed,"CLOCK CHANGE FRESH")
+ s.clock.minutes=930
+ var farid=s.semantic._record("farid");farid.pose.ground+=Vector2(20,0)
+ check(not s.semantic.policy.evaluate(bound.details.context,"continuation").allowed,"MOVED ACTOR FRESH")
+ farid.pose.ground=s.player_ground
+ s.relationships.adjust(&"farid",&"player",&"familiarity",10)
+ check(s.relationships.value(&"farid",&"player",&"familiarity")!=s.relationships.value(&"player",&"farid",&"familiarity"),"ACTUAL DIRECTIONAL STORE")
+ s.config.data.narrative_policies.topics.demo.choices={"forward":{"op":"relationship","from":{"role":"partner"},"to":{"actor":"player"},"axis":"familiarity","compare":">=","value":5},"reverse":{"op":"relationship","from":{"actor":"player"},"to":{"role":"partner"},"axis":"familiarity","compare":">=","value":5}}
+ check(s.semantic.configure(s).ok,"DIRECTIONAL RULES COMPILE")
+ bound=s.semantic.policy.bind("demo",{"person":"farid"},{})
+ check(s.semantic.policy.evaluate(bound.details.context,"choice","forward").allowed and not s.semantic.policy.evaluate(bound.details.context,"choice","reverse").allowed,"DIRECTIONAL POLICY DECISIONS DIFFER")
+ var samples: Array=[]
+ for frame in range(240):
+  await process_frame
+  var began:=Time.get_ticks_usec()
+  for actor in actors:
+   var b:=s.semantic.policy.bind("demo",{"person":actor},{})
+   s.semantic.policy.evaluate(b.details.context,"continuation")
+  samples.append(float(Time.get_ticks_usec()-began)/1000.0)
+ samples.sort();var total:=0.0
+ for n in samples:total+=n
+ print("FOUR PRESENT ACTORS FIVE PROVIDERS 240 FRAMES mean_ms=",total/samples.size()," p95_ms=",samples[int(samples.size()*0.95)]," calls=",s.semantic.policy.calls," nodes=",s.semantic.policy.nodes)
+ print("FAILURES ",bad);s.queue_free();codec.queue_free();store.queue_free();await process_frame;quit(bad)

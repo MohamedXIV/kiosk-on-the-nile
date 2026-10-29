@@ -7,6 +7,8 @@ func _init(config: Dictionary = {}) -> void:
  _catalog = config.get("facts",[]).duplicate()
  for fact in config.get("initial_facts",[]): _facts[str(fact)] = {"source":"initial"}
  for note in config.get("initial_notes",[]): _notes.append(str(note))
+func record(fact: StringName) -> Dictionary:
+ return _facts.get(str(fact),{}).duplicate(true)
 func has(fact: StringName) -> bool:
  return _facts.has(str(fact))
 func learn(fact: StringName, note: String, source: String = "") -> bool:
