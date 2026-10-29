@@ -4,6 +4,7 @@ extends RefCounted
 var _events: Array[Dictionary]=[]
 var _ids: Dictionary={}
 var _heard_actors: Dictionary={}
+var _speech_chapters: Dictionary={}
 var _actors: Array=[]
 var _clock: GameClock
 var revision: int=0
@@ -18,6 +19,7 @@ func append_once(event: Dictionary) -> ActionResult:
  _ids[event.id]=_events.size()
  _events.append(event.duplicate(true))
  _heard_actors[event.actor]=true
+ if event.channel=="speech":_speech_chapters[event.chapter]=true
  revision+=1
  return ActionResult.success()
 func entries(filters: Dictionary = {}) -> Array[Dictionary]:
@@ -31,6 +33,7 @@ func entries(filters: Dictionary = {}) -> Array[Dictionary]:
  return result
 func event(id: String) -> Dictionary:
  return _events[int(_ids[id])].duplicate(true) if _ids.has(id) else {}
+func has_speech(chapter: String) -> bool:return _speech_chapters.has(chapter)
 func has_actor(actor: String) -> bool:return _heard_actors.has(actor)
 func snapshot() -> Dictionary:
  return {"events":_events.duplicate(true)}
@@ -45,6 +48,7 @@ func restore(data: Dictionary) -> ActionResult:
  _events=candidate._events
  _ids=candidate._ids
  _heard_actors=candidate._heard_actors
+ _speech_chapters=candidate._speech_chapters
  revision+=1
  return ActionResult.success()
 func _valid(e: Dictionary) -> bool:

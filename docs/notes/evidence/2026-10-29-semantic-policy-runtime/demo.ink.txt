@@ -1,0 +1,8 @@
+VAR character_id = "farid"
+I know a little about a useful fan. # speaker:{character_id} # policy_action:teach # effect:learn\|KNOWN_CHEAP_FAN\|A heard prototype fact.
+* [Ask a blocked follow-up # policy_choice:blocked]
+  This must never be selected.
+  -> END
+* [Continue the conversation # policy_choice:continue_chat]
+  We can finish after you have heard the information. # speaker:{character_id}
+  -> END

@@ -54,6 +54,7 @@ func apply(effect: Dictionary, occurrence_id: StringName, speaker: String = "", 
   "learn": _knowledge.learn(StringName(effect.fact_id),effect.note,str(occurrence_id))
  _applied[str(occurrence_id)] = true
  return ActionResult.success()
+func applied(id: String) -> bool:return _applied.has(id)
 func snapshot() -> Dictionary:
  return {"applied":_applied.duplicate()}
 func restore(data: Dictionary) -> ActionResult:

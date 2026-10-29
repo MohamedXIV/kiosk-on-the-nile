@@ -11,6 +11,25 @@ var _definition: StoryDefinition
 var _frame := NarrativeTypes.Frame.new()
 var _error: String = ""
 var _context: Dictionary={}
+var _policy_choices: Dictionary={}
+var _policy_map_valid: bool=true
+func _scan_policy_choices(value: Variant, depth: int = 0) -> void:
+ if depth>128:_policy_map_valid=false;return
+ if value is Array:
+  var pending := ""
+  for part in value:
+   if part is String and part.begins_with("^policy_choice:"):
+    var id: String = part.trim_prefix("^policy_choice:").strip_edges()
+    if not pending.is_empty() or not id.is_valid_identifier():_policy_map_valid=false
+    pending=id
+   elif part is Dictionary and part.has("*") and not pending.is_empty():
+    if not part["*"] is String or (_policy_choices.has(part["*"]) and _policy_choices[part["*"]]!=pending):_policy_map_valid=false
+    else:_policy_choices[part["*"]]=pending
+    pending=""
+   _scan_policy_choices(part,depth+1)
+  if not pending.is_empty():_policy_map_valid=false
+ elif value is Dictionary:
+  for part in value.values():_scan_policy_choices(part,depth+1)
 static func valid_autonomous_story(compiled: Dictionary, fallback: Variant) -> bool:
  # Compiled Ink details stay within this adapter. Check declarations before activation.
  var containers: Variant=compiled.get("root")
@@ -38,6 +57,9 @@ func open(definition: StoryDefinition, context: Dictionary, cache: InkPlayerCach
 func _open(definition: StoryDefinition, context: Dictionary, cache: InkPlayerCache) -> ActionResult:
  close()
  _definition = definition
+ _policy_choices={};_policy_map_valid=true
+ if definition.raw_json.contains("policy_choice:"):_scan_policy_choices(JSON.parse_string(definition.raw_json))
+ if not _policy_map_valid:return ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_policy_choice_map")
  var json := definition.raw_json if not definition.raw_json.is_empty() else FileAccess.get_file_as_string(definition.compiled_path)
  if not JSON.parse_string(json) is Dictionary or json.sha256_text() != definition.sha256:
   return ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"invalid_story")
@@ -102,7 +124,7 @@ func _advance_frame() -> NarrativeTypes.Frame:
     return _frame
   for tag in _player.current_tags:
    var parts: PackedStringArray = str(tag).split(":", true, 1)
-   if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join", "loc", "autonomous"]:
+   if parts.size() != 2 or not parts[0].strip_edges() in ["speaker", "duration", "effect", "join", "loc", "autonomous", "policy_action"]:
     _frame.result = ActionResult.failure(ActionResult.Code.INVALID_CONTENT, &"unknown_story_metadata")
     _frame.effects.clear()
     _frame.ended = true
@@ -115,6 +137,10 @@ func _advance_frame() -> NarrativeTypes.Frame:
       _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
       return _frame
      _frame.autonomous=value
+    "policy_action":
+     if not value.is_valid_identifier():
+      _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_policy_action");return _frame
+     _frame.policy_action=value
     "loc":
      _frame.loc_id=value
      _frame.loc_args=_context.get("localization_args",{}).duplicate(true)
@@ -154,6 +180,15 @@ func _advance_frame() -> NarrativeTypes.Frame:
   if choice.tags is Array:
    for tag in choice.tags:
     if str(tag).begins_with("loc:"):record["loc_id"]=str(tag).trim_prefix("loc:").strip_edges()
+  for tag in choice.tags if choice.tags is Array else []:
+   if str(tag).begins_with("policy_choice:"):
+    var stable := str(tag).trim_prefix("policy_choice:").strip_edges()
+    if not stable.is_valid_identifier() or _frame.choices.any(func(c):return c.get("semantic_id")==stable):
+     _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_policy_choice");return _frame
+    record["semantic_id"]=stable
+  var mapped: String=str(_policy_choices.get(choice.path_string_on_choice,""))
+  if record.get("semantic_id","")!=mapped:
+   _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_policy_choice_map");return _frame
   _frame.choices.append(record)
  if not _frame.autonomous.is_empty() and (not _valid_autonomous_path(_frame.autonomous) or _frame.choices.is_empty()):
   _frame.result=ActionResult.failure(ActionResult.Code.INVALID_CONTENT,&"invalid_autonomous_path")
@@ -187,6 +222,7 @@ func restore(data: Dictionary) -> ActionResult:
  for flow in state.flows.values():
   if not flow is Dictionary or not flow.get("callstack") is Dictionary or not flow.get("outputStream") is Array or not flow.get("currentChoices") is Array: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_flow")
  var displayed: Dictionary = data.frame
+ if displayed.has("policy_action") and (not displayed.policy_action is String or not displayed.policy_action.is_valid_identifier()):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_policy_action")
  if displayed.has("autonomous") and (not displayed.autonomous is String or not displayed.autonomous.is_valid_identifier()):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_autonomous_path")
  if displayed.has("loc_id") and (not displayed.loc_id is String or not displayed.get("loc_args") is Dictionary):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_localized_frame")
  if not displayed.get("text") is String or not displayed.get("speaker_id") is String or not ContentValidation.number(displayed.get("duration")) or displayed.duration<=0 or not displayed.get("choices") is Array or not displayed.get("effects") is Array or not displayed.get("ended") is bool: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_frame")
@@ -211,7 +247,15 @@ func restore(data: Dictionary) -> ActionResult:
  if not _error.is_empty() or _player.current_choices.size()!=displayed.choices.size():
   _player.set_state(previous)
   return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_state")
+ var actual_action := ""
+ for tag in _player.current_tags:
+  if str(tag).begins_with("policy_action:"):actual_action=str(tag).trim_prefix("policy_action:").strip_edges()
+ if displayed.get("policy_action","")!=actual_action:
+  _player.set_state(previous);return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_policy_action")
  for i in range(_player.current_choices.size()):
+  var actual_choice: String=str(_policy_choices.get(_player.current_choices[i].path_string_on_choice,""))
+  if displayed.choices[i].get("semantic_id","")!=actual_choice:
+   _player.set_state(previous);return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_policy_choice")
   if _player.current_choices[i].text.strip_edges()!=displayed.choices[i].text or _player.current_choices[i].index!=int(displayed.choices[i].index):
    _player.set_state(previous)
    return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_ink_choices")

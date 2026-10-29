@@ -1,6 +1,7 @@
 class_name ConditionEvaluator
 extends RefCounted
 ## Finite declarative queries; never invokes content-provided methods.
+var semantic: SemanticNarrative
 var presence: ActorPresence
 var social_life: SocialLife
 var social_actions: Array=[]
@@ -110,3 +111,7 @@ func permits(rule: Dictionary, participants: PackedStringArray = PackedStringArr
     if visit == null or visit.pose.location_id!=_player.location_id or visit.pose.ground.distance_to(_player.ground)>float(value): return false
    return true
  return false
+
+func semantic_decision(entry: Dictionary, participants: PackedStringArray, stage: String, key: String = "", conversation: ConversationSession = null) -> PolicyDecision:
+ if semantic==null:return PolicyDecision.make("invalid","semantic_service_unavailable")
+ return semantic.decide(entry,participants,stage,key,conversation)

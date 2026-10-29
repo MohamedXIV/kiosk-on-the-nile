@@ -1,0 +1,29 @@
+extends SceneTree
+var s: GameSession
+var config: SessionConfig
+var bad: int=0
+var locale := LocaleService.new()
+func _initialize():call_deferred("run")
+func check(ok: bool,label: String,details: Variant=""):
+ print(label," ",ok," ",details)
+ if not ok:bad+=1
+func run():
+ var store:=ContentStore.new();root.add_child(store);store.required_sections=SessionConfig.REQUIRED_SECTIONS.duplicate()
+ var loaded:=store.load_directory("res://content");check(loaded.ok,"PRODUCTION CONTENT")
+ var bundle:=store.bundle();locale.configure(bundle)
+ var yes={"op":"time_window","start":0,"end":1440};var no={"op":"not","rule":yes}
+ var knows={"op":"knowledge","knower":{"actor":"player"},"fact":{"type":"legacy_player_fact","args":{"id":"KNOWN_CHEAP_FAN"}},"provenance_kinds":["heard","initial"]}
+ bundle.narrative_policies={"contract_version":1,"profiles":{},"policies":{},"fact_types":{"legacy_player_fact":{"id":"fact"}},"topics":{"demo":{"bindings":{"person":"actor"},"roles":{"partner":{"binding":"person"},"observer":{"actor":"player"}},"stages":{"start":{"op":"all","rules":[{"op":"not","rule":knows},{"op":"domain","id":"kiosk.open","args":{}}]},"continuation":yes},"choices":{"blocked":no,"continue_chat":{"op":"domain","id":"kiosk.open","args":{}}},"actions":{"teach":yes}}}}
+ bundle.encounters.semantic_demo={"story":"semantic_demo","semantic_topic":"demo","semantic_bindings":{"person":{"participant":0}},"manual":true,"requires":{},"offer_requires":{},"advancement":"manual"}
+ bundle.story_semantic_demo=JSON.parse_string(FileAccess.get_file_as_string("res://work/semantic-runtime/speakerless.ink.json"))
+ bundle.visitors.characters.farid.manual_encounters=["semantic_demo"];bundle.visitors.characters.youssef.manual_encounters=["semantic_demo"]
+ config=SessionConfig.new(bundle,"semantic-prototype")
+ check(ContentValidation.validate(bundle).ok,"OPT IN CONTENT VALIDATION")
+ s=GameSession.new();root.add_child(s);var result:=s.configure(config);check(result.ok,"CONFIG",result.details)
+ if not result.ok:quit(1);return
+ s.start_new();s.kiosk_open=true;s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var v:=s.visitors.spawn(&"farid");v.phase=&"staying";v.pose.ground=s.player_ground;v.destination=v.pose.ground;v.shopping_state=&"declined"
+ result=await s.narrative.start(&"semantic_demo",PackedStringArray([str(v.id)]),{"manual_read":false})
+ check(not result.ok,"SPEAKERLESS EFFECT REJECT")
+ check(not s.knowledge.has(&"KNOWN_CHEAP_FAN"),"SPEAKERLESS DOES NOT TEACH")
+ print("FAILURES ",bad);s.queue_free();await process_frame;quit(bad)

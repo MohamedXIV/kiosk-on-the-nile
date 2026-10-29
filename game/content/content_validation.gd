@@ -2,6 +2,8 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ var semantic := SemanticNarrative.validate(bundle)
+ if not semantic.ok:return semantic
  var save_feedback := SaveFeedbackValidation.validate(bundle)
  if not save_feedback.ok:return save_feedback
  var peer_result := PeerContentValidation.validate(bundle)
