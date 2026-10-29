@@ -42,6 +42,7 @@ func validate(rule: Variant, depth: int = 0) -> bool:
   "not": return validate(value,depth+1)
   "social_action":return value is String and value in social_actions
   "social_topic":return value is String and value in social_topics
+  "acquaintance":return value is Dictionary and value.get("actor") in ["farid","youssef","participant"] and value.get("profile") in ["personal","relay","home"]
   "fact_known": return value is String and value in _facts
   "venue_observation":return value in ["dirty","improved","food"]
   "recipe_attempted","recipe_completed":return value is String and value in recipe_ids
@@ -75,6 +76,13 @@ func permits(rule: Dictionary, participants: PackedStringArray = PackedStringArr
   "not": return not permits(value,participants)
   "social_action":return social_life!=null and social_life.available(value)
   "social_topic":return social_life!=null and social_life.topic_available(value)
+  "acquaintance":
+   if social_life==null:return false
+   var actor := str(value.actor)
+   if actor=="participant":
+    if presence==null or participants.size()!=1 or not presence.has(participants[0]):return false
+    actor=str(presence.record(participants[0]).character_id)
+   return social_life.acquainted(actor,str(value.profile))
   "fact_known": return _knowledge.has(StringName(value))
   "venue_observation":
    if customer_experience==null or participants.is_empty():return false

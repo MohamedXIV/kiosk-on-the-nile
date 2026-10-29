@@ -1141,6 +1141,12 @@
     "story.home_company.bye_yes": "You are always welcome. We can carry on later.",
     "story.home_company.bye": "Thank you. I will head out in my own time. See you soon.",
     "story.home_company.stay": "Stay a little longer, if you like.",
-    "story.home_company.stay_reply": "Thank you. It is a peaceful moment."
+    "story.home_company.stay_reply": "Thank you. It is a peaceful moment.",
+    "story.companionship.company_farid": "A long day, and it passed. It is good to have somewhere to sit quietly and talk when the words come.",
+    "story.companionship.company_youssef": "No big news today. It is just good to sit with someone I have got to know, without rushing anywhere.",
+    "story.companionship.shawarma_hint": "I like shawarma. A relative who worked in a shop showed me how to prepare it. I remember a few details, if you ever want to hear them while we sit.",
+    "topic.company_farid": "Sit and chat for a while",
+    "topic.company_youssef": "Sit and chat for a while",
+    "topic.shawarma_hint": "What do you like making?"
   }
 }

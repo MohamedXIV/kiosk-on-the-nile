@@ -19,7 +19,8 @@
     "YOUSSEF_EXAM_PLAN",
     "YOUSSEF_EXAM_PROGRESS",
     "FARID_RADIO_PLAN",
-    "FARID_RADIO_PROGRESS"
+    "FARID_RADIO_PROGRESS",
+    "FARID_SHAWARMA_STORY"
   ],
   "relationship_defaults": {
     "familiarity": 0,

@@ -95,7 +95,7 @@ func reserved(actor: String) -> bool:
  return current!=null and str(current.character_id)==actor
 func can_invite(visit_id: StringName) -> bool:
  var visit: VisitState=_session.visitors.visits.get(str(visit_id))
- return visit!=null and _session.visitors.is_available(visit_id) and str(visit.character_id) in _data.get("social_guests",[]) and _session.social_life.done("meet_"+str(visit.character_id)) and invitation.is_empty() and last_social_day!=_session.clock.day and not reserved(str(visit.character_id))
+ return visit!=null and _session.visitors.is_available(visit_id) and str(visit.character_id) in _data.get("social_guests",[]) and _session.social_life.acquainted(str(visit.character_id),"home") and invitation.is_empty() and last_social_day!=_session.clock.day and not reserved(str(visit.character_id))
 func action(id: String, _source: String, speaker: String, participants: PackedStringArray) -> ActionResult:
  if participants.size()!=1:return _fail()
  var person: Variant=_session.presence.record(participants[0])
@@ -125,7 +125,11 @@ func _spawn(actor: String) -> bool:
  return true
 
 func validate_links() -> ActionResult:
- if not invitation.is_empty() and not _session.social_life.done("meet_"+str(invitation.actor)):return _fail()
+ if not invitation.is_empty():
+  var actor := str(invitation.actor)
+  var introduction: Dictionary=_session.social_life.snapshot().receipts.get("meet_"+actor,{})
+  var days := int(_session.config.section("social_life").pacing.home.days)
+  if not _session.social_life.acquainted(actor,"home") or introduction.is_empty() or floori(float(invitation.offered_at)/1440.0)-floori(float(introduction.at)/1440.0)<days:return _fail()
  if current!=null and current.character_id!=&"abdul_karim":
-  if not _session.social_life.done("meet_"+str(current.character_id)) or _session.visitors._has_character(current.character_id) or _session.social_life.snapshot().activity.phase=="active":return _fail()
+  if not _session.social_life.acquainted(str(current.character_id),"home") or _session.visitors._has_character(current.character_id) or _session.social_life.snapshot().activity.phase=="active":return _fail()
  return ActionResult.success()

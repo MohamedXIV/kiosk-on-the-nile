@@ -123,6 +123,15 @@ VAR appointment_label = ""
 - "radio_return":
  حلو إنك قابلت فريد وطمنتني. والراديو ده أكيد وراه حكايات؛ لما أشوفه أبقى أسمع منه. تسلم إنك وصلت الكلام. # speaker:youssef # duration:9 # effect:social\|radio_return # loc:story.companionship.radio_return
  -> END
+- "company_farid":
+ يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام. # speaker:farid # duration:7 # effect:social\|company_farid # loc:story.companionship.company_farid
+ -> END
+- "company_youssef":
+ مفيش أخبار كبيرة النهارده. بس حلو إني أقعد مع حد بقيت أعرفه، من غير ما نكون مستعجلين على حاجة. # speaker:youssef # duration:8 # effect:social\|company_youssef # loc:story.companionship.company_youssef
+ -> END
+- "shawarma_hint":
+ بحب الشاورما، وقريبي كان شغال في محل ووراني تجهيزها. فاكر منه حبة تفاصيل، لو حبيت أرجع أحكيهالك وإحنا قاعدين. # speaker:farid # duration:8 # effect:social\|shawarma_hint # loc:story.companionship.shawarma_hint
+ -> END
 - else: -> END
 }
 === consent_farid ===

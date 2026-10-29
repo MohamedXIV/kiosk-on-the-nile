@@ -1141,6 +1141,12 @@
     "story.home_company.bye_yes": "تنور في أي وقت، نكمل بعدين.",
     "story.home_company.bye": "ربنا يخليك. أنا أمشي على مهلي، ونشوف بعض على خير.",
     "story.home_company.stay": "لا، لسه بدري؛ خد راحتك.",
-    "story.home_company.stay_reply": "متشكر، أهو وقت رايق."
+    "story.home_company.stay_reply": "متشكر، أهو وقت رايق.",
+    "story.companionship.company_farid": "يوم طويل وعدّى.. حلو نلاقي قعدة نسكت فيها شوية، ونحكي على قد ما ييجي الكلام.",
+    "story.companionship.company_youssef": "مفيش أخبار كبيرة النهارده. بس حلو إني أقعد مع حد بقيت أعرفه، من غير ما نكون مستعجلين على حاجة.",
+    "story.companionship.shawarma_hint": "بحب الشاورما، وقريبي كان شغال في محل ووراني تجهيزها. فاكر منه حبة تفاصيل، لو حبيت أرجع أحكيهالك وإحنا قاعدين.",
+    "topic.company_farid": "نقعد وندردش شوية",
+    "topic.company_youssef": "نقعد وندردش شوية",
+    "topic.shawarma_hint": "إيه الأكل اللي بتحب تعمله؟"
   }
 }

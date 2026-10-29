@@ -311,7 +311,23 @@
           "farid"
         ],
         "requires": {
-          "recipe_completed": "shawarma"
+          "all": [
+            {
+              "recipe_completed": "shawarma"
+            },
+            {
+              "fact_known": "FARID_SHAWARMA_STORY"
+            },
+            {
+              "acquaintance": {
+                "actor": "farid",
+                "profile": "personal"
+              }
+            },
+            {
+              "fact_known": "KNOWN_SHAWARMA_BASICS"
+            }
+          ]
         },
         "recipe_id": "shawarma",
         "label": "أحكيلك عن آخر طبخة"
@@ -329,12 +345,28 @@
         "requires": {
           "all": [
             {
-              "recipe_attempted": "shawarma"
+              "all": [
+                {
+                  "recipe_attempted": "shawarma"
+                },
+                {
+                  "not": {
+                    "recipe_completed": "shawarma"
+                  }
+                }
+              ]
             },
             {
-              "not": {
-                "recipe_completed": "shawarma"
+              "fact_known": "FARID_SHAWARMA_STORY"
+            },
+            {
+              "acquaintance": {
+                "actor": "farid",
+                "profile": "personal"
               }
+            },
+            {
+              "fact_known": "KNOWN_SHAWARMA_BASICS"
             }
           ]
         },
@@ -351,9 +383,22 @@
           "farid"
         ],
         "requires": {
-          "not": {
-            "fact_known": "KNOWN_SHAWARMA_BASICS"
-          }
+          "all": [
+            {
+              "not": {
+                "fact_known": "KNOWN_SHAWARMA_BASICS"
+              }
+            },
+            {
+              "fact_known": "FARID_SHAWARMA_STORY"
+            },
+            {
+              "acquaintance": {
+                "actor": "farid",
+                "profile": "personal"
+              }
+            }
+          ]
         },
         "label": "احكيلي عن الشاورما"
       }
@@ -1039,6 +1084,12 @@
         },
         {
           "distance_at_most": 3.4
+        },
+        {
+          "acquaintance": {
+            "actor": "participant",
+            "profile": "home"
+          }
         }
       ]
     },
@@ -1064,6 +1115,57 @@
   "home_goodbye": {
     "story": "home_company",
     "manual": true,
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_company_farid": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "company_farid",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_company_youssef": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "company_youssef",
+    "requires": {
+      "all": [
+        {
+          "participants_available": true
+        },
+        {
+          "distance_at_most": 3.4
+        }
+      ]
+    },
+    "offer_requires": {},
+    "advancement": "manual"
+  },
+  "social_shawarma_hint": {
+    "story": "companionship",
+    "manual": true,
+    "social_topic": "shawarma_hint",
     "requires": {
       "all": [
         {

@@ -1,0 +1,4 @@
+847836932a3a8ea9394255eeb4efbd8ad2a81cdd10e47408b09c7540a3aba07c  work/perf-2026-10-29/kiosk-baseline.png
+847836932a3a8ea9394255eeb4efbd8ad2a81cdd10e47408b09c7540a3aba07c  work/perf-2026-10-29/kiosk-fixed.png
+c7916707797a7db6df1c7d9045c77b0a3903bb864798ba0bf94f956bcfe7a0e7  work/perf-2026-10-29/rooftop-baseline.png
+c7916707797a7db6df1c7d9045c77b0a3903bb864798ba0bf94f956bcfe7a0e7  work/perf-2026-10-29/rooftop-fixed.png

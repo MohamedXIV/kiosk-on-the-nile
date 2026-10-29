@@ -15,7 +15,9 @@ func _draw() -> void:
   paving(_config.pavement,Color(_config.pavement_color))
   for tile in _config.get("building_tiles",[_config.boards]):
    ground_rect(tile,Color(_config.boards_color))
-   timber(tile)
+  # Keep fills together before surface lines: alternating rectangles and lines
+  # for every authored quarter-metre cell breaks Compatibility renderer batches.
+  for tile in _config.get("building_tiles",[_config.boards]):timber(tile)
  else:
   paving(_config.surroundings,Color(_config.surroundings_color))
   for tile in _config.get("building_tiles",[_config.room]):
@@ -41,15 +43,19 @@ func _draw() -> void:
 # All marks are flat surface wear; no new route, obstacle or object is implied.
 func paving(box: Array, color: Color) -> void:
  ground_rect(box,color)
+ var seams := PackedVector2Array()
+ var scuffs := PackedVector2Array()
  for y in range(ceili(float(box[1])),floori(float(box[3]))):
   for x in range(ceili(float(box[0])),floori(float(box[2]))):
    var a := _mapping.to_canvas(Vector2(x,y))+Vector2(1,1)
    var size := Vector2(_mapping.x_scale-2,_mapping.depth_scale-2)
    var wear := (sin(x*12.73+y*37.11)+1)*0.5
    draw_rect(Rect2(a,size),color.lightened(0.025+wear*0.035))
-   draw_line(a+Vector2(2,size.y-2),a+size-Vector2(2,2),Color(0.72,0.65,0.54,0.09),1)
+   seams.append_array(PackedVector2Array([a+Vector2(2,size.y-2),a+size-Vector2(2,2)]))
    if wear>0.72:
-    draw_line(a+Vector2(7,11),a+Vector2(17,10),Color(0.72,0.65,0.54,0.12),1)
+    scuffs.append_array(PackedVector2Array([a+Vector2(7,11),a+Vector2(17,10)]))
+ if not seams.is_empty():draw_multiline(seams,Color(0.72,0.65,0.54,0.09),1)
+ if not scuffs.is_empty():draw_multiline(scuffs,Color(0.72,0.65,0.54,0.12),1)
 func timber(box: Array) -> void:
  var a := _mapping.to_canvas(Vector2(box[0],box[1]))
  var b := _mapping.to_canvas(Vector2(box[2],box[3]))

@@ -23,12 +23,17 @@ func _draw() -> void:
  var origin := Vector2(_space.origin[0],_space.origin[1])
  var membership := {}
  for cell in _cells:membership[cell]=true
+ # Draw all cell fills before their line details, so adjacent authored cells
+ # share batches instead of switching primitive types for every cell.
  for cell in _cells:
   var point := origin+Vector2(cell)*scale
   var a := _mapping.to_canvas(point,height)
   var b := _mapping.to_canvas(point+Vector2(scale,scale),height)
-  var rect := Rect2(a,b-a)
-  draw_rect(rect,color)
+  draw_rect(Rect2(a,b-a),color)
+ for cell in _cells:
+  var point := origin+Vector2(cell)*scale
+  var a := _mapping.to_canvas(point,height)
+  var b := _mapping.to_canvas(point+Vector2(scale,scale),height)
   # Corrugations stop exactly at authored roof cells, including edited shapes.
   for x in range(int(a.x)+3,int(b.x),8):
    draw_line(Vector2(x,a.y),Vector2(x,b.y),color.lightened(0.055),1)
