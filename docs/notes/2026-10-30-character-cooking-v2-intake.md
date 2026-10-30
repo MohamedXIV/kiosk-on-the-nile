@@ -4,7 +4,9 @@ Recorded 2026-10-30, Africa/Cairo. Source inspected: main
 `ae643b33fff2e9951deed114db47dd64a5b8ca5d` (0.3.0-prealpha.1,
 save schema4/revision21). Parent: [epic #35](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/35).
 
-**Status: source-grounded requirements and proposed roadmap.** This is not an
+**Status: direction and roadmap approved by the user on2026-10-30.** Detailed engineering contract: [character/cooking v2 design](../superpowers/specs/2026-10-30-character-cooking-v2-design.md); [execution plan](../superpowers/plans/2026-10-30-character-cooking-v2.md).
+
+Historical intake status: This is not an
 approved detailed design, implementation plan or claim that v2 already exists.
 The playable preview remains unchanged. Version/changelog/save decisions belong
 at the end of a coherent implemented batch, as the user requested.
