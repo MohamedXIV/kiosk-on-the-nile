@@ -19,7 +19,8 @@ func record_attempt(job_id: StringName, recipe_id: StringName, evidence: Diction
 func record_result(job_id: StringName, item_id: StringName, quality: int) -> ActionResult:
  var job := _workflow.job(job_id)
  var item := _items.get_item(item_id)
- if job.get("status")!="completed" or job.get("result_item_id")!=str(item_id) or job.get("result_quality")!=quality or item.is_empty() or item.attributes.get("source_job_id")!=str(job_id) or item.attributes.get("quality_score")!=quality:return _fail("unverified_recipe_result")
+ var proof := _workflow.result_for(job_id,item_id)
+ if proof.get("quality_score")!=quality or item.is_empty() or item.attributes.get("source_job_id")!=str(job_id) or item.attributes.get("quality_score")!=quality:return _fail("unverified_recipe_result")
  if _results.has(str(item_id)):return ActionResult.success({"duplicate":true})
  _results[str(item_id)]={"job_id":str(job_id),"item_id":str(item_id),"recipe_id":job.recipe_id,"family":_family(job.recipe_id),"quality":quality,"at":job.last_world_minutes}
  return ActionResult.success()
@@ -45,7 +46,8 @@ func restore(data: Dictionary) -> ActionResult:
   var record: Variant=data.results[id]
   if not record is Dictionary or record.get("item_id")!=id or not ContentValidation.integer(record.get("quality")) or record.quality<0 or record.quality>3:return _fail("invalid_result_evidence")
   var job := _workflow.job(StringName(str(record.get("job_id",""))))
-  if job.get("status")!="completed" or job.get("result_item_id")!=id or job.get("result_quality")!=record.quality or record.get("family")!=_family(str(job.recipe_id)):return _fail("orphan_result_evidence")
+  var proof := _workflow.result_for(StringName(str(record.job_id)),StringName(str(id)))
+  if proof.get("quality_score")!=record.quality or record.get("family")!=_family(str(job.get("recipe_id",""))):return _fail("orphan_result_evidence")
  _attempts=data.attempts.duplicate(true)
  _results=data.results.duplicate(true)
  return ActionResult.success()

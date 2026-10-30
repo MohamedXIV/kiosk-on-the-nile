@@ -173,5 +173,73 @@
     "spice": 0.1,
     "satiation": 0.22,
     "hydration": 0.05
+  },
+  "kebda_pane": {
+    "label": "سندوتش كبدة بانيه",
+    "price_minor": 2800,
+    "nourishment": {
+      "hunger": 35,
+      "base_mood": 10,
+      "quality_mood": 2
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ],
+    "quality_names": [
+      "محروقة شوية",
+      "مقبول",
+      "حلو",
+      "ممتاز (ريحة تجيب آخر الشارع)"
+    ],
+    "tips": [
+      0,
+      0,
+      100,
+      300
+    ],
+    "menu_label": "الكبدة البانيه",
+    "order_icon": "sandwich",
+    "category": "meal",
+    "temperature": "hot",
+    "spice": 0.1,
+    "satiation": 0.35,
+    "hydration": 0.05
+  },
+  "ful": {
+    "label": "طبق فول",
+    "price_minor": 800,
+    "nourishment": {
+      "hunger": 30,
+      "base_mood": 1,
+      "quality_mood": 2
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ],
+    "quality_names": [
+      "محروق",
+      "مقبول",
+      "حلو",
+      "ممتاز"
+    ],
+    "tips": [
+      0,
+      0,
+      100,
+      300
+    ],
+    "menu_label": "الفول",
+    "order_icon": "plate",
+    "category": "snack",
+    "temperature": "hot",
+    "spice": 0.15,
+    "satiation": 0.3,
+    "hydration": 0.05
   }
 }

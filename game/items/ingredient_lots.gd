@@ -32,9 +32,10 @@ static func quality(evidence: Array) -> float:
  for item in evidence:
   if not item is Dictionary:continue
   var lot: Dictionary=item.get("attributes",{}).get("lot",{})
-  if lot.is_empty():continue
+  var derived: Variant=item.get("attributes",{}).get("material_quality")
+  if lot.is_empty() and not ContentValidation.bounded(derived,0,1):continue
   var quantity := int(item.get("consumed_quantity",item.get("quantity",0)))
-  total+=float(lot.quality)*quantity;units+=quantity
+  total+=(float(lot.quality) if not lot.is_empty() else float(derived)*100.0)*quantity;units+=quantity
  return total/(100.0*units) if units>0 else 0.6
 static func sources(items: Dictionary, shops: Dictionary, deliveries: Dictionary, versions: Dictionary, catalog: Dictionary) -> ActionResult:
  var totals := {}
@@ -80,7 +81,8 @@ static func sources(items: Dictionary, shops: Dictionary, deliveries: Dictionary
  return ActionResult.success()
 static func validate_session(session: GameSession) -> ActionResult:
  var records: Dictionary=session.items.snapshot().items
- for id in session.workflow.snapshot().jobs:
+ var jobs: Dictionary=session.workflow.snapshot().jobs
+ for id in jobs:
   var job := session.workflow.job(StringName(id))
   if not job.inputs_consumed:continue
   for index in range(job.input_evidence.size()):
@@ -89,6 +91,14 @@ static func validate_session(session: GameSession) -> ActionResult:
    var copy := input.duplicate(true)
    copy.quantity=int(input.consumed_quantity)
    records["consumed/"+id+"/"+str(index)]=copy
+  for output_id in job.get("portion_results",{}):
+   var output: Dictionary=job.portion_results[output_id]
+   var serving: Array=output.get("serving_evidence",[])
+   for index in range(serving.size()):
+    var input: Dictionary=serving[index]
+    if not input.attributes.has("lot"):continue
+    var copy := input.duplicate(true);copy.quantity=int(input.consumed_quantity)
+    records["serving/"+str(output_id)+"/"+str(index)]=copy
  return sources(records,session.shops.snapshot().receipts,session.deliveries.snapshot().occurrences,session.contracts.snapshot().versions,session.config.section("shops").shops)
 static func _same_lot(a: Dictionary, b: Dictionary) -> bool:
  if a.size()!=b.size():return false

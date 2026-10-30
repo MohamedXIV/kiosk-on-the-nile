@@ -18,8 +18,8 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
     if not food.sugars.has(raw.sugar_id):return _fail("food_sugar")
    elif raw.sugar_id!="":return _fail("food_sugar")
    if raw.has("source_job_id"):
-    var job := session.workflow.job(StringName(raw.source_job_id))
-    if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("food_source")
+    var proof := session.workflow.result_for(StringName(raw.source_job_id),StringName(id))
+    if proof.is_empty() or proof.get("quality_score")!=raw.quality_score or not RecipeProcesses.preparation_matches(raw,proof):return _fail("food_source")
  for id in items.consumed:
   var receipt: Dictionary=items.consumed[id]
   if float(receipt.at)>session.clock.world_minutes+0.001:return _fail("consumed_time")
@@ -28,8 +28,8 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
   var food := session.foods.definition(StringName(str(raw.get("food_id",""))))
   if raw.get("id")!=id or food.is_empty() or not ContentValidation.integer(raw.get("quality_score")) or not ContentValidation.bounded(raw.quality_score,0,3) or raw.get("quality_key")!=food.quality_keys[int(raw.quality_score)]:return _fail("consumed_food")
   if raw.has("source_job_id"):
-   var job := session.workflow.job(StringName(raw.source_job_id))
-   if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("consumed_source")
+   var proof := session.workflow.result_for(StringName(raw.source_job_id),StringName(id))
+   if proof.is_empty() or proof.get("quality_score")!=raw.quality_score or not RecipeProcesses.preparation_matches(raw,proof):return _fail("consumed_source")
   for order in session.service.snapshot().orders.values():
    if order.get("delivered_item_id")==id:return _fail("consumed_delivered_food")
  for container in items.containers.values():

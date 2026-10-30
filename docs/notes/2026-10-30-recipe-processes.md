@@ -1,0 +1,17 @@
+# Generic recipe processes checkpoint (#39)
+
+Feature branch only, not a delivered release. Version/changelog/save revision remain deferred to the coherent integration (#44). Current development shape requires a new game; no historical migration is promised.
+
+RecipeWorkflow owns the new data-driven prepare/soak/transfer/passive-heat/hold phases. RecipeProcesses prepares atomic changes to that owner, real ingredients and equipment reservations; it is not another simulation. Methods and heat levels are separate. Buttons use the same commands future minigames can call. Actual material grades are selectable before the inputs/recipe are frozen.
+
+The roster includes three-portion Alexandrian-style liver, breaded liver through counter and fryer, four-portion ful through soak and slow heat, and fried/baked potato batches. Existing tea and learned shawarma paths remain. Bread is consumed per sandwich; plate/packaging/addition rules belong to #41. No new free starter stock, weather, fuel or mini-game is implied. Initial quality retains continuous consumed-material and process evidence independently of future ageing and personal taste.
+
+Passive cooking finishes at the derived world-time boundary, automatically entering holding. An eight-hour sleep does not pretend the pot became fresh at wake-up or create a remote held meal. Turning heat off pauses cooking; unsuitable heat affects technique. Discard/cancel releases the remaining real vessel and equipment, not already-produced portions. Multiple results have canonical per-item proofs, including recipe-learning evidence; excessive yield is rejected without replacing the current job.
+
+The disposable observation used explicit fixture stock, device placement and player positioning, then actual owners and commands. It observed three liver portions and rejection of a fourth, bread debit, current JSON candidate with multiple portions, actual sleep/ful, counter-to-fryer transfer, occupied-device denial, heat pause/wrong-heat quality, cancellation, oven placement/roast and final current candidate. It is not a natural pacing, culinary timing or human playability acceptance. Exit retained ObjectDB/resource warnings (148/22 at the final run); no leak-free claim. No automated suite added/run.
+
+Soundscape now reads a narrow active heating projection rather than deep-copying all job and ingredient history each frame. Workflow tick/status also use a derived active-ID cache rebuilt on restore. No renderer/assets/particles added. Brief populated comparison remains #44.
+
+Culinary references informed distinct methods, not literal game durations: [Bibliotheca Alexandrina community liver recipe](https://www.bibalex.org/alexmed/gastronomy/CommunityRecipes/RecipeDetails.aspx?id=%2BpNzCVdF5YaNaTICbo59RQ%3D%3D), [Middle Eats quick liver](https://www.youtube.com/watch?v=jNg2B0sMH48) (creator description, video not watched), [Shorouk M.Ayad breaded liver](https://cookpad.com/sa/%D9%88%D8%B5%D9%81%D8%A7%D8%AA/16137837) (flour/egg/breadcrumb/frying), [Colette Rossant ful](https://www.foodnetwork.com/recipes/ful-medames-recipe-2015121) (soak/slow cooking). Durations, yields and quality weights are initial builder balance choices, not culinary instructions or user-approved numeric targets.
+
+Evidence: [actual commands](evidence/2026-10-30-recipe-processes/observation.gd.txt), [native output](evidence/2026-10-30-recipe-processes/observation.log), [tracked build](evidence/2026-10-30-recipe-processes/build.log).

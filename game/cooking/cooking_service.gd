@@ -36,6 +36,12 @@ func tick(delta: float) -> void:
 func job(station_id: StringName) -> CookingJob:
  var current := _legacy.job(station_id)
  if current==null or current.stage!=&"EMPTY" or _workflow==null:return current
+ var status := _workflow.station_status(station_id)
+ if status.get("process",false):
+  var view := CookingJob.new(station_id,current.recipe)
+  view.stage=&"SIDE_A" if status.step.kind in ["passive_heat","batch_hold"] and status.heat!="off" else &"EMPTY"
+  view.side_a_elapsed=float(status.elapsed)
+  return view
  var active := _workflow.active_at(station_id)
  if active.is_empty() or not active.recipe_id in ["tea","kebda"]:return current
  var view := CookingJob.new(station_id,current.recipe)
@@ -86,3 +92,6 @@ func restore(data: Dictionary) -> ActionResult:
 func set_hygiene_provider(provider: Callable, use_provider: Callable) -> void:
  _legacy.hygiene_provider=provider
  _legacy.use_provider=use_provider
+
+func process_status(instance_id: StringName) -> Dictionary:
+ return _workflow.station_status(instance_id) if _workflow!=null else {}

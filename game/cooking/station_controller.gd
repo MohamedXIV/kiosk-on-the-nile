@@ -6,6 +6,8 @@ func _init(source: CookingService, primary_key: String = "E") -> void:
  cooking = source
  _primary_key = primary_key
 func status_label(station_id: StringName, compact: bool = false) -> String:
+ var process := cooking.process_status(station_id)
+ if process.get("process",false):return ItemText.recipe(str(process.recipe_id),str(process.label))+" · "+ItemText.step(str(process.recipe_id),process.step)
  var current := cooking.job(station_id)
  if current == null: return ""
  var recipe := current.recipe

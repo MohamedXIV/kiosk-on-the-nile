@@ -479,5 +479,79 @@
       "grade": "good",
       "quality": 85
     }
+  },
+  "cooking_vessel": {
+    "kind": "batch",
+    "label": "وعاء تحضير"
+  },
+  "onion": {
+    "kind": "ingredient",
+    "label": "بصل",
+    "required_storage": "dry",
+    "material": {
+      "family": "onion",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "green_pepper": {
+    "kind": "ingredient",
+    "label": "فلفل أخضر",
+    "required_storage": "dry",
+    "material": {
+      "family": "green_pepper",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "breadcrumbs": {
+    "kind": "ingredient",
+    "label": "بقسماط",
+    "required_storage": "dry",
+    "material": {
+      "family": "breadcrumbs",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "fava_beans": {
+    "kind": "ingredient",
+    "label": "فول ناشف",
+    "required_storage": "dry",
+    "material": {
+      "family": "fava_beans",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "flour": {
+    "kind": "ingredient",
+    "label": "دقيق",
+    "required_storage": "dry",
+    "material": {
+      "family": "flour",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "eggs": {
+    "kind": "ingredient",
+    "label": "بيض",
+    "required_storage": "cold",
+    "material": {
+      "family": "eggs",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "liver_seasoning": {
+    "kind": "ingredient",
+    "label": "تتبيلة كبدة",
+    "required_storage": "dry",
+    "material": {
+      "family": "liver_seasoning",
+      "grade": "standard",
+      "quality": 60
+    }
   }
 }

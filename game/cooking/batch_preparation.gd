@@ -25,7 +25,7 @@ static func slice_portion(job: Dictionary, change: ItemChangeSet, technique: int
  if int(batch.attributes.portions_remaining)<=0:return ActionResult.failure(ActionResult.Code.OUT_OF_STOCK,&"batch_empty")
  var id := "item_%d" % int(change.state.next_id)
  change.state.next_id=int(change.state.next_id)+1
- change.state.items[id]={"id":id,"definition_id":job.definition.filling_definition,"kind":"ingredient","quantity":1,"container_id":"player_hand","attributes":{"personal_use":bool(job.get("personal_use",false)),"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"step_evidence":job.step_results.duplicate(true),"heat_elapsed":job.elapsed}}
+ change.state.items[id]={"id":id,"definition_id":job.definition.filling_definition,"kind":"ingredient","quantity":1,"container_id":"player_hand","attributes":{"personal_use":bool(job.get("personal_use",false)),"source_job_id":job.id,"material_quality":IngredientLots.quality(job.input_evidence),"technique_grade":technique,"mood_penalty":job.quality_penalty,"step_evidence":job.step_results.duplicate(true),"heat_elapsed":job.elapsed}}
  batch.attributes.portions_remaining=int(batch.attributes.portions_remaining)-1
  var records: Array=change.state.items[id].attributes.step_evidence
  var step: Dictionary=job.definition.steps[int(job.step_index)]

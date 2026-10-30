@@ -15,7 +15,14 @@
         "tea_portion_good": 12,
         "tea_portion_premium": 12,
         "kebda_portion_good": 12,
-        "potato_good": 12
+        "potato_good": 12,
+        "onion": 20,
+        "green_pepper": 20,
+        "breadcrumbs": 20,
+        "fava_beans": 20,
+        "flour": 20,
+        "eggs": 20,
+        "liver_seasoning": 20
       },
       "offers": {
         "tea_portion": {
@@ -161,6 +168,83 @@
           "contents": [
             {
               "definition_id": "potato_good",
+              "quantity": 1
+            }
+          ]
+        },
+        "onion": {
+          "label": "بصل",
+          "description": "خامات للتحضير.",
+          "price_minor": 70,
+          "contents": [
+            {
+              "definition_id": "onion",
+              "quantity": 1
+            }
+          ]
+        },
+        "green_pepper": {
+          "label": "فلفل أخضر",
+          "description": "خامات للتحضير.",
+          "price_minor": 80,
+          "contents": [
+            {
+              "definition_id": "green_pepper",
+              "quantity": 1
+            }
+          ]
+        },
+        "breadcrumbs": {
+          "label": "بقسماط",
+          "description": "خامات للتحضير.",
+          "price_minor": 100,
+          "contents": [
+            {
+              "definition_id": "breadcrumbs",
+              "quantity": 1
+            }
+          ]
+        },
+        "fava_beans": {
+          "label": "فول ناشف",
+          "description": "خامات للتحضير.",
+          "price_minor": 180,
+          "contents": [
+            {
+              "definition_id": "fava_beans",
+              "quantity": 1
+            }
+          ]
+        },
+        "flour": {
+          "label": "دقيق",
+          "description": "خامات للتحضير.",
+          "price_minor": 90,
+          "contents": [
+            {
+              "definition_id": "flour",
+              "quantity": 1
+            }
+          ]
+        },
+        "eggs": {
+          "label": "بيض",
+          "description": "خامات للتحضير.",
+          "price_minor": 150,
+          "contents": [
+            {
+              "definition_id": "eggs",
+              "quantity": 1
+            }
+          ]
+        },
+        "liver_seasoning": {
+          "label": "تتبيلة كبدة",
+          "description": "توم وكمون وخلطة حمضيات وبهارات للتحضير.",
+          "price_minor": 80,
+          "contents": [
+            {
+              "definition_id": "liver_seasoning",
               "quantity": 1
             }
           ]

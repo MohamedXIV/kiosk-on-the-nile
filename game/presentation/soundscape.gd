@@ -40,13 +40,10 @@ func present(location: StringName, cooking: CookingService, home: HomeService, i
   if job.recipe.rules_id==&"tea" and job.stage in [&"HEATING",&"BREWING"]: active_tea=true
  var active_oven := false
  if workflow!=null:
-  for job in workflow.snapshot().jobs.values():
-   if job.status!="active" or job.location_id!=str(location):continue
-   var step: Dictionary=job.definition.steps[int(job.step_index)]
-   if step.kind in ["heat","batch_heat","brew"] and job.get("heat_on",true):
-    if step.capability=="heat_water":active_tea=true
-    if step.capability in ["fry","griddle","roast_rotisserie"]:active_grill=true
-    if step.capability=="bake":active_oven=true
+  for state in workflow.heating_states(location):
+   if state.capability=="heat_water" or state.method in ["boil","simmer","brew"]:active_tea=true
+   elif state.capability in ["fry","griddle","roast_rotisserie"]:active_grill=true
+   if state.capability=="bake":active_oven=true
  for id in _players:
   var gain := float(_data.layers[id].get(str(location)+"_gain",0))
   if id=="sizzle": gain= gain if active_grill else 0

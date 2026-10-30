@@ -11,11 +11,11 @@ func stock_count(location_id: StringName, ingredient_id: StringName) -> int:
  for item in material_instances(StringName(definition_id)):
   var container := items.get_container(StringName(item.container_id))
   if container.get("location_id")==str(location_id) and container.get("kind") in ["dry","cold"]: total += int(item.quantity)
- for lines in items.snapshot().reservations.values():
-  for line in lines:
-   var item := items.get_item(StringName(line.item_id))
-   var container := items.get_container(StringName(item.container_id))
-   if _matches(str(item.definition_id),definition_id) and container.location_id==str(location_id):total-=int(line.quantity)
+ var reserved := items.reserved_quantities()
+ for id in reserved:
+  var item := items.get_item(StringName(id))
+  var container := items.get_container(StringName(item.container_id))
+  if _matches(str(item.definition_id),definition_id) and container.location_id==str(location_id):total-=int(reserved[id])
  return total
 func held_id() -> StringName:
  var held := items.items_in(&"player_hand")
@@ -109,22 +109,21 @@ var equipment: EquipmentService
 func available(location_id: StringName, requirements: Array[Dictionary]) -> ActionResult:
  var remaining: Dictionary={}
  var sources: Array[Dictionary]=[]
- var state := items.snapshot()
- var reserved: Dictionary={}
- for lines in state.reservations.values():
-  for line in lines:reserved[line.item_id]=int(reserved.get(line.item_id,0))+int(line.quantity)
- for requirement in requirements:
+ var reserved := items.reserved_quantities()
+ for requirement_index in range(requirements.size()):
+  var requirement: Dictionary=requirements[requirement_index]
   var definition_id := str(requirement.get("definition_id",""))
   if not ContentValidation.integer(requirement.get("quantity")) or requirement.quantity<1 or items.definition(StringName(definition_id)).is_empty():return ContentValidation.fail("inventory.requirement")
   var needed := int(requirement.quantity)
   for item in material_instances(StringName(definition_id)):
    if requirement.has("item_id") and requirement.item_id!=item.id:continue
+   if requirement.has("grade") and item.attributes.get("lot",{}).get("grade")!=requirement.grade:continue
    var container := items.get_container(StringName(item.container_id))
    if not _usable_storage(container,location_id,str(requirement.get("required_storage",items.definition(StringName(definition_id)).get("required_storage","dry")))):continue
    var used := int(reserved.get(item.id,0))+int(remaining.get(item.id,0))
    var quantity := mini(needed,maxi(0,int(item.quantity)-used))
    if quantity<=0:continue
-   sources.append({"item_id":item.id,"definition_id":item.definition_id,"requirement_id":definition_id,"quantity":quantity})
+   sources.append({"item_id":item.id,"definition_id":item.definition_id,"requirement_id":definition_id,"requirement_index":requirement_index,"quantity":quantity})
    remaining[item.id]=int(remaining.get(item.id,0))+quantity
    needed-=quantity
    if needed==0:break

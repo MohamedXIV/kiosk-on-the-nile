@@ -65,6 +65,34 @@
     "potato_good": {
       "price_minor": 150,
       "daily_stock": 12
+    },
+    "onion": {
+      "price_minor": 70,
+      "daily_stock": 20
+    },
+    "green_pepper": {
+      "price_minor": 80,
+      "daily_stock": 20
+    },
+    "breadcrumbs": {
+      "price_minor": 100,
+      "daily_stock": 20
+    },
+    "fava_beans": {
+      "price_minor": 180,
+      "daily_stock": 20
+    },
+    "flour": {
+      "price_minor": 90,
+      "daily_stock": 20
+    },
+    "eggs": {
+      "price_minor": 150,
+      "daily_stock": 20
+    },
+    "liver_seasoning": {
+      "price_minor": 80,
+      "daily_stock": 20
     }
   },
   "emergency": {

@@ -29,6 +29,11 @@ func instances(definition_id: StringName) -> Array[Dictionary]:
  for item in _state.items.values():
   if item.definition_id==str(definition_id): result.append(item.duplicate(true))
  return result
+func reserved_quantities() -> Dictionary:
+ var result := {}
+ for lines in _state.reservations.values():
+  for line in lines:result[str(line.item_id)]=int(result.get(str(line.item_id),0))+int(line.quantity)
+ return result
 func ingredient_family(id: String) -> String:
  return str(_definitions.get(id,{}).get("material",{}).get("family",id))
 func ingredient_matches(actual: String, required: String) -> bool:
@@ -126,6 +131,7 @@ func _validate_state(data: Dictionary) -> ActionResult:
   if str(id).begins_with("food_") or str(id).begins_with("item_"):
    var suffix := str(id).substr(str(id).find("_")+1)
    if not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_item_counter")
+  if item.attributes.has("material_quality") and not ContentValidation.bounded(item.attributes.material_quality,0,1):return _fail("invalid_material_quality")
   var lot_result := IngredientLots.validate(item,_definitions,world_clock.world_minutes if world_clock!=null else INF)
   if not lot_result.ok:return lot_result
   var definition: Dictionary = _definitions[item.definition_id]

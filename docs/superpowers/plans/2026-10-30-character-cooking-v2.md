@@ -68,11 +68,11 @@
 
 **Interfaces:** Keep `RecipeWorkflow.start/act/tick/job/progress_view` and equipment candidate contracts. Add typed process data and candidate-only helpers to RecipeProcesses; ItemStore owns created batches/portions and reservations. `PreparedItem.snapshot/from_dict` carries actual source batch/lot and serving fields produced here.
 
-- [ ] Extend strict recipe validation and reusable preprocessing, passive cooking/holding and method/heat selection. Use existing capability/resource reservations; freeze recipe version at start.
-- [ ] Author tea, revised liver batch + breaded variant, ful soak/slow cook and preserved shawarma/potato paths, with compatible raw ingredients/devices/knowledge.
-- [ ] Expose button actions/heat/state/yield in existing recipe UI and both locales; future minigame inputs use the same act command, no mini-game code now.
-- [ ] Observe actual raw reservation/consumption, shared-ingredient differing processes, busy equipment, cancellation and last-portion conservation; one night-to-morning passive completion without frame replay.
-- [ ] Build/record/commit and state any unmet roster requirement truthfully.
+- [x] Extend strict recipe validation and reusable preprocessing, passive cooking/holding and method/heat selection. Use existing capability/resource reservations; freeze recipe version at start.
+- [x] Author tea, revised liver batch + breaded variant, ful soak/slow cook and preserved shawarma/potato paths, with compatible raw ingredients/devices/knowledge.
+- [x] Expose button actions/heat/state/yield in existing recipe UI and both locales; future minigame inputs use the same act command, no mini-game code now.
+- [x] Observe actual raw reservation/consumption, shared-ingredient differing processes, busy equipment, cancellation and last-portion conservation; one night-to-morning passive completion without frame replay.
+- [x] Build/record/commit and state any unmet roster requirement truthfully.
 
 ### Task5 — freshness/holding and humane passive time (#40)
 

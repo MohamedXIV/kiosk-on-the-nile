@@ -52,65 +52,88 @@
     ]
   },
   "kebda": {
-    "version": 1,
-    "label": "كبدة إسكندراني",
+    "version": 2,
+    "process_version": 2,
+    "label": "دفعة كبدة إسكندراني",
     "learning_fact": "",
-    "consume_on_start": true,
-    "presentation_minutes_per_second": 2.5,
+    "consume_on_start": false,
+    "presentation_minutes_per_second": 1,
     "inputs": [
       {
         "definition_id": "kebda_portion",
+        "quantity": 3,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "onion",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "green_pepper",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "oil",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "liver_seasoning",
         "quantity": 1,
         "required_storage": "dry"
       }
     ],
     "steps": [
       {
-        "id": "side_a",
-        "kind": "heat",
+        "id": "prep",
+        "kind": "prepare",
         "capability": "griddle",
-        "duration": 4.5,
-        "action": "flip",
-        "label": "قلّب الكبدة",
-        "assess": false,
-        "after": []
+        "duration": 5,
+        "action": "prepare_batch",
+        "label": "جهّز الكبدة والفلفل والبصل في الطاسة",
+        "after": [],
+        "consume_inputs": true,
+        "vessel_after": "device"
       },
       {
-        "id": "side_b",
-        "kind": "heat",
+        "id": "cook",
+        "kind": "passive_heat",
         "capability": "griddle",
-        "duration": 0,
-        "action": "season",
-        "label": "تبّل الكبدة",
-        "assess": false,
+        "duration": 15,
+        "action": "check",
+        "label": "الكبدة بتتسوّى",
         "after": [
-          "side_a"
+          "prep"
         ]
       },
       {
-        "id": "finish",
-        "kind": "heat",
+        "id": "hold",
+        "kind": "batch_hold",
         "capability": "griddle",
         "duration": 0,
-        "action": "take",
-        "label": "عبّي في الفينو",
-        "assess": false,
-        "inherit_elapsed": true,
+        "action": "serve",
+        "label": "قدّم سندوتش من الدفعة",
         "after": [
-          "side_b"
+          "cook"
         ]
       }
     ],
-    "quality": {
-      "kind": "two_sides",
-      "burnt_after": 37.5,
-      "excellent_a_min": 5.5,
-      "excellent_a_max": 17.5,
-      "excellent_b_min": 4.5,
-      "excellent_b_max": 17.5,
-      "good_total_min": 8.75,
-      "good_total_max": 31.25
-    },
+    "vessel_definition": "cooking_vessel",
+    "portions": 3,
+    "method": "saute",
+    "default_heat": "medium",
+    "ideal_heat": "medium",
+    "hold_heat": "low",
+    "serving_inputs": [
+      {
+        "definition_id": "bread",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "serving_format": "sandwich",
     "output": {
       "food_id": "kebda"
     },
@@ -246,14 +269,16 @@
     ]
   },
   "potato_fried": {
-    "version": 1,
-    "label": "بطاطس مقلية",
+    "version": 2,
+    "process_version": 2,
+    "label": "دفعة بطاطس مقلية",
     "learning_fact": "",
-    "consume_on_start": true,
+    "consume_on_start": false,
+    "presentation_minutes_per_second": 1,
     "inputs": [
       {
         "definition_id": "potato",
-        "quantity": 1,
+        "quantity": 2,
         "required_storage": "dry"
       },
       {
@@ -264,18 +289,47 @@
     ],
     "steps": [
       {
+        "id": "prep",
+        "kind": "prepare",
+        "capability": "fry",
+        "duration": 3,
+        "action": "prepare_batch",
+        "label": "جهّز دفعة البطاطس",
+        "after": [],
+        "consume_inputs": true,
+        "vessel_after": "device"
+      },
+      {
         "id": "cook",
-        "kind": "heat",
+        "kind": "passive_heat",
         "capability": "fry",
         "duration": 8,
-        "good_until": 16,
-        "okay_until": 16,
-        "burnt_after": 24,
-        "action": "take",
-        "label": "خد البطاطس",
-        "after": []
+        "action": "check",
+        "label": "البطاطس بتتقلي",
+        "after": [
+          "prep"
+        ]
+      },
+      {
+        "id": "hold",
+        "kind": "batch_hold",
+        "capability": "fry",
+        "duration": 0,
+        "action": "serve",
+        "label": "قدّم طبق بطاطس",
+        "after": [
+          "cook"
+        ]
       }
     ],
+    "vessel_definition": "cooking_vessel",
+    "portions": 2,
+    "method": "fry",
+    "default_heat": "medium",
+    "ideal_heat": "medium",
+    "hold_heat": "off",
+    "serving_inputs": [],
+    "serving_format": "plate",
     "output": {
       "food_id": "potato_fried"
     },
@@ -290,14 +344,16 @@
     ]
   },
   "potato_baked": {
-    "version": 1,
+    "version": 2,
+    "process_version": 2,
     "label": "بطاطس في الفرن",
     "learning_fact": "",
-    "consume_on_start": true,
+    "consume_on_start": false,
+    "presentation_minutes_per_second": 1,
     "inputs": [
       {
         "definition_id": "potato",
-        "quantity": 1,
+        "quantity": 2,
         "required_storage": "dry"
       },
       {
@@ -308,20 +364,259 @@
     ],
     "steps": [
       {
+        "id": "prep",
+        "kind": "prepare",
+        "capability": "bake",
+        "duration": 3,
+        "action": "prepare_batch",
+        "label": "جهّز صينية البطاطس",
+        "after": [],
+        "consume_inputs": true,
+        "vessel_after": "device"
+      },
+      {
         "id": "cook",
-        "kind": "heat",
+        "kind": "passive_heat",
         "capability": "bake",
         "duration": 12,
-        "good_until": 24,
-        "okay_until": 24,
-        "burnt_after": 36,
-        "action": "take",
-        "label": "خد البطاطس",
-        "after": []
+        "action": "check",
+        "label": "البطاطس بتتسوّى في الفرن",
+        "after": [
+          "prep"
+        ]
+      },
+      {
+        "id": "hold",
+        "kind": "batch_hold",
+        "capability": "bake",
+        "duration": 0,
+        "action": "serve",
+        "label": "قدّم طبق بطاطس من الصينية",
+        "after": [
+          "cook"
+        ]
       }
     ],
+    "vessel_definition": "cooking_vessel",
+    "portions": 2,
+    "method": "roast",
+    "default_heat": "medium",
+    "ideal_heat": "medium",
+    "hold_heat": "off",
+    "serving_inputs": [],
+    "serving_format": "plate",
     "output": {
       "food_id": "potato_baked"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ],
+    "allowed_locations": [
+      "kiosk"
+    ]
+  },
+  "kebda_pane": {
+    "version": 2,
+    "process_version": 2,
+    "label": "دفعة كبدة بانيه",
+    "learning_fact": "",
+    "consume_on_start": false,
+    "presentation_minutes_per_second": 1,
+    "inputs": [
+      {
+        "definition_id": "kebda_portion",
+        "quantity": 2,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "breadcrumbs",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "oil",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "flour",
+        "quantity": 1,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "eggs",
+        "quantity": 1,
+        "required_storage": "cold"
+      },
+      {
+        "definition_id": "liver_seasoning",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "coat",
+        "kind": "prepare",
+        "capability": "prep_surface",
+        "duration": 5,
+        "action": "coat",
+        "label": "غلّف الكبدة وخد الوعاء",
+        "after": [],
+        "consume_inputs": true,
+        "vessel_after": "hand"
+      },
+      {
+        "id": "load",
+        "kind": "transfer",
+        "capability": "fry",
+        "duration": 0,
+        "action": "load",
+        "label": "حط الوعاء في القلاية",
+        "after": [
+          "coat"
+        ]
+      },
+      {
+        "id": "cook",
+        "kind": "passive_heat",
+        "capability": "fry",
+        "duration": 12,
+        "action": "check",
+        "label": "الكبدة البانيه بتتقلي",
+        "after": [
+          "load"
+        ]
+      },
+      {
+        "id": "hold",
+        "kind": "batch_hold",
+        "capability": "fry",
+        "duration": 0,
+        "action": "serve",
+        "label": "قدّم سندوتش كبدة بانيه",
+        "after": [
+          "cook"
+        ]
+      }
+    ],
+    "vessel_definition": "cooking_vessel",
+    "portions": 2,
+    "method": "fry",
+    "default_heat": "medium",
+    "ideal_heat": "medium",
+    "hold_heat": "off",
+    "serving_inputs": [
+      {
+        "definition_id": "bread",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "serving_format": "sandwich",
+    "output": {
+      "food_id": "kebda_pane"
+    },
+    "quality_keys": [
+      "burnt",
+      "okay",
+      "good",
+      "excellent"
+    ],
+    "allowed_locations": [
+      "kiosk"
+    ]
+  },
+  "ful": {
+    "version": 2,
+    "process_version": 2,
+    "label": "قدرة فول",
+    "learning_fact": "",
+    "consume_on_start": false,
+    "presentation_minutes_per_second": 1,
+    "inputs": [
+      {
+        "definition_id": "fava_beans",
+        "quantity": 2,
+        "required_storage": "dry"
+      },
+      {
+        "definition_id": "oil",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "steps": [
+      {
+        "id": "prep",
+        "kind": "prepare",
+        "capability": "prep_surface",
+        "duration": 4,
+        "action": "soak",
+        "label": "حط الفول في المية للنقع",
+        "after": [],
+        "consume_inputs": true,
+        "vessel_after": "device"
+      },
+      {
+        "id": "soak",
+        "kind": "soak",
+        "capability": "prep_surface",
+        "duration": 240,
+        "action": "take_pot",
+        "label": "اكتفي بالنقع وخد القدرة",
+        "after": [
+          "prep"
+        ],
+        "allow_early": true
+      },
+      {
+        "id": "load",
+        "kind": "transfer",
+        "capability": "griddle",
+        "duration": 0,
+        "action": "load",
+        "label": "حط القدرة على نار هادية",
+        "after": [
+          "soak"
+        ]
+      },
+      {
+        "id": "cook",
+        "kind": "passive_heat",
+        "capability": "griddle",
+        "duration": 360,
+        "action": "check",
+        "label": "الفول بيتدمّس على الهادي",
+        "after": [
+          "load"
+        ]
+      },
+      {
+        "id": "hold",
+        "kind": "batch_hold",
+        "capability": "griddle",
+        "duration": 0,
+        "action": "serve",
+        "label": "قدّم طبق فول من القدرة",
+        "after": [
+          "cook"
+        ]
+      }
+    ],
+    "vessel_definition": "cooking_vessel",
+    "portions": 4,
+    "method": "simmer",
+    "default_heat": "low",
+    "ideal_heat": "low",
+    "hold_heat": "low",
+    "serving_inputs": [],
+    "serving_format": "plate",
+    "output": {
+      "food_id": "ful"
     },
     "quality_keys": [
       "burnt",
