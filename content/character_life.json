@@ -473,6 +473,92 @@
           0.75
         ]
       }
+    },
+    "abdul_karim": {
+      "buying_enabled": false,
+      "food_weights": {},
+      "category_weights": {
+        "drink": 1,
+        "meal": 1,
+        "snack": 1
+      },
+      "temperature_weights": {
+        "hot": 1.0,
+        "cold": 0.8,
+        "ambient": 0.7
+      },
+      "spice_preference": [
+        0.1,
+        0.6
+      ],
+      "spice_limit": 1,
+      "preferred_window": [
+        0,
+        1440
+      ],
+      "thermal_affinity": "neutral",
+      "price_sensitivity": 1.0,
+      "initial": {
+        "hunger": [
+          0.2,
+          0.55
+        ],
+        "thirst": [
+          0.3,
+          0.7
+        ],
+        "tiredness": [
+          0.15,
+          0.5
+        ],
+        "social": [
+          0.3,
+          0.75
+        ]
+      }
+    },
+    "fathi": {
+      "buying_enabled": false,
+      "food_weights": {},
+      "category_weights": {
+        "drink": 1,
+        "meal": 1,
+        "snack": 1
+      },
+      "temperature_weights": {
+        "hot": 1.0,
+        "cold": 0.8,
+        "ambient": 0.7
+      },
+      "spice_preference": [
+        0.1,
+        0.6
+      ],
+      "spice_limit": 1,
+      "preferred_window": [
+        0,
+        1440
+      ],
+      "thermal_affinity": "neutral",
+      "price_sensitivity": 1.0,
+      "initial": {
+        "hunger": [
+          0.2,
+          0.55
+        ],
+        "thirst": [
+          0.3,
+          0.7
+        ],
+        "tiredness": [
+          0.15,
+          0.5
+        ],
+        "social": [
+          0.3,
+          0.75
+        ]
+      }
     }
   }
 }

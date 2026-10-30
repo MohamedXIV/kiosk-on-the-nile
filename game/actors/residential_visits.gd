@@ -130,6 +130,7 @@ func _spawn(actor: String, source: String = "") -> bool:
  var standing := Vector2(_data.standing[0],_data.standing[1])
  var solids := _session.spaces.solids(&"rooftop")
  if _session.player_ground.distance_to(point)<0.8 or FootprintGeometry.blocked(point,solids,0.18) or FootprintGeometry.blocked(standing,solids,0.18):return false
+ if not _session.character_life.ensure(StringName(actor)).ok:return false
  current=ResidentialRecord.new();current.id=StringName("residential_%d" % _next);_next+=1
  current.semantic_source=source
  current.character_id=StringName(actor);current.pose.location_id=&"rooftop";current.pose.ground=point;current.destination=standing

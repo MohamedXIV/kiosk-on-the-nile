@@ -29,6 +29,8 @@ func instances(definition_id: StringName) -> Array[Dictionary]:
  for item in _state.items.values():
   if item.definition_id==str(definition_id): result.append(item.duplicate(true))
  return result
+func ingredient_family(id: String) -> String:
+ return str(_definitions.get(id,{}).get("material",{}).get("family",id))
 func ingredient_matches(actual: String, required: String) -> bool:
  return IngredientLots.matches(_definitions,actual,required)
 func material_instances(required: StringName) -> Array[Dictionary]:

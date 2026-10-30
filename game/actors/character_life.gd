@@ -23,13 +23,18 @@ func profile(actor: StringName) -> Dictionary:
  return _data.profiles.get(str(actor),{}).duplicate(true)
 func state(actor: StringName) -> Dictionary:
  return _project(str(actor)) if _states.has(str(actor)) else {}
-func arrive(actor: StringName, visit: StringName) -> ActionResult:
+func ensure(actor: StringName) -> ActionResult:
  var p := profile(actor)
- if p.is_empty() or not _visit_id(str(visit)):return _invalid("character_life_actor")
+ if p.is_empty():return _invalid("character_life_actor")
  if not _states.has(str(actor)):
   var needs := {}
   for need in CharacterLifeValidation.NEEDS:needs[need]=_rng.randf_range(float(p.initial[need][0]),float(p.initial[need][1]))
   _states[str(actor)]={"needs":needs,"at":_clock.world_minutes,"visit":"","decisions":0,"decision":{}}
+ return ActionResult.success()
+func arrive(actor: StringName, visit: StringName) -> ActionResult:
+ if not _visit_id(str(visit)):return _invalid("character_life_visit")
+ var initialised := ensure(actor)
+ if not initialised.ok:return initialised
  var current := _project(str(actor))
  if current.visit!=str(visit):
   current.visit=str(visit);current.decisions=0;current.decision={}
@@ -37,7 +42,7 @@ func arrive(actor: StringName, visit: StringName) -> ActionResult:
  return ActionResult.success()
 func consider(actor: StringName, visit: StringName, offers: Array[Dictionary], expected: Dictionary={}) -> Dictionary:
  var current := state(actor)
- if current.is_empty() or current.visit!=str(visit):return {"intent":"quiet","food_id":"","reason":"actor_unavailable"}
+ if not _visit_id(str(visit)) or current.is_empty() or current.visit!=str(visit):return {"intent":"quiet","food_id":"","reason":"actor_unavailable"}
  var previous: Dictionary=current.decision
  if not previous.is_empty() and _clock.world_minutes<float(previous.next_at):return previous.duplicate(true)
  var p := profile(actor)
@@ -118,12 +123,13 @@ func restore(data: Dictionary) -> ActionResult:
   if not _data.profiles.has(actor) or not record is Dictionary or not CharacterLifeValidation.keys(record,["needs","at","visit","decisions","decision"]) or not record.needs is Dictionary or not CharacterLifeValidation.keys(record.needs,CharacterLifeValidation.NEEDS):return _invalid("character_life_actor")
   for value in record.needs.values():
    if not ContentValidation.bounded(value,0,1):return _invalid("character_life_needs")
-  if not ContentValidation.bounded(record.at,0,_clock.world_minutes) or not _visit_id(str(record.visit)) or not ContentValidation.integer(record.decisions) or record.decisions<0 or not record.decision is Dictionary:return _invalid("character_life_time")
+  if not ContentValidation.bounded(record.at,0,_clock.world_minutes) or not record.visit is String or (not record.visit.is_empty() and not _visit_id(record.visit)) or not ContentValidation.integer(record.decisions) or record.decisions<0 or not record.decision is Dictionary:return _invalid("character_life_time")
   var decision: Dictionary=record.decision
   if decision.is_empty():
    if record.decisions!=0:return _invalid("character_life_decision")
    continue
   if not CharacterLifeValidation.keys(decision,["food_id","intent","factors","visit","index","at","next_at"]) or decision.visit!=record.visit or decision.index!=record.decisions or not decision.intent in ["quiet","company","rest","eat","drink"] or not decision.food_id is String or not decision.factors is Dictionary:return _invalid("character_life_decision")
+  if record.visit.is_empty():return _invalid("character_life_decision_visit")
   var buying: bool=decision.intent in ["eat","drink"]
   if buying!=(not decision.food_id.is_empty()) or (buying and not _foods.has_food(StringName(decision.food_id))) or not ContentValidation.bounded(decision.at,0,float(record.at)) or not ContentValidation.number(decision.next_at) or absf(float(decision.next_at)-float(decision.at)-float(_data.policy.reconsider_minutes))>0.001:return _invalid("character_life_choice")
   if not ContentValidation.integer(decision.index) or decision.index<1:return _invalid("character_life_index")
@@ -141,7 +147,7 @@ func restore(data: Dictionary) -> ActionResult:
 func validate_visits(visitors: VisitorService) -> ActionResult:
  var next := int(visitors.snapshot().next_id)
  for record in _states.values():
-  if int(str(record.visit).trim_prefix("visit_"))>=next:return _invalid("character_life_visit")
+  if not str(record.visit).is_empty() and int(str(record.visit).trim_prefix("visit_"))>=next:return _invalid("character_life_visit")
  for visit in visitors.visits.values():
   if not _states.has(str(visit.character_id)) or _states[str(visit.character_id)].visit!=str(visit.id):return _invalid("character_life_visit")
  return ActionResult.success()

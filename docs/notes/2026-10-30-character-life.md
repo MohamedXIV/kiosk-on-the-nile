@@ -58,3 +58,14 @@ Pinned Godot4.7.2 tracked Ink/localisation/import/Web Release build passed;
 shutdown reports ObjectDB/resource warnings (73/22 in this disposable fixture);
 no leak-free or long-session-memory claim. Renderer/batching unchanged. One fresh
 whole-feature-branch review follows the complete slice, not each task.
+
+## Shared actor registry follow-up
+
+The same ActorPresence authored registry now validates all12 registered NPC
+profiles, including the existing supplier/landlord, without making them kiosk
+buyers or adding arrivals. Their neutral, non-buying profiles are explicit data.
+`ensure(actor)` samples private state once on actual phone contact/residential
+spawn; the world arrival adapter additionally binds the real visit identity.
+Pure reads never initialise state. Non-commercial actors can retain state with
+no world visit/decision, and current Continue validates that form. Real supplier
+contact/delivery/current candidate passed after this change. No new cast/visuals.

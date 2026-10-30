@@ -69,3 +69,10 @@ Mandatory development save fields changed; no intermediate build is an old-save
 upgrade. Preserve earlier files and finalise the actual schema/new-game guide,
 version/changelog and verified preview at coherent completion#44. Final fresh
 whole-feature-branch review remains after integration, not per owner task.
+
+A follow-up groups frozen input quantities by material family (including repeated
+requirements), validates frozen recipe shape before reading its inputs, and
+rejects a resealed non-array input definition as invalid_workflow_definition
+without an exception. Actual market/tea/current candidate and duplicate-origin
+rejection remain observed with the shared12-actor registry. This fixes a
+validation-order gap in the new input-evidence path.
