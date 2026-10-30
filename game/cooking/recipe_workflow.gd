@@ -6,6 +6,7 @@ signal item_completed(job_id: StringName, item_id: StringName, quality: int)
 var policy: ActionPolicy
 var quality_provider: Callable
 var sugar_provider: Callable
+var serving_provider: Callable
 var use_provider: Callable
 var hygiene_provider: Callable
 var _recipes: Dictionary
@@ -84,7 +85,7 @@ func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedS
  if not result.ok:return result
  attempt_started.emit(StringName(id),recipe_id,{"location_id":str(location_id),"at":_clock.world_minutes})
  return ActionResult.success({"job_id":id,"cue":"chime"})
-func act(job_id: StringName, action_id: StringName) -> ActionResult:
+func act(job_id: StringName, action_id: StringName, options: Dictionary={}) -> ActionResult:
  if not _jobs.has(str(job_id)) or _jobs[str(job_id)].status!="active":return _fail("unknown_job")
  var candidate: Dictionary=_jobs[str(job_id)].duplicate(true)
  if action_id==&"cancel":return _cancel(candidate)
@@ -93,7 +94,7 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
   if not synced.ok:return synced
   candidate=_jobs[str(job_id)].duplicate(true)
  var step: Dictionary=candidate.definition.steps[int(candidate.step_index)]
- if RecipeProcesses.supports(candidate.definition):return _publish_process(RecipeProcesses.prepare_action(self,candidate,action_id))
+ if RecipeProcesses.supports(candidate.definition):return _publish_process(RecipeProcesses.prepare_action(self,candidate,action_id,options))
  if step.kind=="batch_heat":return _batch_action(candidate,action_id)
  var action_device := str(candidate.devices[step.capability])
  if step.kind=="cold_wait":
@@ -115,11 +116,13 @@ func act(job_id: StringName, action_id: StringName) -> ActionResult:
  var resource_lines: Array[Dictionary]=[]
  if int(candidate.step_index)+1>=candidate.definition.steps.size():
   if not _inventory.held_id().is_empty():return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
-  output=_prepared_output(candidate,change)
+  var prepared_output := _prepared_output(candidate,change,options)
+  if not prepared_output.ok:return prepared_output
+  output=prepared_output.details.item
   candidate.status="completed"
   candidate["result_item_id"]=str(output.id)
   candidate["result_quality"]=output.quality_score
-  candidate["result_snapshot"]=output.snapshot()
+  candidate["result_snapshot"]=change.state.items[str(output.id)].attributes.duplicate(true)
   change.state.reservations.erase(str(job_id))
  else:
   candidate.step_index=int(candidate.step_index)+1
@@ -223,7 +226,7 @@ func _consume_all(change: ItemChangeSet, job: Dictionary) -> void:
   if change.state.items[line.item_id].quantity==0:change.state.items.erase(line.item_id)
  change.state.reservations[job.id]=[]
  job.inputs_consumed=true
-func _prepared_output(job: Dictionary, change: ItemChangeSet) -> PreparedItem:
+func _prepared_output(job: Dictionary, change: ItemChangeSet, options: Dictionary={}) -> ActionResult:
  var item := PreparedItem.new()
  item.id=StringName("food_%d" % int(change.state.next_id))
  change.state.next_id=int(change.state.next_id)+1
@@ -249,10 +252,17 @@ func _prepared_output(job: Dictionary, change: ItemChangeSet) -> PreparedItem:
  item.serving_format=StringName(str(job.definition.get("serving_format","cup" if job.recipe_id=="tea" else "plate" if str(job.recipe_id).begins_with("potato") else "sandwich")))
  item.quality_score=RecipeProcesses.grade_for(item.initial_quality)
  item.quality_key=StringName(job.definition.quality_keys[item.quality_score])
+ var plan: ActionResult = serving_provider.call(item.food_id,options) if serving_provider.is_valid() else ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"incompatible_serving")
+ if not plan.ok:return plan
+ var serving := MenuService.consume_inputs(_inventory,change,StringName(job.location_id),plan.details.plan)
+ if not serving.ok:return serving
+ item.variant_id=StringName(plan.details.plan.variant_id);item.serving_format=StringName(plan.details.plan.serving_format);item.consumption_mode=StringName(plan.details.plan.consumption_mode);item.additions=PackedStringArray(plan.details.plan.additions)
  var attributes := item.snapshot()
+ attributes["portioned_at"]=_clock.world_minutes
+ attributes["serving_plan"]=plan.details.plan.duplicate(true);attributes["serving_evidence"]=serving.details.evidence
  attributes.merge({"personal_use":bool(job.get("personal_use",false)) or job.input_evidence.any(func(input):return input.attributes.get("personal_use",false)),"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"hygiene_penalty":hygiene_penalty,"step_evidence":job.step_results.duplicate(true)})
  change.state.items[str(item.id)]={"id":str(item.id),"definition_id":"prepared_food","kind":"prepared","quantity":1,"container_id":"player_hand","attributes":attributes}
- return item
+ return ActionResult.success({"item":item})
 func _hygiene_evidence(job: Dictionary, step: Dictionary) -> Dictionary:
  return hygiene_provider.call(PackedStringArray([str(job.devices[step.capability])])) if hygiene_provider.is_valid() else {}
 func _commit(change: ItemChangeSet, equipment_state: Dictionary, job: Dictionary, record_use: bool=true) -> ActionResult:
@@ -318,6 +328,10 @@ func restore(data: Dictionary) -> ActionResult:
   if RecipeProcesses.supports(job.definition):
    var process_result := RecipeProcesses.validate_saved(job,_inventory.items,_clock.world_minutes)
    if not process_result.ok:return process_result
+  if job.status=="completed" and not RecipeProcesses.supports(job.definition) and not job.definition.has("vessel_definition"):
+   if not job.get("result_snapshot") is Dictionary:return _fail("invalid_result_snapshot")
+   var serving_check := RecipeProcesses.validate_serving(job.result_snapshot,_inventory.items,_clock.world_minutes)
+   if not serving_check.ok:return serving_check
   if job.status=="active" and job.definition.has("vessel_definition") and job.step_index>=1:
    var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
    if bowl.get("kind")!="batch" or bowl.attributes.get("source_job_id")!=id or not ContentValidation.integer(bowl.attributes.get("portions_remaining")) or bowl.attributes.portions_remaining<1 or bowl.attributes.portions_remaining>int(job.definition.portions):return _fail("invalid_batch")
@@ -398,11 +412,11 @@ func _progress_slice(job: Dictionary, delta: float) -> void:
  if not resources.ok:return
  _commit(change,resources.details.state,candidate)
 
-func available_foods(location_id: StringName) -> PackedStringArray:
+func available_foods(location_id: StringName, include_prepared: bool=true) -> PackedStringArray:
  var result := PackedStringArray()
  # Finished portions remain sellable after their last raw inputs were consumed.
  for item in _inventory.items.snapshot().items.values():
-  if item.kind!="prepared":continue
+  if not include_prepared or item.kind!="prepared":continue
   var container := _inventory.items.get_container(StringName(item.container_id))
   var local: bool = container.location_id==str(location_id) and container.kind!="purchase_bag"
   var carried: bool = container.id=="player_hand" and _inventory.player_pose!=null and _inventory.player_pose.location_id==location_id
@@ -414,9 +428,8 @@ func available_foods(location_id: StringName) -> PackedStringArray:
    for id in _active_jobs:
     var job: Dictionary=_jobs[id]
     if job.recipe_id!=recipe_id or job.location_id!=str(location_id) or job.definition.steps[int(job.step_index)].kind!="batch_hold":continue
-    var serving: Array[Dictionary]=[];serving.assign(job.definition.serving_inputs)
     var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
-    if not bowl.is_empty() and FoodFreshness.view(bowl.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable and _inventory.available(location_id,serving).ok and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
+    if not bowl.is_empty() and FoodFreshness.view(bowl.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
    continue
   if definition.has("vessel_definition"):continue
   if not definition.get("allowed_locations",[]).is_empty() and not str(location_id) in definition.allowed_locations:continue

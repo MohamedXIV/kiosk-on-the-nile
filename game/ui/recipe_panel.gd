@@ -17,6 +17,7 @@ var _clean_button: Button
 var _stop_button: Button
 var _progress: Array[Dictionary]=[]
 var _selected_ingredients: Dictionary={}
+var _serving_options: Dictionary={}
 var _last_result: ActionResult
 var _hygiene_data: Dictionary
 var _dirty: bool=true
@@ -104,7 +105,8 @@ func _render_jobs() -> void:
   _progress.append({"job_id":str(job.id),"step_id":str(step.id),"label":progress})
   if step.kind=="cold_wait":card.add_child(SheetControls.label(ItemText.t("cold_wait")))
   var id := StringName(str(job.id));var action := StringName(str(step.action))
-  if step.kind!="passive_heat":card.add_child(SheetControls.button(ItemText.step(str(job.recipe_id),step),func():_apply(_session.workflow.act(id,action))))
+  if step.kind=="batch_hold" or not job.definition.has("vessel_definition") and int(job.step_index)==job.definition.steps.size()-1:_serving_controls(card,job)
+  if step.kind!="passive_heat":card.add_child(SheetControls.button(ItemText.step(str(job.recipe_id),step),func():_apply(_session.workflow.act(id,action,_serving_options.get(str(id),{})))))
   if step.kind=="soak":card.add_child(SheetControls.label(ItemText.t("soak_hint")))
   if RecipeProcesses.supports(job.definition):
    card.add_child(SheetControls.label(ItemText.t("method",{"method":UiText.localized("cooking.method."+str(job.definition.method),{},str(job.definition.method))})))
@@ -189,3 +191,20 @@ func _update_progress() -> void:
   if cleaning:
    var progress: Dictionary=state.get("cleaning",{})
    _clean_progress.text=ItemText.t("cleaning",{"minutes":"%.1f" % maxf(0,float(progress.get("required_minutes",0))-float(progress.get("completed_minutes",0)))})
+
+func _serving_controls(card: VBoxContainer, job: Dictionary) -> void:
+ var food := str(job.definition.output.food_id)
+ var options: Dictionary=_serving_options.get(str(job.id),{"variant_id":_session.menu.default_variant(food),"additions":[]})
+ var variants := _session.menu.variants(food)
+ var picker := OptionButton.new();card.add_child(picker)
+ for id in variants:
+  picker.add_item(UiText.localized("serving."+id.get_slice("/",1),{},id.get_slice("/",1))+" · "+UiText.localized("serving."+id.get_slice("/",2),{},id.get_slice("/",2)))
+  if id==str(options.variant_id):picker.select(picker.item_count-1)
+ picker.item_selected.connect(func(index):options.variant_id=variants[index];_serving_options[str(job.id)]=options.duplicate(true))
+ for addition in _session.menu._data.foods[food].additions:
+  var id: String=str(addition)
+  var toggle := CheckBox.new();toggle.text=UiText.localized("addition."+id,{},id);toggle.button_pressed=id in options.additions;card.add_child(toggle)
+  toggle.toggled.connect(func(enabled):
+   if enabled and not id in options.additions:options.additions.append(id)
+   elif not enabled:options.additions.erase(id)
+   _serving_options[str(job.id)]=options.duplicate(true))

@@ -93,6 +93,26 @@
     "liver_seasoning": {
       "price_minor": 80,
       "daily_stock": 20
+    },
+    "paper_cup": {
+      "price_minor": 15,
+      "daily_stock": 30
+    },
+    "paper_plate": {
+      "price_minor": 20,
+      "daily_stock": 30
+    },
+    "takeaway_wrap": {
+      "price_minor": 15,
+      "daily_stock": 30
+    },
+    "chili_sauce": {
+      "price_minor": 35,
+      "daily_stock": 30
+    },
+    "cheese": {
+      "price_minor": 60,
+      "daily_stock": 30
     }
   },
   "emergency": {

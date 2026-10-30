@@ -48,6 +48,7 @@ var supplies: SupplyService
 var life: LifeActions
 var service: ServiceSystem
 var character_life: CharacterLife
+var menu: MenuService
 var visitors: VisitorService
 var social_life: SocialLife
 var relationships: RelationshipStore
@@ -170,7 +171,11 @@ func configure(source: SessionConfig) -> ActionResult:
  foods=FoodRegistry.new()
  var food_result := foods.configure(source.section("foods"))
  if not food_result.ok:return food_result
+ menu=MenuService.new()
+ var menu_result := menu.configure(source.section("menu"),foods,inventory,clock)
+ if not menu_result.ok:return menu_result
  character_life=CharacterLife.new()
+ character_life.menu=menu
  var character_result := character_life.configure(source.section("character_life"),foods,clock)
  if not character_result.ok:return character_result
  cooking = CookingService.new()
@@ -181,6 +186,7 @@ func configure(source: SessionConfig) -> ActionResult:
  items.cold_active=func(id):return equipment.enabled(id) and not spaces.placement(id).is_empty()
  var workflow_result := workflow.configure(source.section("recipe_workflows"),inventory,equipment,clock,knowledge)
  if not workflow_result.ok:return workflow_result
+ workflow.serving_provider=menu.plan
  workflow.policy=actions
  workflow.quality_provider=func():return mood_policy.quality_penalty(needs.mood)
  cooking.foods=foods
@@ -201,6 +207,8 @@ func configure(source: SessionConfig) -> ActionResult:
  supplies = SupplyService.new(travel,home,knowledge)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
+ service.menu=menu
+ service.quote_provider=_quote_for_visit
  service.policy=actions
  service.gift_allowed=can_offer_hospitality
  service.receipt_recipes=source.section("recipe_workflows")
@@ -444,10 +452,7 @@ func _equipment_busy(id: StringName) -> bool:
  return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id)) or (visitors!=null and visitors.seating.busy_item(id)) or (seat_use!=null and seat_use.busy_item(id))
 
 func _choose_food(character_id: StringName, visit_id: StringName) -> StringName:
- var offers: Array[Dictionary]=[]
- for id in workflow.available_foods(&"kiosk"):
-  var food := foods.definition(StringName(id))
-  offers.append({"food_id":str(id),"price_minor":int(food.price_minor)})
+ var offers := menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false))
  var decision := character_life.consider(character_id,visit_id,offers)
  return StringName(str(decision.get("food_id","")))
 
@@ -484,7 +489,7 @@ func _step_experiences(_frame: Dictionary) -> ActionResult:
  return ActionResult.success()
 
 func request_can_prepare(food_id: StringName) -> bool:
- return str(food_id) in workflow.available_foods(&"kiosk")
+ return menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false)).any(func(o):return o.food_id==str(food_id))
 func _service_effect(action: String, participants: PackedStringArray) -> ActionResult:
  if action in ["accept","accept_gift"] and not accounts.business_allowed():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  if participants.size()!=1 or not visitors.is_available(StringName(participants[0])):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
@@ -492,6 +497,8 @@ func _service_effect(action: String, participants: PackedStringArray) -> ActionR
  if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("spatial").hearing_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  if action=="decline":return visitors.decline_request(visit.id)
  if not request_can_prepare(visit.food_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_ingredients")
+ var quoted := _quote_for_visit(visit.id,visit.food_id)
+ if not quoted.ok:visitors.reset_request(visit.id);return quoted
  return visitors.accept_request(visit.id,action=="accept_gift")
 
 func can_offer_hospitality(visit_id: StringName) -> bool:
@@ -541,3 +548,16 @@ func validate_financial_chapters() -> ActionResult:
 
 func supplier_context(chapter: String) -> Dictionary:return account_dialogue.context(chapter,"fathi")
 func supplier_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:return account_dialogue.supplier_effect(action,source,participants)
+
+func _quote_for_visit(visit_id: StringName, food_id: StringName) -> ActionResult:
+ var visit: VisitState=visitors.visits.get(str(visit_id))
+ if visit==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ var decision: Dictionary=character_life.state(visit.character_id).get("decision",{})
+ var variant := menu.default_variant(str(food_id));var additions := PackedStringArray()
+ if decision.get("food_id")==str(food_id):variant=str(decision.variant_id);additions=PackedStringArray(decision.additions)
+ var quoted := menu.quote(StringName(variant),additions)
+ if not quoted.ok:return quoted
+ if decision.get("food_id")==str(food_id) and int(quoted.details.quote.price_minor)!=int(decision.price_minor):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"offer_changed")
+ var offers := menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false))
+ if not offers.any(func(o):return o.variant_id==variant and o.additions==Array(additions)):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"offer_changed")
+ return quoted

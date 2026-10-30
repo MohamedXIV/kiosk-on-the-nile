@@ -108,3 +108,5 @@ func process_status(instance_id: StringName) -> Dictionary:
 
 func freshness(item: PreparedItem) -> Dictionary:
  return FoodFreshness.view(item.snapshot(),_inventory.items.world_clock.world_minutes,_inventory.items.food_definitions)
+
+func held_record() -> Dictionary:return _inventory.items.get_item(_inventory.held_id())

@@ -1,11 +1,17 @@
 {
   "initial_stock": {
     "tea": 6,
-    "kebda": 5
+    "kebda": 5,
+    "paper_cup": 6,
+    "paper_plate": 4,
+    "takeaway_wrap": 4
   },
   "stock_labels": {
     "tea": "شاي",
-    "kebda": "كبدة"
+    "kebda": "كبدة",
+    "paper_cup": "كوباية ورق",
+    "paper_plate": "طبق ورق",
+    "takeaway_wrap": "تغليف تيك أواي"
   },
   "recipes": {
     "tea": {

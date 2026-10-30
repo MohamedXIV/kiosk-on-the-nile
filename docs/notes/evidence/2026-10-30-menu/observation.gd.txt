@@ -1,0 +1,45 @@
+extends SceneTree
+func _initialize():call_deferred("run")
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded:=content.load_directory("res://content")
+ if not loaded.ok:print("CONTENT ",loaded.details);quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint)
+ var session:=GameSession.new();root.add_child(session)
+ var configured:=session.configure(cfg)
+ print("CONFIG ",configured.ok," ",configured.message_key)
+ if not configured.ok:quit(1);return
+ var q:=session.menu.quote(&"tea/cup/here")
+ print("QUOTE ",JSON.stringify(q.details))
+ session.menu.set_price(&"tea/cup/here",0)
+ print("ZERO_PRICE ",session.menu.quote(&"tea/cup/here").details)
+ session.player_pose.location_id=&"kiosk";session.player_ground=session.spaces.ground(&"tea")+Vector2(0,1)
+ var started:=session.workflow.start(&"tea",&"kiosk",PackedStringArray(["tea"]))
+ if not started.ok:print("START ",started.message_key);quit(1);return
+ var id:=StringName(started.details.job_id)
+ session.clock.advance(3.2);session.workflow.tick(session.clock.frame(3.2))
+ var added:=session.workflow.act(id,&"add_tea")
+ if not added.ok:print("ADD ",added.message_key);quit(1);return
+ session.clock.advance(2.5);session.workflow.tick(session.clock.frame(2.5))
+ var served:=session.workflow.act(id,&"pour",{"variant_id":"tea/cup/takeaway","additions":[]})
+ print("REAL_TAKEAWAY ",served.ok," ",served.message_key," ",session.cooking.held_item().snapshot() if served.ok else {})
+ if not served.ok:quit(1);return
+ var visit:=session.visitors.spawn(&"amgad")
+ visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground
+ session.service.quote_provider=func(_visit,_food):return session.menu.quote(&"tea/cup/takeaway")
+ var order:=session.service.place_order(visit.id,&"tea")
+ if order==null:print("NO_ORDER");quit(1);return
+ visit.food_id=&"tea";visit.order_id=order.id;visit.shopping_state=&"pending"
+ session.menu.set_price(&"tea/cup/takeaway",900)
+ print("FROZEN_ACCEPTED_QUOTE ",order.base_price," NEW ",session.menu.quote(&"tea/cup/takeaway").details.quote.price_minor)
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("CURRENT_CANDIDATE ",restored.ok," ",restored.message_key," ",restored.details)
+ if not restored.ok:quit(1);return
+ var paid:=session.service.complete(order.id,&"paid")
+ print("REAL_SETTLEMENT ",paid.ok," ",paid.message_key," ",paid.details)
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,cfg)
+ print("SETTLED_CURRENT_CANDIDATE ",restored.ok," ",restored.message_key," ",restored.details)
+ quit(0 if restored.ok and paid.ok and order.payment==1200 else 1)

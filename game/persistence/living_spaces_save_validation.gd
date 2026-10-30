@@ -102,6 +102,10 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
   if not session.hygiene.snapshot().applied.has("visit:"+str(id)):return _fail("experience_floor_event")
  var item_counter := int(items.next_id)
  for order in session.service.snapshot().orders.values():
+  if order.status=="delivered":
+   var raw: Dictionary=order.source_item
+   var proof := session.workflow.result_for(StringName(str(raw.get("source_job_id",""))),StringName(order.delivered_item_id))
+   if proof.is_empty() or not RecipeProcesses.preparation_matches(raw,proof):return _fail("delivered_preparation_source")
   if order.delivered_item_id!="" and not _counter_id(order.delivered_item_id,"food_",item_counter):return _fail("delivered_food_counter")
  for receipt in session.shops.snapshot().receipts.values():
   if not _counter_id(receipt.journey_id,"journey_",int(session.travel.snapshot().next_id)):return _fail("purchase_journey_counter")

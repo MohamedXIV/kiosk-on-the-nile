@@ -5,6 +5,7 @@ signal supplier_requested
 signal tuning_requested
 signal clean_floor_requested
 signal travel_requested(route_id: StringName)
+signal menu_requested
 signal inventory_requested
 signal arrange_requested
 signal save_requested
@@ -47,7 +48,7 @@ func configure(text: UiText) -> void:
  _menu.add_child(menu_scroll)
  actions.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  menu_scroll.add_child(actions)
- for entry in [{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
+ for entry in [{"key":"menu_prices","action":func():menu_requested.emit()},{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
   var callback: Callable = entry.action
   actions.add_child(text.key_button(entry.key,func():_menu.hide();callback.call()))
  actions.add_child(text.key_button("supplier_phone",func():_menu.hide();supplier_requested.emit()))

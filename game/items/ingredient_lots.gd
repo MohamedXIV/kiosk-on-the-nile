@@ -91,8 +91,10 @@ static func validate_session(session: GameSession) -> ActionResult:
    var copy := input.duplicate(true)
    copy.quantity=int(input.consumed_quantity)
    records["consumed/"+id+"/"+str(index)]=copy
-  for output_id in job.get("portion_results",{}):
-   var output: Dictionary=job.portion_results[output_id]
+  var outputs: Dictionary=job.get("portion_results",{}).duplicate(true)
+  if job.has("result_snapshot"):outputs[str(job.result_item_id)]=job.result_snapshot
+  for output_id in outputs:
+   var output: Dictionary=outputs[output_id]
    var serving: Array=output.get("serving_evidence",[])
    for index in range(serving.size()):
     var input: Dictionary=serving[index]

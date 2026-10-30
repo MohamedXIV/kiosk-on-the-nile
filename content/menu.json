@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "foods": {
+    "tea": {
+      "formats": [
+        "cup"
+      ],
+      "additions": []
+    },
+    "kebda": {
+      "formats": [
+        "sandwich",
+        "plate"
+      ],
+      "additions": [
+        "chili",
+        "cheese"
+      ]
+    },
+    "kebda_pane": {
+      "formats": [
+        "sandwich",
+        "plate"
+      ],
+      "additions": [
+        "chili",
+        "cheese"
+      ]
+    },
+    "ful": {
+      "formats": [
+        "plate",
+        "sandwich"
+      ],
+      "additions": [
+        "chili"
+      ]
+    },
+    "potato_fried": {
+      "formats": [
+        "plate"
+      ],
+      "additions": [
+        "chili",
+        "cheese"
+      ]
+    },
+    "potato_baked": {
+      "formats": [
+        "plate"
+      ],
+      "additions": [
+        "chili",
+        "cheese"
+      ]
+    },
+    "shawarma": {
+      "formats": [
+        "sandwich"
+      ],
+      "additions": [
+        "chili",
+        "cheese"
+      ]
+    }
+  },
+  "formats": {
+    "sandwich": [
+      {
+        "definition_id": "bread",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "plate": [
+      {
+        "definition_id": "paper_plate",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "cup": [
+      {
+        "definition_id": "paper_cup",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ]
+  },
+  "packaging": {
+    "sandwich": [
+      {
+        "definition_id": "takeaway_wrap",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "plate": [
+      {
+        "definition_id": "takeaway_wrap",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ],
+    "cup": [
+      {
+        "definition_id": "takeaway_wrap",
+        "quantity": 1,
+        "required_storage": "dry"
+      }
+    ]
+  },
+  "additions": {
+    "chili": {
+      "inputs": [
+        {
+          "definition_id": "chili_sauce",
+          "quantity": 1,
+          "required_storage": "dry"
+        }
+      ],
+      "price_minor": 0,
+      "spice": 0.25
+    },
+    "cheese": {
+      "inputs": [
+        {
+          "definition_id": "cheese",
+          "quantity": 1,
+          "required_storage": "cold"
+        }
+      ],
+      "price_minor": 100,
+      "spice": 0
+    }
+  }
+}

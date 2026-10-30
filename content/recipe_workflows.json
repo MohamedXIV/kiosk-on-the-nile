@@ -127,14 +127,6 @@
     "default_heat": "medium",
     "ideal_heat": "medium",
     "hold_heat": "low",
-    "serving_inputs": [
-      {
-        "definition_id": "bread",
-        "quantity": 1,
-        "required_storage": "dry"
-      }
-    ],
-    "serving_format": "sandwich",
     "output": {
       "food_id": "kebda"
     },
@@ -332,8 +324,6 @@
     "default_heat": "medium",
     "ideal_heat": "medium",
     "hold_heat": "off",
-    "serving_inputs": [],
-    "serving_format": "plate",
     "output": {
       "food_id": "potato_fried"
     },
@@ -407,8 +397,6 @@
     "default_heat": "medium",
     "ideal_heat": "medium",
     "hold_heat": "off",
-    "serving_inputs": [],
-    "serving_format": "plate",
     "output": {
       "food_id": "potato_baked"
     },
@@ -513,14 +501,6 @@
     "default_heat": "medium",
     "ideal_heat": "medium",
     "hold_heat": "off",
-    "serving_inputs": [
-      {
-        "definition_id": "bread",
-        "quantity": 1,
-        "required_storage": "dry"
-      }
-    ],
-    "serving_format": "sandwich",
     "output": {
       "food_id": "kebda_pane"
     },
@@ -617,8 +597,6 @@
     "default_heat": "low",
     "ideal_heat": "low",
     "hold_heat": "low",
-    "serving_inputs": [],
-    "serving_format": "plate",
     "output": {
       "food_id": "ful"
     },

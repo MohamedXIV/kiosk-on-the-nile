@@ -22,7 +22,12 @@
         "fava_beans": 20,
         "flour": 20,
         "eggs": 20,
-        "liver_seasoning": 20
+        "liver_seasoning": 20,
+        "paper_cup": 30,
+        "paper_plate": 30,
+        "takeaway_wrap": 30,
+        "chili_sauce": 30,
+        "cheese": 30
       },
       "offers": {
         "tea_portion": {
@@ -245,6 +250,61 @@
           "contents": [
             {
               "definition_id": "liver_seasoning",
+              "quantity": 1
+            }
+          ]
+        },
+        "paper_cup": {
+          "label": "كوباية ورق",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 15,
+          "contents": [
+            {
+              "definition_id": "paper_cup",
+              "quantity": 1
+            }
+          ]
+        },
+        "paper_plate": {
+          "label": "طبق ورق",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 20,
+          "contents": [
+            {
+              "definition_id": "paper_plate",
+              "quantity": 1
+            }
+          ]
+        },
+        "takeaway_wrap": {
+          "label": "تغليف تيك أواي",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 15,
+          "contents": [
+            {
+              "definition_id": "takeaway_wrap",
+              "quantity": 1
+            }
+          ]
+        },
+        "chili_sauce": {
+          "label": "صوص شطة",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 35,
+          "contents": [
+            {
+              "definition_id": "chili_sauce",
+              "quantity": 1
+            }
+          ]
+        },
+        "cheese": {
+          "label": "جبنة إضافية",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 60,
+          "contents": [
+            {
+              "definition_id": "cheese",
               "quantity": 1
             }
           ]

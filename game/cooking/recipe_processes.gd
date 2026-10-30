@@ -7,10 +7,7 @@ static func supports(definition: Dictionary) -> bool:return definition.get("proc
 static func validate(definition: Dictionary, items: ItemStore) -> ActionResult:
  if not supports(definition):return ActionResult.success()
  if not ContentValidation.integer(definition.get("portions")) or not ContentValidation.bounded(definition.portions,1,12) or items.definition(StringName(str(definition.get("vessel_definition","")))).get("kind")!="batch":return _fail("batch")
- if not definition.get("method") in METHODS or not definition.get("default_heat") in HEATS.slice(1) or not definition.get("ideal_heat") in HEATS.slice(1) or not definition.get("hold_heat") in ["off","low"] or not definition.get("serving_inputs") is Array:return _fail("method")
- if not definition.get("serving_format") in ["sandwich","plate","cup"]:return _fail("serving_format")
- for input in definition.serving_inputs:
-  if not input is Dictionary or items.definition(StringName(str(input.get("definition_id","")))).get("kind")!="ingredient" or not ContentValidation.integer(input.get("quantity")) or input.quantity<1 or not input.get("required_storage") in ["dry","cold"]:return _fail("serving_inputs")
+ if not definition.get("method") in METHODS or not definition.get("default_heat") in HEATS.slice(1) or not definition.get("ideal_heat") in HEATS.slice(1) or not definition.get("hold_heat") in ["off","low"]:return _fail("method")
  var cooking := 0;var holding := 0
  for step in definition.steps:
   if step.kind=="passive_heat":cooking+=1
@@ -24,7 +21,7 @@ static func initialise(job: Dictionary) -> void:
  job["heat_error"]=0.0;job["heat_history"]=[]
  job["portion_results"]={};job["portions_served"]=0
  job["ready_at"]=-1.0;job["initial_quality"]=-1.0
-static func prepare_action(owner: RecipeWorkflow, original: Dictionary, action: StringName) -> ActionResult:
+static func prepare_action(owner: RecipeWorkflow, original: Dictionary, action: StringName, options: Dictionary={}) -> ActionResult:
  var job := original.duplicate(true)
  var step: Dictionary=job.definition.steps[int(job.step_index)]
  var device := str(job.devices[step.capability])
@@ -46,7 +43,7 @@ static func prepare_action(owner: RecipeWorkflow, original: Dictionary, action: 
  if step.kind=="passive_heat":return ActionResult.failure(ActionResult.Code.TOO_EARLY,&"too_early")
  if step.kind=="batch_hold":
   if not owner._inventory.held_id().is_empty():return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
-  return _serve(owner,job,change)
+  return _serve(owner,job,change,options)
  var elapsed := float(job.elapsed)
  if elapsed<float(step.duration) and not step.get("allow_early",false):return ActionResult.failure(ActionResult.Code.TOO_EARLY,&"too_early")
  var grade := 3 if elapsed>=float(step.duration) else 1
@@ -109,20 +106,16 @@ static func prepare_tick(owner: RecipeWorkflow, job: Dictionary, frame: Dictiona
   if rate>0:job.heat_error=float(job.heat_error)+delta*difference
  job.last_world_minutes=now
  return ActionResult.success({"publish":false})
-static func _serve(owner: RecipeWorkflow, job: Dictionary, change: ItemChangeSet) -> ActionResult:
+static func _serve(owner: RecipeWorkflow, job: Dictionary, change: ItemChangeSet, options: Dictionary) -> ActionResult:
  var batch: Dictionary=change.state.items.get(str(job.get("bowl_id","")),{})
  if batch.is_empty() or int(batch.attributes.portions_remaining)<1:return owner._fail("batch_empty")
  var age := FoodFreshness.view(batch.attributes,owner._clock.world_minutes,owner._inventory.items.food_definitions)
  if not age.sellable:return owner._fail("food_unservable")
- var inputs: Array[Dictionary]=[];inputs.assign(job.definition.serving_inputs)
- var available := owner._inventory.available(StringName(job.location_id),inputs)
- if not available.ok:return available
- var serving: Array=[]
- for source in available.details.sources:
-  var record: Dictionary=change.state.items[source.item_id].duplicate(true)
-  record["consumed_quantity"]=int(source.quantity);record["requirement_index"]=int(source.requirement_index);serving.append(record)
-  change.state.items[source.item_id].quantity-=int(source.quantity)
-  if change.state.items[source.item_id].quantity==0:change.state.items.erase(source.item_id)
+ var plan: ActionResult = owner.serving_provider.call(StringName(str(job.definition.output.food_id)),options) if owner.serving_provider.is_valid() else ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"incompatible_serving")
+ if not plan.ok:return plan
+ var consumed := MenuService.consume_inputs(owner._inventory,change,StringName(job.location_id),plan.details.plan)
+ if not consumed.ok:return consumed
+ var serving: Array=consumed.details.evidence
  var output := PreparedItem.new()
  output.id=StringName("food_%d" % int(change.state.next_id));change.state.next_id=int(change.state.next_id)+1
  output.recipe_id=StringName(job.recipe_id);output.food_id=StringName(job.definition.output.food_id)
@@ -134,7 +127,7 @@ static func _serve(owner: RecipeWorkflow, job: Dictionary, change: ItemChangeSet
  output.quality_key=StringName(job.definition.quality_keys[output.quality_score])
  var attributes := output.snapshot()
  job.portions_served=int(job.portions_served)+1
- attributes.merge({"source_job_id":job.id,"portion_index":job.portions_served,"personal_use":bool(job.get("personal_use",false)),"serving_evidence":serving,"portioned_at":owner._clock.world_minutes})
+ attributes.merge({"source_job_id":job.id,"portion_index":job.portions_served,"personal_use":bool(job.get("personal_use",false)),"serving_plan":plan.details.plan.duplicate(true),"serving_evidence":serving,"portioned_at":owner._clock.world_minutes})
  change.state.items[str(output.id)]={"id":str(output.id),"definition_id":"prepared_food","kind":"prepared","quantity":1,"container_id":"player_hand","attributes":attributes}
  batch.attributes.portions_remaining=int(batch.attributes.portions_remaining)-1
  job.portion_results[str(output.id)]=attributes.duplicate(true)
@@ -197,22 +190,11 @@ static func validate_saved(job: Dictionary, items: ItemStore, now: float) -> Act
   var r: Variant=job.portion_results[id]
   if not r is Dictionary or r.get("id")!=id or r.get("recipe_id")!=job.recipe_id or r.get("food_id")!=job.definition.output.food_id or r.get("batch_id")!=job.get("bowl_id") or not ContentValidation.bounded(r.get("initial_quality"),0,100) or not is_equal_approx(float(r.initial_quality),float(job.initial_quality)) or not ContentValidation.bounded(r.get("prepared_at"),float(job.started_at),now) or not is_equal_approx(float(r.prepared_at),float(job.ready_at)) or not ContentValidation.integer(r.get("quality_score")) or r.quality_score!=grade_for(float(r.initial_quality)) or r.get("quality_key")!=job.definition.quality_keys[int(r.quality_score)]:return _fail("saved_portion")
   if not ContentValidation.integer(r.get("portion_index")) or r.portion_index<1 or r.portion_index>job.portions_served or seen.has(int(r.portion_index)) or not ContentValidation.bounded(r.get("portioned_at"),float(job.ready_at),now) or not r.get("serving_evidence") is Array:return _fail("saved_portion_source")
-  if r.get("method")!=job.definition.method or r.get("serving_format")!=job.definition.serving_format or r.get("consumption_mode")!="here" or r.get("additions")!=[] or not r.get("heat") in HEATS or r.get("sugar_id")!="" or r.get("source_job_id")!=job.id or r.get("personal_use")!=job.personal_use:return _fail("saved_portion_recipe")
+  if r.get("method")!=job.definition.method or not r.get("heat") in HEATS or r.get("sugar_id")!="" or r.get("source_job_id")!=job.id or r.get("personal_use")!=job.personal_use:return _fail("saved_portion_recipe")
   seen[int(r.portion_index)]=true
   if not FoodFreshness.valid(r.get("freshness"),float(job.ready_at),float(r.portioned_at)):return _fail("saved_portion_freshness")
-  var counts := {}
-  for input in r.serving_evidence:
-   if not input is Dictionary or not input.get("attributes") is Dictionary or not input.get("definition_id") is String or not ContentValidation.integer(input.get("consumed_quantity")) or input.consumed_quantity<1:return _fail("saved_serving_input")
-   var checked := IngredientLots.validate(input,items._definitions,float(r.portioned_at))
-   if not checked.ok:return checked
-   var family := items.ingredient_family(str(input.definition_id))
-   counts[family]=int(counts.get(family,0))+int(input.consumed_quantity)
-  var required := {}
-  for input in job.definition.serving_inputs:
-   var family := items.ingredient_family(str(input.definition_id));required[family]=int(required.get(family,0))+int(input.quantity)
-  if counts.size()!=required.size():return _fail("saved_serving_quantity")
-  for family in required:
-   if int(counts.get(family,0))!=int(required[family]):return _fail("saved_serving_quantity")
+  var serving_check := validate_serving(r,items,now)
+  if not serving_check.ok:return serving_check
  if job.status=="active" and int(job.step_index)>0:
   var batch := items.get_item(StringName(str(job.get("bowl_id",""))))
   if batch.get("kind")!="batch" or batch.get("definition_id")!=job.definition.vessel_definition or batch.attributes.get("source_job_id")!=job.id or batch.attributes.get("portions_total")!=job.definition.portions or batch.attributes.get("portions_remaining")!=int(job.definition.portions)-int(job.portions_served):return _fail("saved_batch")
@@ -221,8 +203,23 @@ static func validate_saved(job: Dictionary, items: ItemStore, now: float) -> Act
   if step.kind=="batch_hold" and (not is_equal_approx(float(batch.attributes.get("ready_at",-1)),float(job.ready_at)) or not is_equal_approx(float(batch.attributes.get("initial_quality",-1)),float(job.initial_quality))):return _fail("saved_batch_quality")
  if job.status=="completed" and job.portions_served!=int(job.definition.portions):return _fail("saved_yield")
  return ActionResult.success()
+static func validate_serving(record: Dictionary, items: ItemStore, now: float) -> ActionResult:
+ if not MenuService.validate_plan(record.get("serving_plan"),items.serving_catalog) or not record.get("serving_evidence") is Array or not ContentValidation.bounded(record.get("portioned_at"),0,now):return _fail("saved_serving_plan")
+ for key in ["variant_id","food_id","serving_format","consumption_mode","additions"]:
+  if record.get(key)!=record.serving_plan.get(key):return _fail("saved_serving_identity")
+ var counts := {}
+ for input in record.serving_evidence:
+  if not input is Dictionary or not input.get("attributes") is Dictionary or not input.get("definition_id") is String or not ContentValidation.integer(input.get("consumed_quantity")) or input.consumed_quantity<1 or not ContentValidation.integer(input.get("requirement_index")) or input.requirement_index<0 or input.requirement_index>=record.serving_plan.inputs.size():return _fail("saved_serving_input")
+  var index := int(input.requirement_index)
+  if not items.ingredient_matches(str(input.definition_id),str(record.serving_plan.inputs[index].definition_id)):return _fail("saved_serving_material")
+  var checked := IngredientLots.validate(input,items._definitions,float(record.portioned_at))
+  if not checked.ok:return checked
+  counts[index]=int(counts.get(index,0))+int(input.consumed_quantity)
+ for index in range(record.serving_plan.inputs.size()):
+  if int(counts.get(index,0))!=int(record.serving_plan.inputs[index].quantity):return _fail("saved_serving_quantity")
+ return ActionResult.success()
 static func preparation_matches(item: Dictionary, proof: Dictionary) -> bool:
- for key in ["id","food_id","recipe_id","batch_id","method","serving_format","consumption_mode","additions"]:
+ for key in ["id","food_id","recipe_id","batch_id","method","variant_id","serving_format","consumption_mode","additions"]:
   if not item.has(key) or not proof.has(key) or item[key]!=proof[key]:return false
  if not item.get("freshness") is Dictionary or not proof.get("freshness") is Dictionary:return false
  var time: Variant = item.freshness.get("at",-1)

@@ -51,6 +51,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not recipe_store_result.ok:return recipe_store_result
   var workflow_result := CookingWorkflowValidation.validate_recipes(bundle.recipe_workflows,recipe_items)
   if not workflow_result.ok:return workflow_result
+ if bundle.has("menu"):
+  var menu_result := MenuService.validate_catalog(bundle.menu,bundle.get("foods",{}),bundle.get("items",{}))
+  if not menu_result.ok:return menu_result
  if bundle.has("foods"):
   var foods_result := FoodRegistry.validate(bundle.foods)
   if not foods_result.ok:return foods_result

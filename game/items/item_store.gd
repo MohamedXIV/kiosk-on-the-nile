@@ -7,6 +7,7 @@ var revision: int = 0
 var world_clock: GameClock
 var food_definitions: Dictionary={}
 var cold_active: Callable
+var serving_catalog: Dictionary={}
 func configure(definitions: Dictionary, containers: Dictionary) -> ActionResult:
  var result := ItemContentValidation.validate(definitions,containers)
  if not result.ok: return result

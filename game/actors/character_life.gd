@@ -2,6 +2,7 @@ class_name CharacterLife
 extends RefCounted
 ## Actor state and coarse decisions. Reading projections never consumes RNG or mutates state.
 var environment_provider: Callable
+var menu: MenuService
 var _data: Dictionary
 var _foods: FoodRegistry
 var _clock: GameClock
@@ -44,34 +45,45 @@ func consider(actor: StringName, visit: StringName, offers: Array[Dictionary], e
  var current := state(actor)
  if not _visit_id(str(visit)) or current.is_empty() or current.visit!=str(visit):return {"intent":"quiet","food_id":"","reason":"actor_unavailable"}
  var previous: Dictionary=current.decision
- if not previous.is_empty() and _clock.world_minutes<float(previous.next_at):return previous.duplicate(true)
+ if not previous.is_empty() and _clock.world_minutes<float(previous.next_at):
+  if not str(previous.food_id).is_empty():
+   var current_offer := offers.any(func(o):return o.get("variant_id")==previous.get("variant_id") and o.get("additions")==previous.get("additions") and o.get("price_minor")==previous.get("price_minor"))
+   if not current_offer:
+    previous=previous.duplicate(true);previous.food_id="";previous.intent="quiet";previous.variant_id="";previous.additions=[];previous.price_minor=-1;previous.factors={"quiet":1.0}
+    current.decision=previous;_states[str(actor)]=current
+  return previous.duplicate(true)
  var p := profile(actor)
  var needs: Dictionary=current.needs
  var quiet := float(_data.policy.quiet_weight)*(0.4+0.7*(1.0-maxf(float(needs.hunger),float(needs.thirst)))+float(needs.tiredness)*0.5)
  var candidates: Array[Dictionary]=[]
  var total := quiet
- var seen := {}
+ var seen := {};var counts := {}
+ for offer in offers:
+  if ContentValidation.integer(offer.get("price_minor")) and int(offer.price_minor)<=int(p.spend_limit_minor) and _foods.has_food(StringName(str(offer.get("food_id","")))) and ContentValidation.bounded(offer.get("spice"),0,float(p.spice_limit)):
+   counts[str(offer.food_id)]=int(counts.get(str(offer.food_id),0))+1
  if p.buying_enabled:
   for offer in offers:
    var food := str(offer.get("food_id",""))
-   if seen.has(food) or not _foods.has_food(StringName(food)) or not ContentValidation.integer(offer.get("price_minor")) or offer.price_minor<0:continue
-   seen[food]=true
+   var key := str(offer.get("variant_id",""))+StableJson.stringify(offer.get("additions",[]))
+   if seen.has(key) or not offer.get("variant_id") is String or not offer.get("additions") is Array or not _foods.has_food(StringName(food)) or not ContentValidation.integer(offer.get("price_minor")) or offer.price_minor<0 or int(offer.price_minor)>int(p.spend_limit_minor):continue
+   seen[key]=true
    var d := _foods.definition(StringName(food))
-   if float(d.spice)>float(p.spice_limit):continue
+   if not ContentValidation.bounded(offer.get("spice"),0,float(p.spice_limit)):continue
+   d.spice=float(offer.spice)
    var known: Variant=expected.get(food,{})
    if not known is Dictionary or (known.has("score") and not ContentValidation.bounded(known.score,0,100)):continue
    var factors := _factors(p,needs,d,food,int(offer.price_minor),known)
-   var weight: float=factors.need*factors.preference*factors.price*factors.memory
+   var weight: float=factors.need*factors.preference*factors.price*factors.memory/maxi(1,int(counts.get(food,1)))
    if weight<=0:continue
-   candidates.append({"food_id":food,"weight":weight,"factors":factors});total+=weight
- var choice := {"food_id":"","intent":"rest" if float(needs.tiredness)>0.8 else "company" if float(needs.social)>0.6 else "quiet","factors":{"quiet":quiet}}
+   candidates.append({"food_id":food,"variant_id":offer.variant_id,"additions":offer.additions.duplicate(),"price_minor":int(offer.price_minor),"weight":weight,"factors":factors});total+=weight
+ var choice := {"variant_id":"","additions":[],"price_minor":-1,"food_id":"","intent":"rest" if float(needs.tiredness)>0.8 else "company" if float(needs.social)>0.6 else "quiet","factors":{"quiet":quiet}}
  var roll := _rng.randf()*total
  if roll>=quiet:
   roll-=quiet
   for candidate in candidates:
    roll-=float(candidate.weight)
    if roll<=0:
-    choice={"food_id":candidate.food_id,"intent":"drink" if _foods.definition(StringName(candidate.food_id)).category=="drink" else "eat","factors":candidate.factors};break
+    choice={"variant_id":candidate.variant_id,"additions":candidate.additions.duplicate(),"price_minor":candidate.price_minor,"food_id":candidate.food_id,"intent":"drink" if _foods.definition(StringName(candidate.food_id)).category=="drink" else "eat","factors":candidate.factors};break
  current.decisions=int(current.decisions)+1
  choice["visit"]=str(visit);choice["index"]=current.decisions;choice["at"]=_clock.world_minutes
  choice["next_at"]=_clock.world_minutes+float(_data.policy.reconsider_minutes)
@@ -128,12 +140,15 @@ func restore(data: Dictionary) -> ActionResult:
   if decision.is_empty():
    if record.decisions!=0:return _invalid("character_life_decision")
    continue
-  if not CharacterLifeValidation.keys(decision,["food_id","intent","factors","visit","index","at","next_at"]) or decision.visit!=record.visit or decision.index!=record.decisions or not decision.intent in ["quiet","company","rest","eat","drink"] or not decision.food_id is String or not decision.factors is Dictionary:return _invalid("character_life_decision")
+  if not CharacterLifeValidation.keys(decision,["food_id","intent","factors","visit","index","at","next_at","variant_id","additions","price_minor"]) or decision.visit!=record.visit or decision.index!=record.decisions or not decision.intent in ["quiet","company","rest","eat","drink"] or not decision.food_id is String or not decision.factors is Dictionary:return _invalid("character_life_decision")
+  if not decision.get("variant_id") is String or not decision.get("additions") is Array or not ContentValidation.integer(decision.get("price_minor")):return _invalid("character_life_offer")
   if record.visit.is_empty():return _invalid("character_life_decision_visit")
   var buying: bool=decision.intent in ["eat","drink"]
   if buying!=(not decision.food_id.is_empty()) or (buying and not _foods.has_food(StringName(decision.food_id))) or not ContentValidation.bounded(decision.at,0,float(record.at)) or not ContentValidation.number(decision.next_at) or absf(float(decision.next_at)-float(decision.at)-float(_data.policy.reconsider_minutes))>0.001:return _invalid("character_life_choice")
   if not ContentValidation.integer(decision.index) or decision.index<1:return _invalid("character_life_index")
+  if not buying and (decision.variant_id!="" or not decision.additions.is_empty() or decision.price_minor!= -1):return _invalid("character_life_offer")
   if buying:
+   if menu==null or not menu.plan(StringName(decision.food_id),{"variant_id":decision.variant_id,"additions":decision.additions}).ok or not ContentValidation.bounded(decision.price_minor,0,float(_data.profiles[actor].spend_limit_minor)):return _invalid("character_life_offer")
    var food := _foods.definition(StringName(decision.food_id))
    if (food.category=="drink")!=(decision.intent=="drink") or not _data.profiles[actor].buying_enabled or float(food.spice)>float(_data.profiles[actor].spice_limit):return _invalid("character_life_intent")
   if not CharacterLifeValidation.keys(decision.factors,["need","preference","price","memory"] if buying else ["quiet"]):return _invalid("character_life_factors")

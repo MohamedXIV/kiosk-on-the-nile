@@ -554,5 +554,55 @@
       "grade": "standard",
       "quality": 60
     }
+  },
+  "paper_cup": {
+    "kind": "ingredient",
+    "label": "كوباية ورق",
+    "required_storage": "dry",
+    "material": {
+      "family": "paper_cup",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "paper_plate": {
+    "kind": "ingredient",
+    "label": "طبق ورق",
+    "required_storage": "dry",
+    "material": {
+      "family": "paper_plate",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "takeaway_wrap": {
+    "kind": "ingredient",
+    "label": "تغليف تيك أواي",
+    "required_storage": "dry",
+    "material": {
+      "family": "takeaway_wrap",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "chili_sauce": {
+    "kind": "ingredient",
+    "label": "صوص شطة",
+    "required_storage": "dry",
+    "material": {
+      "family": "chili_sauce",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "cheese": {
+    "kind": "ingredient",
+    "label": "جبنة إضافية",
+    "required_storage": "cold",
+    "material": {
+      "family": "cheese",
+      "grade": "standard",
+      "quality": 60
+    }
   }
 }

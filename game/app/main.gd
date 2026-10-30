@@ -18,6 +18,7 @@ var _district_panel: DistrictPanel
 var _shop_panel: ShopPanel
 var _journey_panel: JourneyPanel
 var _inventory_panel: InventoryPanel
+var _menu_panel: MenuPanel
 var _build_panel: BuildPanel
 var _placement_preview: PlacementPreview
 var _physical: PhysicalWorldController
@@ -184,6 +185,8 @@ func _install(candidate: GameSession) -> void:
  _build_panel=BuildPanel.new()
  _hud.add_child(_build_panel)
  _build_panel.configure(_text,_session.build,_session)
+ _menu_panel=MenuPanel.new();_hud.add_child(_menu_panel);_menu_panel.configure(_text,_session)
+ _hud.menu_requested.connect(func():_menu_panel.open())
  _inventory_panel=InventoryPanel.new()
  _hud.add_child(_inventory_panel)
  _inventory_panel.configure(_text,_session)
@@ -217,7 +220,7 @@ func _install(candidate: GameSession) -> void:
  _hud.add_child(_district_panel)
  _district_panel.configure(_text,_session)
  _modals=ModalCoordinator.new()
- for entry in [["payment",_payment_panel],["inventory",_inventory_panel],["recipes",_recipe_panel],["visitor",_visitor_panel],["tuning",_tuning_panel],["notebook",_hud.notebook],["sleep",_hud.sleep_panel]]:_modals.register(str(entry[0]),entry[1])
+ for entry in [["menu",_menu_panel],["payment",_payment_panel],["inventory",_inventory_panel],["recipes",_recipe_panel],["visitor",_visitor_panel],["tuning",_tuning_panel],["notebook",_hud.notebook],["sleep",_hud.sleep_panel]]:_modals.register(str(entry[0]),entry[1])
  _modals.register("build",_build_panel,_end_arrange)
  _modals.register("supplier",_supplier_panel,func():_session.contact.panel_requested=false;_supplier_panel.hide())
 
@@ -319,6 +322,9 @@ func _unhandled_input(event: InputEvent) -> void:
   return
  if event is InputEventKey and event.pressed and event.keycode==KEY_F8 and _session.config.section("tuning").dev_panel_enabled:
   _tuning_panel.open()
+  return
+ if _menu_panel.visible:
+  if event.is_action_pressed("cancel"):_menu_panel.hide()
   return
  if _payment_panel.visible:return
  if _visitor_panel.visible:
@@ -485,6 +491,7 @@ func _travel_changed() -> void:
  if _session.build.active:
   _session.build.cancel()
   _build_panel.hide()
+ _menu_panel.hide()
  _inventory_panel.hide()
  _recipe_panel.hide()
 
