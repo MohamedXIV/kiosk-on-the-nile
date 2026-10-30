@@ -36,7 +36,12 @@
     "temperature": "hot",
     "spice": 0,
     "satiation": 0.05,
-    "hydration": 0.55
+    "hydration": 0.55,
+    "freshness": {
+      "fresh_until": 90,
+      "declined_after": 240,
+      "unservable_after": 720
+    }
   },
   "kebda": {
     "label": "سندوتش كبدة إسكندراني",
@@ -70,7 +75,12 @@
     "temperature": "hot",
     "spice": 0.45,
     "satiation": 0.35,
-    "hydration": 0.05
+    "hydration": 0.05,
+    "freshness": {
+      "fresh_until": 180,
+      "declined_after": 480,
+      "unservable_after": 1440
+    }
   },
   "shawarma": {
     "label": "سندوتش شاورما فراخ",
@@ -104,7 +114,12 @@
     "temperature": "hot",
     "spice": 0.2,
     "satiation": 0.36,
-    "hydration": 0.05
+    "hydration": 0.05,
+    "freshness": {
+      "fresh_until": 180,
+      "declined_after": 480,
+      "unservable_after": 1440
+    }
   },
   "potato_fried": {
     "label": "بطاطس مقلية",
@@ -138,7 +153,12 @@
     "temperature": "hot",
     "spice": 0.1,
     "satiation": 0.22,
-    "hydration": 0.05
+    "hydration": 0.05,
+    "freshness": {
+      "fresh_until": 30,
+      "declined_after": 180,
+      "unservable_after": 720
+    }
   },
   "potato_baked": {
     "label": "بطاطس في الفرن",
@@ -172,7 +192,12 @@
     "temperature": "hot",
     "spice": 0.1,
     "satiation": 0.22,
-    "hydration": 0.05
+    "hydration": 0.05,
+    "freshness": {
+      "fresh_until": 180,
+      "declined_after": 480,
+      "unservable_after": 1440
+    }
   },
   "kebda_pane": {
     "label": "سندوتش كبدة بانيه",
@@ -206,7 +231,12 @@
     "temperature": "hot",
     "spice": 0.1,
     "satiation": 0.35,
-    "hydration": 0.05
+    "hydration": 0.05,
+    "freshness": {
+      "fresh_until": 30,
+      "declined_after": 180,
+      "unservable_after": 720
+    }
   },
   "ful": {
     "label": "طبق فول",
@@ -240,6 +270,11 @@
     "temperature": "hot",
     "spice": 0.15,
     "satiation": 0.3,
-    "hydration": 0.05
+    "hydration": 0.05,
+    "freshness": {
+      "fresh_until": 180,
+      "declined_after": 480,
+      "unservable_after": 1440
+    }
   }
 }

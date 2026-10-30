@@ -93,7 +93,7 @@ func execute(secondary: bool) -> ActionResult:
   "clean":return _session.hygiene.begin_clean(StringName(record.instance_id))
   "recipes":return ActionResult.success({"show_recipes":str(record.instance_id)})
   "inventory":
-   if _session.items.get_item(_session.inventory.held_id()).get("kind")=="batch":return _session.inventory.store_held(StringName(record.container_id))
+   if _session.items.get_item(_session.inventory.held_id()).get("kind") in ["batch","prepared"]:return _session.inventory.store_held(StringName(record.container_id))
    return ActionResult.success({"show_inventory":true})
   "toggle_equipment":
    var id := StringName(record.instance_id)

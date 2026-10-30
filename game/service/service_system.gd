@@ -65,6 +65,7 @@ func _check_handover(value: OrderState) -> ActionResult:
  if value==null or value.status!=&"pending" or not _available.call(value.visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
  var item := _cooking.held_item()
  if item==null or item.food_id!=value.food_id:return ActionResult.failure(ActionResult.Code.WRONG_ORDER,&"wrong_order")
+ if not _cooking.freshness(item).sellable:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"food_unservable")
  if personal_item.is_valid() and personal_item.call(item.id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"personal_food")
  if policy!=null and policy.business_allowed.is_valid() and not policy.business_allowed.call():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  return ActionResult.success()

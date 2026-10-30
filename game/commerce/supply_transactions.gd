@@ -73,7 +73,7 @@ func emergency(source: String) -> ActionResult:
  if not result.ok:return _fail("out_of_stock")
  delivery.occurrences[occurrence_id]={"id":occurrence_id,"version_id":"","scheduled_at":now,"status":"scheduled","reason":"","evaluated_at":-1.0,"receipt":"","grants":[],"emergency":true,"cash_waiting":false}
  var id := "food_%d" % int(_session.items.snapshot().next_id)
- var prepared := _session.items.prepare_grants([{"id":id,"definition_id":"prepared_food","quantity":1,"container_id":"player_hand","attributes":{"id":id,"recipe_id":terms.recipe_id,"food_id":terms.food_id,"quality_score":2,"quality_key":_session.foods.definition(StringName(terms.food_id)).quality_keys[2],"sugar_id":"","personal_use":true,"supply_occurrence":occurrence_id}}])
+ var prepared := _session.items.prepare_grants([{"id":id,"definition_id":"prepared_food","quantity":1,"container_id":"player_hand","attributes":{"id":id,"recipe_id":terms.recipe_id,"food_id":terms.food_id,"initial_quality":70.0,"prepared_at":now,"freshness":FoodFreshness.begin(now),"batch_id":"","method":"supply","heat":"off","serving_format":"sandwich","consumption_mode":"here","additions":[],"quality_score":2,"quality_key":_session.foods.definition(StringName(terms.food_id)).quality_keys[2],"sugar_id":"","personal_use":true,"supply_occurrence":occurrence_id}}])
  if not prepared.ok:return prepared
  return _complete(occurrence_id,terms,prepared.details.change,delivery,result.details.units,true)
 func _stock(candidate: Dictionary, lines: Array, at: float, emergency_food: bool) -> ActionResult:
@@ -182,6 +182,7 @@ func validate_links() -> ActionResult:
    var food_id := str(o.grants[0].get("id",""))
    var food := _session.items.get_item(StringName(food_id))
    if food.is_empty():food=_session.items.snapshot().consumed.get(food_id,{}).get("item",{})
+   if food.is_empty():food=_session.items.snapshot().discarded.get(food_id,{}).get("item",{})
    var attributes: Dictionary=food.get("attributes",{})
    if attributes.get("food_id")!=quote.food_id or attributes.get("recipe_id")!=quote.recipe_id or attributes.get("personal_use")!=true or attributes.get("quality_score")!=2:return _fail("invalid_emergency_food")
   if d.mode=="credit" and absf(float(ledger.invoices[o.id].due_at)-(float(receipt.at)+terms_due))>0.001:return _fail("supplier_invoice_deadline")
@@ -197,6 +198,7 @@ func validate_links() -> ActionResult:
   if StableJson.stringify(granted)!=StableJson.stringify(expected_grants):return _fail("supplier_grant_quantity")
  var all_items: Array=_session.items.snapshot().items.values()
  for consumption in _session.items.snapshot().consumed.values():all_items.append(consumption.item)
+ for discarded in _session.items.snapshot().discarded.values():all_items.append(discarded.item)
  for item in all_items:
   if not item.attributes.has("supply_occurrence"):continue
   var origin_id := str(item.attributes.get("supply_grant_id",item.id))

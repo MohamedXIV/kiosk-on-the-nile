@@ -143,7 +143,9 @@ func tick(frame: Dictionary) -> void:
   if RecipeProcesses.supports(job.definition):
    _publish_process(RecipeProcesses.prepare_tick(self,job,frame))
    continue
-  var delta := maxf(0,float(frame.world_minutes)-float(job.last_world_minutes))
+  var world_delta := maxf(0,float(frame.world_minutes)-float(job.last_world_minutes))
+  var elapsed_before := float(job.elapsed)
+  var delta := world_delta
   job.last_world_minutes=float(frame.world_minutes)
   var step: Dictionary=job.definition.steps[int(job.step_index)]
   if job.get("reaction_time_domain","")=="simulation_seconds" and step.kind not in ["cold_wait","batch_heat"]:
@@ -158,6 +160,11 @@ func tick(frame: Dictionary) -> void:
    var slice_delta := float(frame.delta)*float(job.definition.get("presentation_minutes_per_second",1)) if job.get("reaction_time_domain","")=="simulation_seconds" else delta
    _progress_slice(job,slice_delta)
   elif step.kind in ["heat","brew","wait"] or _near(StringName(job.devices[step.capability]),StringName(job.location_id)):job.elapsed=float(job.elapsed)+delta
+  if step.kind in ["brew","batch_heat"] and float(job.elapsed)>=float(step.duration) and not job.has("ready_at"):
+   var progress := float(job.elapsed)-elapsed_before
+   job["ready_at"]=float(frame.world_minutes)-world_delta*clampf((float(job.elapsed)-float(step.duration))/maxf(progress,0.001),0,1)
+   job["freshness"]=FoodFreshness.begin(float(job.ready_at),"warm" if step.kind=="brew" else "ambient")
+   if step.kind=="batch_heat":job.elapsed=float(step.duration);job["heat_on"]=false
 func job(id: StringName) -> Dictionary:
  return _jobs.get(str(id),{}).duplicate(true)
 func progress_view(id: StringName) -> Dictionary:
@@ -167,7 +174,11 @@ func progress_view(id: StringName) -> Dictionary:
  var step: Dictionary=record.definition.steps[int(record.step_index)]
  var portions := 0
  if step.kind in ["batch_heat","batch_hold"]:portions=int(_inventory.items.get_item(StringName(str(record.get("bowl_id","")))).get("attributes",{}).get("portions_remaining",0))
- return {"step_id":str(step.id),"kind":str(step.kind),"elapsed":float(record.elapsed),"duration":float(step.duration),"portions":portions,"heat_on":bool(record.get("heat_on",true)),"slicing":record.has("pending_slice"),"heat":str(record.get("heat","medium")),"process":RecipeProcesses.supports(record.definition)}
+ var freshness_stage := ""
+ if step.kind=="batch_hold":
+  var batch := _inventory.items.get_item(StringName(str(record.get("bowl_id",""))))
+  if not batch.is_empty():freshness_stage=str(FoodFreshness.view(batch.attributes,_clock.world_minutes,_inventory.items.food_definitions).stage)
+ return {"freshness_stage":freshness_stage,"step_id":str(step.id),"kind":str(step.kind),"elapsed":float(record.elapsed),"duration":float(step.duration),"portions":portions,"heat_on":bool(record.get("heat_on",true)),"slicing":record.has("pending_slice"),"heat":str(record.get("heat","medium")),"process":RecipeProcesses.supports(record.definition)}
 func active_at(instance_id: StringName) -> Dictionary:
  for id in _active_jobs:
   var record: Dictionary=_jobs[id]
@@ -227,8 +238,13 @@ func _prepared_output(job: Dictionary, change: ItemChangeSet) -> PreparedItem:
  for evidence in job.step_results:hygiene_penalty=maxi(hygiene_penalty,int(evidence.get("hygiene_evidence",{}).get("penalty",0)))
  for input in job.input_evidence:hygiene_penalty=maxi(hygiene_penalty,int(input.attributes.get("hygiene_penalty",0)))
  item.initial_quality=RecipeProcesses.initial_quality(job,technique)
- item.prepared_at=_clock.world_minutes
- item.method=StringName(str(job.definition.get("method","brew" if job.recipe_id=="tea" else "fry")))
+ item.prepared_at=float(job.get("ready_at",_clock.world_minutes))
+ item.freshness=FoodFreshness.transition(job.get("freshness",FoodFreshness.begin(item.prepared_at)),"ambient",_clock.world_minutes)
+ for input in job.input_evidence:
+  if not input.attributes.has("freshness"):continue
+  item.prepared_at=minf(item.prepared_at,float(input.attributes.prepared_at))
+  item.freshness.exposure=maxf(float(item.freshness.exposure),FoodFreshness.exposure(input.attributes.freshness,_clock.world_minutes))
+ item.method=StringName(str(job.definition.get("method","mix")))
  item.heat=&"medium"
  item.serving_format=StringName(str(job.definition.get("serving_format","cup" if job.recipe_id=="tea" else "plate" if str(job.recipe_id).begins_with("potato") else "sandwich")))
  item.quality_score=RecipeProcesses.grade_for(item.initial_quality)
@@ -306,6 +322,8 @@ func restore(data: Dictionary) -> ActionResult:
    var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
    if bowl.get("kind")!="batch" or bowl.attributes.get("source_job_id")!=id or not ContentValidation.integer(bowl.attributes.get("portions_remaining")) or bowl.attributes.portions_remaining<1 or bowl.attributes.portions_remaining>int(job.definition.portions):return _fail("invalid_batch")
    if job.definition.steps[int(job.step_index)].kind=="batch_heat" and bowl.container_id!=str(job.devices[job.definition.steps[int(job.step_index)].capability])+":batch":return _fail("batch_device")
+  if not RecipeProcesses.supports(job.definition) and job.has("ready_at"):
+   if not ContentValidation.bounded(job.ready_at,float(job.started_at),_clock.world_minutes) or not FoodFreshness.valid(job.get("freshness"),float(job.ready_at),_clock.world_minutes):return _fail("invalid_workflow_freshness")
   if job.has("pending_slice"):
    if not job.pending_slice is Dictionary or not ContentValidation.number(job.pending_slice.get("elapsed")) or job.pending_slice.elapsed<0 or job.pending_slice.get("duration")!=job.definition.get("slice_minutes"):return _fail("invalid_slice")
   for instance_id in job.devices.values():
@@ -335,12 +353,17 @@ func _batch_action(job: Dictionary, action_id: StringName) -> ActionResult:
  var step: Dictionary=job.definition.steps[int(job.step_index)]
  if not _near(StringName(job.devices[step.capability]),StringName(job.location_id)):return _fail("equipment_out_of_reach")
  if action_id==&"stop_heat":
+  if float(job.elapsed)<float(step.duration):return ActionResult.failure(ActionResult.Code.TOO_EARLY,&"too_early")
   job["heat_on"]=false
+  if job.has("freshness"):job.freshness=FoodFreshness.transition(job.freshness,"ambient",_clock.world_minutes)
   _jobs[job.id]=job
   changed.emit()
   return ActionResult.success()
  if action_id!=&"slice":return _fail("invalid_cooking_stage")
  if float(job.elapsed)<float(step.duration):return ActionResult.failure(ActionResult.Code.TOO_EARLY,&"too_early")
+ if job.has("freshness"):
+  var current := {"food_id":str(job.definition.get("freshness_food_id","")),"prepared_at":float(job.ready_at),"initial_quality":100.0,"freshness":job.freshness}
+  if not FoodFreshness.view(current,_clock.world_minutes,_inventory.items.food_definitions).sellable:return _fail("food_unservable")
  if job.has("pending_slice"):return _fail("slice_in_progress")
  if not _inventory.held_id().is_empty():return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
  job["pending_slice"]={"elapsed":0.0,"duration":float(job.definition.slice_minutes)}
@@ -363,7 +386,7 @@ func _progress_slice(job: Dictionary, delta: float) -> void:
  for result in candidate.step_results:
   if result.get("assess",true):technique=mini(technique,int(result.grade))
  var change := _inventory.items.candidate()
- var sliced := BatchPreparation.slice_portion(candidate,change,technique)
+ var sliced := BatchPreparation.slice_portion(candidate,change,technique,_clock.world_minutes,_inventory.items.food_definitions)
  if not sliced.ok:return
  candidate.erase("pending_slice")
  var lines: Array[Dictionary]=[]
@@ -384,7 +407,7 @@ func available_foods(location_id: StringName) -> PackedStringArray:
   var local: bool = container.location_id==str(location_id) and container.kind!="purchase_bag"
   var carried: bool = container.id=="player_hand" and _inventory.player_pose!=null and _inventory.player_pose.location_id==location_id
   var food_id := str(item.attributes.get("food_id",""))
-  if (local or carried) and food_id!="" and not food_id in result:result.append(food_id)
+  if (local or carried) and food_id!="" and FoodFreshness.view(item.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable and not food_id in result:result.append(food_id)
  for recipe_id in _recipes:
   var definition: Dictionary=_recipes[recipe_id]
   if RecipeProcesses.supports(definition):
@@ -392,7 +415,8 @@ func available_foods(location_id: StringName) -> PackedStringArray:
     var job: Dictionary=_jobs[id]
     if job.recipe_id!=recipe_id or job.location_id!=str(location_id) or job.definition.steps[int(job.step_index)].kind!="batch_hold":continue
     var serving: Array[Dictionary]=[];serving.assign(job.definition.serving_inputs)
-    if _inventory.available(location_id,serving).ok and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
+    var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
+    if not bowl.is_empty() and FoodFreshness.view(bowl.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable and _inventory.available(location_id,serving).ok and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
    continue
   if definition.has("vessel_definition"):continue
   if not definition.get("allowed_locations",[]).is_empty() and not str(location_id) in definition.allowed_locations:continue

@@ -31,6 +31,10 @@ func set_enabled(id: StringName, enabled: bool) -> ActionResult:
  if is_busy(id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"equipment_busy")
  var change := _items.candidate()
  change.state.items[str(id)].attributes["enabled"]=enabled
+ for food in change.state.items.values():
+  var container: Dictionary=change.state.containers[food.container_id]
+  if container.get("kind")=="cold" and container.get("host_id")==str(id) and food.attributes.has("freshness"):
+   food.attributes.freshness=FoodFreshness.transition(food.attributes.freshness,"cold" if enabled else "ambient",_items.world_clock.world_minutes)
  return _items.commit(change)
 func enabled(id: StringName) -> bool:
  var item := _items.get_item(id)

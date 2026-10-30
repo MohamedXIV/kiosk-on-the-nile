@@ -2,14 +2,16 @@ class_name ItemStore
 extends RefCounted
 signal changed(revision: int)
 var _definitions: Dictionary = {}
-var _state: Dictionary = {"items":{},"containers":{},"reservations":{},"consumed":{},"next_id":1}
+var _state: Dictionary = {"items":{},"containers":{},"reservations":{},"consumed":{},"discarded":{},"next_id":1}
 var revision: int = 0
 var world_clock: GameClock
+var food_definitions: Dictionary={}
+var cold_active: Callable
 func configure(definitions: Dictionary, containers: Dictionary) -> ActionResult:
  var result := ItemContentValidation.validate(definitions,containers)
  if not result.ok: return result
  _definitions = definitions.duplicate(true)
- _state = {"items":{},"containers":containers.duplicate(true),"reservations":{},"consumed":{},"next_id":1}
+ _state = {"items":{},"containers":containers.duplicate(true),"reservations":{},"consumed":{},"discarded":{},"next_id":1}
  revision = 0
  return ActionResult.success()
 func definition(id: StringName) -> Dictionary:
@@ -62,7 +64,12 @@ func prepare_moves(moves: Array[Dictionary]) -> ActionResult:
   if not change.state.items.has(id): return _fail("missing_item")
   var item: Dictionary = change.state.items[id]
   if item.container_id!=str(move.get("from_container","")) or not ContentValidation.integer(move.get("quantity")) or int(move.quantity)!=int(item.quantity): return _fail("invalid_item_move")
-  item.container_id = str(move.get("to_container",""))
+  var destination := str(move.get("to_container",""))
+  if item.attributes.has("freshness"):
+   var container: Dictionary=change.state.containers.get(destination,{})
+   var context := "cold" if container.get("kind")=="cold" and cold_active.is_valid() and cold_active.call(StringName(str(container.host_id))) else "ambient"
+   item.attributes.freshness=FoodFreshness.transition(item.attributes.freshness,context,world_clock.world_minutes)
+  item.container_id = destination
  return _prepared(change)
 func prepare_grants(grants: Array[Dictionary]) -> ActionResult:
  var change := candidate()
@@ -101,6 +108,11 @@ func validate_change(change: ItemChangeSet) -> ActionResult:
  for id in change.state.items:
   if _state.items.has(id) and _state.items[id].attributes.has("lot"):
    if not IngredientLots._same_lot(_state.items[id].attributes.lot,change.state.items[id].attributes.get("lot",{})):return _fail("immutable_ingredient_lot")
+  if _state.items.has(id) and _state.items[id].attributes.has("freshness"):
+   var before: Dictionary=_state.items[id].attributes
+   var after: Dictionary=change.state.items[id].attributes
+   if not after.has("freshness") or after.get("prepared_at")!=before.get("prepared_at") or after.get("initial_quality")!=before.get("initial_quality"):return _fail("immutable_food_origin")
+   if not is_equal_approx(FoodFreshness.exposure(before.freshness,world_clock.world_minutes),FoodFreshness.exposure(after.freshness,world_clock.world_minutes)):return _fail("food_rejuvenation")
  return ActionResult.success()
 func commit(change: ItemChangeSet, notify: bool = true) -> ActionResult:
  if change==null or change.revision!=revision: return _fail("stale_item_change")
@@ -115,6 +127,7 @@ func restore(data: Dictionary) -> ActionResult:
  if not result.ok: return result
  _state = data.duplicate(true)
  if not _state.has("consumed"):_state["consumed"]={}
+ if not _state.has("discarded"):_state["discarded"]={}
  revision += 1
  return ActionResult.success()
 func _prepared(change: ItemChangeSet) -> ActionResult:
@@ -132,6 +145,9 @@ func _validate_state(data: Dictionary) -> ActionResult:
    var suffix := str(id).substr(str(id).find("_")+1)
    if not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_item_counter")
   if item.attributes.has("material_quality") and not ContentValidation.bounded(item.attributes.material_quality,0,1):return _fail("invalid_material_quality")
+  if item.attributes.has("freshness") and (not ContentValidation.bounded(item.attributes.get("initial_quality"),0,100) or not ContentValidation.number(item.attributes.get("prepared_at"))):return _fail("invalid_food_origin")
+  if item.attributes.has("freshness") and not FoodFreshness.valid(item.attributes.freshness,float(item.attributes.get("prepared_at",-1)),world_clock.world_minutes if world_clock!=null else INF):return _fail("invalid_food_freshness")
+  if item.get("kind")=="prepared" and not item.attributes.has("freshness"):return _fail("missing_food_freshness")
   var lot_result := IngredientLots.validate(item,_definitions,world_clock.world_minutes if world_clock!=null else INF)
   if not lot_result.ok:return lot_result
   var definition: Dictionary = _definitions[item.definition_id]
@@ -141,10 +157,20 @@ func _validate_state(data: Dictionary) -> ActionResult:
   used[item.container_id] = int(used.get(item.container_id,0))+int(item.quantity)
   if int(used[item.container_id])>int(container.capacity): return _fail("container_full")
  var reserved: Dictionary = {}
+ if not data.get("discarded") is Dictionary:return _fail("invalid_discard_history")
+ for id in data.discarded:
+  var receipt: Variant=data.discarded[id]
+  if not receipt is Dictionary or not receipt.get("item") is Dictionary or not receipt.get("item",{}).get("attributes") is Dictionary or receipt.item.get("id")!=id or data.items.has(id) or data.get("consumed",{}).has(id) or receipt.item.get("container_id")!="player_hand" or not receipt.item.get("kind") in ["prepared","ingredient"] or receipt.item.get("quantity")!=1 or not ContentValidation.bounded(receipt.get("at"),0,world_clock.world_minutes):return _fail("invalid_discard")
+  if not _definitions.has(str(receipt.item.get("definition_id",""))) or _definitions[str(receipt.item.definition_id)].kind!=receipt.item.kind:return _fail("invalid_removed_definition")
+  var raw: Dictionary=receipt.item.attributes
+  if not ContentValidation.bounded(raw.get("initial_quality"),0,100) or not ContentValidation.number(raw.get("prepared_at")) or not FoodFreshness.valid(raw.get("freshness"),float(raw.prepared_at),float(receipt.at)):return _fail("invalid_discard_freshness")
  if not data.get("consumed",{}) is Dictionary:return _fail("invalid_consumption_history")
  for id in data.get("consumed",{}):
   var receipt: Variant=data.consumed[id]
   if not receipt is Dictionary or not receipt.get("item") is Dictionary or receipt.item.get("id")!=id or data.items.has(id) or receipt.item.get("container_id")!="player_hand" or receipt.item.get("kind")!="prepared" or receipt.item.get("quantity")!=1 or not receipt.item.get("attributes") is Dictionary or not ContentValidation.number(receipt.get("at")) or receipt.at<0:return _fail("invalid_consumption_receipt")
+  if not _definitions.has(str(receipt.item.get("definition_id",""))) or _definitions[str(receipt.item.definition_id)].kind!=receipt.item.kind:return _fail("invalid_removed_definition")
+  var raw: Dictionary=receipt.item.attributes
+  if not ContentValidation.bounded(raw.get("initial_quality"),0,100) or not ContentValidation.number(raw.get("prepared_at")) or not FoodFreshness.valid(raw.get("freshness"),float(raw.prepared_at),float(receipt.at)):return _fail("invalid_consumed_freshness")
   var suffix := str(id).trim_prefix("food_")
   if not str(id).begins_with("food_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_consumption_id")
  for job_id in data.reservations:

@@ -20,8 +20,11 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
    if raw.has("source_job_id"):
     var proof := session.workflow.result_for(StringName(raw.source_job_id),StringName(id))
     if proof.is_empty() or proof.get("quality_score")!=raw.quality_score or not RecipeProcesses.preparation_matches(raw,proof):return _fail("food_source")
- for id in items.consumed:
-  var receipt: Dictionary=items.consumed[id]
+ var removed: Dictionary=items.consumed.duplicate(true)
+ removed.merge(items.discarded)
+ for id in removed:
+  var receipt: Dictionary=removed[id]
+  if receipt.item.kind!="prepared":continue
   if float(receipt.at)>session.clock.world_minutes+0.001:return _fail("consumed_time")
   var item: Dictionary=receipt.item
   var raw: Dictionary=item.attributes

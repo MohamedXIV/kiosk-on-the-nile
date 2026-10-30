@@ -10,6 +10,7 @@ static func validate(definitions: Dictionary) -> ActionResult:
  for id in definitions:
   var d: Variant=definitions[id]
   if not d is Dictionary or not d.get("label") is String or not ContentValidation.integer(d.get("price_minor")) or d.price_minor<0 or not d.get("nourishment") is Dictionary:return ContentValidation.fail("foods."+id)
+  if not FoodFreshness.validate_curve(d.get("freshness")):return ContentValidation.fail("foods.freshness")
   if not d.get("menu_label") is String or d.menu_label.is_empty() or not d.get("order_icon") in ["cup","sandwich","plate"]:return ContentValidation.fail("foods.order_presentation")
   for field in ["hunger","base_mood","quality_mood"]:
    if not ContentValidation.bounded(d.nourishment.get(field),0,100):return ContentValidation.fail("foods.nourishment")

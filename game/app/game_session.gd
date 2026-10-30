@@ -108,6 +108,7 @@ func configure(source: SessionConfig) -> ActionResult:
  actions.business_allowed=accounts.business_allowed
  items = ItemStore.new()
  items.world_clock=clock
+ items.food_definitions=source.section("foods")
  var item_result := items.configure(source.section("items"),source.section("containers"))
  if not item_result.ok: return item_result
  inventory = InventoryService.new(items,{"tea":"tea_portion","kebda":"kebda_portion"})
@@ -177,6 +178,7 @@ func configure(source: SessionConfig) -> ActionResult:
  if not kitchen.ok: return kitchen
  cooking.set_quality_provider(func():return mood_policy.quality_penalty(needs.mood))
  workflow=RecipeWorkflow.new()
+ items.cold_active=func(id):return equipment.enabled(id) and not spaces.placement(id).is_empty()
  var workflow_result := workflow.configure(source.section("recipe_workflows"),inventory,equipment,clock,knowledge)
  if not workflow_result.ok:return workflow_result
  workflow.policy=actions

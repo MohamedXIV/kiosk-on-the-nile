@@ -4,6 +4,7 @@ var id: StringName
 var recipe_id: StringName
 var food_id: StringName
 var sugar_id: StringName
+var freshness: Dictionary={}
 var initial_quality: float=0
 var prepared_at: float=-1
 var batch_id: StringName
@@ -15,9 +16,10 @@ var additions: PackedStringArray=[]
 var quality_score: int = 0
 var quality_key: StringName
 func snapshot() -> Dictionary:
- return {"initial_quality":initial_quality,"prepared_at":prepared_at,"batch_id":str(batch_id),"method":str(method),"heat":str(heat),"serving_format":str(serving_format),"consumption_mode":str(consumption_mode),"additions":Array(additions),"id":str(id),"recipe_id":str(recipe_id),"food_id":str(food_id),"sugar_id":str(sugar_id),"quality_score":quality_score,"quality_key":str(quality_key)}
+ return {"freshness":freshness.duplicate(true),"initial_quality":initial_quality,"prepared_at":prepared_at,"batch_id":str(batch_id),"method":str(method),"heat":str(heat),"serving_format":str(serving_format),"consumption_mode":str(consumption_mode),"additions":Array(additions),"id":str(id),"recipe_id":str(recipe_id),"food_id":str(food_id),"sugar_id":str(sugar_id),"quality_score":quality_score,"quality_key":str(quality_key)}
 static func from_dict(data: Dictionary) -> PreparedItem:
  var item := PreparedItem.new()
+ item.freshness=data.get("freshness",{}).duplicate(true)
  item.initial_quality=float(data.get("initial_quality",0))
  item.prepared_at=float(data.get("prepared_at",-1))
  item.batch_id=StringName(str(data.get("batch_id","")))

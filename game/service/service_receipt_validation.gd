@@ -11,6 +11,9 @@ static func valid(record: Dictionary, foods: FoodRegistry, recipes: Dictionary) 
  var recipe: Dictionary=recipes.get(item.recipe_id,{})
  var food := foods.definition(StringName(item.food_id)) if foods!=null else {}
  if recipe.get("output",{}).get("food_id")!=item.food_id or food.is_empty() or item.quality_key!=str(food.quality_keys[int(item.quality_score)]):return false
+ if not FoodFreshness.valid(item.get("freshness"),float(item.get("prepared_at",-1)),float(record.get("served_at",-1))):return false
+ var at_service := FoodFreshness.view(item,float(record.served_at),foods._definitions)
+ if not at_service.sellable or int(at_service.grade)!=int(item.quality_score):return false
  if food.has("sugars"):
   if not food.sugars.has(item.sugar_id):return false
  elif not item.sugar_id.is_empty():return false

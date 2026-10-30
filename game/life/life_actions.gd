@@ -14,6 +14,9 @@ func snack() -> ActionResult:
 func consume_held() -> ActionResult:
  var item := _session.cooking.held_item()
  if item == null: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
+ var age := _session.cooking.freshness(item)
+ if not age.sellable:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"food_unservable")
+ item.quality_score=int(age.grade)
  var effect: Dictionary = _session.foods.definition(item.food_id).get("nourishment",{})
  if effect.is_empty():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"unknown_food")
  var taken := _session.inventory.consume_for_player(item.id,_session.clock.world_minutes)

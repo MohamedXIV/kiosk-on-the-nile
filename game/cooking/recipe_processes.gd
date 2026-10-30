@@ -34,6 +34,9 @@ static func prepare_action(owner: RecipeWorkflow, original: Dictionary, action: 
   var heat := str(action).trim_prefix("heat:")
   if not heat in HEATS or not step.kind in ["passive_heat","batch_hold"]:return owner._fail("invalid_cooking_stage")
   job.heat=heat
+  if step.kind=="batch_hold" and change.state.items.has(str(job.bowl_id)):
+   var attributes: Dictionary=change.state.items[str(job.bowl_id)].attributes
+   attributes.freshness=FoodFreshness.transition(attributes.freshness,"ambient" if heat=="off" else "warm",owner._clock.world_minutes)
   var record := {"at":owner._clock.world_minutes,"heat":heat}
   if job.heat_history.size()>=32:job.heat_history.remove_at(1)
   job.heat_history.append(record)
@@ -98,7 +101,7 @@ static func prepare_tick(owner: RecipeWorkflow, job: Dictionary, frame: Dictiona
    var change := owner._inventory.items.candidate()
    var bowl: Dictionary=change.state.items.get(str(candidate.get("bowl_id","")),{})
    if bowl.is_empty():return owner._fail("missing_batch")
-   bowl.attributes.merge({"state":"ready","ready_at":candidate.ready_at,"initial_quality":candidate.initial_quality,"heat":candidate.heat},true)
+   bowl.attributes.merge({"state":"ready","ready_at":candidate.ready_at,"initial_quality":candidate.initial_quality,"heat":candidate.heat,"food_id":str(candidate.definition.output.food_id),"prepared_at":candidate.ready_at,"freshness":FoodFreshness.begin(float(candidate.ready_at),"ambient" if candidate.heat=="off" else "warm")},true)
    var prepared := _prepared(owner,candidate,change)
    if prepared.ok:prepared.details["automatic"]=true
    return prepared
@@ -109,6 +112,8 @@ static func prepare_tick(owner: RecipeWorkflow, job: Dictionary, frame: Dictiona
 static func _serve(owner: RecipeWorkflow, job: Dictionary, change: ItemChangeSet) -> ActionResult:
  var batch: Dictionary=change.state.items.get(str(job.get("bowl_id","")),{})
  if batch.is_empty() or int(batch.attributes.portions_remaining)<1:return owner._fail("batch_empty")
+ var age := FoodFreshness.view(batch.attributes,owner._clock.world_minutes,owner._inventory.items.food_definitions)
+ if not age.sellable:return owner._fail("food_unservable")
  var inputs: Array[Dictionary]=[];inputs.assign(job.definition.serving_inputs)
  var available := owner._inventory.available(StringName(job.location_id),inputs)
  if not available.ok:return available
@@ -122,6 +127,7 @@ static func _serve(owner: RecipeWorkflow, job: Dictionary, change: ItemChangeSet
  output.id=StringName("food_%d" % int(change.state.next_id));change.state.next_id=int(change.state.next_id)+1
  output.recipe_id=StringName(job.recipe_id);output.food_id=StringName(job.definition.output.food_id)
  output.initial_quality=float(job.initial_quality);output.prepared_at=float(job.ready_at)
+ output.freshness=FoodFreshness.transition(batch.attributes.freshness,"ambient",owner._clock.world_minutes)
  output.batch_id=StringName(job.bowl_id);output.method=StringName(job.definition.method)
  output.heat=StringName(job.heat);output.serving_format=StringName(job.definition.get("serving_format","sandwich"))
  output.quality_score=grade_for(output.initial_quality)
@@ -193,6 +199,7 @@ static func validate_saved(job: Dictionary, items: ItemStore, now: float) -> Act
   if not ContentValidation.integer(r.get("portion_index")) or r.portion_index<1 or r.portion_index>job.portions_served or seen.has(int(r.portion_index)) or not ContentValidation.bounded(r.get("portioned_at"),float(job.ready_at),now) or not r.get("serving_evidence") is Array:return _fail("saved_portion_source")
   if r.get("method")!=job.definition.method or r.get("serving_format")!=job.definition.serving_format or r.get("consumption_mode")!="here" or r.get("additions")!=[] or not r.get("heat") in HEATS or r.get("sugar_id")!="" or r.get("source_job_id")!=job.id or r.get("personal_use")!=job.personal_use:return _fail("saved_portion_recipe")
   seen[int(r.portion_index)]=true
+  if not FoodFreshness.valid(r.get("freshness"),float(job.ready_at),float(r.portioned_at)):return _fail("saved_portion_freshness")
   var counts := {}
   for input in r.serving_evidence:
    if not input is Dictionary or not input.get("attributes") is Dictionary or not input.get("definition_id") is String or not ContentValidation.integer(input.get("consumed_quantity")) or input.consumed_quantity<1:return _fail("saved_serving_input")
@@ -210,12 +217,17 @@ static func validate_saved(job: Dictionary, items: ItemStore, now: float) -> Act
   var batch := items.get_item(StringName(str(job.get("bowl_id",""))))
   if batch.get("kind")!="batch" or batch.get("definition_id")!=job.definition.vessel_definition or batch.attributes.get("source_job_id")!=job.id or batch.attributes.get("portions_total")!=job.definition.portions or batch.attributes.get("portions_remaining")!=int(job.definition.portions)-int(job.portions_served):return _fail("saved_batch")
   if step.kind in ["passive_heat","batch_hold","soak"] and batch.container_id!=str(job.devices[step.capability])+":batch":return _fail("saved_batch_device")
+  if step.kind=="batch_hold" and not FoodFreshness.valid(batch.attributes.get("freshness"),float(job.ready_at),now):return _fail("saved_batch_freshness")
   if step.kind=="batch_hold" and (not is_equal_approx(float(batch.attributes.get("ready_at",-1)),float(job.ready_at)) or not is_equal_approx(float(batch.attributes.get("initial_quality",-1)),float(job.initial_quality))):return _fail("saved_batch_quality")
  if job.status=="completed" and job.portions_served!=int(job.definition.portions):return _fail("saved_yield")
  return ActionResult.success()
 static func preparation_matches(item: Dictionary, proof: Dictionary) -> bool:
  for key in ["id","food_id","recipe_id","batch_id","method","serving_format","consumption_mode","additions"]:
   if not item.has(key) or not proof.has(key) or item[key]!=proof[key]:return false
+ if not item.get("freshness") is Dictionary or not proof.get("freshness") is Dictionary:return false
+ var time: Variant = item.freshness.get("at",-1)
+ if not ContentValidation.number(time) or not ContentValidation.number(proof.freshness.get("at")) or float(time)<float(proof.freshness.at):return false
+ if not ContentValidation.bounded(item.freshness.get("exposure"),float(proof.freshness.exposure)+maxf(0,float(time)-float(proof.freshness.at))*0.25-0.001,float(proof.freshness.exposure)+maxf(0,float(time)-float(proof.freshness.at))+0.001):return false
  for key in ["initial_quality","prepared_at"]:
   if not ContentValidation.number(item.get(key)) or not ContentValidation.number(proof.get(key)) or not is_equal_approx(float(item[key]),float(proof[key])):return false
  return true

@@ -118,6 +118,7 @@ func available(location_id: StringName, requirements: Array[Dictionary]) -> Acti
   for item in material_instances(StringName(definition_id)):
    if requirement.has("item_id") and requirement.item_id!=item.id:continue
    if requirement.has("grade") and item.attributes.get("lot",{}).get("grade")!=requirement.grade:continue
+   if item.attributes.has("freshness") and not FoodFreshness.view(item.attributes,items.world_clock.world_minutes,items.food_definitions).sellable:continue
    var container := items.get_container(StringName(item.container_id))
    if not _usable_storage(container,location_id,str(requirement.get("required_storage",items.definition(StringName(definition_id)).get("required_storage","dry")))):continue
    var used := int(reserved.get(item.id,0))+int(remaining.get(item.id,0))
@@ -236,15 +237,15 @@ func store_held(container_id: StringName) -> ActionResult:
  var id := held_id()
  var item := items.get_item(id)
  var container := items.get_container(container_id)
- if item.get("kind")!="batch" or player_pose==null or not _usable_storage(container,player_pose.location_id,"cold") or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
+ if not item.get("kind") in ["batch","prepared"] or player_pose==null or not _usable_storage(container,player_pose.location_id,"cold") or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
  var result := items.prepare_moves([{"item_id":str(id),"quantity":1,"from_container":"player_hand","to_container":str(container_id)}])
  return items.commit(result.details.change) if result.ok else result
 func pick_up_storage(item_id: StringName) -> ActionResult:
  if not held_id().is_empty():return ActionResult.failure(ActionResult.Code.HANDS_BUSY,&"hands_busy")
  var item := items.get_item(item_id)
- if item.get("kind")!="batch" or player_pose==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_item")
+ if not item.get("kind") in ["batch","prepared"] or player_pose==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_item")
  var container := items.get_container(StringName(item.container_id))
- if not _usable_storage(container,player_pose.location_id,"cold") or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
+ if container.get("kind")!="cold" or container.get("location_id")!=str(player_pose.location_id) or spaces.placement(StringName(container.host_id)).is_empty() or spaces.ground(StringName(container.host_id)).distance_to(player_pose.ground)>1.6:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"storage_out_of_reach")
  var result := items.prepare_moves([{"item_id":str(item_id),"quantity":1,"from_container":item.container_id,"to_container":"player_hand"}])
  return items.commit(result.details.change) if result.ok else result
 
@@ -261,3 +262,11 @@ func _matches(actual: String, required: String) -> bool:
  return items.ingredient_matches(actual,required)
 func material_instances(required: StringName) -> Array[Dictionary]:
  return items.material_instances(required)
+
+func discard_held() -> ActionResult:
+ var item := items.get_item(held_id())
+ if not item.get("kind") in ["prepared","ingredient"] or not item.get("attributes",{}).has("freshness"):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"empty_hands")
+ var change := items.candidate()
+ change.state.discarded[str(item.id)]={"item":item.duplicate(true),"at":items.world_clock.world_minutes}
+ change.state.items.erase(str(item.id))
+ return items.commit(change)

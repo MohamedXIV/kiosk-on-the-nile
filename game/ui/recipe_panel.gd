@@ -177,6 +177,7 @@ func _update_progress() -> void:
    line+=" · "+_text.text("recipe_portions",{"count":value.portions})
    if not value.heat_on:line+="\n"+ItemText.t("heat_off")
    if value.slicing:line+="\n"+_text.outcome(ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"slice_in_progress"))
+  if not str(value.get("freshness_stage","")).is_empty():line+=" · "+UiText.localized("freshness."+str(value.freshness_stage),{},str(value.freshness_stage))
   entry.label.text=line
  if is_instance_valid(_cleanliness):
   var state := _session.hygiene.state(_instance_id)

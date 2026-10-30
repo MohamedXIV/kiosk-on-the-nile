@@ -78,10 +78,10 @@
 
 **Interfaces:** `FoodFreshness.view(item: Dictionary, now: float, definitions: Dictionary) -> Dictionary` returns initial/present quality, stage and sellable status without mutation; `transition(item: Dictionary, context: String, now: float) -> Dictionary` accumulates exposure then changes future rate. All splits/portions inherit original origin and exposure.
 
-- [ ] Author comfortable recipe/category curves and storage/holding modifiers; wire final eligibility, preparation display and deliberate discard.
-- [ ] Integrate passive phase-boundary handling for sleep/travel and held equipment; interactive reaction steps remain humane.
-- [ ] Observe fresh/texture-declined/still-edible/unservable states and split/move/reheat no rejuvenation; actual clock speed and rare demand inform numeric rulings.
-- [ ] Build/record/commit; don't add weather/thermodynamics/illness.
+- [x] Author comfortable recipe/category curves and storage/holding modifiers; wire final eligibility, preparation display and deliberate discard.
+- [x] Integrate passive phase-boundary handling for sleep/travel and held equipment; interactive reaction steps remain humane.
+- [x] Observe fresh/texture-declined/still-edible/unservable states and split/move/reheat no rejuvenation; actual clock speed and rare demand inform numeric rulings.
+- [x] Build/record/commit; don't add weather/thermodynamics/illness.
 
 ### Task6 — real offered variants, free menu prices and fixed quotes (#41)
 

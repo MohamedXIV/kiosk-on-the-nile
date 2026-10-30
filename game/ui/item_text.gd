@@ -37,12 +37,15 @@ static func item_details(session: GameSession, item: Dictionary) -> String:
   var detail := t("material_lot",{"grade":grade,"day":floori(float(lot.acquired_at)/1440.0)+1})
   if lot.cost_known:detail+=" · "+t("material_cost",{"amount":"%.2f" % (float(lot.cost_minor)/float(lot.cost_units)/100.0)})
   return detail
- if item.kind=="batch":return UiText.localized("ui.recipe_portions",{"count":attributes.get("portions_remaining",0)},str(attributes.get("portions_remaining",0)))
+ if item.kind=="batch":
+  var line := UiText.localized("ui.recipe_portions",{"count":attributes.get("portions_remaining",0)},str(attributes.get("portions_remaining",0)))
+  return line+" · "+freshness(session,attributes) if attributes.has("freshness") else line
  if item.kind=="prepared":
   var food_id := str(attributes.get("food_id",""))
   var food := session.cooking.foods.definition(StringName(food_id))
-  var score := int(attributes.get("quality_score",-1))
-  if not food.is_empty() and score>=0 and score<food.quality_names.size():return t("quality",{"label":source("food."+food_id+".quality."+str(food.quality_keys[score]),str(food.quality_names[score]))})
+  var age := FoodFreshness.view(attributes,session.clock.world_minutes,session.items.food_definitions)
+  var score := int(age.grade)
+  if not food.is_empty() and score>=0 and score<food.quality_names.size():return t("quality",{"label":source("food."+food_id+".quality."+str(food.quality_keys[score]),str(food.quality_names[score]))})+" · "+freshness(session,attributes)
  return ""
 static func requirements(session: GameSession, definition_data: Dictionary) -> String:
  var values := PackedStringArray()
@@ -63,3 +66,7 @@ static func hygiene(data: Dictionary, state: Dictionary) -> String:
  if state.is_empty():return ""
  var key := "clean" if float(state.cleanliness)>=float(data.thresholds.wipe) else "wipe" if float(state.cleanliness)>=float(data.thresholds.dirty) else "dirty"
  return t("cleanliness",{"label":source("hygiene."+key,str(state.label))})
+
+static func freshness(session: GameSession, attributes: Dictionary) -> String:
+ var age := FoodFreshness.view(attributes,session.clock.world_minutes,session.items.food_definitions)
+ return UiText.localized("freshness."+str(age.stage),{},str(age.stage))

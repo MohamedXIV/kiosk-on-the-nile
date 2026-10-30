@@ -50,7 +50,7 @@ func _refresh() -> void:
  _description.text=_text.text(description,{"food":OutingText.order(_session,order.food_id)})
  SheetControls.clear(_choices)
  var item := _session.cooking.held_item()
- var quality: int=item.quality_score if order.status==&"pending" and item!=null else order.served_quality
+ var quality: int=int(_session.cooking.freshness(item).grade) if order.status==&"pending" and item!=null else order.served_quality
  var amount: int=order.base_price+int(order.tips[clampi(quality,0,3)])
  if not order.gift_promised:_choices.add_child(SheetControls.button(_text.text("payment_paid_settle" if already_served else "payment_paid",{"amount":NotebookView.money(amount)}),_choose.bind(&"paid")))
  if order.gift_promised or _session.can_offer_hospitality(order.visit_id):_choices.add_child(SheetControls.button(_text.text("payment_gift_settle" if already_served else "payment_gift"),_choose.bind(&"gift")))

@@ -220,8 +220,8 @@
     "ui.recipe_stop_heat": "Turn off the heat",
     "ui.recipe_progress": "{elapsed} / {duration} minutes",
     "ui.recipe_missing": "Needed: {reason}",
-    "ui.recipe_store_bowl": "Put the bowl in this fridge",
-    "ui.recipe_take_bowl": "Pick up the bowl",
+    "ui.recipe_store_bowl": "Store held food / vessel in fridge",
+    "ui.recipe_take_bowl": "Take from fridge",
     "ui.recipe_portions": "Portions remaining: {count}",
     "ui.clean_item": "Clean this item",
     "ui.clean_stop": "Stop cleaning",
@@ -1248,6 +1248,12 @@
     "item.liver_seasoning": "Liver seasoning",
     "shop.market.offer.liver_seasoning.label": "Liver seasoning",
     "shop.market.offer.liver_seasoning.description": "Garlic, cumin, acidity and spices for preparation.",
-    "ui.error.carry_prepared_vessel": "Pick up the prepared vessel first."
+    "ui.error.carry_prepared_vessel": "Pick up the prepared vessel first.",
+    "freshness.fresh": "Fresh",
+    "freshness.settled": "Past its freshest",
+    "freshness.declined": "Still servable · reduced quality",
+    "freshness.unservable": "No longer servable",
+    "ui.discard_held": "Discard held food",
+    "ui.error.food_unservable": "This food is no longer servable. Discard it through inventory."
   }
 }

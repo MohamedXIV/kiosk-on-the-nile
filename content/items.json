@@ -218,7 +218,8 @@
       "capacity": 48,
       "allowed_tags": [
         "ingredient",
-        "batch"
+        "batch",
+        "prepared"
       ]
     },
     "placement": {
