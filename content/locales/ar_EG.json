@@ -1283,6 +1283,15 @@
     "shop.market.offer.cheese.description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
     "ui.error.invalid_menu_price": "السعر غير صالح.",
     "ui.error.incompatible_serving": "طريقة التقديم أو الإضافات غير متاحة للأكلة دي.",
-    "ui.error.offer_changed": "العرض اتغير قبل تأكيد الطلب. هنراجع الاختيار بهدوء."
+    "ui.error.offer_changed": "العرض اتغير قبل تأكيد الطلب. هنراجع الاختيار بهدوء.",
+    "menu.serving": "{food} · {format} · {mode}",
+    "menu.with_addition": "{base} + {addition}",
+    "menu.food.tea": "شاي",
+    "menu.food.kebda": "كبدة إسكندراني",
+    "menu.food.kebda_pane": "كبدة بانيه",
+    "menu.food.ful": "فول",
+    "menu.food.shawarma": "شاورما",
+    "menu.food.potato_fried": "بطاطس مقلية",
+    "menu.food.potato_baked": "بطاطس فرن"
   }
 }

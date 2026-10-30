@@ -1,0 +1,35 @@
+extends SceneTree
+func _initialize():call_deferred("run")
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded:=content.load_directory("res://content")
+ if not loaded.ok:quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);var s:=GameSession.new();root.add_child(s)
+ if not s.configure(cfg).ok:quit(1);return
+ var count:=0;var unchanged:=true;var budget:=true
+ var offers:Array[Dictionary]=[{"food_id":"tea","variant_id":"tea/cup/here","additions":[],"price_minor":1200,"spice":0.0}]
+ for seed in range(1,17):
+  var data:=cfg.section("character_life");data.policy.seed=seed
+  var life:=CharacterLife.new();life.menu=s.menu
+  life.configure(data,s.foods,s.clock);life.arrive(&"amgad",&"visit_1")
+  life._states.amgad.needs.thirst=0.95
+  var first:=life.consider(&"amgad",&"visit_1",offers)
+  var state:=life.snapshot();var again:=life.consider(&"amgad",&"visit_1",offers)
+  unchanged=unchanged and StableJson.stringify(first)==StableJson.stringify(again) and state.rng_state==life.snapshot().rng_state
+  if first.food_id!="":
+   count+=1
+   var repriced:Array[Dictionary]=[{"food_id":"tea","variant_id":"tea/cup/here","additions":[],"price_minor":1300,"spice":0.0}]
+   var quiet:=life.consider(&"amgad",&"visit_1",repriced)
+   unchanged=unchanged and quiet.food_id=="" and state.rng_state==life.snapshot().rng_state and quiet.next_at==first.next_at
+   var saved:=life.snapshot();var decoded:Dictionary=JSON.parse_string(StableJson.stringify(saved))
+   unchanged=unchanged and life.restore(decoded).ok
+  var other:=CharacterLife.new();other.menu=s.menu;other.configure(data,s.foods,s.clock);other.arrive(&"amgad",&"visit_1")
+  var absurd:Array[Dictionary]=[{"food_id":"tea","variant_id":"tea/cup/here","additions":[],"price_minor":99999999,"spice":0.0}]
+  budget=budget and other.consider(&"amgad",&"visit_1",absurd).food_id==""
+ print("COARSE_INTENTIONS ",StableJson.stringify({"seeds":16,"buying":count,"quiet":16-count,"cache_and_no_reroll":unchanged,"budget_denial":budget}))
+ var locales:=LocaleService.new();locales.configure(cfg.data)
+ var ref:Dictionary=OutingText.serving_reference({"variant_id":"kebda/plate/takeaway","additions":["cheese","chili"]})
+ for language in ["ar_EG","en"]:
+  LocaleService.current.set_locale(language)
+  print("VARIANT_LABEL ",language," ",LocaleService.current.text(ref.text_ref,ref.parameters))
+ quit(0 if count>0 and unchanged and budget else 1)

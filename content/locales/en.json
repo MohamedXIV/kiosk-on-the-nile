@@ -1283,6 +1283,15 @@
     "shop.market.offer.cheese.description": "Serving supplies and additions, consumed when preparing a portion.",
     "ui.error.invalid_menu_price": "Invalid price.",
     "ui.error.incompatible_serving": "This serving or addition is incompatible.",
-    "ui.error.offer_changed": "The offer changed before acceptance. We will reconsider quietly."
+    "ui.error.offer_changed": "The offer changed before acceptance. We will reconsider quietly.",
+    "menu.serving": "{food} · {format} · {mode}",
+    "menu.with_addition": "{base} + {addition}",
+    "menu.food.tea": "Tea",
+    "menu.food.kebda": "Alexandrian liver",
+    "menu.food.kebda_pane": "Breaded liver",
+    "menu.food.ful": "Ful",
+    "menu.food.shawarma": "Shawarma",
+    "menu.food.potato_fried": "Fried potatoes",
+    "menu.food.potato_baked": "Baked potatoes"
   }
 }

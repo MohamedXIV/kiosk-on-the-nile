@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+INCOMPATIBLE_ATOMIC true
+PLATE_EXTRAS true 
+PORTION {"additions":["cheese","chili"],"batch_id":"item_29","consumption_mode":"takeaway","food_id":"kebda","freshness":{"at":950,"context":"ambient","exposure":0},"heat":"low","id":"food_30","initial_quality":90,"method":"saute","prepared_at":950,"quality_key":"excellent","quality_score":3,"recipe_id":"kebda","serving_format":"plate","sugar_id":"","variant_id":"kebda/plate/takeaway"}
+ACTUAL_STOCK 3 3 0
+WRONG_VARIANT_ATOMIC true
+BATCH_CURRENT true  { "session": @Node@8:<Node#302124107369>, "migration_report": {  } }
+EXPIRED_ATOMIC true food_unservable
+WARNING: 73 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

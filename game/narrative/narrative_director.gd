@@ -34,6 +34,10 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  for i in range(recipe.quality_keys.size()):
   if recipe.quality_keys[i] == quality: quality = recipe.quality_names[str(i)]
  var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"kiosk_open":_session.kiosk_open,"business_allowed":_session.accounts.business_allowed(),"request_can_prepare":_session.request_can_prepare(StringName(intended_food)),"mode":0,"quality_score":0,"order_label":_session.foods.definition(StringName(intended_food)).get("menu_label","")}
+ var selection: Dictionary=pending.quote if pending!=null else _session.character_life.state(StringName(character_id)).get("decision",{})
+ if not str(selection.get("variant_id","")).is_empty():
+  data.order_label=OutingText.serving(_session,selection)
+  data["localization_args"]={"order_label":OutingText.serving_reference(selection)}
  var visit: Variant = _session.presence.record(participants[0]) if not participants.is_empty() else null
  var hospitality := _session.visitors.history.hospitality(character_id)
  data.merge({"needs_hospitality":visit.needs_hospitality if visit is VisitState else false,"hospitality_outcome":str(hospitality.get("outcome","")),"hospitality_offer":_session.can_offer_hospitality(visit.id) if visit is VisitState else false},true)

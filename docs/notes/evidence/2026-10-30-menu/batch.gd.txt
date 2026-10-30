@@ -1,0 +1,52 @@
+extends SceneTree
+var s:GameSession
+func _initialize():call_deferred("run")
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded:=content.load_directory("res://content")
+ if not loaded.ok:print("CONTENT ",loaded.details);quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);s=GameSession.new();root.add_child(s)
+ var configured:=s.configure(cfg)
+ if not configured.ok:print("CONFIG ",configured.message_key);quit(1);return
+ var grants:Array[Dictionary]=[]
+ for id in ["onion","green_pepper","oil","liver_seasoning","bread","chili_sauce"]:grants.append({"definition_id":id,"quantity":1,"container_id":"kiosk_dry","attributes":{}})
+ grants.append({"definition_id":"cheese","quantity":1,"container_id":"kiosk_fridge:cold","attributes":{}})
+ var raw:=s.items.prepare_grants(grants)
+ if not raw.ok:print("GRANTS ",raw.message_key);quit(1);return
+ s.items.commit(raw.details.change)
+ s.location_id=&"kiosk";s.player_ground=s.spaces.ground(&"kebda")+Vector2(0,1)
+ var started:=s.workflow.start(&"kebda",&"kiosk",PackedStringArray(["kebda"]))
+ if not started.ok:print("START ",started.message_key);quit(1);return
+ var id:=StringName(started.details.job_id)
+ s.clock.advance(5);s.workflow.tick(s.clock.frame(5));var prep:=s.workflow.act(id,&"prepare_batch")
+ if not prep.ok:print("PREP ",prep.message_key);quit(1);return
+ s.workflow.tick(s.clock.elapse_minutes(15))
+ var before:=s.items.revision
+ var incompatible:=s.workflow.act(id,&"serve",{"variant_id":"kebda/cup/here","additions":[]})
+ print("INCOMPATIBLE_ATOMIC ",not incompatible.ok and before==s.items.revision)
+ var served:=s.workflow.act(id,&"serve",{"variant_id":"kebda/plate/takeaway","additions":["chili","cheese"]})
+ print("PLATE_EXTRAS ",served.ok," ",served.message_key)
+ if not served.ok:quit(1);return
+ print("PORTION ",StableJson.stringify(s.cooking.held_item().snapshot()))
+ print("ACTUAL_STOCK ",s.inventory.stock_count(&"kiosk",&"paper_plate")," ",s.inventory.stock_count(&"kiosk",&"takeaway_wrap")," ",s.inventory.stock_count(&"kiosk",&"cheese"))
+ var visit:=s.visitors.spawn(&"amgad");visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground
+ s.service.quote_provider=func(_v,_f):return s.menu.quote(&"kebda/sandwich/here")
+ var order:=s.service.place_order(visit.id,&"kebda")
+ if order==null:print("NO_ORDER");quit(1);return
+ visit.food_id=&"kebda";visit.order_id=order.id;visit.shopping_state=&"pending"
+ var wallet:=s.wallet.balance;before=s.items.revision
+ var wrong:=s.service.complete(order.id,&"paid")
+ print("WRONG_VARIANT_ATOMIC ",not wrong.ok and wallet==s.wallet.balance and before==s.items.revision and order.status==&"pending")
+ s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("BATCH_CURRENT ",restored.ok," ",restored.message_key," ",restored.details)
+ if not restored.ok:quit(1);return
+ s.workflow.tick(s.clock.elapse_minutes(1500))
+ before=s.items.revision;wallet=s.wallet.balance
+ # A deliberately matching pending quote isolates the expiry boundary.
+ order.quote=s.menu.quote(&"kebda/plate/takeaway",PackedStringArray(["chili","cheese"])).details.quote;order.quote.at=order.created_at;order.base_price=int(order.quote.price_minor)
+ var expired:=s.service.complete(order.id,&"paid")
+ print("EXPIRED_ATOMIC ",not expired.ok and before==s.items.revision and wallet==s.wallet.balance and order.status==&"pending"," ",expired.message_key)
+ quit(0 if not incompatible.ok and not wrong.ok and not expired.ok else 1)

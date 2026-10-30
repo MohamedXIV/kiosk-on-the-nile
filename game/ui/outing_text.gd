@@ -14,3 +14,13 @@ static func order(session: GameSession, id: StringName) -> String:
 static func manual_topic(value: Dictionary) -> String:
  var key := str(value.key)
  return ItemText.source("topic."+key.trim_prefix("social:") if key.begins_with("social:") else "manual_topic."+key,str(value.label))
+
+static func serving_reference(selection: Dictionary) -> Dictionary:
+ var variant := str(selection.get("variant_id",""))
+ var reference := {"text_ref":"menu.serving","parameters":{"food":{"text_ref":"menu.food."+variant.get_slice("/",0)},"format":{"text_ref":"serving."+variant.get_slice("/",1)},"mode":{"text_ref":"serving."+variant.get_slice("/",2)}}}
+ for id in selection.get("additions",[]):reference={"text_ref":"menu.with_addition","parameters":{"base":reference,"addition":{"text_ref":"addition."+str(id)}}}
+ return reference
+static func serving(session: GameSession, selection: Dictionary) -> String:
+ if str(selection.get("variant_id","")).is_empty():return order(session,StringName(str(selection.get("food_id",""))))
+ var ref := serving_reference(selection)
+ return UiText.localized(str(ref.text_ref),ref.parameters,"")
