@@ -24,6 +24,7 @@ var service_busy: Callable
 var availability_provider: Callable
 var purchase_blocked: Callable
 var demand_provider: Callable
+var character_life: CharacterLife
 var food_selector: Callable
 var tuning: TuningStore
 var foods: FoodRegistry
@@ -74,6 +75,9 @@ func spawn(character_id: StringName) -> VisitState:
  visit.pose.ground = Vector2(spawn_position[0],spawn_position[1])
  var marker: Array = _markers[definition.leisure_marker]
  visit.destination = Vector2(marker[0],marker[1])
+ if character_life!=null:
+  var arrived := character_life.arrive(character_id,visit.id)
+  if not arrived.ok:return null
  visits[str(visit.id)] = visit
  return visit
 func tick(delta: float, calendar_delta: float = -1) -> void:
@@ -185,9 +189,8 @@ func _consider_purchase(visit: VisitState, delta: float) -> void:
  var definition := character(visit.character_id)
  var service_point := _service_point(visit)
  if not _position_available(service_point,visit.id):return
- if _rng.randf()>=float(definition.purchase_chance):visit.shopping_state=&"declined";return
- var food := StringName(str(food_selector.call(visit.character_id))) if food_selector.is_valid() else StringName(definition.food_id)
- if food.is_empty():visit.shopping_state=&"declined";return
+ var food := StringName(str(food_selector.call(visit.character_id,visit.id))) if food_selector.is_valid() else StringName(definition.food_id)
+ if food.is_empty():return
  visit.food_id=food
  visit.shopping_state=&"approaching"
  visit.destination=service_point

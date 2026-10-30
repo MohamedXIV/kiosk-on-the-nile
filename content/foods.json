@@ -31,7 +31,12 @@
       "none": "سادة"
     },
     "menu_label": "الشاي",
-    "order_icon": "cup"
+    "order_icon": "cup",
+    "category": "drink",
+    "temperature": "hot",
+    "spice": 0,
+    "satiation": 0.05,
+    "hydration": 0.55
   },
   "kebda": {
     "label": "سندوتش كبدة إسكندراني",
@@ -60,7 +65,12 @@
       300
     ],
     "menu_label": "سندوتش الكبدة",
-    "order_icon": "sandwich"
+    "order_icon": "sandwich",
+    "category": "meal",
+    "temperature": "hot",
+    "spice": 0.45,
+    "satiation": 0.35,
+    "hydration": 0.05
   },
   "shawarma": {
     "label": "سندوتش شاورما فراخ",
@@ -89,7 +99,12 @@
       300
     ],
     "menu_label": "سندوتش الشاورما",
-    "order_icon": "sandwich"
+    "order_icon": "sandwich",
+    "category": "meal",
+    "temperature": "hot",
+    "spice": 0.2,
+    "satiation": 0.36,
+    "hydration": 0.05
   },
   "potato_fried": {
     "label": "بطاطس مقلية",
@@ -118,7 +133,12 @@
       300
     ],
     "menu_label": "البطاطس المقلية",
-    "order_icon": "plate"
+    "order_icon": "plate",
+    "category": "snack",
+    "temperature": "hot",
+    "spice": 0.1,
+    "satiation": 0.22,
+    "hydration": 0.05
   },
   "potato_baked": {
     "label": "بطاطس في الفرن",
@@ -147,6 +167,11 @@
       300
     ],
     "menu_label": "البطاطس في الفرن",
-    "order_icon": "plate"
+    "order_icon": "plate",
+    "category": "snack",
+    "temperature": "hot",
+    "spice": 0.1,
+    "satiation": 0.22,
+    "hydration": 0.05
   }
 }

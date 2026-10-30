@@ -47,6 +47,7 @@ var cooking: CookingService
 var supplies: SupplyService
 var life: LifeActions
 var service: ServiceSystem
+var character_life: CharacterLife
 var visitors: VisitorService
 var social_life: SocialLife
 var relationships: RelationshipStore
@@ -167,6 +168,9 @@ func configure(source: SessionConfig) -> ActionResult:
  foods=FoodRegistry.new()
  var food_result := foods.configure(source.section("foods"))
  if not food_result.ok:return food_result
+ character_life=CharacterLife.new()
+ var character_result := character_life.configure(source.section("character_life"),foods,clock)
+ if not character_result.ok:return character_result
  cooking = CookingService.new()
  var kitchen := cooking.configure(source.section("recipes"),inventory)
  if not kitchen.ok: return kitchen
@@ -207,6 +211,7 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.seat_unavailable=func(id):return hygiene!=null and hygiene.is_cleaning(id)
  visitors.tuning=tuning
  visitors.foods=foods
+ visitors.character_life=character_life
  visitors.food_selector=_choose_food
  service.configure(wallet,cooking,visitors.is_available,balance,foods,clock)
  visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open)
@@ -435,18 +440,13 @@ func _actor_snapshots() -> Array[Dictionary]:
 func _equipment_busy(id: StringName) -> bool:
  return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id)) or (visitors!=null and visitors.seating.busy_item(id)) or (seat_use!=null and seat_use.busy_item(id))
 
-func _choose_food(character_id: StringName) -> StringName:
- var character := visitors.character(character_id)
- if str(character.get("food_id","")).is_empty():return &""
- var offered := workflow.available_foods(&"kiosk")
- var preferences: Dictionary=character.get("food_preferences",{str(character.food_id):1})
- var pool: Array[String]=[]
- for id in preferences:
-  if not id in offered:continue
-  for i in range(int(preferences[id])):pool.append(id)
- if pool.is_empty():return &""
- if not visitors.random_chance(customer_experience.demand_factor(&"kiosk")):return &""
- return StringName(pool[visitors.random_index(pool.size())])
+func _choose_food(character_id: StringName, visit_id: StringName) -> StringName:
+ var offers: Array[Dictionary]=[]
+ for id in workflow.available_foods(&"kiosk"):
+  var food := foods.definition(StringName(id))
+  offers.append({"food_id":str(id),"price_minor":int(food.price_minor)})
+ var decision := character_life.consider(character_id,visit_id,offers)
+ return StringName(str(decision.get("food_id","")))
 
 func _record_cooking_use(job_id: StringName, step_index: int, instance_id: StringName, kind: StringName) -> void:
  var use_id: StringName=&"prep" if kind==&"prepare" else &"assembly" if kind==&"assemble" else &"batch"

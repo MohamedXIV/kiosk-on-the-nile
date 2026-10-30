@@ -1,0 +1,15 @@
+extends SceneTree
+func _initialize() -> void:
+ call_deferred("observe")
+func observe() -> void:
+ var content := ContentStore.new()
+ root.add_child(content)
+ content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded := content.load_directory("res://content")
+ if not loaded.ok:print("OBSERVATION ",loaded.message_key);quit(1);return
+ var session := GameSession.new()
+ root.add_child(session)
+ var configured := session.configure(SessionConfig.new(content.bundle(),content.fingerprint))
+ var has_life := session.get_property_list().any(func(p):return p.name=="character_life")
+ print("OBSERVATION ",JSON.stringify({"configured":configured.ok,"temporary_character_state":has_life,"farid_existing_weights":session.visitors.character(&"farid").food_preferences,"new_state_expected":true}))
+ session.queue_free();content.queue_free();quit()

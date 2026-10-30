@@ -42,18 +42,18 @@
 
 - [x] Inspect owners and record the detailed spec, initial roster, clock/quote/taste semantics.
 - [x] Fresh read-only builder check: no materially blocking question. Routine balance/UI choices remain builder decisions.
-- [ ] Commit contract/plan with intake, verify reference/whitespace/source isolation, update PR#45 and issue#36; integrate safely with current checks. Do not claim v2 delivered.
+- [x] Commit contract/plan with intake, verify reference/whitespace/source isolation, update PR#45 and issue#36; integrate safely with current checks. Do not claim v2 delivered.
 
 ### Task2 — profiles, state and real contextual decisions (#37)
 
 **Interfaces:** `CharacterLife.configure(data: Dictionary, foods: FoodRegistry, clock: GameClock) -> ActionResult`; `arrive(actor: StringName, visit: StringName) -> ActionResult`; `state(actor: StringName) -> Dictionary` (pure projection); `consider(actor: StringName, visit: StringName, offers: Array[Dictionary], expected: Dictionary={}) -> Dictionary`; `satisfy(actor: StringName, source: String, food: StringName, at: float) -> ActionResult`; snapshot/restore. Offer contains food_id/price_minor and later variant identity; expected contains personal known experiences only. `environment_provider` defaults neutral.
 
-- [ ] Retain a disposable actual-content observation of existing fixed purchase decline/no temporary state. Record expected new behavior before code.
-- [ ] Add strict authored profile/food descriptors and owner, saved RNG and once source/deadline records; invalid actor/finite/bounds references reject.
-- [ ] Wire VisitorService arrival/decision and replace _choose_food's separate chance/expanded repeated-ID pool with a single constrained weighted intent. Quiet decisions have bounded reconsideration; pending/requested/served remain stable.
-- [ ] Wire current persistence and semantic self state projections as needed; no automatic player profile disclosure or taste on handover.
-- [ ] Observe pure reads, actual no-purchase/candidate decisions, cooldown/re-entry, exact JSON Continue and malformed state rejection, neutral weather and low/high need differences.
-- [ ] Import/build appropriate gates, commit and ledger actual limits.
+- [x] Retain a disposable actual-content observation of existing fixed purchase decline/no temporary state. Record expected new behavior before code.
+- [x] Add strict authored profile/food descriptors and owner, saved RNG and once source/deadline records; invalid actor/finite/bounds references reject.
+- [x] Wire VisitorService arrival/decision and replace _choose_food's separate chance/expanded repeated-ID pool with a single constrained weighted intent. Quiet decisions have bounded reconsideration; pending/requested/served remain stable.
+- [x] Wire current persistence and semantic self state projections as needed; no automatic player profile disclosure or taste on handover.
+- [x] Observe pure reads, actual no-purchase/candidate decisions, cooldown/re-entry, exact JSON Continue and malformed state rejection, neutral weather and low/high need differences.
+- [x] Import/build appropriate gates, commit and ledger actual limits.
 
 ### Task3 — material lots and category grades (#38)
 

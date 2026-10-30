@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("character_life"):
+  var characters := CharacterLifeValidation.validate(bundle.character_life,bundle.get("visitors",{}).get("characters",{}).keys(),bundle.get("foods",{}))
+  if not characters.ok:return characters
  var semantic := SemanticNarrative.validate(bundle)
  if not semantic.ok:return semantic
  var save_feedback := SaveFeedbackValidation.validate(bundle)

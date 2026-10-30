@@ -74,6 +74,7 @@
     "story_river_company": "stories/river_company.ink.json",
     "story_home_company": "stories/home_company.ink.json",
     "narrative_policies": "narrative_policies.json",
-    "narrative_knowledge": "narrative_knowledge.json"
+    "narrative_knowledge": "narrative_knowledge.json",
+    "character_life": "character_life.json"
   }
 }
