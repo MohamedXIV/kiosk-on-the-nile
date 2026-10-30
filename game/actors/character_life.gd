@@ -150,7 +150,9 @@ func restore(data: Dictionary) -> ActionResult:
   if buying:
    if menu==null or not menu.plan(StringName(decision.food_id),{"variant_id":decision.variant_id,"additions":decision.additions}).ok or not ContentValidation.bounded(decision.price_minor,0,float(_data.profiles[actor].spend_limit_minor)):return _invalid("character_life_offer")
    var food := _foods.definition(StringName(decision.food_id))
-   if (food.category=="drink")!=(decision.intent=="drink") or not _data.profiles[actor].buying_enabled or float(food.spice)>float(_data.profiles[actor].spice_limit):return _invalid("character_life_intent")
+   var spice := float(food.spice)
+   for addition in decision.additions:spice+=float(menu._data.additions[addition].spice)
+   if (food.category=="drink")!=(decision.intent=="drink") or not _data.profiles[actor].buying_enabled or clampf(spice,0,1)>float(_data.profiles[actor].spice_limit):return _invalid("character_life_intent")
   if not CharacterLifeValidation.keys(decision.factors,["need","preference","price","memory"] if buying else ["quiet"]):return _invalid("character_life_factors")
   for weight in decision.factors.values():
    if not ContentValidation.bounded(weight,0,100):return _invalid("character_life_factors")

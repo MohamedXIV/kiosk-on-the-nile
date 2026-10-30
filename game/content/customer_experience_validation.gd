@@ -4,6 +4,7 @@ static func validate(data: Dictionary, bundle: Dictionary) -> ActionResult:
  for key in ["weights","environment_weights","sensitivities","categories","labels"]:
   if not data.get(key) is Dictionary:return ContentValidation.fail("customer_experience."+key)
  if not ContentValidation.integer(data.get("window")) or data.window<1 or data.window>100:return ContentValidation.fail("customer_experience.window")
+ if not ContentValidation.bounded(data.get("taste_delay_minutes"),1,30):return ContentValidation.fail("customer_experience.taste_delay")
  for key in ["observe_interval","observe_radius","improvement_delta"]:
   if not ContentValidation.bounded(data.get(key),0.01,1000):return ContentValidation.fail("customer_experience."+key)
  if not ContentValidation.bounded(data.get("recovery_floor"),0.01,1) or not data.get("quality_scores") is Array or data.quality_scores.size()!=4:return ContentValidation.fail("customer_experience.scoring")

@@ -55,5 +55,6 @@
       "food": 1,
       "wait": 0.8
     }
-  }
+  },
+  "taste_delay_minutes": 3
 }

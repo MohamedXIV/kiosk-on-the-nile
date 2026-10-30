@@ -232,6 +232,9 @@ func configure(source: SessionConfig) -> ActionResult:
  var experience_result := customer_experience.configure(source.section("customer_experience"),hygiene,spaces,clock)
  if not experience_result.ok:return experience_result
  customer_experience.visit_provider=func(id):return visitors.visits.get(str(id))
+ customer_experience.order_provider=service.order
+ customer_experience.relationship_provider=func(actor):return relationships.value(actor,&"player",&"familiarity")
+ visitors.return_provider=customer_experience.return_factor
  visitors.service_presence=func():return location_id==&"kiosk"
  visitors.service_busy=func():return personal!=null and personal.active() or narrative!=null and narrative.focused_session()!=null
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
@@ -453,7 +456,7 @@ func _equipment_busy(id: StringName) -> bool:
 
 func _choose_food(character_id: StringName, visit_id: StringName) -> StringName:
  var offers := menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false))
- var decision := character_life.consider(character_id,visit_id,offers)
+ var decision := character_life.consider(character_id,visit_id,offers,customer_experience.expected(character_id))
  return StringName(str(decision.get("food_id","")))
 
 func _record_cooking_use(job_id: StringName, step_index: int, instance_id: StringName, kind: StringName) -> void:
@@ -486,6 +489,10 @@ func _step_experiences(_frame: Dictionary) -> ActionResult:
   if visit.phase==&"leaving":continue
   var result := _sync_experience(visit.id,visit.order_id)
   if not result.ok:return result
+  var order := service.order(visit.order_id)
+  if order!=null:
+   result=customer_experience.confirm_taste(order,character_life,foods,menu)
+   if not result.ok:return result
  return ActionResult.success()
 
 func request_can_prepare(food_id: StringName) -> bool:

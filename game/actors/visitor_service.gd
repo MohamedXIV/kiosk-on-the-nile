@@ -24,6 +24,7 @@ var service_busy: Callable
 var availability_provider: Callable
 var purchase_blocked: Callable
 var demand_provider: Callable
+var return_provider: Callable
 var character_life: CharacterLife
 var food_selector: Callable
 var tuning: TuningStore
@@ -132,6 +133,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     var previous := history.last_visit(id)
     var freshness := 1.0 if previous<0 else clampf((_clock.world_minutes-previous)/1440.0,0.25,1.0)
     var weight := float(_data.characters[id].arrival_weight)*freshness
+    if return_provider.is_valid():weight*=clampf(float(return_provider.call(StringName(id))),1.0,1.15)
     pool.append(id);weights.append(weight);total+=weight
    if total>0:
     var roll := _rng.randf()*total
