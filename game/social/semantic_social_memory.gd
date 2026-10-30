@@ -7,7 +7,7 @@ var _session: GameSession
 var _schemas: Dictionary
 var _cap: float
 var _events: Dictionary = {}
-var _indexes: Dictionary = {"introductions":{},"days":{},"consents":{},"consumed":{},"positive":{},"messages":{}}
+var _indexes: Dictionary = {"introductions":{},"days":{},"consents":{},"consumed":{},"latest_consumed":{},"positive":{},"messages":{}}
 func configure(session: GameSession) -> void:
  _session=session;_schemas=SemanticNarrative.schemas(session.config.data)
  _cap=float(session.config.data.get("narrative_social",{}).get("daily_gain_cap",session.config.data.social_life.relationships.daily_cap))
@@ -112,7 +112,7 @@ func _derive(events: Dictionary, sources: Dictionary, check_applied: bool) -> Ac
   if not receipt is Dictionary or not receipt.get("social") is Array or int(row.index)>=receipt.social.size() or row.effect!=receipt.social[int(row.index)] or id!=row.source+"/social/"+str(int(row.index)):return _fail()
   ordered.append(row.duplicate(true))
  ordered.sort_custom(func(a,b):return int(a.index)<int(b.index) if sources[a.source].order==sources[b.source].order else sources[a.source].order<sources[b.source].order)
- var indexes := {"introductions":{},"days":{},"consents":{},"consumed":{},"messages":{}};var daily := {};var gained := {};var normalized := {};var gains: Array=[]
+ var indexes := {"introductions":{},"days":{},"consents":{},"consumed":{},"latest_consumed":{},"messages":{}};var daily := {};var gained := {};var normalized := {};var gains: Array=[]
  for row in ordered:
   var r: Dictionary=sources[row.source];var e: Dictionary=row.effect;var applied:=0.0
   var day:=floori(float(r.at)/1440.0)
@@ -159,9 +159,17 @@ func _derive(events: Dictionary, sources: Dictionary, check_applied: bool) -> Ac
     var key:=scope_key(r.identity,e.scope,e.actors,str(e.get("evidence","")),float(r.at),r.get("visits",{}))
     if key.is_empty() or indexes.consumed.has(key):return _fail()
     indexes.consumed[key]=row.source
+    var latest: Dictionary=indexes.latest_consumed.get(r.topic,{})
+    for actor in e.actors:latest[str(actor)]=maxf(float(latest.get(str(actor),-1)),float(r.at))
+    latest["*"]=maxf(float(latest.get("*",-1)),float(r.at));indexes.latest_consumed[r.topic]=latest
   if check_applied and row.applied!=applied:return _fail()
   row.applied=applied;normalized[row.id]=row
  indexes["positive"]=daily
  return ActionResult.success({"events":normalized,"indexes":indexes,"gains":gains})
 static func _heard_pair(from: String, to: String, receipt: Dictionary) -> bool:return from!=to and from in [receipt.speaker,receipt.listener] and to in [receipt.speaker,receipt.listener]
 static func _fail() -> ActionResult:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_semantic_social_memory")
+
+func latest_consumed_at(topics: Array, actor: String="*") -> float:
+ var latest := -1.0
+ for topic in topics:latest=maxf(latest,float(_indexes.get("latest_consumed",{}).get(str(topic),{}).get(actor,-1)))
+ return latest

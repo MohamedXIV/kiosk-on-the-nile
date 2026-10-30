@@ -40,43 +40,10 @@ INCLUDE context.inkinc
 }
 -> END
 === served ===
-{quality_score >= 2 && line_variant == 1:
- {character_id:
- - "nadia": حلو قوي، ده هيتاكل قبل ما أوصل البيت كده. # speaker:nadia # duration:5 # loc:story.visitors.line_014
- - "farid": تسلم يا ريس. نأكل بقى قبل ما حد يفتكر الشغل تاني. # speaker:farid # duration:5 # loc:story.visitors.line_015
- - "salma": ريحتها حلوة.. أهو وقت صغير لنفسي. # speaker:salma # duration:5 # loc:story.visitors.line_016
- - "youssef": كده نقدر نفتح الكتاب، أو نحاول يعني. # speaker:youssef # duration:5 # loc:story.visitors.line_017
- - else: على كده الواحد يقعد دقيقتين كمان. تسلم. # speaker:{character_id} # duration:5 # loc:story.visitors.line_018
- }
- -> END
-}
-{quality_score >= 2 && line_variant == 2:
- {character_id:
- - "nadia": ربنا يبارك لك، وفّرت عليّا طبخة النهاردة. # speaker:nadia # duration:5 # loc:story.visitors.line_019
- - "farid": الله يفتح عليك. أحلى من العشا وأنا لوحدي في الورشة. # speaker:farid # duration:5 # loc:story.visitors.line_020
- - "salma": متشكرة، الشاي مع النسمة دي حكاية تانية. # speaker:salma # duration:5 # loc:story.visitors.line_021
- - "youssef": تسلم.. كده القعدة مش ناقصها حاجة. # speaker:youssef # duration:5 # loc:story.visitors.line_022
- - else: الله ينور، متشكر على تعبك. # speaker:{character_id} # duration:5 # loc:story.visitors.line_023
- }
- -> END
-}
-{quality_score >= 2:
- {character_id:
- - "nadia": تسلم إيدك. كده العشا اتظبط، أشوفك على خير. # speaker:nadia # duration:5 # loc:story.visitors.line_024
- - "farid": الله ينور يا ريس.. أهو ده مسك الختام بعد الورشة. # speaker:farid # duration:5 # loc:story.visitors.line_025
- - "salma": متشكرة، هاشربها قبل ما أبص في كراسات التصحيح. # speaker:salma # duration:5 # loc:story.visitors.line_026
- - "youssef": دي جت في وقتها، يمكن المخ يشتغل! # speaker:youssef # duration:5 # loc:story.visitors.line_027
- - "hassan": تسلم إيدك. هاشربها وأنا باصص للناحية التانية. # speaker:hassan # duration:5 # loc:story.visitors.line_028
- - "mahmoud": كوباية تروق الأعصاب بعد الماتش ده. # speaker:mahmoud # duration:5 # loc:story.visitors.line_029
- - "samir": تسلم يا معلم.. نتعشى وننسى الكورة شوية. # speaker:samir # duration:5 # loc:story.visitors.line_030
- - else: متشكر، تسلم إيدك. # speaker:{character_id} # duration:4 # loc:story.visitors.line_031
- }
-- else:
- {line_variant:
- - 0: تسلم.. يمكن محتاجة تتظبط شوية المرة الجاية. # speaker:{character_id} # duration:5 # loc:story.visitors.line_032
- - 1: متشكر يا معلم. كل يوم وليه ظروفه. # speaker:{character_id} # duration:5 # loc:story.visitors.line_033
- - else: تعيش. خد نفسك إنت كمان لو يومك متعب. # speaker:{character_id} # duration:5 # loc:story.visitors.line_034
- }
+{line_variant:
+- 0: تسلم يا معلم، آخد طلبي على رواقة. # speaker:{character_id} # duration:5 # loc:story.visitors.received_0
+- 1: متشكر على تعبك. # speaker:{character_id} # duration:5 # loc:story.visitors.received_1
+- else: الله يبارك لك، تسلم. # speaker:{character_id} # duration:5 # loc:story.visitors.received_2
 }
 -> END
 === waiting ===

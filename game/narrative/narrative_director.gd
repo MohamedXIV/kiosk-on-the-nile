@@ -411,6 +411,29 @@ func _context_for(conversation: ConversationSession) -> Dictionary:
  inputs.merge(_definitions[str(conversation.encounter_id)].get("story_context",{}),true)
  inputs["chapter_id"]=str(conversation.id)
  var projected := context(conversation.participants,inputs)
+ var entry: Dictionary=_definitions[str(conversation.encounter_id)]
+ if entry.has("comment_source_binding"):
+  var bindings: Dictionary=conversation.context_extra.get("semantic_start",{}).get("identity",{}).get("bindings",{})
+  var source := _session.customer_experience.comment_source(str(bindings.get("kind","")),str(bindings.get(str(entry.comment_source_binding),"")))
+  var captures: Dictionary=projected.get("localization_args",{}).duplicate(true)
+  projected["comment_score"]=float(source.get("score",0))
+  if source.get("kind")=="notice":
+   var label: String=str(_session.items.definition(StringName(str(source.definition_id))).get("label",""))
+   projected["comment_item"]=label
+   captures["comment_item"]=LocaleService.current.captured_reference("item."+str(source.definition_id),label) if LocaleService.current else label
+  if source.get("kind")=="taste":
+   var key := "comment.food."+str(source.food_id)
+   if _session.config.data.locale_ar.messages.has(key):
+    projected["comment_food"]=str(_session.config.data.locale_ar.messages[key]);captures["comment_food"]={"text_ref":key}
+   else:
+    var label: String=str(_session.foods.definition(StringName(str(source.food_id))).get("menu_label",str(source.food_id)))
+    projected["comment_food"]=label
+    captures["comment_food"]=LocaleService.current.captured_reference("food."+str(source.food_id)+".menu",label) if LocaleService.current else label
+  if source.get("kind")=="suggestion":
+   var label: String=str(_session.config.data.customer_experience.comment_suggestions[source.subject].label)
+   projected["comment_suggestion"]=label
+   captures["comment_suggestion"]=LocaleService.current.captured_reference("suggestion."+str(source.subject),label) if LocaleService.current else label
+  projected["localization_args"]=captures
  var social_topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
  if not social_topic.is_empty() and str(conversation.encounter_id).begins_with("social_"):
   projected.merge(_session.social_life.dialogue_context(social_topic),true)

@@ -87,30 +87,30 @@
 
 **Interfaces:** `MenuService.configure(data: Dictionary, foods: FoodRegistry) -> ActionResult`; `set_price(variant: StringName, amount_minor: int) -> ActionResult`; `offers(available: PackedStringArray) -> Array[Dictionary]`; `quote(variant: StringName, additions: PackedStringArray) -> ActionResult`; snapshot/restore. Service snapshots the accepted variant/additions/final price/revision, and validates the actual handed portion. Extend CharacterLife offers without another probability roll.
 
-- [ ] Author compatible serving formats/modes/additions, actual portion/extra/packaging input costs and player controls in both languages.
-- [ ] Fix order quote at acceptance, preserve gifts as distinct, and atomically validate/fulfil/settle exact ordered content. Menu edit affects new quotes only.
-- [ ] Observe same order across a price edit/current Continue, unaffordable/no-purchase choices, incompatible modifiers, wrong portion, final stock and no partial settlement on error.
-- [ ] Build/record/commit with full receipt/source validation.
+- [x] Author compatible serving formats/modes/additions, actual portion/extra/packaging input costs and player controls in both languages.
+- [x] Fix order quote at acceptance, preserve gifts as distinct, and atomically validate/fulfil/settle exact ordered content. Menu edit affects new quotes only.
+- [x] Observe same order across a price edit/current Continue, unaffordable/no-purchase choices, incompatible modifiers, wrong portion, final stock and no partial settlement on error.
+- [x] Build/record/commit with full receipt/source validation.
 
 ### Task7 — tasted memories, personal value and optional returns (#42)
 
 **Interfaces:** CustomerExperience remains owner. Add confirmed taste source keyed by actual order/item/actor and at-time, plus bounded per-food/variant memory and expected personal view for CharacterLife. CharacterLife satisfaction consumes the same once source. Existing reputation remains a separate observed projection.
 
-- [ ] Add delayed actual here-tasting while recipient remains available; no taste for takeaway unless authored later feedback explicitly confirms it.
-- [ ] Record personal fit/paid value/gift distinction and bounded learned favourites/recovery, without leaking hidden lot grade or other people's knowledge.
-- [ ] Add modest bounded personal return bias under existing arrival limits/cap; quiet independent reasons remain.
-- [ ] Observe one actual consumption changes only that actor's needs/memory once, duplicate/retarget/future source rejection, no-taste leave/takeaway and personal expected choice after Continue.
-- [ ] Build/record/commit and validate owner cross-links.
+- [x] Add delayed actual here-tasting while recipient remains available; no taste for takeaway unless authored later feedback explicitly confirms it.
+- [x] Record personal fit/paid value/gift distinction and bounded learned favourites/recovery, without leaking hidden lot grade or other people's knowledge.
+- [x] Add modest bounded personal return bias under existing arrival limits/cap; quiet independent reasons remain.
+- [x] Observe one actual consumption changes only that actor's needs/memory once, duplicate/retarget/future source rejection, no-taste leave/takeaway and personal expected choice after Continue.
+- [x] Build/record/commit and validate owner cross-links.
 
 ### Task8 — grounded Ink comments/suggestions (#43)
 
 **Interfaces:** Add registered semantic domain queries over CharacterLife and actual CustomerExperience observation/taste sources; no arbitrary actor-specific predicate branches. Scoped consumption references the selected observed item/experience, with normal start/continuation/hearing receipts.
 
-- [ ] Extend actual observed-place identity/revision without another global frame scan; distinguish first notice from moving the same object.
-- [ ] Author/localise reusable new-item/food-callback/optional-suggestion families with relationship/context/cooldown, shared dialogue priorities and refusal/silence/postpone.
-- [ ] Migrate the touched legacy venue/order comment family coherently; keep unrelated remaining encounter inventory explicit.
-- [ ] Observe unseen/unheard/untasted denial, actual positive lines, own-person lineage, once per meaningful evidence after reload/reposition and no simultaneous chatter burst.
-- [ ] Ink/localisation/import/Web gates, record and commit.
+- [x] Extend actual observed-place identity/revision without another global frame scan; distinguish first notice from moving the same object.
+- [x] Author/localise reusable new-item/food-callback/optional-suggestion families with relationship/context/cooldown, shared dialogue priorities and refusal/silence/postpone.
+- [x] Migrate the touched legacy venue/order comment family coherently; keep unrelated remaining encounter inventory explicit.
+- [x] Observe unseen/unheard/untasted denial, actual positive lines, own-person lineage, once per meaningful evidence after reload/reposition and no simultaneous chatter burst.
+- [x] Ink/localisation/import/Web gates, record and commit.
 
 ### Task9 — one connected verified preview (#44)
 

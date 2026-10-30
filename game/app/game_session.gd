@@ -232,6 +232,8 @@ func configure(source: SessionConfig) -> ActionResult:
  var experience_result := customer_experience.configure(source.section("customer_experience"),hygiene,spaces,clock)
  if not experience_result.ok:return experience_result
  customer_experience.visit_provider=func(id):return visitors.visits.get(str(id))
+ customer_experience.profile_provider=character_life.profile
+ customer_experience.suggestion_available=func(food):return not menu._data.foods.has(food)
  customer_experience.order_provider=service.order
  customer_experience.relationship_provider=func(actor):return relationships.value(actor,&"player",&"familiarity")
  visitors.return_provider=customer_experience.return_factor
@@ -414,7 +416,11 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
  elif extra.get("character_id")=="amgad" and kind==&"served":id=&"amgad_served"
  elif kind==&"served": id=&"visitors_served"
  context_data["mode"] = 4 if kind==&"arrival" else 2 if kind==&"served" else 3 if kind==&"reminder" else 4 if kind==&"ambient" else 0
- if kind in [&"arrival",&"ambient"] and narrative.has_topics(&"venue_comments",participants,context_data):id=&"venue_comments"
+ if kind in [&"arrival",&"ambient"] and narrative.sessions.is_empty():
+  for candidate in config.section("customer_experience").comment_encounters:
+   var entry: Dictionary=narrative._definitions[str(candidate)]
+   if semantic.decide(entry,participants,"offer").allowed:
+    id=StringName(str(candidate));context_data["invitation"]=true;context_data["manual_read"]=false;break
  await narrative.start(id,participants,context_data)
 func person_interaction(visit_id: StringName) -> ActionResult:
  if not presence.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")

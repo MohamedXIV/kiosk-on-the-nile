@@ -18,6 +18,10 @@
       "trust": 2,
       "calendar_days": 2,
       "shared_days": 2
+    },
+    "comment": {
+      "familiarity": 4,
+      "trust": 1
     }
   },
   "policies": {
@@ -81,6 +85,49 @@
           }
         ]
       }
+    },
+    "familiar_comment": {
+      "roles": [
+        "guest"
+      ],
+      "parameters": {
+        "gate": "profile"
+      },
+      "requires": {
+        "op": "all",
+        "rules": [
+          {
+            "op": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "familiarity",
+            "compare": ">=",
+            "value": {
+              "parameter": "gate",
+              "field": "familiarity"
+            }
+          },
+          {
+            "op": "relationship",
+            "from": {
+              "role": "guest"
+            },
+            "to": {
+              "actor": "player"
+            },
+            "axis": "trust",
+            "compare": ">=",
+            "value": {
+              "parameter": "gate",
+              "field": "trust"
+            }
+          }
+        ]
+      }
     }
   },
   "fact_types": {
@@ -102,6 +149,11 @@
       "recipient": "actor",
       "thread": "string",
       "subject": "string"
+    },
+    "comment_report": {
+      "owner": "actor",
+      "kind": "experience_kind",
+      "source": "string"
     }
   },
   "topics": {
@@ -7382,6 +7434,2106 @@
                 }
               ],
               "channel": "personal"
+            }
+          ]
+        }
+      }
+    },
+    "experience_notice": {
+      "bindings": {
+        "guest": "actor",
+        "kind": "experience_kind",
+        "source": "string"
+      },
+      "roles": {
+        "guest": {
+          "binding": "guest"
+        }
+      },
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.comment_ready",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "continuation": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "choices": {
+        "listen": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        },
+        "refuse": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        },
+        "postpone": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "offer": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "record": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "experience_taste": {
+      "bindings": {
+        "guest": "actor",
+        "kind": "experience_kind",
+        "source": "string"
+      },
+      "roles": {
+        "guest": {
+          "binding": "guest"
+        }
+      },
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.comment_ready",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "continuation": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "choices": {
+        "listen": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        },
+        "refuse": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        },
+        "postpone": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "offer": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "record": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "experience_suggestion": {
+      "bindings": {
+        "guest": "actor",
+        "kind": "experience_kind",
+        "source": "string"
+      },
+      "roles": {
+        "guest": {
+          "binding": "guest"
+        }
+      },
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.comment_ready",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "continuation": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "choices": {
+        "listen": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        },
+        "refuse": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        },
+        "postpone": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "offer": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "record": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "experience_dirty": {
+      "bindings": {
+        "guest": "actor",
+        "kind": "experience_kind",
+        "source": "string"
+      },
+      "roles": {
+        "guest": {
+          "binding": "guest"
+        }
+      },
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.comment_ready",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "continuation": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "choices": {
+        "listen": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        },
+        "refuse": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        },
+        "postpone": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "offer": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "record": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "experience_improved": {
+      "bindings": {
+        "guest": "actor",
+        "kind": "experience_kind",
+        "source": "string"
+      },
+      "roles": {
+        "guest": {
+          "binding": "guest"
+        }
+      },
+      "stages": {
+        "start": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.comment_ready",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "continuation": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "choices": {
+        "listen": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
+            }
+          ]
+        },
+        "refuse": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        },
+        "postpone": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "available",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            },
+            {
+              "op": "near",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "channel": "personal"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "offer": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "visit",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ]
+            }
+          ]
+        },
+        "record": {
+          "op": "all",
+          "rules": [
+            {
+              "op": "all",
+              "rules": [
+                {
+                  "op": "available",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ]
+                },
+                {
+                  "op": "near",
+                  "actors": [
+                    {
+                      "role": "guest"
+                    },
+                    {
+                      "actor": "player"
+                    }
+                  ],
+                  "channel": "personal"
+                }
+              ]
+            },
+            {
+              "op": "policy",
+              "id": "familiar_comment",
+              "roles": {
+                "guest": {
+                  "role": "guest"
+                }
+              },
+              "parameters": {
+                "gate": "comment"
+              }
+            },
+            {
+              "op": "domain",
+              "id": "experience.source",
+              "args": {
+                "actor": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            },
+            {
+              "op": "unused",
+              "scope": "evidence",
+              "actors": [
+                {
+                  "role": "guest"
+                },
+                {
+                  "actor": "player"
+                }
+              ],
+              "evidence": {
+                "binding": "source"
+              }
             }
           ]
         }

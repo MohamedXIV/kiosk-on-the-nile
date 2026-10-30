@@ -23,7 +23,7 @@ func _render() -> void:
  var state := _session.menu.snapshot()
  for variant in state.prices:
   var id := StringName(str(variant))
-  var label := OutingText.order(_session,StringName(str(variant).get_slice("/",0)))+" · "+UiText.localized("serving."+str(variant).get_slice("/",1),{},str(variant).get_slice("/",1))+" · "+UiText.localized("serving."+str(variant).get_slice("/",2),{},str(variant).get_slice("/",2))
+  var label := UiText.localized("menu.food."+str(variant).get_slice("/",0),{},OutingText.order(_session,StringName(str(variant).get_slice("/",0))))+" · "+UiText.localized("serving."+str(variant).get_slice("/",1),{},str(variant).get_slice("/",1))+" · "+UiText.localized("serving."+str(variant).get_slice("/",2),{},str(variant).get_slice("/",2))
   _price_row(label,int(state.prices[variant]),func(value):return _session.menu.set_price(id,value))
  for addition in state.addition_prices:
   var id := StringName(str(addition))

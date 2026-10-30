@@ -72,18 +72,6 @@
         "label": "نتعرف ونقعد شوية"
       },
       {
-        "id": "memory",
-        "scope": "once",
-        "modes": [
-          0
-        ],
-        "variants": 1,
-        "requires": {},
-        "requires_previous_service": true,
-        "minimum_visits": 2,
-        "label": "فاكر قعدتنا اللي فاتت؟"
-      },
-      {
         "id": "smalltalk",
         "scope": "day",
         "modes": [
@@ -238,18 +226,6 @@
         "label": "فاكر قعدتنا يومها؟"
       },
       {
-        "id": "memory",
-        "scope": "once",
-        "modes": [
-          0
-        ],
-        "variants": 1,
-        "requires": {},
-        "requires_previous_service": true,
-        "minimum_visits": 2,
-        "label": "فاكر قعدتنا اللي فاتت؟"
-      },
-      {
         "id": "smalltalk",
         "scope": "day",
         "modes": [
@@ -308,71 +284,31 @@
     "semantic_actor": "farid"
   },
   "venue_comments": {
-    "story": "venue_comments",
+    "story": "experience_comments",
     "manual": true,
-    "requires": {
-      "all": [
-        {
-          "participants_available": true
-        },
-        {
-          "distance_at_most": 3.4
-        }
-      ]
-    },
+    "requires": {},
     "offer_requires": {},
-    "choice_conditions": {},
-    "topics": [
-      {
-        "id": "venue_improved",
-        "scope": "evidence",
-        "source_type": "visit",
-        "observation_kind": "improved",
-        "modes": [
-          0,
-          1,
-          4
-        ],
-        "variants": 1,
-        "requires": {
-          "venue_observation": "improved"
-        },
-        "label": "حاسس المكان اتحسن؟"
+    "advancement": "manual",
+    "semantic_topic": "experience_dirty",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
       },
-      {
-        "id": "venue_dirty",
-        "scope": "evidence",
-        "source_type": "visit",
-        "observation_kind": "dirty",
-        "modes": [
-          0,
-          1,
-          4
-        ],
-        "variants": 1,
-        "requires": {
-          "venue_observation": "dirty"
-        },
-        "label": "المكان محتاج يتظبط؟"
-      },
-      {
-        "id": "venue_food_memory",
-        "scope": "evidence",
-        "source_type": "visit",
-        "observation_kind": "food",
-        "modes": [
-          0,
-          1,
-          4
-        ],
-        "variants": 1,
-        "requires": {
-          "venue_observation": "food"
-        },
-        "label": "فاكر آخر طلب؟"
+      "kind": "dirty",
+      "source": {
+        "query": "experience.latest",
+        "kind": "dirty"
       }
-    ],
-    "advancement": "manual"
+    },
+    "story_context": {
+      "topic_id": "dirty"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_label": "شايف حاجة محتاجة اهتمام؟",
+    "comment_source_binding": "source"
   },
   "orders": {
     "story": "orders",
@@ -1213,32 +1149,140 @@
     "semantic_actor": "farid"
   },
   "shawarma_result": {
-    "story": "shawarma_learning",
+    "story": "experience_comments",
     "manual": true,
     "requires": {},
     "offer_requires": {},
     "advancement": "manual",
-    "semantic_topic": "recipe_result",
+    "semantic_topic": "experience_taste",
     "semantic_bindings": {
       "guest": {
         "participant": 0
       },
-      "recipe": "shawarma",
-      "result": {
-        "query": "recipe.latest_result",
-        "recipe": "shawarma"
+      "kind": "taste",
+      "source": {
+        "query": "experience.latest",
+        "kind": "taste",
+        "food": "shawarma"
       }
     },
     "story_context": {
-      "topic_id": "shawarma_result"
+      "topic_id": "taste"
     },
     "optional": true,
     "choice_expiry": 8,
     "listen_choice": 2,
     "personal_choice": "listen",
-    "learning_recipe": "shawarma",
-    "semantic_label": "أحكيلك عن آخر طبخة",
-    "semantic_actor": "farid",
-    "learning_evidence_binding": "result"
+    "semantic_label": "جربت الشاورما عندي؟",
+    "comment_source_binding": "source",
+    "semantic_actor": "farid"
+  },
+  "experience_notice": {
+    "story": "experience_comments",
+    "manual": true,
+    "requires": {},
+    "offer_requires": {},
+    "advancement": "manual",
+    "semantic_topic": "experience_notice",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "kind": "notice",
+      "source": {
+        "query": "experience.latest",
+        "kind": "notice"
+      }
+    },
+    "story_context": {
+      "topic_id": "notice"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_label": "شايف الإضافة الجديدة؟",
+    "comment_source_binding": "source"
+  },
+  "experience_taste": {
+    "story": "experience_comments",
+    "manual": true,
+    "requires": {},
+    "offer_requires": {},
+    "advancement": "manual",
+    "semantic_topic": "experience_taste",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "kind": "taste",
+      "source": {
+        "query": "experience.latest",
+        "kind": "taste"
+      }
+    },
+    "story_context": {
+      "topic_id": "taste"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_label": "فاكر اللي جربته هنا؟",
+    "comment_source_binding": "source"
+  },
+  "experience_suggestion": {
+    "story": "experience_comments",
+    "manual": true,
+    "requires": {},
+    "offer_requires": {},
+    "advancement": "manual",
+    "semantic_topic": "experience_suggestion",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "kind": "suggestion",
+      "source": {
+        "query": "experience.latest",
+        "kind": "suggestion"
+      }
+    },
+    "story_context": {
+      "topic_id": "suggestion"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_label": "فيه حاجة تحب أضيفها؟",
+    "comment_source_binding": "source"
+  },
+  "venue_improved": {
+    "story": "experience_comments",
+    "manual": true,
+    "requires": {},
+    "offer_requires": {},
+    "advancement": "manual",
+    "semantic_topic": "experience_improved",
+    "semantic_bindings": {
+      "guest": {
+        "participant": 0
+      },
+      "kind": "improved",
+      "source": {
+        "query": "experience.latest",
+        "kind": "improved"
+      }
+    },
+    "story_context": {
+      "topic_id": "improved"
+    },
+    "optional": true,
+    "choice_expiry": 8,
+    "listen_choice": 2,
+    "personal_choice": "listen",
+    "semantic_label": "المكان اتظبط شوية؟",
+    "comment_source_binding": "source"
   }
 }

@@ -76,6 +76,7 @@
     "narrative_policies": "narrative_policies.json",
     "narrative_knowledge": "narrative_knowledge.json",
     "character_life": "character_life.json",
-    "menu": "menu.json"
+    "menu": "menu.json",
+    "story_experience_comments": "stories/experience_comments.ink.json"
   }
 }

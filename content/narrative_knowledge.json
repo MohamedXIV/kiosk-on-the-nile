@@ -1414,6 +1414,341 @@
         },
         "choice": "accept"
       }
+    },
+    "experience_notice": {
+      "offer": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "visit",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      },
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "comment_report",
+              "args": {
+                "owner": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "evidence",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ],
+            "evidence": {
+              "binding": "source"
+            }
+          }
+        ]
+      }
+    },
+    "experience_taste": {
+      "offer": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "visit",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      },
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "comment_report",
+              "args": {
+                "owner": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "evidence",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ],
+            "evidence": {
+              "binding": "source"
+            }
+          }
+        ]
+      }
+    },
+    "experience_suggestion": {
+      "offer": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "visit",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      },
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "comment_report",
+              "args": {
+                "owner": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "evidence",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ],
+            "evidence": {
+              "binding": "source"
+            }
+          }
+        ]
+      }
+    },
+    "experience_dirty": {
+      "offer": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "visit",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      },
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "comment_report",
+              "args": {
+                "owner": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "evidence",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ],
+            "evidence": {
+              "binding": "source"
+            }
+          }
+        ]
+      }
+    },
+    "experience_improved": {
+      "offer": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "visit",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ]
+          }
+        ]
+      },
+      "record": {
+        "listeners": [
+          {
+            "actor": "player"
+          }
+        ],
+        "assertions": [
+          {
+            "kind": "heard",
+            "fact": {
+              "type": "comment_report",
+              "args": {
+                "owner": {
+                  "role": "guest"
+                },
+                "kind": {
+                  "binding": "kind"
+                },
+                "source": {
+                  "binding": "source"
+                }
+              }
+            }
+          }
+        ],
+        "social": [
+          {
+            "kind": "consume",
+            "scope": "evidence",
+            "actors": [
+              {
+                "role": "guest"
+              },
+              {
+                "actor": "player"
+              }
+            ],
+            "evidence": {
+              "binding": "source"
+            }
+          }
+        ]
+      }
     }
   },
   "legacy_player_aliases": {

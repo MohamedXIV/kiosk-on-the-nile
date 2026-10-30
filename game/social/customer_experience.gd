@@ -2,10 +2,16 @@ class_name CustomerExperience
 extends RefCounted
 signal changed(location_id: StringName)
 var visit_provider: Callable
+var profile_provider: Callable
+var suggestion_available: Callable
 var order_provider: Callable
 var relationship_provider: Callable
 var _tastes: Dictionary={}
 var _palates: Dictionary={}
+var _first_tastes: Dictionary={}
+var _source_candidates: Dictionary={}
+var _comment_sources: Dictionary={}
+var _starter_placements: Dictionary={}
 var _data: Dictionary
 var _hygiene: HygieneService
 var _spaces: SpaceService
@@ -20,6 +26,7 @@ func configure(data: Dictionary, hygiene: HygieneService, spaces: SpaceService, 
  _hygiene=hygiene
  _spaces=spaces
  _clock=clock
+ _starter_placements=spaces.snapshot().placements.duplicate(true)
  spaces.changed.connect(func(id,_revision):_navigation.erase(str(id)))
  return ActionResult.success()
 func observe(visit_id: StringName, actor_pose: ActorPose) -> ActionResult:
@@ -39,13 +46,24 @@ func observe(visit_id: StringName, actor_pose: ActorPose) -> ActionResult:
   if placed.location_id!=str(actor_pose.location_id):continue
   var item: Dictionary=_spaces.item_record(StringName(id))
   var category := str(_data.categories.get(item.get("definition_id",""),""))
-  if category.is_empty():continue
   var point := _spaces.ground(StringName(id))
   if actor_pose.ground.distance_to(point)>float(_data.observe_radius):continue
   if not _visible(actor_pose.ground,point,id,str(placed.host_id),solids):continue
   if _nav(actor_pose.location_id).path(actor_pose.ground,point).is_empty():continue
+  if item.get("kind") in ["furniture","equipment"] and not _starter_placements.has(id):
+   var appearance := int(item.attributes.get("appearance_revision",0))
+   _remember_source("notice/"+str(record.character_id)+"/"+str(id)+"/"+str(appearance),"notice",record,str(id),str(item.definition_id),appearance,{"observer_ground":[actor_pose.ground.x,actor_pose.ground.y],"target_ground":[point.x,point.y]})
+  if category.is_empty():continue
   var state := _hygiene.state(StringName(id))
   if not state.is_empty():record.observations[id]={"target_id":id,"category":category,"cleanliness":state.cleanliness,"at":_clock.world_minutes}
+ for observation in record.observations.values():
+  if is_equal_approx(float(observation.at),_clock.world_minutes) and float(observation.cleanliness)<float(_data.dirty_below):
+   var evidence := "dirty/"+str(record.character_id)+"/"+str(observation.target_id)+"/"+str(floori(_clock.world_minutes/1440.0))+"/"+str(floori(float(observation.cleanliness)/20.0))
+   _remember_source(evidence,"dirty",record,str(observation.target_id),"",0,{"observation":observation.duplicate(true)})
+ var last: Dictionary=_customers.get(record.character_id,{}).get("last_visit",{})
+ var environment := _environment(record.observations)
+ if not last.is_empty() and last.components.has("environment") and environment>=float(last.components.environment)+float(_data.improvement_delta):
+  _remember_source("improved/"+str(record.character_id)+"/"+str(last.visit_id),"improved",record,str(last.visit_id),"",0,{"previous":float(last.components.environment),"previous_summary":last.duplicate(true),"current":environment,"observations":record.observations.duplicate(true)})
  return ActionResult.success()
 func record_order(visit_id: StringName, order_id: StringName, created_at: float, patience: float) -> ActionResult:
  if not _active.has(str(visit_id)) or patience<=0:return _fail("unknown_experience_visit")
@@ -150,9 +168,9 @@ func _nav(location_id: StringName) -> KioskNavigation:
   _navigation[str(location_id)]=navigation
  return _navigation[str(location_id)]
 func snapshot() -> Dictionary:
- return {"active":_active.duplicate(true),"recent":_recent.duplicate(true),"customers":_customers.duplicate(true),"closed":_closed.duplicate(true),"tastes":_tastes.duplicate(true)}
+ return {"active":_active.duplicate(true),"recent":_recent.duplicate(true),"customers":_customers.duplicate(true),"closed":_closed.duplicate(true),"tastes":_tastes.duplicate(true),"comment_sources":_comment_sources.duplicate(true)}
 func restore(data: Dictionary) -> ActionResult:
- for field in ["active","recent","customers","closed","tastes"]:
+ for field in ["active","recent","customers","closed","tastes","comment_sources"]:
   if not data.get(field) is Dictionary:return _fail("invalid_customer_experience")
  for id in data.closed:
   if data.closed[id]!=true:return _fail("invalid_experience_closed")
@@ -178,6 +196,11 @@ func restore(data: Dictionary) -> ActionResult:
   if not customer is Dictionary or not customer.get("last_visit") is Dictionary or not customer.get("last_food") is Dictionary:return _fail("invalid_customer_memory")
   for key in ["last_visit","last_food"]:
    if not customer[key].is_empty() and (not _valid_summary(customer[key]) or not data.closed.has(str(customer[key].get("visit_id","")))):return _fail("invalid_customer_memory")
+ for id in data.comment_sources:
+  var r: Variant=data.comment_sources[id]
+  if not r is Dictionary or not CharacterLifeValidation.keys(r,["id","kind","actor","subject","definition_id","appearance_revision","at","location_id","visit_id","proof"]) or r.id!=id or not r.kind in ["notice","dirty","improved"] or not r.actor is String or not r.subject is String or not r.definition_id is String or not ContentValidation.integer(r.appearance_revision) or r.appearance_revision<0 or not ContentValidation.bounded(r.at,0,_clock.world_minutes) or not r.location_id is String or not r.visit_id is String or not r.proof is Dictionary:return _fail("invalid_comment_source")
+ _comment_sources=data.comment_sources.duplicate(true);_source_candidates.clear()
+ for source in _comment_sources.values():_index_comment_source(source)
  var sequence := {}
  for id in data.tastes:
   var r: Variant=data.tastes[id]
@@ -192,7 +215,7 @@ func restore(data: Dictionary) -> ActionResult:
    if not observation is Dictionary or not _data.environment_weights.has(str(observation.get("category",""))) or not ContentValidation.bounded(observation.get("cleanliness"),0,100) or not ContentValidation.bounded(observation.get("at"),0,float(r.at)):return _fail("invalid_taste_observation")
   if not is_equal_approx(_environment(r.observations),float(r.environment)):return _fail("invalid_taste_environment")
   sequence[int(r.sequence)]=r
- _tastes=data.tastes.duplicate(true);_palates.clear()
+ _tastes=data.tastes.duplicate(true);_palates.clear();_first_tastes.clear()
  for index in range(1,sequence.size()+1):_remember(sequence[index])
  _active=data.active.duplicate(true)
  _recent=data.recent.duplicate(true)
@@ -250,6 +273,10 @@ func _remember(taste: Dictionary) -> void:
  var previous: Dictionary=own.get(taste.food_id,{})
  own[taste.food_id]={"score":float(taste.score) if previous.is_empty() else float(previous.score)*0.7+float(taste.score)*0.3,"count":int(previous.get("count",0))+1,"source":taste.id,"variant_id":taste.variant_id}
  _palates[taste.actor]=own
+ var first: Dictionary=_first_tastes.get(taste.actor,{})
+ var ids: Array=first.get(taste.food_id,[])
+ if ids.size()<20:ids.append(taste.id)
+ first[taste.food_id]=ids;_first_tastes[taste.actor]=first
 func expected(actor: StringName) -> Dictionary:return _palates.get(str(actor),{}).duplicate(true)
 func return_factor(actor: StringName) -> float:
  var best := 70.0
@@ -287,3 +314,76 @@ func validate_tastes(session: GameSession) -> ActionResult:
   var source: Dictionary=satisfied.get(id,{})
   if source.get("actor")!=r.actor or source.get("food_id")!=r.food_id or not ContentValidation.number(source.get("at")) or not is_equal_approx(float(source.at),float(r.at)):return _fail("taste_satisfaction_source")
  return ActionResult.success()
+
+func _remember_source(id: String, kind: String, record: Dictionary, subject: String, definition: String, appearance: int, proof: Dictionary) -> void:
+ if _comment_sources.has(id):return
+ _comment_sources[id]={"id":id,"kind":kind,"actor":str(record.character_id),"subject":subject,"definition_id":definition,"appearance_revision":appearance,"at":_clock.world_minutes,"location_id":str(record.location_id),"visit_id":str(record.id),"proof":proof.duplicate(true)}
+ _index_comment_source(_comment_sources[id])
+func comment_sources(actor: String, kind: String, food: String="") -> Array[Dictionary]:
+ var result: Array[Dictionary]=[]
+ if kind=="suggestion":
+  for suggestion in _data.comment_suggestions:
+   var source := _suggestion(actor,str(suggestion))
+   if not source.is_empty():result.append(source)
+ elif kind=="taste":
+  for memory in _palates.get(actor,{}).values():
+   var taste: Dictionary=_tastes[memory.source]
+   if food.is_empty() or taste.food_id==food:result.append({"id":taste.id,"kind":kind,"actor":actor,"at":taste.at,"food_id":taste.food_id,"quality":taste.quality,"score":taste.score})
+ else:
+  for id in _source_candidates.get(actor,{}).get(kind,{}).values():
+   result.append(_comment_sources[str(id)].duplicate(true))
+ result.sort_custom(func(a,b):return str(a.id)>str(b.id) if float(a.at)==float(b.at) else float(a.at)>float(b.at))
+ return result
+func comment_source(kind: String, id: String) -> Dictionary:
+ if kind=="suggestion":
+  var parts := id.split("/")
+  return _suggestion(str(parts[1]),str(parts[2])) if parts.size()==3 and parts[0]=="suggestion" else {}
+ if kind=="taste":
+  var taste: Dictionary=_tastes.get(id,{})
+  return {} if taste.is_empty() else {"id":id,"kind":kind,"actor":taste.actor,"at":taste.at,"food_id":taste.food_id,"quality":taste.quality,"score":taste.score}
+ var source: Dictionary=_comment_sources.get(id,{})
+ return source.duplicate(true) if source.get("kind")==kind else {}
+func comment_qualified(actor: String, kind: String, id: String) -> bool:
+ var source := comment_source(kind,id)
+ if source.is_empty() or source.actor!=actor:return false
+ if kind=="suggestion":return suggestion_available.is_valid() and bool(suggestion_available.call(str(_data.comment_suggestions[source.subject].food_id)))
+ if kind=="dirty":return float(_hygiene.state(StringName(source.subject)).get("cleanliness",100))<float(_data.dirty_below)
+ if kind=="notice":
+  var item := _spaces.item_record(StringName(source.subject))
+  return not item.is_empty() and int(item.attributes.get("appearance_revision",0))==int(source.appearance_revision)
+ return true
+func validate_comment_sources(session: GameSession) -> ActionResult:
+ for id in _comment_sources:
+  var r: Dictionary=_comment_sources[id]
+  if not session.presence.profiles().has(r.actor) or not _spaces.definitions().locations.has(r.location_id) or not r.visit_id.begins_with("visit_") or not r.visit_id.trim_prefix("visit_").is_valid_int() or int(r.visit_id.trim_prefix("visit_"))>=int(session.visitors.snapshot().next_id):return _fail("comment_source_actor")
+  if r.kind=="notice":
+   var item := session.items.get_item(StringName(r.subject))
+   if not ContentValidation.vector(r.proof.get("observer_ground"),2) or not ContentValidation.vector(r.proof.get("target_ground"),2) or Vector2(r.proof.observer_ground[0],r.proof.observer_ground[1]).distance_to(Vector2(r.proof.target_ground[0],r.proof.target_ground[1]))>float(_data.observe_radius)+0.001:return _fail("comment_notice_observation")
+   if item.is_empty() or item.definition_id!=r.definition_id or not item.kind in ["furniture","equipment"] or _starter_placements.has(r.subject) or int(item.attributes.get("appearance_revision",0))<int(r.appearance_revision) or id!="notice/"+r.actor+"/"+r.subject+"/"+str(int(r.appearance_revision)):return _fail("comment_notice_source")
+  elif r.kind=="dirty":
+   var observation: Variant=r.proof.get("observation")
+   if not observation is Dictionary or observation.get("target_id")!=r.subject or not ContentValidation.bounded(observation.get("cleanliness"),0,float(_data.dirty_below)) or not ContentValidation.number(observation.get("at")) or not is_equal_approx(float(observation.at),float(r.at)):return _fail("comment_dirty_source")
+  elif not r.proof.get("previous_summary") is Dictionary or not _valid_summary(r.proof.previous_summary) or r.proof.previous_summary.get("character_id")!=r.actor or r.proof.previous_summary.get("visit_id")!=r.subject or not ContentValidation.bounded(r.proof.get("previous"),0,100) or not ContentValidation.bounded(r.proof.get("current"),0,100) or float(r.proof.current)<float(r.proof.previous)+float(_data.improvement_delta):return _fail("comment_improved_source")
+  if r.kind=="improved":
+   if not r.proof.get("observations") is Dictionary or not ContentValidation.number(r.proof.previous_summary.get("ended_at")) or float(r.proof.previous_summary.ended_at)>float(r.at) or not is_equal_approx(float(r.proof.previous_summary.components.get("environment",-1)),float(r.proof.previous)) or not is_equal_approx(_environment(r.proof.observations),float(r.proof.current)):return _fail("comment_improved_observation")
+ return ActionResult.success()
+
+func _suggestion(actor: String, id: String) -> Dictionary:
+ var rule: Dictionary=_data.comment_suggestions.get(id,{})
+ if rule.is_empty() or not profile_provider.is_valid():return {}
+ var p: Dictionary=profile_provider.call(StringName(actor))
+ if float(p.get("temperature_weights",{}).get(str(rule.temperature),0))<float(rule.minimum_weight):return {}
+ var own: Dictionary=_palates.get(actor,{}).get(str(rule.required_food),{})
+ if int(own.get("count",0))<int(rule.minimum_tastes):return {}
+ var ids: Array=_first_tastes.get(actor,{}).get(str(rule.required_food),[])
+ var tasted: Dictionary=_tastes.get(str(ids[int(rule.minimum_tastes)-1]),{}) if ids.size()>=int(rule.minimum_tastes) else {}
+ if tasted.is_empty():return {}
+ return {"id":"suggestion/"+actor+"/"+id,"kind":"suggestion","actor":actor,"subject":id,"at":tasted.at,"upstream":tasted.id}
+
+func _index_comment_source(source: Dictionary) -> void:
+ var own: Dictionary=_source_candidates.get(source.actor,{})
+ var kinds: Dictionary=own.get(source.kind,{})
+ var key := "environment" if source.kind=="improved" else str(source.subject)
+ var previous: Dictionary=_comment_sources.get(str(kinds.get(key,"")),{})
+ if previous.is_empty() or float(source.at)>float(previous.at) or float(source.at)==float(previous.at) and str(source.id)>=str(previous.id):kinds[key]=source.id
+ own[source.kind]=kinds;_source_candidates[source.actor]=own

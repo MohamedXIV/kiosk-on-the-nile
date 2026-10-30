@@ -8,7 +8,7 @@ static func empty_catalog() -> Dictionary:
  return {"contract_version":1,"profiles":{},"policies":{},"topics":{},"fact_types":{}}
 static func schemas(bundle: Dictionary) -> Dictionary:
  var actors: Array=bundle.get("visitors",{}).get("characters",{}).keys()+bundle.get("residential_visits",{}).get("profiles",{}).keys()+bundle.get("suppliers",{}).get("profiles",{}).keys()+["player"]
- return {"types":{"actor":actors,"recipe":bundle.get("recipe_workflows",{}).keys()+bundle.get("learning",{}).get("families",{}).values(),"location":bundle.get("locations",{}).keys(),"fact":bundle.get("social",{}).get("facts",[]),"social_event":["introduction","company"],"message_stage":["request","reply","delivered"]},"axes":bundle.get("social",{}).get("relationship_defaults",{}).keys(),"channels":["personal","hearing"],"queries":{"home.invite":{"actor":"actor"},"home.cancel":{"actor":"actor"},"home.heard":{"actor":"actor"},"home.goodbye":{"actor":"actor"},"kiosk.open":{},"recipe.attempted":{"recipe":"recipe"},"recipe.completed":{"recipe":"recipe"}},"events":{"message.stage":{"thread":"string","subject":"string","sender":"actor","recipient":"actor","courier":"actor","stage":"message_stage"},"social.occurred":{"kind":"social_event","observer":"actor","other":"actor"}}}
+ return {"types":{"actor":actors,"food":bundle.get("foods",{}).keys(),"experience_kind":["notice","taste","suggestion","dirty","improved"],"recipe":bundle.get("recipe_workflows",{}).keys()+bundle.get("learning",{}).get("families",{}).values(),"location":bundle.get("locations",{}).keys(),"fact":bundle.get("social",{}).get("facts",[]),"social_event":["introduction","company"],"message_stage":["request","reply","delivered"]},"axes":bundle.get("social",{}).get("relationship_defaults",{}).keys(),"channels":["personal","hearing"],"queries":{"experience.source":{"actor":"actor","kind":"experience_kind","source":"string"},"experience.comment_ready":{"actor":"actor"},"home.invite":{"actor":"actor"},"home.cancel":{"actor":"actor"},"home.heard":{"actor":"actor"},"home.goodbye":{"actor":"actor"},"kiosk.open":{},"recipe.attempted":{"recipe":"recipe"},"recipe.completed":{"recipe":"recipe"}},"events":{"message.stage":{"thread":"string","subject":"string","sender":"actor","recipient":"actor","courier":"actor","stage":"message_stage"},"social.occurred":{"kind":"social_event","observer":"actor","other":"actor"}}}
 static func validate(bundle: Dictionary) -> ActionResult:
  var compiled := NarrativePolicyValidation.compile(bundle.get("narrative_policies",empty_catalog()),schemas(bundle))
  if not compiled.ok:return compiled
@@ -26,12 +26,14 @@ static func validate(bundle: Dictionary) -> ActionResult:
    if not key in ["topic_id","home_mode"] or not NarrativePolicyValidation.typed(entry.story_context[key],"string",compiled.details.schemas):return ContentValidation.fail("encounters."+id+".story_context")
   var topic: Dictionary=compiled.details.topics[entry.semantic_topic]
   if entry.has("personal_choice") and (not entry.personal_choice is String or not topic.choices.has(entry.personal_choice)):return ContentValidation.fail("encounters."+id+".personal_choice")
+  if entry.has("comment_source_binding") and (not entry.comment_source_binding is String or not entry.semantic_bindings.get(entry.comment_source_binding,{}) is Dictionary or entry.semantic_bindings[entry.comment_source_binding].get("query")!="experience.latest"):return ContentValidation.fail("encounters."+id+".comment_binding")
   if entry.has("learning_evidence_binding") and (not entry.learning_evidence_binding is String or not entry.semantic_bindings.get(entry.learning_evidence_binding,{}) is Dictionary or entry.semantic_bindings[entry.learning_evidence_binding].get("query")!="recipe.latest_result"):return ContentValidation.fail("encounters."+id+".learning_evidence_binding")
   if not NarrativePolicyValidation.same_keys(entry.semantic_bindings,topic.bindings):return ContentValidation.fail("encounters."+id+".semantic_bindings")
   for key in entry.semantic_bindings:
    var ref: Variant=entry.semantic_bindings[key]
    if ref is Dictionary:
     if ref.has("query"):
+     if ref.query=="experience.latest" and NarrativePolicyValidation.fields(ref,["query","kind"],["food"]) and ref.kind in compiled.details.schemas.types.experience_kind and topic.bindings[key]=="string" and (not ref.has("food") or ref.food in compiled.details.schemas.types.food):continue
      if ref.query=="home.invitation" and NarrativePolicyValidation.fields(ref,["query"]) and topic.bindings[key]=="string":continue
      if not NarrativePolicyValidation.fields(ref,["query","recipe"]) or ref.query!="recipe.latest_result" or not ref.recipe in compiled.details.schemas.types.recipe or topic.bindings[key]!="string":return ContentValidation.fail("encounters."+id+".evidence_binding")
      continue
@@ -97,6 +99,12 @@ func _near(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
 func _domain(rule: Dictionary, _context: NarrativeContext) -> Dictionary:
  match rule.id:
   "home.invite","home.cancel","home.heard","home.goodbye":return NarrativePolicy.answer(_session.residential.semantic_available(rule.id.trim_prefix("home."),rule.args.actor))
+  "experience.source":return NarrativePolicy.answer(_session.customer_experience.comment_qualified(str(rule.args.actor),str(rule.args.kind),str(rule.args.source)))
+  "experience.comment_ready":
+   var data := _session.config.section("customer_experience")
+   var global := _session.social_life.memory.latest_consumed_at(data.comment_topics)
+   var own := _session.social_life.memory.latest_consumed_at(data.comment_topics,str(rule.args.actor))
+   return NarrativePolicy.answer((global<0 or _session.clock.world_minutes-global>=float(data.comment_global_minutes)) and (own<0 or _session.clock.world_minutes-own>=float(data.comment_actor_minutes)))
   "kiosk.open":return NarrativePolicy.answer(_session.kiosk_open)
   "recipe.attempted":return NarrativePolicy.answer(_session.learning.context(StringName(rule.args.recipe)).attempted)
   "recipe.completed":return NarrativePolicy.answer(_session.learning.context(StringName(rule.args.recipe)).completed)
@@ -130,7 +138,22 @@ func _context(entry: Dictionary, participants: PackedStringArray, turn: Dictiona
   var ref: Variant=entry.semantic_bindings[key]
   if ref is Dictionary:
    if ref.has("query"):
-    var fallback: String=_session.residential.invitation_scope(str(_session.presence.record(participants[0]).character_id)) if ref.query=="home.invitation" and not participants.is_empty() else str(_session.learning.context(StringName(ref.get("recipe",""))).last_item_id)
+    var fallback: String="none"
+    if ref.query=="experience.latest":
+     if participants.is_empty():return _fail()
+     var person: Variant=_session.presence.record(participants[0])
+     if person==null:return _fail()
+     var candidates := _session.customer_experience.comment_sources(str(person.character_id),str(ref.kind),str(ref.get("food","")))
+     for source in candidates:
+      var candidate_values := {"guest":str(person.character_id),"kind":str(ref.kind),"source":str(source.id)}
+      var candidate := policy.bind(entry.semantic_topic,candidate_values,{})
+      if not candidate.ok:continue
+      var identity: Dictionary=candidate.details.context.identity()
+      var scope := SemanticSocialMemory.scope_key(identity,"evidence",[str(person.character_id),"player"],str(source.id),_session.clock.world_minutes,{})
+      if _session.social_life.memory.unused(scope) and _session.customer_experience.comment_qualified(str(person.character_id),str(ref.kind),str(source.id)):fallback=str(source.id);break
+    elif ref.query=="home.invitation":
+     if not participants.is_empty():fallback=_session.residential.invitation_scope(str(_session.presence.record(participants[0]).character_id))
+    else:fallback=str(_session.learning.context(StringName(ref.get("recipe",""))).last_item_id)
     var value: String=str(fixed.get(key,fallback))
     if value.is_empty():value="none"
     if not evidence_binding_valid(ref,value):return _fail()
@@ -216,6 +239,10 @@ func validate_detached(entry: Dictionary, record: Dictionary) -> bool:
  return proof_valid(c,bound.details.context)
 
 func evidence_binding_valid(ref: Dictionary, value: String) -> bool:
+ if ref.query=="experience.latest":
+  if value=="none":return true
+  var source := _session.customer_experience.comment_source(str(ref.kind),value)
+  return not source.is_empty() and (not ref.has("food") or source.get("food_id")==ref.food)
  if ref.query=="home.invitation":
   var parts:=value.split("/")
   return parts.size()==3 and parts[0]=="home" and parts[1] in policy._compiled.schemas.types.actor and parts[2].begins_with("day_") and parts[2].trim_prefix("day_").is_valid_int() and int(parts[2].trim_prefix("day_"))>=2 and int(parts[2].trim_prefix("day_"))<=_session.clock.day+1

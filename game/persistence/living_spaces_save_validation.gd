@@ -2,6 +2,8 @@ class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
  if envelope.get("schema_revision")!=SaveCodec.SCHEMA_REVISION: return _fail("schema_revision")
+ var comment_result := session.customer_experience.validate_comment_sources(session)
+ if not comment_result.ok:return comment_result
  var taste_result := session.customer_experience.validate_tastes(session)
  if not taste_result.ok:return taste_result
  var social_result := session.social_life.cross_validate()
