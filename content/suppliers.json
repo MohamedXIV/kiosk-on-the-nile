@@ -49,6 +49,22 @@
     "potato": {
       "price_minor": 100,
       "daily_stock": 30
+    },
+    "tea_portion_good": {
+      "price_minor": 180,
+      "daily_stock": 12
+    },
+    "tea_portion_premium": {
+      "price_minor": 280,
+      "daily_stock": 12
+    },
+    "kebda_portion_good": {
+      "price_minor": 650,
+      "daily_stock": 12
+    },
+    "potato_good": {
+      "price_minor": 150,
+      "daily_stock": 12
     }
   },
   "emergency": {

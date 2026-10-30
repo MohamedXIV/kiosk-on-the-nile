@@ -60,8 +60,11 @@ func start(recipe_id: StringName, location_id: StringName, instance_ids: PackedS
  if not available.ok:return available
  change.state.reservations[id]=available.details.sources.duplicate(true)
  var evidence: Array=[]
- for source in available.details.sources:evidence.append(change.state.items[source.item_id].duplicate(true))
- var job := {"id":id,"recipe_id":str(recipe_id),"recipe_version":int(definition.version),"definition":definition,"time_domain":"world_minutes","location_id":str(location_id),"step_index":0,"elapsed":0.0,"last_world_minutes":_clock.world_minutes,"step_results":[],"devices":devices,"input_evidence":evidence,"quality_penalty":int(quality_provider.call()) if quality_provider.is_valid() else 0,"sugar_id":str(sugar_provider.call(StringName(instance_ids[0]))) if sugar_provider.is_valid() and not instance_ids.is_empty() else "","status":"active","inputs_consumed":false}
+ for source in available.details.sources:
+  var input: Dictionary=change.state.items[source.item_id].duplicate(true)
+  input["consumed_quantity"]=int(source.quantity)
+  evidence.append(input)
+ var job := {"id":id,"recipe_id":str(recipe_id),"recipe_version":int(definition.version),"definition":definition,"time_domain":"world_minutes","location_id":str(location_id),"step_index":0,"elapsed":0.0,"last_world_minutes":_clock.world_minutes,"started_at":_clock.world_minutes,"step_results":[],"devices":devices,"input_evidence":evidence,"quality_penalty":int(quality_provider.call()) if quality_provider.is_valid() else 0,"sugar_id":str(sugar_provider.call(StringName(instance_ids[0]))) if sugar_provider.is_valid() and not instance_ids.is_empty() else "","status":"active","inputs_consumed":false}
  job["personal_use"]=for_self
  job["reaction_time_domain"]="simulation_seconds"
  job["current_hygiene_evidence"]=_hygiene_evidence(job,first)
@@ -248,6 +251,20 @@ func restore(data: Dictionary) -> ActionResult:
   if not str(id).begins_with("cook_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id):return _fail("invalid_workflow_counter")
   var job: Variant=data.jobs[id]
   if not job is Dictionary or job.get("id")!=id or not job.get("definition") is Dictionary or not job.get("status") in ["active","completed","cancelled"] or job.get("time_domain")!="world_minutes" or not ContentValidation.integer(job.get("step_index")) or not ContentValidation.number(job.get("elapsed")) or job.elapsed<0 or not ContentValidation.number(job.get("last_world_minutes")) or (job.last_world_minutes<0 or job.last_world_minutes>_clock.world_minutes+0.001) or not job.get("devices") is Dictionary or not job.get("step_results") is Array or not job.get("inputs_consumed") is bool:return _fail("invalid_workflow")
+  if not job.get("input_evidence") is Array or not ContentValidation.bounded(job.get("started_at"),0,float(job.last_world_minutes)):return _fail("invalid_workflow_inputs")
+  var consumed := {}
+  for input in job.input_evidence:
+   if not input is Dictionary or not input.get("id") is String or not input.get("definition_id") is String or not input.get("attributes") is Dictionary or input.get("kind")!="ingredient" or not ContentValidation.integer(input.get("consumed_quantity")) or input.consumed_quantity<1 or not ContentValidation.integer(input.get("quantity")) or input.quantity<input.consumed_quantity:return _fail("invalid_workflow_input")
+   var actual := str(input.definition_id)
+   var matched := ""
+   for requirement in job.definition.get("inputs",[]):
+    if _inventory.items.ingredient_matches(actual,str(requirement.definition_id)):matched=str(requirement.definition_id);break
+   if matched.is_empty():return _fail("invalid_workflow_input_material")
+   var lot_result := IngredientLots.validate(input,_inventory.items._definitions,float(job.started_at))
+   if not lot_result.ok:return lot_result
+   consumed[matched]=int(consumed.get(matched,0))+int(input.consumed_quantity)
+  for requirement in job.definition.get("inputs",[]):
+   if int(consumed.get(str(requirement.definition_id),0))!=int(requirement.quantity):return _fail("invalid_workflow_input_quantity")
   var result := CookingWorkflowValidation.validate_recipes({str(job.recipe_id):job.definition},_inventory.items)
   if not result.ok or job.step_index<0 or job.step_index>=job.definition.steps.size():return _fail("invalid_workflow_definition")
   if not job.get("recipe_id") is String or job.get("recipe_version")!=job.definition.version:return _fail("invalid_recipe_version")

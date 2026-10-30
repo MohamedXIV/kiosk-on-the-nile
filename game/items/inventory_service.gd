@@ -8,14 +8,14 @@ func _init(store: ItemStore, aliases: Dictionary) -> void:
 func stock_count(location_id: StringName, ingredient_id: StringName) -> int:
  var total := 0
  var definition_id := str(_aliases.get(str(ingredient_id),str(ingredient_id)))
- for item in items.instances(StringName(definition_id)):
+ for item in material_instances(StringName(definition_id)):
   var container := items.get_container(StringName(item.container_id))
   if container.get("location_id")==str(location_id) and container.get("kind") in ["dry","cold"]: total += int(item.quantity)
  for lines in items.snapshot().reservations.values():
   for line in lines:
    var item := items.get_item(StringName(line.item_id))
    var container := items.get_container(StringName(item.container_id))
-   if item.definition_id==definition_id and container.location_id==str(location_id):total-=int(line.quantity)
+   if _matches(str(item.definition_id),definition_id) and container.location_id==str(location_id):total-=int(line.quantity)
  return total
 func held_id() -> StringName:
  var held := items.items_in(&"player_hand")
@@ -33,7 +33,7 @@ func debit_legacy(ingredient_id: StringName, quantity: int) -> ActionResult:
  var definition_id := str(_aliases.get(str(ingredient_id),str(ingredient_id)))
  var change := items.candidate()
  var remaining := quantity
- for item in items.instances(StringName(definition_id)):
+ for item in material_instances(StringName(definition_id)):
   var container := items.get_container(StringName(item.container_id))
   if container.location_id!="kiosk" or not container.kind in ["dry","cold"]: continue
   var taken := mini(remaining,int(item.quantity))
@@ -43,11 +43,11 @@ func debit_legacy(ingredient_id: StringName, quantity: int) -> ActionResult:
   if remaining==0: break
  if remaining!=0 or quantity<0: return ActionResult.failure(ActionResult.Code.OUT_OF_STOCK,&"out_of_stock")
  return items.commit(change)
-func restock_legacy(stock: Dictionary) -> ActionResult:
+func restock_legacy(stock: Dictionary, source: String="grant") -> ActionResult:
  var grants: Array[Dictionary] = []
  for id in stock:
   if not ContentValidation.integer(stock[id]) or stock[id]<0: return ContentValidation.fail("stock")
-  if stock[id]>0: grants.append({"definition_id":str(_aliases.get(id,id)),"quantity":int(stock[id]),"container_id":"kiosk_dry","attributes":{}})
+  if stock[id]>0: grants.append({"definition_id":str(_aliases.get(id,id)),"quantity":int(stock[id]),"container_id":"kiosk_dry","attributes":{"acquisition":{"source_kind":source,"cost_known":source=="starter"}}})
  if grants.is_empty(): return ActionResult.success()
  var result := items.prepare_grants(grants)
  return items.commit(result.details.change) if result.ok else result
@@ -117,14 +117,14 @@ func available(location_id: StringName, requirements: Array[Dictionary]) -> Acti
   var definition_id := str(requirement.get("definition_id",""))
   if not ContentValidation.integer(requirement.get("quantity")) or requirement.quantity<1 or items.definition(StringName(definition_id)).is_empty():return ContentValidation.fail("inventory.requirement")
   var needed := int(requirement.quantity)
-  for item in items.instances(StringName(definition_id)):
+  for item in material_instances(StringName(definition_id)):
    if requirement.has("item_id") and requirement.item_id!=item.id:continue
    var container := items.get_container(StringName(item.container_id))
    if not _usable_storage(container,location_id,str(requirement.get("required_storage",items.definition(StringName(definition_id)).get("required_storage","dry")))):continue
    var used := int(reserved.get(item.id,0))+int(remaining.get(item.id,0))
    var quantity := mini(needed,maxi(0,int(item.quantity)-used))
    if quantity<=0:continue
-   sources.append({"item_id":item.id,"definition_id":definition_id,"quantity":quantity})
+   sources.append({"item_id":item.id,"definition_id":item.definition_id,"requirement_id":definition_id,"quantity":quantity})
    remaining[item.id]=int(remaining.get(item.id,0))+quantity
    needed-=quantity
    if needed==0:break
@@ -145,7 +145,7 @@ func consume_reservation(job_id: StringName, amounts: Array[Dictionary]) -> Acti
   if not ContentValidation.integer(amount.get("quantity")) or amount.quantity<1:return ContentValidation.fail("inventory.consume")
   var needed := int(amount.quantity)
   for line in lines:
-   if line.definition_id!=str(amount.get("definition_id","")):continue
+   if str(line.get("requirement_id",line.definition_id))!=str(amount.get("definition_id","")):continue
    var taken := mini(needed,int(line.quantity))
    line.quantity-=taken
    change.state.items[line.item_id].quantity-=taken
@@ -257,3 +257,8 @@ func consume_for_player(expected_id: StringName, at: float) -> ActionResult:
  change.state.consumed[str(expected_id)]={"item":item.duplicate(true),"at":at}
  change.state.items.erase(str(expected_id))
  return items.commit(change,false)
+
+func _matches(actual: String, required: String) -> bool:
+ return items.ingredient_matches(actual,required)
+func material_instances(required: StringName) -> Array[Dictionary]:
+ return items.material_instances(required)

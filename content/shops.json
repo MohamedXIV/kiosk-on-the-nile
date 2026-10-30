@@ -11,7 +11,11 @@
         "oil": 20,
         "bread": 20,
         "garlic_sauce": 20,
-        "potato": 20
+        "potato": 20,
+        "tea_portion_good": 12,
+        "tea_portion_premium": 12,
+        "kebda_portion_good": 12,
+        "potato_good": 12
       },
       "offers": {
         "tea_portion": {
@@ -114,6 +118,50 @@
             {
               "definition_id": "kebda_portion",
               "quantity": 4
+            }
+          ]
+        },
+        "tea_portion_good": {
+          "label": "شاي أجود",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 180,
+          "contents": [
+            {
+              "definition_id": "tea_portion_good",
+              "quantity": 1
+            }
+          ]
+        },
+        "tea_portion_premium": {
+          "label": "شاي فاخر",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 280,
+          "contents": [
+            {
+              "definition_id": "tea_portion_premium",
+              "quantity": 1
+            }
+          ]
+        },
+        "kebda_portion_good": {
+          "label": "كبدة أجود",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 650,
+          "contents": [
+            {
+              "definition_id": "kebda_portion_good",
+              "quantity": 1
+            }
+          ]
+        },
+        "potato_good": {
+          "label": "بطاطس أجود",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 150,
+          "contents": [
+            {
+              "definition_id": "potato_good",
+              "quantity": 1
             }
           ]
         }

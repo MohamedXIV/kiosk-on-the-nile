@@ -1162,6 +1162,23 @@
     "story.companionship.radio_answer.later": "Let's leave this for another time.",
     "manual_topic.semantic/shawarma_learning": "Tell me about making shawarma.",
     "manual_topic.semantic/shawarma_attempt": "I tried what you told me about.",
-    "manual_topic.semantic/shawarma_result": "Let me tell you about my latest attempt."
+    "manual_topic.semantic/shawarma_result": "Let me tell you about my latest attempt.",
+    "item.tea_portion_good": "Better tea",
+    "shop.market.offer.tea_portion_good.label": "Better tea",
+    "shop.market.offer.tea_portion_good.description": "A higher-grade ingredient for cooking.",
+    "item.tea_portion_premium": "Premium tea",
+    "shop.market.offer.tea_portion_premium.label": "Premium tea",
+    "shop.market.offer.tea_portion_premium.description": "A higher-grade ingredient for cooking.",
+    "item.kebda_portion_good": "Better liver",
+    "shop.market.offer.kebda_portion_good.label": "Better liver",
+    "shop.market.offer.kebda_portion_good.description": "A higher-grade ingredient for cooking.",
+    "item.potato_good": "Better potatoes",
+    "shop.market.offer.potato_good.label": "Better potatoes",
+    "shop.market.offer.potato_good.description": "A higher-grade ingredient for cooking.",
+    "ingredient.grade.standard": "Standard",
+    "ingredient.grade.good": "Better",
+    "ingredient.grade.premium": "Premium",
+    "items_ui.material_lot": "{grade} grade · received day {day}",
+    "items_ui.material_cost": "Unit cost about {amount} EGP"
   }
 }

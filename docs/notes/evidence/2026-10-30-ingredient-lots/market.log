@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STEP content {"ok":true,"reason":""}
+STEP configure {"ok":true,"reason":""}
+OBSERVATION starter {"lot":{"acquired_at":930.0,"cost_known":true,"cost_minor":0,"cost_units":1,"grade":"standard","origin":"item_1","quality":60,"source_kind":"starter","source_ref":"item_1"}}
+STEP travel_market {"ok":true,"reason":""}
+STEP quote {"ok":true,"reason":""}
+STEP purchase {"ok":true,"reason":""}
+OBSERVATION purchase {"debit":860,"lots":[{"attributes":{"lot":{"acquired_at":940.0,"cost_known":true,"cost_minor":280,"cost_units":1,"grade":"premium","origin":"item_19","quality":94,"source_kind":"shop","source_ref":"lot_observation_buy"}},"container_id":"journey_1:bag","definition_id":"tea_portion_premium","id":"item_19","kind":"ingredient","quantity":2},{"attributes":{"lot":{"acquired_at":940.0,"cost_known":true,"cost_minor":150,"cost_units":1,"grade":"good","origin":"item_20","quality":85,"source_kind":"shop","source_ref":"lot_observation_buy"}},"container_id":"journey_1:bag","definition_id":"potato_good","id":"item_20","kind":"ingredient","quantity":2}],"quote":860}
+STEP return {"ok":true,"reason":""}
+STEP padding {"ok":true,"reason":""}
+STEP partial_unpack {"ok":true,"reason":""}
+OBSERVATION split {"details":{"moved":[{"definition_id":"tea_portion_premium","quantity":1}],"remaining":[{"definition_id":"tea_portion_premium","quantity":1},{"definition_id":"potato_good","quantity":2}]},"premium_instances":[{"attributes":{"lot":{"acquired_at":940.0,"cost_known":true,"cost_minor":280,"cost_units":1,"grade":"premium","origin":"item_19","quality":94,"source_kind":"shop","source_ref":"lot_observation_buy"}},"container_id":"journey_1:bag","definition_id":"tea_portion_premium","id":"item_19","kind":"ingredient","quantity":1},{"attributes":{"lot":{"acquired_at":940.0,"cost_known":true,"cost_minor":280,"cost_units":1,"grade":"premium","origin":"item_19","quality":94,"source_kind":"shop","source_ref":"lot_observation_buy"}},"container_id":"rooftop_dry","definition_id":"tea_portion_premium","id":"item_22","kind":"ingredient","quantity":1}]}
+OBSERVATION immutable {"rejected":true,"unchanged":true}
+STEP family_available {"ok":true,"reason":""}
+OBSERVATION family_sources {"sources":[{"definition_id":"tea_portion_premium","item_id":"item_22","quantity":1,"requirement_id":"tea_portion"},{"definition_id":"tea_portion","item_id":"item_21","quantity":1,"requirement_id":"tea_portion"}]}
+STEP reserve {"ok":true,"reason":""}
+STEP consume_one {"ok":true,"reason":""}
+STEP release {"ok":true,"reason":""}
+STEP to_kiosk {"ok":true,"reason":""}
+STEP kiosk_unpack {"ok":true,"reason":""}
+STEP real_tea_start {"ok":true,"reason":""}
+STEP real_tea_consume {"ok":true,"reason":""}
+OBSERVATION actual_input_evidence [{"attributes":{"lot":{"acquired_at":930.0,"cost_known":true,"cost_minor":0,"cost_units":1,"grade":"standard","origin":"item_1","quality":60,"source_kind":"starter","source_ref":"item_1"}},"consumed_quantity":1,"container_id":"kiosk_dry","definition_id":"tea_portion","id":"item_1","kind":"ingredient","quantity":6}]
+STEP current_candidate {"ok":true,"reason":""}
+STEP lot_sources {"ok":true,"reason":""}
+OBSERVATION english Premium grade · received day 1 · Unit cost about 2.80 EGP
+STEP tampered_cost_candidate {"ok":false,"reason":"invalid_ingredient_lot_shop_cost"}
+STEP duplicated_origin_candidate {"ok":false,"reason":"invalid_ingredient_lot_shop_conservation"}
+WARNING: 123 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

@@ -55,7 +55,7 @@ func deliver(occurrence_id: String, confirm_cash: bool = false, sleeping: bool =
  var stock_result := _stock(delivery,terms.lines,float(occurrence.scheduled_at),false)
  if not stock_result.ok:return _skip(occurrence_id,"stock_missing")
  var grants: Array[Dictionary]=[]
- for line in terms.lines:grants.append({"definition_id":str(line.definition_id),"quantity":int(line.quantity),"container_id":str(terms.destination.id),"attributes":{"supply_occurrence":occurrence_id}})
+ for line in terms.lines:grants.append({"definition_id":str(line.definition_id),"quantity":int(line.quantity),"container_id":str(terms.destination.id),"attributes":{"supply_occurrence":occurrence_id,"acquisition":{"source_kind":"supplier","source_ref":occurrence_id,"cost_known":true,"cost_minor":int(line.unit_minor),"cost_units":1}}})
  var prepared := _session.items.prepare_grants(grants)
  if not prepared.ok:return _skip(occurrence_id,"storage_full")
  return _complete(occurrence_id,terms,prepared.details.change,delivery,stock_result.details.units,false)

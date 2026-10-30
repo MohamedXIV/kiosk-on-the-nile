@@ -1162,6 +1162,23 @@
     "story.companionship.radio_answer.later": "نكمّل بعدين على رواقة.",
     "manual_topic.semantic/shawarma_learning": "احكيلي عن الشاورما",
     "manual_topic.semantic/shawarma_attempt": "جربت اللي حكيت لي عليه",
-    "manual_topic.semantic/shawarma_result": "أحكيلك عن آخر طبخة"
+    "manual_topic.semantic/shawarma_result": "أحكيلك عن آخر طبخة",
+    "item.tea_portion_good": "شاي أجود",
+    "shop.market.offer.tea_portion_good.label": "شاي أجود",
+    "shop.market.offer.tea_portion_good.description": "خامة بجودة أعلى للتحضير.",
+    "item.tea_portion_premium": "شاي فاخر",
+    "shop.market.offer.tea_portion_premium.label": "شاي فاخر",
+    "shop.market.offer.tea_portion_premium.description": "خامة بجودة أعلى للتحضير.",
+    "item.kebda_portion_good": "كبدة أجود",
+    "shop.market.offer.kebda_portion_good.label": "كبدة أجود",
+    "shop.market.offer.kebda_portion_good.description": "خامة بجودة أعلى للتحضير.",
+    "item.potato_good": "بطاطس أجود",
+    "shop.market.offer.potato_good.label": "بطاطس أجود",
+    "shop.market.offer.potato_good.description": "خامة بجودة أعلى للتحضير.",
+    "ingredient.grade.standard": "عادية",
+    "ingredient.grade.good": "أجود",
+    "ingredient.grade.premium": "فاخرة",
+    "items_ui.material_lot": "درجة {grade} · استلام يوم {day}",
+    "items_ui.material_cost": "تكلفة الوحدة نحو {amount} ج.م"
   }
 }

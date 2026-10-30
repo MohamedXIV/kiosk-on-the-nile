@@ -96,6 +96,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
  if not result.ok:
   candidate.queue_free()
   return result
+ result=IngredientLots.validate_session(candidate)
+ if not result.ok:
+  candidate.queue_free()
+  return result
  result=candidate.supply_transactions.validate_links()
  if not result.ok:
   candidate.queue_free()

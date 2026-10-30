@@ -107,10 +107,11 @@ func configure(source: SessionConfig) -> ActionResult:
  residential=ResidentialVisits.new();residential.configure(self)
  actions.business_allowed=accounts.business_allowed
  items = ItemStore.new()
+ items.world_clock=clock
  var item_result := items.configure(source.section("items"),source.section("containers"))
  if not item_result.ok: return item_result
  inventory = InventoryService.new(items,{"tea":"tea_portion","kebda":"kebda_portion"})
- item_result = inventory.restock_legacy(source.section("recipes").initial_stock)
+ item_result = inventory.restock_legacy(source.section("recipes").initial_stock,"starter")
  if not item_result.ok: return item_result
  home = HomeService.new(items)
  var initial_layout := source.section("initial_layout")

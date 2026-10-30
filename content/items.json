@@ -2,12 +2,22 @@
   "tea_portion": {
     "kind": "ingredient",
     "label": "وحدة شاي",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "tea_portion",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "kebda_portion": {
     "kind": "ingredient",
     "label": "وحدة كبدة",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "kebda_portion",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "prepared_food": {
     "kind": "prepared",
@@ -279,32 +289,62 @@
   "chicken": {
     "kind": "ingredient",
     "label": "فراخ",
-    "required_storage": "cold"
+    "required_storage": "cold",
+    "material": {
+      "family": "chicken",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "marinade": {
     "kind": "ingredient",
     "label": "تتبيلة",
-    "required_storage": "cold"
+    "required_storage": "cold",
+    "material": {
+      "family": "marinade",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "oil": {
     "kind": "ingredient",
     "label": "زيت",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "oil",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "bread": {
     "kind": "ingredient",
     "label": "عيش",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "bread",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "garlic_sauce": {
     "kind": "ingredient",
     "label": "ثومية",
-    "required_storage": "cold"
+    "required_storage": "cold",
+    "material": {
+      "family": "garlic_sauce",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "potato": {
     "kind": "ingredient",
     "label": "بطاطس",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "potato",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "rotisserie": {
     "kind": "equipment",
@@ -399,5 +439,45 @@
     "kind": "ingredient",
     "label": "حصة حشو شاورما",
     "required_storage": "hand"
+  },
+  "tea_portion_good": {
+    "kind": "ingredient",
+    "label": "شاي أجود",
+    "required_storage": "dry",
+    "material": {
+      "family": "tea_portion",
+      "grade": "good",
+      "quality": 78
+    }
+  },
+  "tea_portion_premium": {
+    "kind": "ingredient",
+    "label": "شاي فاخر",
+    "required_storage": "dry",
+    "material": {
+      "family": "tea_portion",
+      "grade": "premium",
+      "quality": 94
+    }
+  },
+  "kebda_portion_good": {
+    "kind": "ingredient",
+    "label": "كبدة أجود",
+    "required_storage": "dry",
+    "material": {
+      "family": "kebda_portion",
+      "grade": "good",
+      "quality": 85
+    }
+  },
+  "potato_good": {
+    "kind": "ingredient",
+    "label": "بطاطس أجود",
+    "required_storage": "dry",
+    "material": {
+      "family": "potato",
+      "grade": "good",
+      "quality": 85
+    }
   }
 }

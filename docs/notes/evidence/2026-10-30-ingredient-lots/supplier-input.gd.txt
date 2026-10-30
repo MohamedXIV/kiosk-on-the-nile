@@ -1,0 +1,35 @@
+extends SceneTree
+func _initialize() -> void:call_deferred("observe")
+func observe() -> void:
+ var content := ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded := content.load_directory("res://content")
+ if not loaded.ok:print("STEP content ",loaded.message_key);quit(1);return
+ var config := SessionConfig.new(content.bundle(),content.fingerprint)
+ var session := GameSession.new();root.add_child(session)
+ var configured := session.configure(config)
+ if not configured.ok:print("STEP configure ",configured.message_key);quit(1);return
+ var point: Dictionary=session.contact.points()[0]
+ session.player_pose.location_id=StringName(point.location_id);session.player_ground=point.ground+Vector2(0,0.5)
+ var contact := await session.contact.begin(str(point.host_id))
+ print("STEP contact ",JSON.stringify({"ok":contact.ok,"reason":str(contact.message_key)}))
+ if not contact.ok:quit(1);return
+ var quoted := session.contracts.quote({"basket":{"tea_portion_premium":2,"potato_good":2},"destination":"kiosk_dry","weekdays":[floori(session.clock.world_minutes/1440.0)%7],"minute":int(session.clock.minutes)+30,"leave_goods":true,"mode":"credit","once":true})
+ print("STEP quote ",JSON.stringify({"ok":quoted.ok,"reason":str(quoted.message_key)}))
+ if not quoted.ok:quit(1);return
+ var accepted := session.contracts.accept(str(quoted.details.quote.id),"supplier_lot_observation")
+ print("STEP accepted ",JSON.stringify({"ok":accepted.ok,"reason":str(accepted.message_key)}))
+ session.contact.close()
+ session.player_pose.location_id=&"rooftop"
+ var spawn: Array=config.section("locations").rooftop.spawn;session.player_ground=Vector2(spawn[0],spawn[1])
+ session.clock.elapse_minutes(31)
+ var delivered := session.deliveries.tick({})
+ print("STEP delivery ",JSON.stringify({"ok":delivered.ok,"reason":str(delivered.message_key),"occurrences":session.deliveries.snapshot().occurrences,"tea":session.items.instances(&"tea_portion_premium")}))
+ var proof := IngredientLots.validate_session(session)
+ print("STEP source ",JSON.stringify({"ok":proof.ok,"reason":str(proof.message_key)}))
+ var codec := SaveCodec.new();root.add_child(codec)
+ var decoded := SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ var candidate := await codec.create_candidate(decoded.details.data,config)
+ print("STEP current_candidate ",JSON.stringify({"ok":candidate.ok,"reason":str(candidate.message_key)}))
+ if candidate.ok:candidate.details.session.queue_free()
+ session.queue_free();codec.queue_free();content.queue_free();await process_frame
+ quit(0 if accepted.ok and delivered.ok and proof.ok and candidate.ok else 1)

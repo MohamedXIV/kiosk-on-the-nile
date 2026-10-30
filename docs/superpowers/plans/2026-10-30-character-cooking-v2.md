@@ -59,10 +59,10 @@
 
 **Interfaces:** `IngredientLots.matches(definitions: Dictionary, actual: String, required: String) -> bool`; `stamp(definition: Dictionary, source_id: String, at: float, cost_minor: int) -> Dictionary`; `validate(item: Dictionary, definitions: Dictionary, now: float) -> ActionResult`; `quality(evidence: Array) -> float`. Item attributes hold immutable lot origin, acquired time, grade and cost/source. Family matching uses registered recipe requirements; reservations retain actual definition/item identities.
 
-- [ ] Add category-specific grade/family content and actual market/supplier offers, neutral starter provenance and clear labels/costs.
-- [ ] Preserve lot identity/age/grade through grants, bag splits, reservation/partial consumption and cooking input evidence. Do not merge distinct lots or consume the wrong reserved family.
-- [ ] Observe mixed lots, selected grade cost, partial use/split and insufficient-stock/stale-candidate atomicity via real owners; validate saved lot references.
-- [ ] Build/record/commit without new version or migration work.
+- [x] Add category-specific grade/family content and actual market/supplier offers, neutral starter provenance and clear labels/costs.
+- [x] Preserve lot identity/age/grade through grants, bag splits, reservation/partial consumption and cooking input evidence. Do not merge distinct lots or consume the wrong reserved family.
+- [x] Observe mixed lots, selected grade cost, partial use/split and insufficient-stock/stale-candidate atomicity via real owners; validate saved lot references.
+- [x] Build/record/commit without new version or migration work.
 
 ### Task4 — process and batch generalisation (#39)
 

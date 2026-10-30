@@ -31,6 +31,12 @@ static func search_names(session: GameSession, item: Dictionary) -> String:
  return "\n".join(values).to_lower()
 static func item_details(session: GameSession, item: Dictionary) -> String:
  var attributes: Dictionary=item.get("attributes",{})
+ if item.kind=="ingredient" and attributes.has("lot"):
+  var lot: Dictionary=attributes.lot
+  var grade := UiText.localized("ingredient.grade."+str(lot.grade),{},str(lot.grade))
+  var detail := t("material_lot",{"grade":grade,"day":floori(float(lot.acquired_at)/1440.0)+1})
+  if lot.cost_known:detail+=" · "+t("material_cost",{"amount":"%.2f" % (float(lot.cost_minor)/float(lot.cost_units)/100.0)})
+  return detail
  if item.kind=="batch":return UiText.localized("ui.recipe_portions",{"count":attributes.get("portions_remaining",0)},str(attributes.get("portions_remaining",0)))
  if item.kind=="prepared":
   var food_id := str(attributes.get("food_id",""))
