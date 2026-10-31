@@ -1,3 +1,11 @@
+## Character/cooking v2 integration checkpoint — 2026-10-31 (Africa/Cairo)
+
+[Epic#35](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/35), tasks#36–#43 are implemented on PR#46: all-current-cast preferences/lightweight needs, real graded lots, generic recipe phases and overnight batches, comfortable freshness, actual serving variants/free prices/fixed quotes, confirmed personal taste memories and source-grounded comments. One fresh whole-branch review found three material issues; the single fix pass and actual-owner observations address all three. [Evidence and remaining delivery gates](../notes/2026-10-31-character-cooking-integration.md).
+
+Final target **0.4.0-prealpha.1**, save4/revision22: new game required for all earlier unpublished saves; primary/backup bytes preserved. #44 owns exact-head CI/merge and the independently verified immutable archive; its live issue records publication status. No formal release/tag. The linked artifact folder is the delivery location once published.
+
+Quiet independent arrivals and cap4 remain. Weather is only an interface; future minigames can reuse current commands. Human natural pacing/economy/visual/audio and broader seating acceptance#6/#7 remain open. Historical checkpoints below describe their original point in time, not current implementation status.
+
 ## Current checkpoint — 2026-10-30 (Africa/Cairo)
 
 Semantic epic #19 and delivery #26/#27 are complete: main `ae643b33fff2e9951deed114db47dd64a5b8ca5d`, coherent development preview **0.3.0-prealpha.1**, save4/revision21 (new game required), successful main CI40973259465. [Verified complete download](https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/5aae4533c7508683470f1166531aac2ac51a0ba3/semantic-preview-ae643b3/kiosk-on-the-nile-0.3.0-prealpha.1-dev-ae643b33fff2-web.zip). Previous status text below is historical.

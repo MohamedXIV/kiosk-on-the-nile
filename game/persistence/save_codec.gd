@@ -1,7 +1,7 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 21
+const SCHEMA_REVISION := 22
 const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","menu","service","visitors","character_life","residential","seat_use","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}

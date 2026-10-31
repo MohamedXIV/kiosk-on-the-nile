@@ -5,7 +5,21 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Semantic narrative preview target: 0.3.0-prealpha.1
+### Character and cooking v2 preview target: 0.4.0-prealpha.1
+
+- Add authored preferences for all12 current characters and lightweight saved hunger, thirst, tiredness and company intentions. Contextual weighted choices preserve quiet visits; rest/company affect existing social behaviour without increasing the four-person cap. Weather remains a neutral interface.
+- Track ingredient lots, category-specific grades and actual purchase costs. Prepare liver/pane/ful/potato batches through shared preparation, soaking, transfer, heat and holding commands, including overnight ful. Learned shawarma retains its sourced teaching path.
+- Choose real plate/sandwich, here/takeaway and compatible additions; consume their actual ingredients and packaging. Set menu prices freely. Accepted orders retain their chosen content and price after menu edits; gifts remain distinct and prices gain no implicit tip.
+- Let freshness decline gradually with a comfortable grace period. Storage affects future decline; splitting, pouring or reheating does not make old food new. Clearly refuse unservable food and allow deliberate disposal.
+- Remember only a person's confirmed on-site taste, personal fit and paid value. Takeaway and departure do not invent eating. Bounded own memories can influence future choices/returns under existing quiet arrival limits.
+- Add reusable relationship-gated Ink comments about personally noticed additions, actual tastes, optional requests and observed cleanliness changes. Heard sources/cooldowns prevent repeats and knowledge inheritance; suggestions do not unlock recipes or create quests.
+- Add bilingual recipe/serving and price controls. Correct double bread consumption in shawarma and exclude personal-only food from commercial offers while preserving self-use.
+
+**Save compatibility (character/cooking batch):** schema4/revision22 requires a new game for all earlier unpublished saves, including revision21. Unsupported/corrupt primary and backup files are retained; no historical migration is added.
+
+This is an optimized development preview, not a formal tagged release. Connected native observations, normal Web startup/Continue checks and a brief matched populated render observation are bounded evidence; natural long-session pacing, economy, device FPS and broader human acceptance remain open. See [integration evidence](docs/notes/2026-10-31-character-cooking-integration.md).
+
+### Previous semantic narrative preview target: 0.3.0-prealpha.1
 
 - Add typed shared narrative policies, directional acquaintance and meaningful shared days, per-character source-backed knowledge, scoped consent, and once-only message lineage.
 - Convert home invitations/cancellation/company/goodbye, personal check-in request/reply/delivery and recipe connection/teaching/followups onto shared rules. Explicit player choices establish promises and delivery; domain owners retain actual home/workshop/cooking outcomes.
