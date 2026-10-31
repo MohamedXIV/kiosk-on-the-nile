@@ -15,6 +15,8 @@ var _dirty: bool=true
 var _changing: bool=false
 var _reset_scroll: bool=false
 var _location: String=""
+var _age_labels: Array[Dictionary]=[]
+var _age_elapsed: float=0
 const KINDS := ["","purchase_bag","dry","cold","storage"]
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
@@ -49,18 +51,28 @@ func _refresh_language() -> void:
 func open() -> void:
  _render();show()
 func refresh() -> void:_dirty=true
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
  if not visible:return
  if _location!=str(_session.location_id):_dirty=true
  if _dirty:_render()
+ _age_elapsed+=delta
+ if _age_elapsed>=0.5:
+  _age_elapsed=0
+  for entry in _age_labels:
+   if is_instance_valid(entry.label):entry.label.text=ItemText.item_details(_session,entry.item)
 func _render() -> void:
  _dirty=false;_location=str(_session.location_id)
  var scroll := 0.0 if _reset_scroll else _scroll.get_v_scroll_bar().value
  _reset_scroll=false
+ _age_labels.clear()
  SheetControls.clear(_rows)
  var state := _session.items.storage_view()
  var held := _session.items.get_item(_session.inventory.held_id())
  _held.text=ItemText.t("held",{"item":ItemText.instance(_session,held)}) if not held.is_empty() else ItemText.t("hands_empty")
+ if not held.is_empty():
+  var detail := SheetControls.label(ItemText.item_details(_session,held));_rows.add_child(detail)
+  if held.attributes.has("freshness"):_age_labels.append({"label":detail,"item":held})
+  if held.attributes.has("freshness") and held.get("kind") in ["prepared","ingredient"]:_rows.add_child(SheetControls.button(UiText.localized("ui.discard_held",{},"Discard held food"),func():_apply(_session.inventory.discard_held())))
  var reserved: Dictionary={}
  for lines in state.reservations.values():
   for line in lines:reserved[line.item_id]=int(reserved.get(line.item_id,0))+int(line.quantity)
@@ -89,7 +101,7 @@ func _render() -> void:
   card.add_child(SheetControls.label(ItemText.t("capacity",{"name":title,"used":used,"capacity":int(container.capacity)})))
   if container.kind=="storage" and not entries.is_empty():card.add_child(SheetControls.label(_text.text("inventory_furniture")))
   var container_id := StringName(str(container.id))
-  if container.kind=="cold" and held.get("kind")=="batch":card.add_child(SheetControls.button(_text.text("recipe_store_bowl"),func():_apply(_session.inventory.store_held(container_id))))
+  if container.kind=="cold" and held.get("kind") in ["batch","prepared"]:card.add_child(SheetControls.button(_text.text("recipe_store_bowl"),func():_apply(_session.inventory.store_held(container_id))))
   if container.kind=="purchase_bag" and used>0:card.add_child(SheetControls.button(_text.text("inventory_unpack"),func():_apply(_session.inventory.unpack_purchase_bag(container_id,_session.location_id))))
   if entries.is_empty():card.add_child(SheetControls.label(ItemText.t("empty_container")))
   for item in entries:
@@ -99,11 +111,13 @@ func _render() -> void:
    item_label.custom_minimum_size.y=float(_text.data.theme.font_size)*1.4
    detail.add_child(item_label)
    var description := ItemText.item_details(_session,item)
-   if description!="":detail.add_child(SheetControls.label(description))
+   if description!="":
+    var age_label := SheetControls.label(description);detail.add_child(age_label)
+    if item.attributes.has("freshness"):_age_labels.append({"label":age_label,"item":item})
    var count := int(reserved.get(item.id,0))
    if count>0:detail.add_child(SheetControls.label(ItemText.t("reserved",{"count":count})))
    var item_id := StringName(str(item.id))
-   if item.kind=="batch":
+   if item.kind in ["batch","prepared"] and container.kind=="cold":
     var take := SheetControls.button(_text.text("recipe_take_bowl"),func():_apply(_session.inventory.pick_up_storage(item_id)))
     take.custom_minimum_size.x=200
     take.disabled=not held.is_empty();row.add_child(take)

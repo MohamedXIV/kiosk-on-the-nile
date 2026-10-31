@@ -18,14 +18,16 @@ static func load_vessel(job: Dictionary, change: ItemChangeSet, device_id: Strin
  change.state.items[id].attributes.state="roasting"
  job["heat_on"]=true
  return ActionResult.success()
-static func slice_portion(job: Dictionary, change: ItemChangeSet, technique: int) -> ActionResult:
+static func slice_portion(job: Dictionary, change: ItemChangeSet, technique: int, now: float, foods: Dictionary) -> ActionResult:
  var bowl_id := str(job.get("bowl_id",""))
  if not change.state.items.has(bowl_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_batch")
  var batch: Dictionary=change.state.items[bowl_id]
  if int(batch.attributes.portions_remaining)<=0:return ActionResult.failure(ActionResult.Code.OUT_OF_STOCK,&"batch_empty")
+ var cooked := {"food_id":str(job.definition.get("freshness_food_id","")),"prepared_at":float(job.get("ready_at",now)),"initial_quality":RecipeProcesses.initial_quality(job,technique),"freshness":job.get("freshness",FoodFreshness.begin(now))}
+ if not FoodFreshness.view(cooked,now,foods).sellable:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"food_unservable")
  var id := "item_%d" % int(change.state.next_id)
  change.state.next_id=int(change.state.next_id)+1
- change.state.items[id]={"id":id,"definition_id":job.definition.filling_definition,"kind":"ingredient","quantity":1,"container_id":"player_hand","attributes":{"personal_use":bool(job.get("personal_use",false)),"source_job_id":job.id,"technique_grade":technique,"mood_penalty":job.quality_penalty,"step_evidence":job.step_results.duplicate(true),"heat_elapsed":job.elapsed}}
+ change.state.items[id]={"id":id,"definition_id":job.definition.filling_definition,"kind":"ingredient","quantity":1,"container_id":"player_hand","attributes":{"personal_use":bool(job.get("personal_use",false)),"source_job_id":job.id,"material_quality":IngredientLots.quality(job.input_evidence),"food_id":cooked.food_id,"prepared_at":cooked.prepared_at,"initial_quality":cooked.initial_quality,"freshness":FoodFreshness.transition(cooked.freshness,"ambient",now),"technique_grade":technique,"mood_penalty":job.quality_penalty,"step_evidence":job.step_results.duplicate(true),"heat_elapsed":job.elapsed}}
  batch.attributes.portions_remaining=int(batch.attributes.portions_remaining)-1
  var records: Array=change.state.items[id].attributes.step_evidence
  var step: Dictionary=job.definition.steps[int(job.step_index)]

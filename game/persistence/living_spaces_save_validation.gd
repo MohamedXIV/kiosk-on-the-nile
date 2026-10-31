@@ -2,6 +2,10 @@ class_name LivingSpacesSaveValidation
 extends RefCounted
 static func validate(session: GameSession, envelope: Dictionary) -> ActionResult:
  if envelope.get("schema_revision")!=SaveCodec.SCHEMA_REVISION: return _fail("schema_revision")
+ var comment_result := session.customer_experience.validate_comment_sources(session)
+ if not comment_result.ok:return comment_result
+ var taste_result := session.customer_experience.validate_tastes(session)
+ if not taste_result.ok:return taste_result
  var social_result := session.social_life.cross_validate()
  if not social_result.ok:return social_result
  var items := session.items.snapshot()
@@ -18,18 +22,21 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
     if not food.sugars.has(raw.sugar_id):return _fail("food_sugar")
    elif raw.sugar_id!="":return _fail("food_sugar")
    if raw.has("source_job_id"):
-    var job := session.workflow.job(StringName(raw.source_job_id))
-    if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("food_source")
- for id in items.consumed:
-  var receipt: Dictionary=items.consumed[id]
+    var proof := session.workflow.result_for(StringName(raw.source_job_id),StringName(id))
+    if proof.is_empty() or proof.get("quality_score")!=raw.quality_score or not RecipeProcesses.preparation_matches(raw,proof):return _fail("food_source")
+ var removed: Dictionary=items.consumed.duplicate(true)
+ removed.merge(items.discarded)
+ for id in removed:
+  var receipt: Dictionary=removed[id]
+  if receipt.item.kind!="prepared":continue
   if float(receipt.at)>session.clock.world_minutes+0.001:return _fail("consumed_time")
   var item: Dictionary=receipt.item
   var raw: Dictionary=item.attributes
   var food := session.foods.definition(StringName(str(raw.get("food_id",""))))
   if raw.get("id")!=id or food.is_empty() or not ContentValidation.integer(raw.get("quality_score")) or not ContentValidation.bounded(raw.quality_score,0,3) or raw.get("quality_key")!=food.quality_keys[int(raw.quality_score)]:return _fail("consumed_food")
   if raw.has("source_job_id"):
-   var job := session.workflow.job(StringName(raw.source_job_id))
-   if job.get("result_item_id")!=id or job.get("result_quality")!=raw.quality_score:return _fail("consumed_source")
+   var proof := session.workflow.result_for(StringName(raw.source_job_id),StringName(id))
+   if proof.is_empty() or proof.get("quality_score")!=raw.quality_score or not RecipeProcesses.preparation_matches(raw,proof):return _fail("consumed_source")
   for order in session.service.snapshot().orders.values():
    if order.get("delivered_item_id")==id:return _fail("consumed_delivered_food")
  for container in items.containers.values():
@@ -99,6 +106,10 @@ static func validate(session: GameSession, envelope: Dictionary) -> ActionResult
   if not session.hygiene.snapshot().applied.has("visit:"+str(id)):return _fail("experience_floor_event")
  var item_counter := int(items.next_id)
  for order in session.service.snapshot().orders.values():
+  if order.status=="delivered":
+   var raw: Dictionary=order.source_item
+   var proof := session.workflow.result_for(StringName(str(raw.get("source_job_id",""))),StringName(order.delivered_item_id))
+   if proof.is_empty() or not RecipeProcesses.preparation_matches(raw,proof):return _fail("delivered_preparation_source")
   if order.delivered_item_id!="" and not _counter_id(order.delivered_item_id,"food_",item_counter):return _fail("delivered_food_counter")
  for receipt in session.shops.snapshot().receipts.values():
   if not _counter_id(receipt.journey_id,"journey_",int(session.travel.snapshot().next_id)):return _fail("purchase_journey_counter")

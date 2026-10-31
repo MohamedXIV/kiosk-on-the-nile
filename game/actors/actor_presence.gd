@@ -5,9 +5,12 @@ var _session: GameSession
 var _profiles: Dictionary={}
 func configure(session: GameSession) -> void:
  _session=session
- _profiles=session.config.section("visitors").characters
- _profiles.merge(session.config.section("residential_visits").profiles)
- _profiles.merge(session.config.section("suppliers").profiles)
+ _profiles=authored_profiles(session.config.data)
+static func authored_profiles(bundle: Dictionary) -> Dictionary:
+ var profiles: Dictionary=bundle.get("visitors",{}).get("characters",{}).duplicate(true)
+ profiles.merge(bundle.get("residential_visits",{}).get("profiles",{}))
+ profiles.merge(bundle.get("suppliers",{}).get("profiles",{}))
+ return profiles
 func actor_ids() -> Array:
  return _profiles.keys()
 func profiles() -> Dictionary:

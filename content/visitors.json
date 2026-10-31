@@ -25,7 +25,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "amgad"
+        "amgad",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "railing_1",
       "arrival_weight": 1.0,
@@ -54,7 +58,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "table_a",
       "arrival_weight": 1.0,
@@ -83,7 +91,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "table_b",
       "arrival_weight": 1.0,
@@ -112,7 +124,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "railing_2",
       "arrival_weight": 1.0,
@@ -141,7 +157,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "stroll_west",
       "arrival_weight": 1.0,
@@ -165,7 +185,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "river_middle",
       "arrival_weight": 1.0,
@@ -194,7 +218,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "bench_east",
       "arrival_weight": 1.0,
@@ -218,7 +246,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "river_middle",
       "arrival_weight": 1.0,
@@ -245,7 +277,11 @@
         "shawarma_learning",
         "visitors",
         "shawarma_attempt",
-        "shawarma_result"
+        "shawarma_result",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "food_preferences": {
         "kebda": 4,
@@ -279,7 +315,11 @@
       },
       "manual_encounters": [
         "venue_comments",
-        "visitors"
+        "visitors",
+        "experience_notice",
+        "experience_taste",
+        "experience_suggestion",
+        "venue_improved"
       ],
       "leisure_marker": "bench_west",
       "arrival_weight": 1.0,

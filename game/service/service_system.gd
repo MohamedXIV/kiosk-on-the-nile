@@ -3,6 +3,8 @@ extends RefCounted
 signal handed_over(order_id: StringName, visit_id: StringName, item: PreparedItem)
 signal settled(order_id: StringName, visit_id: StringName, item: PreparedItem, payment: int)
 var policy: ActionPolicy
+var menu: MenuService
+var quote_provider: Callable
 var personal_item: Callable
 var gift_allowed: Callable
 var recipient_for: Callable
@@ -29,6 +31,8 @@ func place_order(visit_id: StringName, food_id: StringName, gift_promised: bool=
   if existing.visit_id == visit_id and existing.status == &"pending": return existing
  if gift_promised and (not gift_allowed.is_valid() or not gift_allowed.call(visit_id)):return null
  if not recipient_for.is_valid() or str(recipient_for.call(visit_id)).is_empty():return null
+ var quoted: ActionResult = quote_provider.call(visit_id,food_id) if quote_provider.is_valid() else menu.quote(StringName(menu.default_variant(str(food_id))))
+ if not quoted.ok:return null
  var order := OrderState.new()
  order.id = StringName("order_%d" % _next_id)
  _next_id += 1
@@ -37,8 +41,9 @@ func place_order(visit_id: StringName, food_id: StringName, gift_promised: bool=
  order.food_id = food_id
  order.gift_promised=gift_promised
  var food := _foods.definition(food_id)
- order.base_price=int(food.price_minor)
- order.tips=food.tips.duplicate()
+ order.quote=quoted.details.quote.duplicate(true)
+ order.base_price=int(order.quote.price_minor)
+ order.tips=[0,0,0,0]
  order.created_at=_clock.world_minutes if _clock!=null else -1.0
  order.timing_known=_clock!=null
  _orders[str(order.id)] = order
@@ -65,6 +70,8 @@ func _check_handover(value: OrderState) -> ActionResult:
  if value==null or value.status!=&"pending" or not _available.call(value.visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"order_unavailable")
  var item := _cooking.held_item()
  if item==null or item.food_id!=value.food_id:return ActionResult.failure(ActionResult.Code.WRONG_ORDER,&"wrong_order")
+ if menu==null or not menu.matches(item,value.quote):return ActionResult.failure(ActionResult.Code.WRONG_ORDER,&"wrong_order")
+ if not _cooking.freshness(item).sellable:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"food_unservable")
  if personal_item.is_valid() and personal_item.call(item.id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"personal_food")
  if policy!=null and policy.business_allowed.is_valid() and not policy.business_allowed.call():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  return ActionResult.success()
@@ -77,8 +84,10 @@ func _check_settlement(value: OrderState, mode: StringName) -> ActionResult:
  return ActionResult.success()
 func _handover(value: OrderState) -> PreparedItem:
  var held := _cooking.held_item()
+ var original := _cooking.held_record()
  var item := _cooking.take_held(held.id,false)
  if item==null:return null
+ value.source_item=original.attributes.duplicate(true)
  value.status=&"delivered";value.delivered_item_id=item.id
  value.served_at=_clock.world_minutes if _clock!=null else -1.0
  value.served_quality=item.quality_score;value.served_item=item.snapshot()
@@ -148,7 +157,7 @@ func restore(data: Dictionary) -> ActionResult:
    if not ContentValidation.integer(tip) or tip<0: return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_quote")
   var suffix: String = str(id).trim_prefix("order_")
   if not str(id).begins_with("order_") or not suffix.is_valid_int() or int(suffix)<1 or int(suffix)>=int(data.next_id): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_order_identity")
-  if not ServiceReceiptValidation.valid(record,_foods,receipt_recipes):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_service_receipt")
+  if not ServiceReceiptValidation.valid(record,_foods,receipt_recipes,menu):return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_service_receipt")
   if record.status=="pending" or (record.status=="delivered" and record.settlement=="pending"):
    if visits.has(record.visit_id): return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"duplicate_order")
    visits[record.visit_id] = true
@@ -163,6 +172,7 @@ func restore(data: Dictionary) -> ActionResult:
   value.food_id = StringName(record.food_id)
   value.status = StringName(record.status)
   value.delivered_item_id = StringName(record.delivered_item_id)
+  value.quote=record.quote.duplicate(true);value.source_item=record.source_item.duplicate(true)
   value.gift_promised=record.gift_promised;value.settlement=StringName(record.settlement);value.payment=int(record.payment);value.served_item=record.served_item.duplicate(true)
   if record.has("timing_known") and not record.timing_known is bool:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_order_timing")
   if not ContentValidation.integer(record.get("served_quality",-1)) or int(record.get("served_quality",-1))< -1 or int(record.get("served_quality",-1))>3:return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_order_quality")

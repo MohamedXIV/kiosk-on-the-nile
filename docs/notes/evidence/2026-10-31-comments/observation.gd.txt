@@ -1,0 +1,167 @@
+extends SceneTree
+func _initialize():call_deferred("run")
+func comment_available(s: GameSession, id: String, visit: VisitState) -> bool:
+ return s.semantic.decide(s.config.data.encounters[id],PackedStringArray([str(visit.id)]),"offer").allowed
+func hear_comment(s: GameSession, id: String, visit: VisitState) -> bool:
+ var current:ConversationSession=s.personal.view().get("conversation") if s.personal.active() else null
+ var started:ActionResult
+ if current!=null and str(current.encounter_id)==id:started=ActionResult.success({"session_id":str(current.id)})
+ else:
+  s.personal.leave();s.narrative.cancel_all()
+  started=await s.narrative.start(StringName(id),PackedStringArray([str(visit.id)]),{"manual_read":true})
+ print("COMMENT_START ",id," ",started.ok," ",started.message_key)
+ if not started.ok:return false
+ var chapter:ConversationSession=s.narrative.sessions[started.details.session_id]
+ print("COMMENT_OPENING ",chapter.current.text)
+ var offered:=s.narrative.choices(chapter).filter(func(c):return c.get("semantic_id")=="listen")
+ if offered.is_empty():print("NO_LISTEN ",s.narrative.choices(chapter));return false
+ var chosen:=s.narrative.choose(chapter.id,StringName(offered[0].id))
+ if not chosen.ok:print("CHOOSE_FAILED ",chosen.message_key);return false
+ print("COMMENT_BODY ",chapter.current.text)
+ for index in range(5):
+  if chapter.current.ended:return true
+  var advanced:=s.narrative.advance_manual(chapter.id)
+  if not advanced.ok:print("ADVANCE_FAILED ",advanced.message_key," ",advanced.details);return false
+ return false
+func observe_comments(s: GameSession, codec: SaveCodec, cfg: SessionConfig, visit: VisitState) -> bool:
+ var locales:=LocaleService.new();locales.configure(cfg.data);locales.set_locale("ar_EG")
+ print("RELATION_DENIAL ",not comment_available(s,"experience_taste",visit))
+ s.relationships.adjust(&"amgad",&"player",&"familiarity",10);s.relationships.adjust(&"amgad",&"player",&"trust",2)
+ print("OWN_TASTE_ELIGIBLE ",comment_available(s,"experience_taste",visit)," NO_UNSEEN_NOTICE ",not comment_available(s,"experience_notice",visit))
+ if not await hear_comment(s,"experience_taste",visit):return false
+ s.personal.leave()
+ print("TASTE_ONCE ",not comment_available(s,"experience_taste",visit)," SUGGESTION_COOLDOWN ",not comment_available(s,"experience_suggestion",visit))
+ var reports:=s.knowledge.query_assertions("player",{"type":"comment_report","args":{"owner":"amgad","kind":"taste","source":"taste/"+str(visit.order_id)}})
+ print("PLAYER_HEARD_OWN_REPORT ",reports.size()," NPC_NOT_GRANTED_PLAYER_KNOWLEDGE ",s.knowledge.query_assertions("farid",{"type":"comment_report","args":{"owner":"amgad","kind":"taste","source":"taste/"+str(visit.order_id)}}).is_empty())
+ var grants:Array[Dictionary]=[{"id":"notice_radio","definition_id":"radio","quantity":1,"container_id":"kiosk_furniture","attributes":{}}]
+ var prepared:=s.items.prepare_grants(grants)
+ if not prepared.ok:return false
+ if not s.items.commit(prepared.details.change).ok:return false
+ var placed:=s.spaces.place(PlacementRequest.from_dict({"instance_id":"notice_radio","location_id":"kiosk","cell":[-4,3],"rotation":0,"host_id":"counter_2","slot_id":"top"}))
+ if not placed.ok:print("RADIO_PLACE ",placed.message_key);return false
+ s.clock.elapse_minutes(1);s.customer_experience.observe(visit.id,visit.pose)
+ print("ACTUAL_SEEN ",s.customer_experience.comment_sources("amgad","notice"))
+ s.clock.elapse_minutes(361)
+ if not comment_available(s,"experience_notice",visit):print("NO_NOTICE_AFTER_WAIT");return false
+ var unheard:=await s.narrative.start(&"experience_notice",PackedStringArray([str(visit.id)]),{"manual_read":true})
+ if not unheard.ok:return false
+ s.player_ground=Vector2(8,0);s.personal.tick()
+ var item_source: String=s.customer_experience.comment_sources("amgad","notice")[0].id
+ print("UNHEARD_DETAIL_NOT_GRANTED ",s.knowledge.query_assertions("player",{"type":"comment_report","args":{"owner":"amgad","kind":"notice","source":item_source}}).is_empty())
+ s.player_ground=Vector2(-1.5,-0.5)
+ var resumed:=await s.personal.open_for(visit.id)
+ print("RESUME_UNHEARD_DETAIL ",resumed.ok," ",resumed.message_key)
+ if not resumed.ok:return false
+ if not await hear_comment(s,"experience_notice",visit):return false
+ s.personal.leave()
+ var moved:=s.spaces.place(PlacementRequest.from_dict({"instance_id":"notice_radio","location_id":"kiosk","cell":[12,3],"rotation":0,"host_id":"counter_6","slot_id":"top"}))
+ if not moved.ok:print("MOVE ",moved.message_key);return false
+ visit.pose.ground=Vector2(3,-0.5);visit.destination=visit.pose.ground;s.player_ground=visit.pose.ground
+ s.clock.elapse_minutes(1);s.customer_experience.observe(visit.id,visit.pose)
+ print("MOVE_NO_NEW_NOTICE ",s.customer_experience.comment_sources("amgad","notice").size()==1)
+ var other:=s.visitors.spawn(&"farid")
+ if other==null:return false
+ other.phase=&"staying";other.pose.ground=Vector2(2.5,-0.5);other.destination=other.pose.ground
+ s.relationships.adjust(&"farid",&"player",&"familiarity",10);s.relationships.adjust(&"farid",&"player",&"trust",2)
+ s.customer_experience.observe(other.id,other.pose)
+ print("GLOBAL_COMMENT_GAP ",not comment_available(s,"experience_notice",other)," UNTASTED_OTHER_DENIED ",not comment_available(s,"experience_taste",other))
+ s.clock.elapse_minutes(361)
+ if not await hear_comment(s,"experience_suggestion",visit):return false
+ s.personal.leave()
+ print("COFFEE_NOT_UNLOCKED ",not s.menu._data.foods.has("coffee"))
+ s.clock.elapse_minutes(361)
+ s.hygiene._soil(&"floor:kiosk",60) # Explicit dirt fixture; actual observation/cleaning follow.
+ s.clock.elapse_minutes(1);s.customer_experience.observe(visit.id,visit.pose)
+ print("DIRTY_ACTUALLY_OBSERVED ",comment_available(s,"venue_comments",visit))
+ if not await hear_comment(s,"venue_comments",visit):return false
+ s.personal.leave();s.visitors.clear_visits()
+ s.hygiene.elapse(0)
+ var cleaning:=s.hygiene.begin_clean(&"floor:kiosk")
+ if not cleaning.ok:print("CLEAN ",cleaning.message_key);return false
+ s.hygiene.tick(s.clock.elapse_minutes(10))
+ s.clock.elapse_minutes(1440);s.accounts.tick(s.clock.frame(0))
+ var returned:=s.visitors.spawn(&"amgad")
+ if returned==null:return false
+ returned.phase=&"staying";returned.pose.ground=Vector2(-1.5,-0.5);returned.destination=returned.pose.ground;s.player_ground=returned.pose.ground
+ s.customer_experience.observe(returned.id,returned.pose)
+ print("CLEANED_DIRTY_DENIED ",not comment_available(s,"venue_comments",returned)," OWN_IMPROVEMENT_ELIGIBLE ",comment_available(s,"venue_improved",returned))
+ if not await hear_comment(s,"venue_improved",returned):return false
+ s.personal.leave()
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("HEARD_COMMENTS_CURRENT ",restored.ok," ",restored.message_key," ",restored.details)
+ return restored.ok
+
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded:=content.load_directory("res://content")
+ if not loaded.ok:print("CONTENT ",loaded.details);quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint)
+ var session:=GameSession.new();root.add_child(session)
+ var configured:=session.configure(cfg)
+ print("CONFIG ",configured.ok," ",configured.message_key)
+ if not configured.ok:quit(1);return
+ var q:=session.menu.quote(&"tea/cup/here")
+ print("QUOTE ",JSON.stringify(q.details))
+ session.menu.set_price(&"tea/cup/here",1200)
+ print("ZERO_PRICE ",session.menu.quote(&"tea/cup/here").details)
+ session.player_pose.location_id=&"kiosk";session.player_ground=session.spaces.ground(&"tea")+Vector2(0,1)
+ var started:=session.workflow.start(&"tea",&"kiosk",PackedStringArray(["tea"]))
+ if not started.ok:print("START ",started.message_key);quit(1);return
+ var id:=StringName(started.details.job_id)
+ session.clock.advance(3.2);session.workflow.tick(session.clock.frame(3.2))
+ var added:=session.workflow.act(id,&"add_tea")
+ if not added.ok:print("ADD ",added.message_key);quit(1);return
+ session.clock.advance(2.5);session.workflow.tick(session.clock.frame(2.5))
+ var served:=session.workflow.act(id,&"pour",{"variant_id":"tea/cup/here","additions":[]})
+ print("REAL_HERE ",served.ok," ",served.message_key," ",session.cooking.held_item().snapshot() if served.ok else {})
+ if not served.ok:quit(1);return
+ var visit:=session.visitors.spawn(&"amgad")
+ visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground
+ session.service.quote_provider=func(_visit,_food):return session.menu.quote(&"tea/cup/here")
+ var order:=session.service.place_order(visit.id,&"tea")
+ if order==null:print("NO_ORDER");quit(1);return
+ visit.food_id=&"tea";visit.order_id=order.id;visit.shopping_state=&"pending"
+ session.menu.set_price(&"tea/cup/here",900)
+ print("FROZEN_ACCEPTED_QUOTE ",order.base_price," NEW ",session.menu.quote(&"tea/cup/here").details.quote.price_minor)
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("CURRENT_CANDIDATE ",restored.ok," ",restored.message_key," ",restored.details)
+ if not restored.ok:quit(1);return
+ var paid:=session.service.complete(order.id,&"paid")
+ print("REAL_SETTLEMENT ",paid.ok," ",paid.message_key," ",paid.details)
+ var before_needs:Dictionary=session.character_life.state(&"amgad").needs
+ print("NO_TASTE_ON_HANDOVER ",session.customer_experience.expected(&"amgad").is_empty())
+ session.clock.elapse_minutes(3)
+ var stepped:=session._step_experiences(session.clock.frame(0))
+ print("ACTUAL_TASTE ",stepped.ok," ",stepped.message_key," ",session.customer_experience.taste_sources(&"amgad"))
+ var first_snapshot:=session.character_life.snapshot()
+ var twice:=session._step_experiences(session.clock.frame(0))
+ print("ONCE_ONLY ",twice.ok and StableJson.stringify(first_snapshot)==StableJson.stringify(session.character_life.snapshot()))
+ print("PERSONAL_NEEDS ",before_needs," -> ",session.character_life.state(&"amgad").needs," OTHER_MEMORY_EMPTY ",session.customer_experience.expected(&"farid").is_empty())
+ var imitated:=OrderState.new();imitated.id=order.id
+ var rejected:=session.customer_experience.confirm_taste(imitated,session.character_life,session.foods,session.menu)
+ print("NONCANONICAL_ORDER_REJECTED ",not rejected.ok)
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,cfg)
+ print("SETTLED_CURRENT_CANDIDATE ",restored.ok," ",restored.message_key," ",restored.details)
+ if not restored.ok:quit(1);return
+ print("REMEMBERED_AFTER_CONTINUE ",StableJson.stringify(restored.details.session.customer_experience.expected(&"amgad"))==StableJson.stringify(session.customer_experience.expected(&"amgad"))," RETURN_FACTOR ",session.customer_experience.return_factor(&"amgad"))
+ var bad:=codec.encode(session)
+ var key: String=bad.state.customer_experience.tastes.keys()[0]
+ bad.state.customer_experience.tastes[key].actor="farid"
+ bad.erase("checksum");bad["checksum"]=StableJson.stringify(bad).sha256_text()
+ var retargeted:=await codec.create_candidate(bad,cfg)
+ print("RETARGET_REJECTED ",not retargeted.ok," ",retargeted.message_key)
+ var future:=codec.encode(session)
+ future.state.customer_experience.tastes[key].at=session.clock.world_minutes+1
+ future.erase("checksum");future["checksum"]=StableJson.stringify(future).sha256_text()
+ var future_result:=await codec.create_candidate(future,cfg)
+ print("FUTURE_TASTE_REJECTED ",not future_result.ok," ",future_result.message_key)
+ if not await observe_comments(session,codec,cfg,visit):quit(1);return
+ session.visitors.clear_visits()
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,cfg)
+ print("CLOSED_TASTE_CURRENT ",restored.ok," ",restored.message_key)
+ quit(0 if restored.ok and paid.ok and order.payment==1200 and not retargeted.ok and not rejected.ok else 1)

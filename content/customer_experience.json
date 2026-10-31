@@ -55,5 +55,32 @@
       "food": 1,
       "wait": 0.8
     }
+  },
+  "taste_delay_minutes": 3,
+  "comment_global_minutes": 120,
+  "comment_actor_minutes": 360,
+  "comment_topics": [
+    "experience_notice",
+    "experience_taste",
+    "experience_suggestion",
+    "experience_dirty",
+    "experience_improved"
+  ],
+  "comment_encounters": [
+    "experience_notice",
+    "experience_taste",
+    "experience_suggestion",
+    "venue_comments",
+    "venue_improved"
+  ],
+  "comment_suggestions": {
+    "coffee": {
+      "food_id": "coffee",
+      "required_food": "tea",
+      "temperature": "hot",
+      "minimum_weight": 1.0,
+      "minimum_tastes": 1,
+      "label": "قهوة"
+    }
   }
 }

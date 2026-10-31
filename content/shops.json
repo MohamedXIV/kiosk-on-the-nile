@@ -11,7 +11,23 @@
         "oil": 20,
         "bread": 20,
         "garlic_sauce": 20,
-        "potato": 20
+        "potato": 20,
+        "tea_portion_good": 12,
+        "tea_portion_premium": 12,
+        "kebda_portion_good": 12,
+        "potato_good": 12,
+        "onion": 20,
+        "green_pepper": 20,
+        "breadcrumbs": 20,
+        "fava_beans": 20,
+        "flour": 20,
+        "eggs": 20,
+        "liver_seasoning": 20,
+        "paper_cup": 30,
+        "paper_plate": 30,
+        "takeaway_wrap": 30,
+        "chili_sauce": 30,
+        "cheese": 30
       },
       "offers": {
         "tea_portion": {
@@ -114,6 +130,182 @@
             {
               "definition_id": "kebda_portion",
               "quantity": 4
+            }
+          ]
+        },
+        "tea_portion_good": {
+          "label": "شاي أجود",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 180,
+          "contents": [
+            {
+              "definition_id": "tea_portion_good",
+              "quantity": 1
+            }
+          ]
+        },
+        "tea_portion_premium": {
+          "label": "شاي فاخر",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 280,
+          "contents": [
+            {
+              "definition_id": "tea_portion_premium",
+              "quantity": 1
+            }
+          ]
+        },
+        "kebda_portion_good": {
+          "label": "كبدة أجود",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 650,
+          "contents": [
+            {
+              "definition_id": "kebda_portion_good",
+              "quantity": 1
+            }
+          ]
+        },
+        "potato_good": {
+          "label": "بطاطس أجود",
+          "description": "خامة بجودة أعلى للتحضير.",
+          "price_minor": 150,
+          "contents": [
+            {
+              "definition_id": "potato_good",
+              "quantity": 1
+            }
+          ]
+        },
+        "onion": {
+          "label": "بصل",
+          "description": "خامات للتحضير.",
+          "price_minor": 70,
+          "contents": [
+            {
+              "definition_id": "onion",
+              "quantity": 1
+            }
+          ]
+        },
+        "green_pepper": {
+          "label": "فلفل أخضر",
+          "description": "خامات للتحضير.",
+          "price_minor": 80,
+          "contents": [
+            {
+              "definition_id": "green_pepper",
+              "quantity": 1
+            }
+          ]
+        },
+        "breadcrumbs": {
+          "label": "بقسماط",
+          "description": "خامات للتحضير.",
+          "price_minor": 100,
+          "contents": [
+            {
+              "definition_id": "breadcrumbs",
+              "quantity": 1
+            }
+          ]
+        },
+        "fava_beans": {
+          "label": "فول ناشف",
+          "description": "خامات للتحضير.",
+          "price_minor": 180,
+          "contents": [
+            {
+              "definition_id": "fava_beans",
+              "quantity": 1
+            }
+          ]
+        },
+        "flour": {
+          "label": "دقيق",
+          "description": "خامات للتحضير.",
+          "price_minor": 90,
+          "contents": [
+            {
+              "definition_id": "flour",
+              "quantity": 1
+            }
+          ]
+        },
+        "eggs": {
+          "label": "بيض",
+          "description": "خامات للتحضير.",
+          "price_minor": 150,
+          "contents": [
+            {
+              "definition_id": "eggs",
+              "quantity": 1
+            }
+          ]
+        },
+        "liver_seasoning": {
+          "label": "تتبيلة كبدة",
+          "description": "توم وكمون وخلطة حمضيات وبهارات للتحضير.",
+          "price_minor": 80,
+          "contents": [
+            {
+              "definition_id": "liver_seasoning",
+              "quantity": 1
+            }
+          ]
+        },
+        "paper_cup": {
+          "label": "كوباية ورق",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 15,
+          "contents": [
+            {
+              "definition_id": "paper_cup",
+              "quantity": 1
+            }
+          ]
+        },
+        "paper_plate": {
+          "label": "طبق ورق",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 20,
+          "contents": [
+            {
+              "definition_id": "paper_plate",
+              "quantity": 1
+            }
+          ]
+        },
+        "takeaway_wrap": {
+          "label": "تغليف تيك أواي",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 15,
+          "contents": [
+            {
+              "definition_id": "takeaway_wrap",
+              "quantity": 1
+            }
+          ]
+        },
+        "chili_sauce": {
+          "label": "صوص شطة",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 35,
+          "contents": [
+            {
+              "definition_id": "chili_sauce",
+              "quantity": 1
+            }
+          ]
+        },
+        "cheese": {
+          "label": "جبنة إضافية",
+          "description": "مستلزمات تقديم وإضافات؛ تستهلكها عند تجهيز الحصة.",
+          "price_minor": 60,
+          "contents": [
+            {
+              "definition_id": "cheese",
+              "quantity": 1
             }
           ]
         }

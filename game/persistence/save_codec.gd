@@ -1,8 +1,8 @@
 class_name SaveCodec
 extends Node
 const SCHEMA_VERSION := 4
-const SCHEMA_REVISION := 21
-const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","service","visitors","residential","seat_use","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
+const SCHEMA_REVISION := 22
+const COMPONENTS := ["clock","items","spaces","equipment","travel","shops","routine","wallet","needs","accounts","commitments","district","contracts","deliveries","tuning","alertness","actions","fatigue","home","knowledge","relationships","effects","cooking","workflow","learning","menu","service","visitors","character_life","residential","seat_use","contact","hygiene","customer_experience","scheduler","social_life","journal","personal","inner"]
 func encode(session: GameSession) -> Dictionary:
  var state: Dictionary = {}
  for id in COMPONENTS: state[id] = session.get(id).snapshot()
@@ -73,6 +73,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
    if order==null or order.visit_id!=visit.id:
     candidate.queue_free()
     return ActionResult.failure(ActionResult.Code.INVALID_SAVE,&"invalid_visit_order")
+ result=candidate.character_life.validate_visits(candidate.visitors)
+ if not result.ok:
+  candidate.queue_free()
+  return result
  var services: Dictionary=candidate.visitors.history.snapshot().services
  for actor in services:
   for memory in services[actor]:
@@ -89,6 +93,10 @@ func create_candidate(data: Dictionary, config: SessionConfig, destination: Node
   candidate.queue_free()
   return result
  result = LivingSpacesSaveValidation.validate(candidate,restored_data)
+ if not result.ok:
+  candidate.queue_free()
+  return result
+ result=IngredientLots.validate_session(candidate)
  if not result.ok:
   candidate.queue_free()
   return result

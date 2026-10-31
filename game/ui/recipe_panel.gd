@@ -16,6 +16,8 @@ var _clean_progress: Label
 var _clean_button: Button
 var _stop_button: Button
 var _progress: Array[Dictionary]=[]
+var _selected_ingredients: Dictionary={}
+var _serving_options: Dictionary={}
 var _last_result: ActionResult
 var _hygiene_data: Dictionary
 var _dirty: bool=true
@@ -103,13 +105,23 @@ func _render_jobs() -> void:
   _progress.append({"job_id":str(job.id),"step_id":str(step.id),"label":progress})
   if step.kind=="cold_wait":card.add_child(SheetControls.label(ItemText.t("cold_wait")))
   var id := StringName(str(job.id));var action := StringName(str(step.action))
-  card.add_child(SheetControls.button(ItemText.step(str(job.recipe_id),step),func():_apply(_session.workflow.act(id,action))))
+  if step.kind=="batch_hold" or not job.definition.has("vessel_definition") and int(job.step_index)==job.definition.steps.size()-1:_serving_controls(card,job)
+  if step.kind!="passive_heat":card.add_child(SheetControls.button(ItemText.step(str(job.recipe_id),step),func():_apply(_session.workflow.act(id,action,_serving_options.get(str(id),{})))))
+  if step.kind=="soak":card.add_child(SheetControls.label(ItemText.t("soak_hint")))
+  if RecipeProcesses.supports(job.definition):
+   card.add_child(SheetControls.label(ItemText.t("method",{"method":UiText.localized("cooking.method."+str(job.definition.method),{},str(job.definition.method))})))
+   if step.kind in ["passive_heat","batch_hold"]:
+    var heat_row := HFlowContainer.new();card.add_child(heat_row)
+    for heat in RecipeProcesses.HEATS:
+     var heat_id: String=heat
+     var heat_button := SheetControls.button(UiText.localized("cooking.heat."+heat_id,{},heat_id),func():_apply(_session.workflow.act(id,StringName("heat:"+heat_id))))
+     heat_button.disabled=job.heat==heat_id;heat_row.add_child(heat_button)
   if step.kind=="batch_heat":card.add_child(SheetControls.button(_text.text("recipe_stop_heat"),func():_apply(_session.workflow.act(id,&"stop_heat"))))
   card.add_child(SheetControls.label(ItemText.t("cancel_hint")))
   card.add_child(SheetControls.button(_text.text("recipe_cancel"),func():_apply(_session.workflow.act(id,&"cancel"))))
  if _progress.is_empty():_active.add_child(SheetControls.label(ItemText.t("active_empty")))
 func _render_recipes() -> void:
- var available := _session.workflow.available_recipes(_session.location_id,_instance_id)
+ var available := _session.workflow.available_recipes(_session.location_id,_instance_id,_selected_ingredients)
  _recipes.set_meta("has_recipes",not available.is_empty())
  for recipe in available:
   var definition: Dictionary=recipe.definition
@@ -121,11 +133,32 @@ func _render_recipes() -> void:
    var reason := ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,recipe.missing,recipe.details)
    card.add_child(SheetControls.label(_text.text("recipe_missing",{"reason":ItemText.missing(_session,_text,reason)})))
   var id := StringName(str(recipe.id))
+  for input in definition.inputs:
+   var input_id: String=str(input.definition_id)
+   var options := _session.workflow.grade_options(StringName(input_id),_session.location_id)
+   var selected := str(_selected_ingredients.get(str(id),{}).get(input_id,""))
+   if options.size()<2 and selected.is_empty():continue
+   var row := HBoxContainer.new();card.add_child(row)
+   row.add_child(SheetControls.label(ItemText.definition(_session,input_id)))
+   var picker := OptionButton.new();row.add_child(picker)
+   picker.add_item(ItemText.t("oldest_grade"));picker.set_item_metadata(0,"")
+   for grade in options:
+    picker.add_item(UiText.localized("ingredient.grade."+grade,{},grade));picker.set_item_metadata(picker.item_count-1,grade)
+   if not selected.is_empty() and not selected in options:
+    picker.add_item(UiText.localized("ingredient.grade."+selected,{},selected)+" · "+ItemText.t("grade_empty"));picker.set_item_metadata(picker.item_count-1,selected);picker.set_item_disabled(picker.item_count-1,true)
+   for index in range(picker.item_count):
+    if picker.get_item_metadata(index)==selected:picker.select(index)
+   picker.item_selected.connect(func(index):
+    var picks: Dictionary=_selected_ingredients.get(str(id),{}).duplicate(true)
+    var grade := str(picker.get_item_metadata(index))
+    if grade.is_empty():picks.erase(input_id)
+    else:picks[input_id]=grade
+    _selected_ingredients[str(id)]=picks;_dirty=true)
   var actions := HFlowContainer.new();card.add_child(actions)
-  var start := SheetControls.button(_text.text("recipe_start"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]))))
+  var start := SheetControls.button(_text.text("recipe_start"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]),false,_selected_ingredients.get(str(id),{}))))
   start.custom_minimum_size.x=240
   start.disabled=not recipe.available;actions.add_child(start)
-  var personal := SheetControls.button(_text.text("self_cooking"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]),true)))
+  var personal := SheetControls.button(_text.text("self_cooking"),func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]),true,_selected_ingredients.get(str(id),{}))))
   personal.custom_minimum_size.x=440
   personal.disabled=not recipe.available;actions.add_child(personal)
  if available.is_empty():_recipes.add_child(SheetControls.label(ItemText.t("recipes_empty")))
@@ -142,10 +175,11 @@ func _update_progress() -> void:
   var value := _session.workflow.progress_view(StringName(entry.job_id))
   if value.is_empty() or value.step_id!=entry.step_id:_dirty=true;continue
   var line := _text.text("recipe_progress",{"elapsed":"%.1f" % float(value.elapsed),"duration":value.duration})
-  if value.kind=="batch_heat":
+  if value.kind in ["batch_heat","batch_hold"]:
    line+=" · "+_text.text("recipe_portions",{"count":value.portions})
    if not value.heat_on:line+="\n"+ItemText.t("heat_off")
    if value.slicing:line+="\n"+_text.outcome(ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"slice_in_progress"))
+  if not str(value.get("freshness_stage","")).is_empty():line+=" · "+UiText.localized("freshness."+str(value.freshness_stage),{},str(value.freshness_stage))
   entry.label.text=line
  if is_instance_valid(_cleanliness):
   var state := _session.hygiene.state(_instance_id)
@@ -157,3 +191,20 @@ func _update_progress() -> void:
   if cleaning:
    var progress: Dictionary=state.get("cleaning",{})
    _clean_progress.text=ItemText.t("cleaning",{"minutes":"%.1f" % maxf(0,float(progress.get("required_minutes",0))-float(progress.get("completed_minutes",0)))})
+
+func _serving_controls(card: VBoxContainer, job: Dictionary) -> void:
+ var food := str(job.definition.output.food_id)
+ var options: Dictionary=_serving_options.get(str(job.id),{"variant_id":_session.menu.default_variant(food),"additions":[]})
+ var variants := _session.menu.variants(food)
+ var picker := OptionButton.new();card.add_child(picker)
+ for id in variants:
+  picker.add_item(UiText.localized("serving."+id.get_slice("/",1),{},id.get_slice("/",1))+" · "+UiText.localized("serving."+id.get_slice("/",2),{},id.get_slice("/",2)))
+  if id==str(options.variant_id):picker.select(picker.item_count-1)
+ picker.item_selected.connect(func(index):options.variant_id=variants[index];_serving_options[str(job.id)]=options.duplicate(true))
+ for addition in _session.menu._data.foods[food].additions:
+  var id: String=str(addition)
+  var toggle := CheckBox.new();toggle.text=UiText.localized("addition."+id,{},id);toggle.button_pressed=id in options.additions;card.add_child(toggle)
+  toggle.toggled.connect(func(enabled):
+   if enabled and not id in options.additions:options.additions.append(id)
+   elif not enabled:options.additions.erase(id)
+   _serving_options[str(job.id)]=options.duplicate(true))

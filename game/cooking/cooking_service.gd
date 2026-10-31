@@ -36,6 +36,12 @@ func tick(delta: float) -> void:
 func job(station_id: StringName) -> CookingJob:
  var current := _legacy.job(station_id)
  if current==null or current.stage!=&"EMPTY" or _workflow==null:return current
+ var status := _workflow.station_status(station_id)
+ if status.get("process",false):
+  var view := CookingJob.new(station_id,current.recipe)
+  view.stage=&"SIDE_A" if status.step.kind in ["passive_heat","batch_hold"] and status.heat!="off" else &"EMPTY"
+  view.side_a_elapsed=float(status.elapsed)
+  return view
  var active := _workflow.active_at(station_id)
  if active.is_empty() or not active.recipe_id in ["tea","kebda"]:return current
  var view := CookingJob.new(station_id,current.recipe)
@@ -61,7 +67,15 @@ func legacy_busy(id: StringName) -> bool:
 func held_item() -> PreparedItem:
  return _inventory.prepared_item(_inventory.held_id())
 func take_held(expected_id: StringName, notify: bool = true) -> PreparedItem:
- return _legacy.take_held(expected_id,notify)
+ var item := held_item()
+ if item==null or item.id!=expected_id:return null
+ var age := freshness(item)
+ if not age.sellable:return null
+ var result := _inventory.consume_held(expected_id,notify)
+ if not result.ok:return null
+ item.quality_score=int(age.grade)
+ item.quality_key=StringName(foods.definition(item.food_id).quality_keys[item.quality_score])
+ return item
 func stock_count(id: StringName) -> int:
  return _legacy.stock_count(id)
 func inventory_snapshot() -> Dictionary:
@@ -73,7 +87,9 @@ func item_label(item: PreparedItem) -> String:
 func quality_label(item: PreparedItem) -> String:
  if foods==null:return _legacy.quality_label(item)
  var food := foods.definition(item.food_id)
- return ItemText.source("food."+str(item.food_id)+".quality."+str(food.quality_keys[item.quality_score]),foods.quality_label(item)) if not food.is_empty() else ""
+ var current := PreparedItem.from_dict(item.snapshot())
+ current.quality_score=int(freshness(item).grade)
+ return ItemText.source("food."+str(item.food_id)+".quality."+str(food.quality_keys[current.quality_score]),foods.quality_label(current)) if not food.is_empty() else ""
 func station_ids() -> Array:
  return _legacy.station_ids()
 func set_quality_provider(provider: Callable) -> void:
@@ -86,3 +102,11 @@ func restore(data: Dictionary) -> ActionResult:
 func set_hygiene_provider(provider: Callable, use_provider: Callable) -> void:
  _legacy.hygiene_provider=provider
  _legacy.use_provider=use_provider
+
+func process_status(instance_id: StringName) -> Dictionary:
+ return _workflow.station_status(instance_id) if _workflow!=null else {}
+
+func freshness(item: PreparedItem) -> Dictionary:
+ return FoodFreshness.view(item.snapshot(),_inventory.items.world_clock.world_minutes,_inventory.items.food_definitions)
+
+func held_record() -> Dictionary:return _inventory.items.get_item(_inventory.held_id())

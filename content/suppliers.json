@@ -49,6 +49,70 @@
     "potato": {
       "price_minor": 100,
       "daily_stock": 30
+    },
+    "tea_portion_good": {
+      "price_minor": 180,
+      "daily_stock": 12
+    },
+    "tea_portion_premium": {
+      "price_minor": 280,
+      "daily_stock": 12
+    },
+    "kebda_portion_good": {
+      "price_minor": 650,
+      "daily_stock": 12
+    },
+    "potato_good": {
+      "price_minor": 150,
+      "daily_stock": 12
+    },
+    "onion": {
+      "price_minor": 70,
+      "daily_stock": 20
+    },
+    "green_pepper": {
+      "price_minor": 80,
+      "daily_stock": 20
+    },
+    "breadcrumbs": {
+      "price_minor": 100,
+      "daily_stock": 20
+    },
+    "fava_beans": {
+      "price_minor": 180,
+      "daily_stock": 20
+    },
+    "flour": {
+      "price_minor": 90,
+      "daily_stock": 20
+    },
+    "eggs": {
+      "price_minor": 150,
+      "daily_stock": 20
+    },
+    "liver_seasoning": {
+      "price_minor": 80,
+      "daily_stock": 20
+    },
+    "paper_cup": {
+      "price_minor": 15,
+      "daily_stock": 30
+    },
+    "paper_plate": {
+      "price_minor": 20,
+      "daily_stock": 30
+    },
+    "takeaway_wrap": {
+      "price_minor": 15,
+      "daily_stock": 30
+    },
+    "chili_sauce": {
+      "price_minor": 35,
+      "daily_stock": 30
+    },
+    "cheese": {
+      "price_minor": 60,
+      "daily_stock": 30
     }
   },
   "emergency": {

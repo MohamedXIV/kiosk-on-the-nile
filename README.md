@@ -20,12 +20,18 @@ reference; its visitor and service behavior does not override that vision.
 
 See [VERSION](VERSION) for the current code version; the game is unpublished pre-alpha. [Changelog](CHANGELOG.md) · [Versioning/release/save policy](docs/RELEASING.md). Historical-save compatibility is optional during pre-alpha; each numbered release states its actual reset/migration impact. Existing descriptive/hash previews remain legacy records.
 
-## Current Web preview
+## Current development preview
+
+**0.4.0-prealpha.1 — character life and cooking v2.** [Complete preview archive and evidence](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts/character-cooking-v2-0.4.0-prealpha.1) · [Arabic play guide](docs/PLAYTEST_GUIDE_AR.md) · [Integration evidence](docs/notes/2026-10-31-character-cooking-integration.md).
+
+Start a new game: save schema4/revision22 deliberately rejects earlier unpublished saves while preserving their files. This development target includes contextual character choices, ingredient grades, timed batches/freshness, free menu prices and grounded personal comments. Publication/checksum status is recorded in the archive manifest and linked evidence; it is not a new formal tagged release.
+
+## Historical first numbered Web baseline
 
 [**v0.1.0-prealpha.2 — first numbered baseline**](https://github.com/MohamedXIV/kiosk-on-the-nile/releases/tag/v0.1.0-prealpha.2) · [complete ZIP](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip) · [SHA256](https://github.com/MohamedXIV/kiosk-on-the-nile/raw/c52c952db2468e6203851a2b75544cc2032a1a94/v0.1.0-prealpha.2/kiosk-on-the-nile-0.1.0-prealpha.2-web.zip.sha256).
 This technical preview includes the existing quiet-social/Godot/Ink baseline, offline Arabic/English and the acknowledged Web save fix. VERSION, Godot metadata, annotated tag, BUILD.json and package naming identify the same release. [Foundation, review and CI evidence](docs/notes/2026-10-27-versioning-and-prealpha-policy.md).
 
-This batch leaves save schema4/revision16 unchanged. **Future pre-alpha releases may require a new game**; each changelog entry states its actual reset/migration impact. The game is not publicly launched or feature-complete. General passage coordination and the previously recorded group-choice/candidate-config limits remain; see CHANGELOG.md.
+That historical batch left save schema4/revision16 unchanged. **Future pre-alpha releases may require a new game**; each changelog entry states its actual reset/migration impact. The game is not publicly launched or feature-complete. General passage coordination and the previously recorded group-choice/candidate-config limits remain; see CHANGELOG.md.
 
 Extract the whole ZIP into a fresh folder and serve over local HTTP; do not open file:// or mix exports. [All preserved archives](https://github.com/MohamedXIV/kiosk-on-the-nile/tree/artifacts) include the old descriptive/hash previews and the retained candidate1 validation record. Source integration remains separate.
 

@@ -75,11 +75,13 @@ func purchase(quote: ShopQuote, request_id: StringName) -> ActionResult:
  var journey: Dictionary=_travel.snapshot().journey
  for line in quote.lines:
   var offer: Dictionary=_data.shops[quote.shop_id].offers[line.offer_id]
+  var units := 0
+  for part in offer.contents:units+=int(part.quantity)
   for part in offer.contents:
    var quantity := int(part.quantity)*int(line.quantity)
    stock[quote.shop_id][part.definition_id]-=quantity
    var definition := _items.definition(StringName(part.definition_id))
-   if definition.kind=="ingredient":grants.append({"definition_id":part.definition_id,"quantity":quantity,"container_id":journey.purchase_container_id,"attributes":{}})
+   if definition.kind=="ingredient":grants.append({"definition_id":part.definition_id,"quantity":quantity,"container_id":journey.purchase_container_id,"attributes":{"acquisition":{"source_kind":"shop","source_ref":str(request_id),"cost_known":true,"cost_minor":int(offer.price_minor),"cost_units":units}}})
    else:
     for i in range(quantity):grants.append({"definition_id":part.definition_id,"quantity":1,"container_id":journey.purchase_container_id,"attributes":{"enabled":false} if part.definition_id in ["fan","radio"] else {}})
  var prepared := _items.prepare_grants(grants)
@@ -88,7 +90,7 @@ func purchase(quote: ShopQuote, request_id: StringName) -> ActionResult:
  for id in prepared.details.change.state.items:
   if not _items.get_item(StringName(id)).is_empty():continue
   var item: Dictionary=prepared.details.change.state.items[id]
-  granted.append({"item_id":id,"definition_id":item.definition_id,"quantity":item.quantity})
+  granted.append({"item_id":id,"definition_id":item.definition_id,"quantity":item.quantity,"lot":item.attributes.get("lot",{}).duplicate(true)})
  var receipt := {"grants_known":true,"granted":granted,"id":"receipt_%d" % _next_receipt,"request_id":str(request_id),"journey_id":journey.id,"bag_id":journey.purchase_container_id,"quote":quote.snapshot(),"total_minor":quote.total_minor,"at":_clock.world_minutes}
  var committed := _items.commit(prepared.details.change,false)
  if not committed.ok:return committed

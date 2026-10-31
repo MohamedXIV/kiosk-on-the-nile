@@ -2,12 +2,22 @@
   "tea_portion": {
     "kind": "ingredient",
     "label": "وحدة شاي",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "tea_portion",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "kebda_portion": {
     "kind": "ingredient",
     "label": "وحدة كبدة",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "kebda_portion",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "prepared_food": {
     "kind": "prepared",
@@ -208,7 +218,8 @@
       "capacity": 48,
       "allowed_tags": [
         "ingredient",
-        "batch"
+        "batch",
+        "prepared"
       ]
     },
     "placement": {
@@ -279,32 +290,62 @@
   "chicken": {
     "kind": "ingredient",
     "label": "فراخ",
-    "required_storage": "cold"
+    "required_storage": "cold",
+    "material": {
+      "family": "chicken",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "marinade": {
     "kind": "ingredient",
     "label": "تتبيلة",
-    "required_storage": "cold"
+    "required_storage": "cold",
+    "material": {
+      "family": "marinade",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "oil": {
     "kind": "ingredient",
     "label": "زيت",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "oil",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "bread": {
     "kind": "ingredient",
     "label": "عيش",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "bread",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "garlic_sauce": {
     "kind": "ingredient",
     "label": "ثومية",
-    "required_storage": "cold"
+    "required_storage": "cold",
+    "material": {
+      "family": "garlic_sauce",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "potato": {
     "kind": "ingredient",
     "label": "بطاطس",
-    "required_storage": "dry"
+    "required_storage": "dry",
+    "material": {
+      "family": "potato",
+      "grade": "standard",
+      "quality": 60
+    }
   },
   "rotisserie": {
     "kind": "equipment",
@@ -399,5 +440,169 @@
     "kind": "ingredient",
     "label": "حصة حشو شاورما",
     "required_storage": "hand"
+  },
+  "tea_portion_good": {
+    "kind": "ingredient",
+    "label": "شاي أجود",
+    "required_storage": "dry",
+    "material": {
+      "family": "tea_portion",
+      "grade": "good",
+      "quality": 78
+    }
+  },
+  "tea_portion_premium": {
+    "kind": "ingredient",
+    "label": "شاي فاخر",
+    "required_storage": "dry",
+    "material": {
+      "family": "tea_portion",
+      "grade": "premium",
+      "quality": 94
+    }
+  },
+  "kebda_portion_good": {
+    "kind": "ingredient",
+    "label": "كبدة أجود",
+    "required_storage": "dry",
+    "material": {
+      "family": "kebda_portion",
+      "grade": "good",
+      "quality": 85
+    }
+  },
+  "potato_good": {
+    "kind": "ingredient",
+    "label": "بطاطس أجود",
+    "required_storage": "dry",
+    "material": {
+      "family": "potato",
+      "grade": "good",
+      "quality": 85
+    }
+  },
+  "cooking_vessel": {
+    "kind": "batch",
+    "label": "وعاء تحضير"
+  },
+  "onion": {
+    "kind": "ingredient",
+    "label": "بصل",
+    "required_storage": "dry",
+    "material": {
+      "family": "onion",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "green_pepper": {
+    "kind": "ingredient",
+    "label": "فلفل أخضر",
+    "required_storage": "dry",
+    "material": {
+      "family": "green_pepper",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "breadcrumbs": {
+    "kind": "ingredient",
+    "label": "بقسماط",
+    "required_storage": "dry",
+    "material": {
+      "family": "breadcrumbs",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "fava_beans": {
+    "kind": "ingredient",
+    "label": "فول ناشف",
+    "required_storage": "dry",
+    "material": {
+      "family": "fava_beans",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "flour": {
+    "kind": "ingredient",
+    "label": "دقيق",
+    "required_storage": "dry",
+    "material": {
+      "family": "flour",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "eggs": {
+    "kind": "ingredient",
+    "label": "بيض",
+    "required_storage": "cold",
+    "material": {
+      "family": "eggs",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "liver_seasoning": {
+    "kind": "ingredient",
+    "label": "تتبيلة كبدة",
+    "required_storage": "dry",
+    "material": {
+      "family": "liver_seasoning",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "paper_cup": {
+    "kind": "ingredient",
+    "label": "كوباية ورق",
+    "required_storage": "dry",
+    "material": {
+      "family": "paper_cup",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "paper_plate": {
+    "kind": "ingredient",
+    "label": "طبق ورق",
+    "required_storage": "dry",
+    "material": {
+      "family": "paper_plate",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "takeaway_wrap": {
+    "kind": "ingredient",
+    "label": "تغليف تيك أواي",
+    "required_storage": "dry",
+    "material": {
+      "family": "takeaway_wrap",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "chili_sauce": {
+    "kind": "ingredient",
+    "label": "صوص شطة",
+    "required_storage": "dry",
+    "material": {
+      "family": "chili_sauce",
+      "grade": "standard",
+      "quality": 60
+    }
+  },
+  "cheese": {
+    "kind": "ingredient",
+    "label": "جبنة إضافية",
+    "required_storage": "cold",
+    "material": {
+      "family": "cheese",
+      "grade": "standard",
+      "quality": 60
+    }
   }
 }

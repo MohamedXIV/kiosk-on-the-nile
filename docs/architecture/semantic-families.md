@@ -44,3 +44,7 @@ Removed old actions/gates for converted families are not competing eligibility a
 Generic guest authoring now accepts any declared visitor rather than a character-name whitelist; the authored roster limit2 and live single-guest household capacity are unchanged. The additional Nadia/tea/thread demonstration exists only in retained disposable evidence, not production content.
 
 Current saves are accepted only for the current content identity and coherent proof graph. Old unpublished saves are not migrated or silently reset. Historical graph archival/version decisions remain final closeout work. #25 owns further author diagnostics; #26 owns integrated pacing, long-session/performance and player acceptance; no FPS or leak-free claim follows from these bounded observations.
+
+## Character/cooking phase extension (2026-10-31, draft PR46)
+
+Venue, own food callbacks, observed new items and optional menu wishes now share source-bound experience topics. The old shawarma-result opinion reads the speaker's actual taste, and generic handover acknowledgements do not claim consumption. Five shared experience topics use the same typed provider, actor relationship gates, heard consumption and global/actor cooldown index; no actor-specific predicate branches. Source details and actual observation scope are in [the checkpoint](../notes/2026-10-31-comments.md). This draft extension does not imply conversion of unrelated legacy families or delivery of a final preview.

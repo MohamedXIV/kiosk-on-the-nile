@@ -34,6 +34,10 @@ func context(participants: PackedStringArray, extra: Dictionary = {}) -> Diction
  for i in range(recipe.quality_keys.size()):
   if recipe.quality_keys[i] == quality: quality = recipe.quality_names[str(i)]
  var data := {"day":_session.clock.day,"amgad_visits":_session.visitors.memory.amgad_visits,"last_served_quality":quality if not quality.is_empty() else "مظبوط","known_cheap_fan":_session.knowledge.has(&"KNOWN_CHEAP_FAN"),"familiarity":_session.relationships.value(&"player",StringName(character_id),&"familiarity"),"character_id":character_id,"fan_price_label":String.num(float(_session.config.section("balance").fan_price)/100.0,2),"familiar":_session.relationships.value(&"player",StringName(character_id),&"familiarity")>=float(_session.config.section("social").conversation_familiarity_threshold),"kiosk_open":_session.kiosk_open,"business_allowed":_session.accounts.business_allowed(),"request_can_prepare":_session.request_can_prepare(StringName(intended_food)),"mode":0,"quality_score":0,"order_label":_session.foods.definition(StringName(intended_food)).get("menu_label","")}
+ var selection: Dictionary=pending.quote if pending!=null else _session.character_life.state(StringName(character_id)).get("decision",{})
+ if not str(selection.get("variant_id","")).is_empty():
+  data.order_label=OutingText.serving(_session,selection)
+  data["localization_args"]={"order_label":OutingText.serving_reference(selection)}
  var visit: Variant = _session.presence.record(participants[0]) if not participants.is_empty() else null
  var hospitality := _session.visitors.history.hospitality(character_id)
  data.merge({"needs_hospitality":visit.needs_hospitality if visit is VisitState else false,"hospitality_outcome":str(hospitality.get("outcome","")),"hospitality_offer":_session.can_offer_hospitality(visit.id) if visit is VisitState else false},true)
@@ -407,6 +411,29 @@ func _context_for(conversation: ConversationSession) -> Dictionary:
  inputs.merge(_definitions[str(conversation.encounter_id)].get("story_context",{}),true)
  inputs["chapter_id"]=str(conversation.id)
  var projected := context(conversation.participants,inputs)
+ var entry: Dictionary=_definitions[str(conversation.encounter_id)]
+ if entry.has("comment_source_binding"):
+  var bindings: Dictionary=conversation.context_extra.get("semantic_start",{}).get("identity",{}).get("bindings",{})
+  var source := _session.customer_experience.comment_source(str(bindings.get("kind","")),str(bindings.get(str(entry.comment_source_binding),"")))
+  var captures: Dictionary=projected.get("localization_args",{}).duplicate(true)
+  projected["comment_score"]=float(source.get("score",0))
+  if source.get("kind")=="notice":
+   var label: String=str(_session.items.definition(StringName(str(source.definition_id))).get("label",""))
+   projected["comment_item"]=label
+   captures["comment_item"]=LocaleService.current.captured_reference("item."+str(source.definition_id),label) if LocaleService.current else label
+  if source.get("kind")=="taste":
+   var key := "comment.food."+str(source.food_id)
+   if _session.config.data.locale_ar.messages.has(key):
+    projected["comment_food"]=str(_session.config.data.locale_ar.messages[key]);captures["comment_food"]={"text_ref":key}
+   else:
+    var label: String=str(_session.foods.definition(StringName(str(source.food_id))).get("menu_label",str(source.food_id)))
+    projected["comment_food"]=label
+    captures["comment_food"]=LocaleService.current.captured_reference("food."+str(source.food_id)+".menu",label) if LocaleService.current else label
+  if source.get("kind")=="suggestion":
+   var label: String=str(_session.config.data.customer_experience.comment_suggestions[source.subject].label)
+   projected["comment_suggestion"]=label
+   captures["comment_suggestion"]=LocaleService.current.captured_reference("suggestion."+str(source.subject),label) if LocaleService.current else label
+  projected["localization_args"]=captures
  var social_topic := str(_definitions[str(conversation.encounter_id)].get("social_topic",conversation.context_extra.get("topic_id","")))
  if not social_topic.is_empty() and str(conversation.encounter_id).begins_with("social_"):
   projected.merge(_session.social_life.dialogue_context(social_topic),true)

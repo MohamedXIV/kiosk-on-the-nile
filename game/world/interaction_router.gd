@@ -22,7 +22,7 @@ func nearest() -> InteractionTarget:
   if station!=null:
    target.primary = StationController.new(_session.cooking,str(_text.data.input.interact_primary[0])).status_label(target.id)
    if station.stage!=&"EMPTY": target.secondary="" if _session.cooking.legacy_busy(target.id) else _text.text("station_options")
-   elif station.recipe.rules_id==&"tea":target.secondary=_text.text("station_options")
+   elif station.recipe.rules_id==&"tea" or _session.cooking.process_status(target.id).get("process",false):target.secondary=_text.text("station_options")
   if target.id==&"sign": target.primary=_text.text("close_kiosk") if _session.kiosk_open else _text.text("open_kiosk")
  if _session.locations.is_physical(_session.location_id):
   var person_radius := float(_session.config.section("visitors").interaction_radius)
@@ -74,7 +74,7 @@ func execute(secondary: bool) -> ActionResult:
  if target.id==&"stand" and not secondary:_session.seat_use.stand();return ActionResult.success()
  if str(target.id).begins_with("sit:") and not secondary:return _session.seat_use.sit(str(target.id).trim_prefix("sit:"))
  var station := _session.cooking.job(target.id)
- if secondary and station!=null and station.stage!=&"EMPTY" and not _session.cooking.legacy_busy(target.id):return ActionResult.success({"show_recipes":str(target.id)})
+ if secondary and station!=null and (station.stage!=&"EMPTY" or _session.cooking.process_status(target.id).get("process",false)) and not _session.cooking.legacy_busy(target.id):return ActionResult.success({"show_recipes":str(target.id)})
  if str(target.id).begins_with("phone:") and not secondary:return await _session.contact.begin(str(target.id).trim_prefix("phone:"))
  if not target.visit_id.is_empty():
   if secondary: return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"no_secondary")
@@ -93,7 +93,7 @@ func execute(secondary: bool) -> ActionResult:
   "clean":return _session.hygiene.begin_clean(StringName(record.instance_id))
   "recipes":return ActionResult.success({"show_recipes":str(record.instance_id)})
   "inventory":
-   if _session.items.get_item(_session.inventory.held_id()).get("kind")=="batch":return _session.inventory.store_held(StringName(record.container_id))
+   if _session.items.get_item(_session.inventory.held_id()).get("kind") in ["batch","prepared"]:return _session.inventory.store_held(StringName(record.container_id))
    return ActionResult.success({"show_inventory":true})
   "toggle_equipment":
    var id := StringName(record.instance_id)

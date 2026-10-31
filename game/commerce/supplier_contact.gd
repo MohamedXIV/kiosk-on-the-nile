@@ -28,6 +28,8 @@ func begin(id: String) -> ActionResult:
  if not near_point(id):return _fail()
  if _session.personal.active() and (current==null or not _session.personal.holds_visit(current.id)):return _fail()
  if current==null:
+  var state := _session.character_life.ensure(&"fathi")
+  if not state.ok:return state
   current=ResidentialRecord.new();current.id=StringName("phone_%d" % next_id);next_id+=1
   current.character_id=&"fathi";current.phase=&"staying";current.pose.location_id=_session.location_id
   host_id=id

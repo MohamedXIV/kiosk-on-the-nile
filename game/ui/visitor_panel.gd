@@ -37,7 +37,7 @@ func _refresh() -> void:
  _heading.text=_text.text("visitor_actions",{"name":actor_name})
  var busy := _session.narrative.speech_active(_visit_id)
  var order := _session.service.pending_for(_visit_id)
- _order.text=OutingText.t("pending_order",{"food":OutingText.order(_session,order.food_id)}) if order!=null else OutingText.t("no_order")
+ _order.text=OutingText.t("pending_order",{"food":OutingText.serving(_session,order.quote)}) if order!=null else OutingText.t("no_order")
  _recall.disabled=order==null or busy
  _talk.disabled=not _session.narrative.can_talk(_visit_id)
  var topics := _session.social_life.topics_for(_visit_id)

@@ -13,11 +13,12 @@ static func validate_recipes(recipes: Dictionary, items: ItemStore) -> ActionRes
  for id in recipes:
   var recipe: Variant=recipes[id]
   if not recipe is Dictionary or not ContentValidation.integer(recipe.get("version")) or recipe.version<1 or not recipe.get("label") is String or not recipe.get("inputs") is Array or not recipe.get("steps") is Array or recipe.steps.is_empty() or not recipe.get("quality_keys") is Array or recipe.quality_keys.size()!=4:return ContentValidation.fail("recipe_workflows."+id)
+  if recipe.has("process_version") and (not ContentValidation.integer(recipe.process_version) or not int(recipe.process_version) in [1,2]):return ContentValidation.fail("recipe_workflows.process_version")
   if recipe.has("allowed_locations"):
    if not recipe.allowed_locations is Array:return ContentValidation.fail("recipe_workflows.allowed_locations")
    for location in recipe.allowed_locations:
     if not location is String or location.is_empty():return ContentValidation.fail("recipe_workflows.allowed_location")
-  if recipe.has("vessel_definition"):
+  if recipe.has("vessel_definition") and not RecipeProcesses.supports(recipe):
    if items.definition(StringName(str(recipe.vessel_definition))).get("kind")!="batch" or items.definition(StringName(str(recipe.get("filling_definition","")))).get("kind")!="ingredient" or not ContentValidation.integer(recipe.get("portions")) or recipe.portions<1 or not ContentValidation.bounded(recipe.get("slice_minutes"),0.01,1440):return ContentValidation.fail("recipe_workflows.batch")
   if not recipe.get("output") is Dictionary or not recipe.output.get("food_id") is String:return ContentValidation.fail("recipe_workflows.output")
   if recipe.get("quality",{}).get("kind")=="two_sides":
@@ -25,12 +26,17 @@ static func validate_recipes(recipes: Dictionary, items: ItemStore) -> ActionRes
     if not ContentValidation.number(recipe.quality.get(field)) or recipe.quality[field]<0:return ContentValidation.fail("recipe_workflows.quality")
   for input in recipe.inputs:
    if not input is Dictionary or items.definition(StringName(str(input.get("definition_id","")))).is_empty() or not ContentValidation.integer(input.get("quantity")) or input.quantity<1:return ContentValidation.fail("recipe_workflows.inputs")
+  for input in recipe.inputs:
+   if input.has("grade"):
+    if not input.grade is String or not items._definitions.values().any(func(d):return d.get("material",{}).get("family")==items.ingredient_family(str(input.definition_id)) and d.get("material",{}).get("grade")==input.grade):return ContentValidation.fail("recipe_workflows.input_grade")
   var known: Dictionary={}
   for step in recipe.steps:
-   if not step is Dictionary or not step.get("id") is String or known.has(step.id) or not step.get("kind") in ["heat","brew","wait","prepare","assemble","pour","flip","season","cold_wait","batch_heat"] or not step.get("capability") is String or not step.get("action") is String or not step.get("label") is String or not ContentValidation.number(step.get("duration")) or step.duration<0 or not step.get("after",[]) is Array:return ContentValidation.fail("recipe_workflows.step")
+   if not step is Dictionary or not step.get("id") is String or known.has(step.id) or not step.get("kind") in ["heat","brew","wait","prepare","assemble","pour","flip","season","cold_wait","batch_heat","soak","transfer","passive_heat","batch_hold"] or not step.get("capability") is String or not step.get("action") is String or not step.get("label") is String or not ContentValidation.number(step.get("duration")) or step.duration<0 or not step.get("after",[]) is Array:return ContentValidation.fail("recipe_workflows.step")
    for dependency in step.get("after",[]):
     if not known.has(dependency):return ContentValidation.fail("recipe_workflows.dependency_cycle")
    known[step.id]=true
    for field in ["good_until","okay_until","burnt_after"]:
     if step.has(field) and (not ContentValidation.number(step[field]) or step[field]<step.duration):return ContentValidation.fail("recipe_workflows.window")
+  var process := RecipeProcesses.validate(recipe,items)
+  if not process.ok:return process
  return ActionResult.success()

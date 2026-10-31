@@ -59,6 +59,11 @@ func act(station_id: StringName) -> ActionResult:
   result.details["mood_penalty"] = current.quality_penalty
   result.details["score"] = item.quality_score
   item.quality_key = StringName(recipe.data.quality_keys[item.quality_score])
+  item.initial_quality=[0.0,40.0,70.0,95.0][item.quality_score]
+  item.prepared_at=_inventory.items.world_clock.world_minutes
+  item.freshness=FoodFreshness.begin(item.prepared_at)
+  item.method=&"brew" if item.food_id==&"tea" else &"saute"
+  item.serving_format=&"cup" if item.food_id==&"tea" else &"sandwich"
   var received := _inventory.receive_prepared(item)
   if not received.ok: return received
   result.details["item"] = item

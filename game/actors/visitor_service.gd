@@ -24,6 +24,8 @@ var service_busy: Callable
 var availability_provider: Callable
 var purchase_blocked: Callable
 var demand_provider: Callable
+var return_provider: Callable
+var character_life: CharacterLife
 var food_selector: Callable
 var tuning: TuningStore
 var foods: FoodRegistry
@@ -74,6 +76,9 @@ func spawn(character_id: StringName) -> VisitState:
  visit.pose.ground = Vector2(spawn_position[0],spawn_position[1])
  var marker: Array = _markers[definition.leisure_marker]
  visit.destination = Vector2(marker[0],marker[1])
+ if character_life!=null:
+  var arrived := character_life.arrive(character_id,visit.id)
+  if not arrived.ok:return null
  visits[str(visit.id)] = visit
  return visit
 func tick(delta: float, calendar_delta: float = -1) -> void:
@@ -99,7 +104,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
      _remarks(visit,delta)
     if not seating.reserved(visit.id) and not meetings.active(visit.id) and not peers.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
      leisure.step(visit,elapsed,_markers,str(_data.characters[str(visit.character_id)].leisure_marker),_position_available,route_reachable)
-   if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
+   if (visit.elapsed >= visit.stay_seconds*(character_life.stay_factor(visit.character_id,visit.id) if character_life!=null else 1.0) and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
     if peers.active(visit.id):finish_peer()
     meetings.finish(visit.id)
@@ -128,6 +133,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
     var previous := history.last_visit(id)
     var freshness := 1.0 if previous<0 else clampf((_clock.world_minutes-previous)/1440.0,0.25,1.0)
     var weight := float(_data.characters[id].arrival_weight)*freshness
+    if return_provider.is_valid():weight*=clampf(float(return_provider.call(StringName(id))),1.0,1.15)
     pool.append(id);weights.append(weight);total+=weight
    if total>0:
     var roll := _rng.randf()*total
@@ -158,8 +164,10 @@ func _arrived(visit: VisitState) -> void:
 func busy_in_conversation(visit_id: StringName) -> bool:
  return purchase_blocked.is_valid() and purchase_blocked.call(visit_id)
 func _can_meet(visit: VisitState) -> bool:
+ if character_life!=null and character_life.intent_for(visit.character_id,visit.id)==&"rest":return false
  return not peers.active(visit.id) and visit.phase==&"staying" and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and not busy_in_conversation(visit.id) and meeting_available.is_valid() and bool(meeting_available.call(visit.id))
 func _peer_eligible(visit: VisitState, own_conversation: String) -> bool:
+ if own_conversation.is_empty() and character_life!=null and character_life.intent_for(visit.character_id,visit.id)==&"rest":return false
  return visit.phase==&"staying" and (not own_conversation.is_empty() or peers.active(visit.id) or visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius)) and visit.shopping_state in [&"undecided",&"declined",&"served"] and _orders.pending_for(visit.id)==null and not meetings.active(visit.id) and peer_available.is_valid() and bool(peer_available.call(visit.id,own_conversation))
 func _seat_busy(id: StringName) -> bool:
  return busy_in_conversation(id) or peers.active(id)
@@ -185,9 +193,8 @@ func _consider_purchase(visit: VisitState, delta: float) -> void:
  var definition := character(visit.character_id)
  var service_point := _service_point(visit)
  if not _position_available(service_point,visit.id):return
- if _rng.randf()>=float(definition.purchase_chance):visit.shopping_state=&"declined";return
- var food := StringName(str(food_selector.call(visit.character_id))) if food_selector.is_valid() else StringName(definition.food_id)
- if food.is_empty():visit.shopping_state=&"declined";return
+ var food := StringName(str(food_selector.call(visit.character_id,visit.id))) if food_selector.is_valid() else StringName(definition.food_id)
+ if food.is_empty():return
  visit.food_id=food
  visit.shopping_state=&"approaching"
  visit.destination=service_point
@@ -334,7 +341,7 @@ func restore(data: Dictionary) -> ActionResult:
 func _remarks(visit: VisitState, delta: float) -> void:
  var definition := character(visit.character_id)
  var waiting: bool = _orders.pending_for(visit.id)!=null
- if not waiting and not definition.ambient: return
+ if not waiting and (not definition.ambient or character_life!=null and character_life.intent_for(visit.character_id,visit.id)==&"rest"):return
  visit.remark_remaining -= delta
  if visit.remark_remaining>0: return
  visit.remark_remaining = float(_data.waiting_reminder_seconds) if waiting else _rng.randf_range(float(_data.ambient_remark_delay[0]),float(_data.ambient_remark_delay[1]))

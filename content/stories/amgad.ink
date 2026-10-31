@@ -23,14 +23,10 @@ INCLUDE context.inkinc
 {day >= 2 && not known_cheap_fan:
  تسلم إيدك. لما تفضى عايز أقولك على مروحة لأوضة السطح. # speaker:amgad # duration:6 # loc:story.amgad.line_005
 - else:
- {quality_score >= 2:
-  {line_variant:
-  - 0: تسلم إيدك.. دي تتشرب على رواقة. # speaker:amgad # duration:5 # loc:story.amgad.line_006
-  - 1: الله ينور. ريحة الشاي لوحدها تفوق. # speaker:amgad # duration:5 # loc:story.amgad.line_007
-  - else: كده القعدة كملت، متشكر يا ابني. # speaker:amgad # duration:5 # loc:story.amgad.line_008
-  }
- - else:
-  معلش، المرة الجاية نضبطها سوا. يومك شكله كان طويل. # speaker:amgad # duration:6 # loc:story.amgad.line_009
+ {line_variant:
+ - 0: تسلم، آخد طلبي وأقعد على رواقة. # speaker:amgad # duration:5 # loc:story.amgad.received_0
+ - 1: متشكر على تعبك يا ابني. # speaker:amgad # duration:5 # loc:story.amgad.received_1
+ - else: الله يبارك لك، تسلم. # speaker:amgad # duration:5 # loc:story.amgad.received_2
  }
 }
 -> END

@@ -47,6 +47,8 @@ var cooking: CookingService
 var supplies: SupplyService
 var life: LifeActions
 var service: ServiceSystem
+var character_life: CharacterLife
+var menu: MenuService
 var visitors: VisitorService
 var social_life: SocialLife
 var relationships: RelationshipStore
@@ -106,10 +108,12 @@ func configure(source: SessionConfig) -> ActionResult:
  residential=ResidentialVisits.new();residential.configure(self)
  actions.business_allowed=accounts.business_allowed
  items = ItemStore.new()
+ items.world_clock=clock
+ items.food_definitions=source.section("foods")
  var item_result := items.configure(source.section("items"),source.section("containers"))
  if not item_result.ok: return item_result
  inventory = InventoryService.new(items,{"tea":"tea_portion","kebda":"kebda_portion"})
- item_result = inventory.restock_legacy(source.section("recipes").initial_stock)
+ item_result = inventory.restock_legacy(source.section("recipes").initial_stock,"starter")
  if not item_result.ok: return item_result
  home = HomeService.new(items)
  var initial_layout := source.section("initial_layout")
@@ -167,13 +171,22 @@ func configure(source: SessionConfig) -> ActionResult:
  foods=FoodRegistry.new()
  var food_result := foods.configure(source.section("foods"))
  if not food_result.ok:return food_result
+ menu=MenuService.new()
+ var menu_result := menu.configure(source.section("menu"),foods,inventory,clock)
+ if not menu_result.ok:return menu_result
+ character_life=CharacterLife.new()
+ character_life.menu=menu
+ var character_result := character_life.configure(source.section("character_life"),foods,clock)
+ if not character_result.ok:return character_result
  cooking = CookingService.new()
  var kitchen := cooking.configure(source.section("recipes"),inventory)
  if not kitchen.ok: return kitchen
  cooking.set_quality_provider(func():return mood_policy.quality_penalty(needs.mood))
  workflow=RecipeWorkflow.new()
+ items.cold_active=func(id):return equipment.enabled(id) and not spaces.placement(id).is_empty()
  var workflow_result := workflow.configure(source.section("recipe_workflows"),inventory,equipment,clock,knowledge)
  if not workflow_result.ok:return workflow_result
+ workflow.serving_provider=menu.plan
  workflow.policy=actions
  workflow.quality_provider=func():return mood_policy.quality_penalty(needs.mood)
  cooking.foods=foods
@@ -194,6 +207,8 @@ func configure(source: SessionConfig) -> ActionResult:
  supplies = SupplyService.new(travel,home,knowledge)
  life = LifeActions.new(self)
  service = ServiceSystem.new()
+ service.menu=menu
+ service.quote_provider=_quote_for_visit
  service.policy=actions
  service.gift_allowed=can_offer_hospitality
  service.receipt_recipes=source.section("recipe_workflows")
@@ -207,6 +222,7 @@ func configure(source: SessionConfig) -> ActionResult:
  visitors.seat_unavailable=func(id):return hygiene!=null and hygiene.is_cleaning(id)
  visitors.tuning=tuning
  visitors.foods=foods
+ visitors.character_life=character_life
  visitors.food_selector=_choose_food
  service.configure(wallet,cooking,visitors.is_available,balance,foods,clock)
  visitors.configure(source.section("visitors"),source.section("locations").kiosk.markers,clock,service,func():return kiosk_open)
@@ -216,6 +232,11 @@ func configure(source: SessionConfig) -> ActionResult:
  var experience_result := customer_experience.configure(source.section("customer_experience"),hygiene,spaces,clock)
  if not experience_result.ok:return experience_result
  customer_experience.visit_provider=func(id):return visitors.visits.get(str(id))
+ customer_experience.profile_provider=character_life.profile
+ customer_experience.suggestion_available=func(food):return not menu._data.foods.has(food)
+ customer_experience.order_provider=service.order
+ customer_experience.relationship_provider=func(actor):return relationships.value(actor,&"player",&"familiarity")
+ visitors.return_provider=customer_experience.return_factor
  visitors.service_presence=func():return location_id==&"kiosk"
  visitors.service_busy=func():return personal!=null and personal.active() or narrative!=null and narrative.focused_session()!=null
  visitors.demand_provider=func():return customer_experience.demand_factor(&"kiosk")
@@ -395,7 +416,11 @@ func _start_encounter(kind: StringName, participants: PackedStringArray, extra: 
  elif extra.get("character_id")=="amgad" and kind==&"served":id=&"amgad_served"
  elif kind==&"served": id=&"visitors_served"
  context_data["mode"] = 4 if kind==&"arrival" else 2 if kind==&"served" else 3 if kind==&"reminder" else 4 if kind==&"ambient" else 0
- if kind in [&"arrival",&"ambient"] and narrative.has_topics(&"venue_comments",participants,context_data):id=&"venue_comments"
+ if kind in [&"arrival",&"ambient"] and narrative.sessions.is_empty():
+  for candidate in config.section("customer_experience").comment_encounters:
+   var entry: Dictionary=narrative._definitions[str(candidate)]
+   if semantic.decide(entry,participants,"offer").allowed:
+    id=StringName(str(candidate));context_data["invitation"]=true;context_data["manual_read"]=false;break
  await narrative.start(id,participants,context_data)
 func person_interaction(visit_id: StringName) -> ActionResult:
  if not presence.is_available(visit_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
@@ -435,18 +460,10 @@ func _actor_snapshots() -> Array[Dictionary]:
 func _equipment_busy(id: StringName) -> bool:
  return (cooking!=null and cooking.legacy_busy(id)) or (equipment!=null and equipment.is_busy(id)) or (hygiene!=null and hygiene.is_cleaning(id)) or (visitors!=null and visitors.seating.busy_item(id)) or (seat_use!=null and seat_use.busy_item(id))
 
-func _choose_food(character_id: StringName) -> StringName:
- var character := visitors.character(character_id)
- if str(character.get("food_id","")).is_empty():return &""
- var offered := workflow.available_foods(&"kiosk")
- var preferences: Dictionary=character.get("food_preferences",{str(character.food_id):1})
- var pool: Array[String]=[]
- for id in preferences:
-  if not id in offered:continue
-  for i in range(int(preferences[id])):pool.append(id)
- if pool.is_empty():return &""
- if not visitors.random_chance(customer_experience.demand_factor(&"kiosk")):return &""
- return StringName(pool[visitors.random_index(pool.size())])
+func _choose_food(character_id: StringName, visit_id: StringName) -> StringName:
+ var offers := menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false))
+ var decision := character_life.consider(character_id,visit_id,offers,customer_experience.expected(character_id))
+ return StringName(str(decision.get("food_id","")))
 
 func _record_cooking_use(job_id: StringName, step_index: int, instance_id: StringName, kind: StringName) -> void:
  var use_id: StringName=&"prep" if kind==&"prepare" else &"assembly" if kind==&"assemble" else &"batch"
@@ -478,10 +495,14 @@ func _step_experiences(_frame: Dictionary) -> ActionResult:
   if visit.phase==&"leaving":continue
   var result := _sync_experience(visit.id,visit.order_id)
   if not result.ok:return result
+  var order := service.order(visit.order_id)
+  if order!=null:
+   result=customer_experience.confirm_taste(order,character_life,foods,menu)
+   if not result.ok:return result
  return ActionResult.success()
 
 func request_can_prepare(food_id: StringName) -> bool:
- return str(food_id) in workflow.available_foods(&"kiosk")
+ return menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false)).any(func(o):return o.food_id==str(food_id))
 func _service_effect(action: String, participants: PackedStringArray) -> ActionResult:
  if action in ["accept","accept_gift"] and not accounts.business_allowed():return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"business_suspended")
  if participants.size()!=1 or not visitors.is_available(StringName(participants[0])):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
@@ -489,6 +510,8 @@ func _service_effect(action: String, participants: PackedStringArray) -> ActionR
  if location_id!=visit.pose.location_id or player_ground.distance_to(visit.pose.ground)>float(config.section("spatial").hearing_radius):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
  if action=="decline":return visitors.decline_request(visit.id)
  if not request_can_prepare(visit.food_id):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"missing_ingredients")
+ var quoted := _quote_for_visit(visit.id,visit.food_id)
+ if not quoted.ok:visitors.reset_request(visit.id);return quoted
  return visitors.accept_request(visit.id,action=="accept_gift")
 
 func can_offer_hospitality(visit_id: StringName) -> bool:
@@ -538,3 +561,16 @@ func validate_financial_chapters() -> ActionResult:
 
 func supplier_context(chapter: String) -> Dictionary:return account_dialogue.context(chapter,"fathi")
 func supplier_effect(action: String, source: String, participants: PackedStringArray) -> ActionResult:return account_dialogue.supplier_effect(action,source,participants)
+
+func _quote_for_visit(visit_id: StringName, food_id: StringName) -> ActionResult:
+ var visit: VisitState=visitors.visits.get(str(visit_id))
+ if visit==null:return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"visitor_unavailable")
+ var decision: Dictionary=character_life.state(visit.character_id).get("decision",{})
+ var variant := menu.default_variant(str(food_id));var additions := PackedStringArray()
+ if decision.get("food_id")==str(food_id):variant=str(decision.variant_id);additions=PackedStringArray(decision.additions)
+ var quoted := menu.quote(StringName(variant),additions)
+ if not quoted.ok:return quoted
+ if decision.get("food_id")==str(food_id) and int(quoted.details.quote.price_minor)!=int(decision.price_minor):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"offer_changed")
+ var offers := menu.offers(workflow.available_foods(&"kiosk"),workflow.available_foods(&"kiosk",false))
+ if not offers.any(func(o):return o.variant_id==variant and o.additions==Array(additions)):return ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,&"offer_changed")
+ return quoted

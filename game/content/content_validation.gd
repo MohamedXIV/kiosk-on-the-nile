@@ -2,6 +2,9 @@ class_name ContentValidation
 extends RefCounted
 ## Shared runtime/tool validation. Invalid edits never partially activate.
 static func validate(bundle: Dictionary) -> ActionResult:
+ if bundle.has("character_life"):
+  var characters := CharacterLifeValidation.validate(bundle.character_life,ActorPresence.authored_profiles(bundle).keys(),bundle.get("foods",{}))
+  if not characters.ok:return characters
  var semantic := SemanticNarrative.validate(bundle)
  if not semantic.ok:return semantic
  var save_feedback := SaveFeedbackValidation.validate(bundle)
@@ -48,6 +51,9 @@ static func validate(bundle: Dictionary) -> ActionResult:
   if not recipe_store_result.ok:return recipe_store_result
   var workflow_result := CookingWorkflowValidation.validate_recipes(bundle.recipe_workflows,recipe_items)
   if not workflow_result.ok:return workflow_result
+ if bundle.has("menu"):
+  var menu_result := MenuService.validate_catalog(bundle.menu,bundle.get("foods",{}),bundle.get("items",{}))
+  if not menu_result.ok:return menu_result
  if bundle.has("foods"):
   var foods_result := FoodRegistry.validate(bundle.foods)
   if not foods_result.ok:return foods_result
