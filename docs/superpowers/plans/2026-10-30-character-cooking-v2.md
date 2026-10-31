@@ -114,9 +114,11 @@
 
 ### Task9 — one connected verified preview (#44)
 
-- [ ] Run one connected domain/browser play observation: market/supplier grade → actual batch/night → priced custom portion → confirmed taste → later eligible callback/optional return.
-- [ ] Observe bilingual/current Continue/rejected-byte preservation and relevant existing social/home/workshop routes. Record exact scope and human natural-feel limits.
-- [ ] Brief matching populated render/counter sample; deepen only for a material reproducible regression. Preserve batching.
-- [ ] One fresh whole-branch review on the strongest available reviewer, one material fix pass with reproduction and observation; ledger minors/rulings honestly.
+- [x] Run one connected domain/browser play observation: market/supplier grade → actual batch/night → priced custom portion → confirmed taste → later eligible callback/optional return.
+- [x] Observe bilingual/current Continue/rejected-byte preservation and relevant existing social/home/workshop routes. Record exact scope and human natural-feel limits.
+- [x] Brief matching populated render/counter sample; deepen only for a material reproducible regression. Preserve batching.
+- [x] One fresh whole-branch review on the strongest available reviewer, one material fix pass with reproduction and observation; ledger minors/rulings honestly.
 - [ ] Finalise actual new version, curated changelog, save revision/reset impact, guide and metadata, then tracked clean build and verified immutable complete package. No formal release/tag unless deliberately part of delivery.
 - [ ] Safe exact-head checks/merge, successful post-merge evidence, append artifacts without rewriting prior entries/archives; update epic/roadmap and delete only this plan's ignored scratch after retaining evidence.
+
+Final delivery bookkeeping: the last two package/merge/archive checks are recorded authoritatively on#44 and in the artifacts manifest after publication, avoiding a false completed claim in pre-merge source. Functional/UI/save/render/review evidence is complete; #6/#7 human acceptance remains open.
