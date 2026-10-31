@@ -1,0 +1,44 @@
+{
+  "epic": 35,
+  "delivery_issue": 44,
+  "pull_request": 46,
+  "reviewed_head": "e169d8ccfcbbc3831a9f3eb487d975a7472e9919",
+  "head_ci": 41174049344,
+  "merge_source": "c7622bb5e2ff6f26f4c25ffcc7484d530f2f4a44",
+  "merge_tree_equals_reviewed_head": true,
+  "main_ci": {
+    "conclusion": "success",
+    "event": "push",
+    "head_sha": "c7622bb5e2ff6f26f4c25ffcc7484d530f2f4a44",
+    "html_url": "https://github.com/MohamedXIV/kiosk-on-the-nile/actions/runs/41174164354",
+    "id": 41174164354,
+    "status": "completed"
+  },
+  "archive": {
+    "url": "https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/283b419e5f2db101e25ac2935fd5d9f2ef37b2ad/character-cooking-v2-0.4.0-prealpha.1/kiosk-on-the-nile-0.4.0-prealpha.1-dev-c7622bb5e2ff-web.zip",
+    "archive_commit": "283b419e5f2db101e25ac2935fd5d9f2ef37b2ad",
+    "source": "c7622bb5e2ff6f26f4c25ffcc7484d530f2f4a44",
+    "version": "0.4.0-prealpha.1",
+    "save_format": {
+      "schema": 4,
+      "revision": 22
+    },
+    "bytes": 12227143,
+    "sha256": "2aa84952a34b1d03d927434772e74c5f15aa6c53f53ababa61da4876ebd4add9",
+    "zip_crc": "passed",
+    "all_export_hashes": "passed",
+    "clean_source_release_template": "passed",
+    "guide_changelog": "passed",
+    "previous_manifest_entries_preserved": 42,
+    "existing_archive_paths_and_bytes": "unchanged git tree",
+    "new_files": 106
+  },
+  "plan_tasks_1_through_9": "complete within documented bounded scope",
+  "human_acceptance_issues_left_open": [
+    6,
+    7
+  ],
+  "formal_tag_or_release": false,
+  "source_worktree": "host-owned detached merge checkout preserved; feature branch retained",
+  "cleanup": "plan-specific scratch can be removed after retaining evidence; unrelated workspaces untouched"
+}

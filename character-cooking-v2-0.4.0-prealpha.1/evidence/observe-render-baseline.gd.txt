@@ -1,0 +1,26 @@
+extends SceneTree
+var main:Node
+func _initialize():call_deferred("run")
+func run():
+ root.size=Vector2i(1280,720)
+ DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+ main=load("res://game/app/main.tscn").instantiate();root.add_child(main)
+ await process_frame;main.begin_new_game();await process_frame
+ if main._session==null:print("NO_GAME");quit(1);return
+ main._session.location_id=&"kiosk";main._session.player_ground=Vector2(-4,1.8);main._travel_changed();main._session.running=false
+ main._motor.teleport(&"kiosk",Vector2(-4,1.8))
+ var n:=0
+ for actor in [&"farid",&"youssef",&"amgad",&"samir"]:
+  var visit:VisitState=main._session.visitors.spawn(actor)
+  if visit==null:continue
+  visit.phase=&"staying";visit.pose.ground=Vector2(-3.5+float(n)*0.1,1.8);visit.destination=visit.pose.ground;n+=1
+ main._physical.step(0)
+ for index in range(60):await process_frame
+ var draws:Array[float]=[];var times:Array[float]=[]
+ for index in range(120):
+  var start:=Time.get_ticks_usec();await process_frame
+  times.append(float(Time.get_ticks_usec()-start)/1000);draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+ times.sort();draws.sort()
+ print("MATCHED_POPULATED_RENDER ",StableJson.stringify({"viewport":[1280,720],"population":n,"renderer":RenderingServer.get_current_rendering_method(),"median_ms":times[60],"p95_ms":times[114],"draws":draws[60]}))
+
+ main.free();quit(0)

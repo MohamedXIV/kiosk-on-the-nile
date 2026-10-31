@@ -378,5 +378,24 @@
     },
     "save_impact": "New game required for all earlier unpublished revisions, including20; primary and backup files preserved.",
     "verification": "Independently downloaded immutable archive: exact bytes/SHA256, ZIP CRC, clean source/version/save format and Arabic guide verified. Native integrated and matched performance evidence remains bounded; human feel acceptance pending."
+  },
+  {
+    "version": "character-cooking-v2-c7622bb",
+    "game_version": "0.4.0-prealpha.1",
+    "stage": "pre-alpha",
+    "publication_state": "development",
+    "path": "character-cooking-v2-0.4.0-prealpha.1/kiosk-on-the-nile-0.4.0-prealpha.1-dev-c7622bb5e2ff-web.zip",
+    "bytes": 12227143,
+    "sha256": "2aa84952a34b1d03d927434772e74c5f15aa6c53f53ababa61da4876ebd4add9",
+    "original_branch": "main",
+    "original_commit": "c7622bb5e2ff6f26f4c25ffcc7484d530f2f4a44",
+    "archive_commit": "283b419e5f2db101e25ac2935fd5d9f2ef37b2ad",
+    "url": "https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/283b419e5f2db101e25ac2935fd5d9f2ef37b2ad/character-cooking-v2-0.4.0-prealpha.1/kiosk-on-the-nile-0.4.0-prealpha.1-dev-c7622bb5e2ff-web.zip",
+    "save_format": {
+      "schema": 4,
+      "revision": 22
+    },
+    "save_impact": "New game required for all earlier unpublished revisions, including21; primary and backup bytes preserved.",
+    "verification": "Independent immutable download: exact bytes/SHA256, ZIP CRC, all export hashes, pinned release WASM, clean merge source/version/save22 and Arabic guide/changelog passed. Main CI41174164354 and check runs success. Previous42 entries and archive paths/bytes unchanged. Bounded native/normal-Web/matched-render observations; human natural pacing/device acceptance remains open."
   }
 ]

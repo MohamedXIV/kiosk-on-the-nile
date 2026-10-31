@@ -1,0 +1,9 @@
+{
+  "browser_source": "650b1045917615a42c783a22203cdd22a17a84a4",
+  "merged_source": "c7622bb5e2ff6f26f4c25ffcc7484d530f2f4a44",
+  "compared_after_normalizing_commit_qualified_engine_filenames": true,
+  "differing_files": [
+    "index.html"
+  ],
+  "all_other_export_hashes_identical": true
+}
