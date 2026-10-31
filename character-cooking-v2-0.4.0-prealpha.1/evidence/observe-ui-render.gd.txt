@@ -1,0 +1,59 @@
+extends SceneTree
+var main:Node
+func _initialize():call_deferred("run")
+func descendants(node: Node, kind: String) -> Array:
+ var result:Array=[]
+ if node.is_class(kind):result.append(node)
+ for child in node.get_children():result.append_array(descendants(child,kind))
+ return result
+func press_text(text: String) -> bool:
+ for button in descendants(main._recipe_panel,"Button"):
+  if button.text==text and not button.disabled:button.pressed.emit();return true
+ return false
+func run():
+ root.size=Vector2i(1280,720)
+ DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+ main=load("res://game/app/main.tscn").instantiate();root.add_child(main)
+ await process_frame;main.begin_new_game();await process_frame
+ if main._session==null:print("NO_GAME");quit(1);return
+ main._session.location_id=&"kiosk";main._session.player_ground=Vector2(-4,1.8);main._travel_changed();main._session.running=false
+ main._motor.teleport(&"kiosk",Vector2(-4,1.8))
+ var n:=0
+ for actor in [&"farid",&"youssef",&"amgad",&"samir"]:
+  var visit:VisitState=main._session.visitors.spawn(actor)
+  if visit==null:continue
+  visit.phase=&"staying";visit.pose.ground=Vector2(-3.5+float(n)*0.1,1.8);visit.destination=visit.pose.ground;n+=1
+ main._physical.step(0)
+ for index in range(60):await process_frame
+ var draws:Array[float]=[];var times:Array[float]=[]
+ for index in range(120):
+  var start:=Time.get_ticks_usec();await process_frame
+  times.append(float(Time.get_ticks_usec()-start)/1000);draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+ times.sort();draws.sort()
+ print("MATCHED_POPULATED_RENDER ",StableJson.stringify({"viewport":[1280,720],"population":n,"renderer":RenderingServer.get_current_rendering_method(),"median_ms":times[60],"p95_ms":times[114],"draws":draws[60]}))
+ if not "--ui" in OS.get_cmdline_user_args():main.free();quit(0);return
+ for language in ["ar_EG","en"]:
+  main._locale.set_locale(language);main._menu_panel.open()
+  for index in range(3):await process_frame
+  print("MENU_LAYOUT ",language," ",main._menu_panel.get_rect()," PRICE_ROWS ",descendants(main._menu_panel,"SpinBox").size())
+  var image:=root.get_texture().get_image();image.save_png("/tmp/kiosk-v2-menu-"+language+".png")
+  main._menu_panel.hide()
+ main._locale.set_locale("en")
+ main._motor.teleport(&"kiosk",main._session.spaces.ground(&"tea")+Vector2(0,1))
+ main._recipe_panel.present(&"tea")
+ for index in range(3):await process_frame
+ print("UI_START ",press_text(main._text.text("recipe_start")))
+ main._session.clock.advance(3.2);main._session.workflow.tick(main._session.clock.frame(3.2))
+ for index in range(3):await process_frame
+ print("UI_ADD_TEA ",press_text(ItemText.step("tea",main._session.workflow._recipes.tea.steps[0])))
+ main._session.clock.advance(2.5);main._session.workflow.tick(main._session.clock.frame(2.5))
+ for index in range(3):await process_frame
+ var options:=descendants(main._recipe_panel._active,"OptionButton")
+ if options.is_empty():print("NO_SERVING_PICKER");quit(1);return
+ var picker:OptionButton=options[0];picker.select(1);picker.item_selected.emit(1)
+ print("UI_POUR ",press_text(ItemText.step("tea",main._session.workflow._recipes.tea.steps[1])))
+ await process_frame
+ var held:PreparedItem=main._session.cooking.held_item()
+ print("UI_ACTUAL_HELD ",held.snapshot() if held!=null else {})
+ root.get_texture().get_image().save_png("/tmp/kiosk-v2-recipe-en.png")
+ main.free();quit(0 if held!=null and held.consumption_mode==&"takeaway" else 1)

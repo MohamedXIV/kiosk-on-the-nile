@@ -1,0 +1,22 @@
+extends SceneTree
+func _initialize():call_deferred("run")
+func write(path:String,value:String):
+ var file:=FileAccess.open(path,FileAccess.WRITE);file.store_string(value);file.close()
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ if not content.load_directory("res://content").ok:quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);var s:=GameSession.new();root.add_child(s)
+ if not s.configure(cfg).ok:quit(1);return
+ var save:=SaveCoordinator.new();save.store=SaveStore.new("/tmp/kiosk-v2-save-boundaries");root.add_child(save)
+ DirAccess.make_dir_recursive_absolute(save.store.root)
+ var data:=save.codec.encode(s);data.schema_revision=SaveCodec.SCHEMA_REVISION-1
+ data.erase("checksum");data["checksum"]=StableJson.stringify(data).sha256_text()
+ var primary:=StableJson.stringify(data);var backup:="\n "+primary+"\n"
+ var p:=save.store.root.path_join("session.json");var b:=save.store.root.path_join("previous.json")
+ write(p,primary);write(b,backup)
+ var unsupported:=await save.load_candidate(cfg)
+ print("UNSUPPORTED_BYTES ",StableJson.stringify({"refused":not unsupported.ok,"reason":str(unsupported.message_key),"primary_preserved":FileAccess.get_file_as_string(p)==primary,"backup_preserved":FileAccess.get_file_as_string(b)==backup,"current_revision":SaveCodec.SCHEMA_REVISION,"older_revision":data.schema_revision}))
+ var corrupt:="{unfinished-corrupt-json";write(p,corrupt)
+ var broken:=await save.load_candidate(cfg)
+ print("CORRUPT_BYTES ",StableJson.stringify({"refused":not broken.ok,"reason":str(broken.message_key),"primary_preserved":FileAccess.get_file_as_string(p)==corrupt,"backup_preserved":FileAccess.get_file_as_string(b)==backup}))
+ quit(0 if not unsupported.ok and not broken.ok and FileAccess.get_file_as_string(p)==corrupt and FileAccess.get_file_as_string(b)==backup else 1)

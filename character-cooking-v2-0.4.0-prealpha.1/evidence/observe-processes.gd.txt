@@ -1,0 +1,150 @@
+extends SceneTree
+var session: GameSession
+var config: SessionConfig
+func _initialize() -> void:call_deferred("observe")
+func result(label: String, action: ActionResult) -> bool:
+ print("STEP ",label," ",JSON.stringify({"ok":action.ok,"reason":str(action.message_key),"details":action.details if not action.details.has("item") else {"item":action.details.item.snapshot()}}))
+ return action.ok
+func at_device(id: StringName) -> void:
+ session.player_pose.location_id=&"kiosk";session.player_ground=session.spaces.ground(id)+Vector2(0,1)
+func advance(minutes: float) -> void:
+ var frame := session.clock.elapse_minutes(minutes);session.workflow.tick(frame)
+func reaction(seconds: float) -> void:
+ session.clock.advance(seconds);session.workflow.tick(session.clock.frame(seconds))
+func clear_fixture_hand() -> void:
+ var held := session.inventory.held_id()
+ if not held.is_empty():result("fixture_clear_hand",session.inventory.consume_held(held))
+func observe() -> void:
+ var content := ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ if not result("content",content.load_directory("res://content")):quit(1);return
+ config=SessionConfig.new(content.bundle(),content.fingerprint)
+ session=GameSession.new();root.add_child(session)
+ if not result("configure",session.configure(config)):quit(1);return
+ var grants: Array[Dictionary]=[]
+ for id in ["oil","onion","green_pepper","bread","liver_seasoning","fava_beans","breadcrumbs","flour","potato"]:grants.append({"definition_id":id,"quantity":6 if id=="bread" else 4 if id=="oil" else 2,"container_id":"kiosk_dry","attributes":{}})
+ grants.append({"definition_id":"kebda_portion_good","quantity":3,"container_id":"kiosk_dry","attributes":{}})
+ grants.append({"definition_id":"eggs","quantity":2,"container_id":"kiosk_fridge:cold","attributes":{}})
+ var prepared := session.items.prepare_grants(grants)
+ if not result("fixture_raws",prepared):quit(1);return
+ if not result("fixture_raw_commit",session.items.commit(prepared.details.change)):quit(1);return
+ at_device(&"kebda")
+ var kebda := session.workflow.start(&"kebda",&"kiosk",PackedStringArray(["kebda"]),false,{"kebda_portion":"good"})
+ if not result("kebda_start",kebda):quit(1);return
+ var id := StringName(kebda.details.job_id)
+ reaction(5)
+ if not result("kebda_prepare",session.workflow.act(id,&"prepare_batch")):quit(1);return
+ var expected_ready := session.clock.world_minutes+15
+ var effort_before: int = session.actions.snapshot().effort.size()
+ advance(60)
+ var job := session.workflow.job(id)
+ print("OBSERVATION kebda_ready ",JSON.stringify({"expected_ready_at":expected_ready,"ready_at":job.ready_at,"now":session.clock.world_minutes,"stage":job.definition.steps[int(job.step_index)].kind,"initial_quality":job.initial_quality,"automatic_no_player_effort":effort_before==session.actions.snapshot().effort.size(),"offered":session.workflow.available_foods(&"kiosk")}))
+ for index in range(3):
+  if not result("kebda_portion_%d" % index,session.workflow.act(id,&"serve")):quit(1);return
+  if index<2:clear_fixture_hand()
+ var exhausted := session.workflow.act(id,&"serve")
+ print("OBSERVATION kebda_yield ",JSON.stringify({"job_status":session.workflow.job(id).status,"produced":session.workflow.job(id).portion_results.size(),"fourth_rejected":not exhausted.ok,"equipment_free":not session.equipment.is_busy(&"kebda")}))
+ var codec := SaveCodec.new();root.add_child(codec)
+ var decoded := SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ var restored := await codec.create_candidate(decoded.details.data,config)
+ if not result("multi_portion_current_save",restored):quit(1);return
+ restored.details.session.queue_free()
+ clear_fixture_hand()
+ at_device(&"counter_6")
+ var ful := session.workflow.start(&"ful",&"kiosk",PackedStringArray(["counter_6"]))
+ if not result("ful_start",ful):quit(1);return
+ var ful_id := StringName(ful.details.job_id)
+ reaction(4)
+ if not result("ful_soak_begin",session.workflow.act(ful_id,&"soak")):quit(1);return
+ advance(240)
+ if not result("ful_take_pot",session.workflow.act(ful_id,&"take_pot")):quit(1);return
+ at_device(&"kebda")
+ if not result("ful_load",session.workflow.act(ful_id,&"load")):quit(1);return
+ var ful_ready := session.clock.world_minutes+360
+ # Actual sleep owner invokes SessionAdvance catch_up; no synthetic eating/speech/physics.
+ session.player_pose.location_id=&"rooftop"
+ var roof: Array=config.section("locations").rooftop.spawn;session.player_ground=Vector2(roof[0],roof[1])
+ var slept := session.life.sleep(8)
+ if not result("actual_sleep",slept):quit(1);return
+ var pot := session.workflow.job(ful_id)
+ print("OBSERVATION overnight_ful ",JSON.stringify({"expected_ready_at":ful_ready,"ready_at":pot.ready_at,"now":session.clock.world_minutes,"stage":pot.definition.steps[int(pot.step_index)].kind,"initial_quality":pot.initial_quality,"no_remote_food_in_hand":session.inventory.held_id().is_empty()}))
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,config)
+ if not result("overnight_current_save",restored):quit(1);return
+ restored.details.session.queue_free()
+ at_device(&"kebda")
+ for index in range(4):
+  if not result("ful_portion_%d" % index,session.workflow.act(ful_id,&"serve")):quit(1);return
+  clear_fixture_hand()
+ # Place an existing appliance through its actual owner for the other process paths.
+ var appliance: Array[Dictionary]=[{"id":"fixture_fryer","definition_id":"fryer","quantity":1,"container_id":"kiosk_furniture","attributes":{}}]
+ prepared=session.items.prepare_grants(appliance)
+ if not result("fixture_fryer_grant",prepared):quit(1);return
+ result("fixture_fryer_commit",session.items.commit(prepared.details.change))
+ var placement := PlacementRequest.from_dict({"instance_id":"fixture_fryer","location_id":"kiosk","cell":[-4,3],"rotation":0,"host_id":"counter_2","slot_id":"top"})
+ if not result("fryer_place",session.spaces.place(placement)):quit(1);return
+ at_device(&"counter_6")
+ var pane := session.workflow.start(&"kebda_pane",&"kiosk",PackedStringArray(["counter_6"]))
+ if not result("pane_start",pane):quit(1);return
+ var pane_id := StringName(pane.details.job_id)
+ reaction(5)
+ if not result("pane_coat",session.workflow.act(pane_id,&"coat")):quit(1);return
+ at_device(&"fixture_fryer")
+ if not result("pane_load",session.workflow.act(pane_id,&"load")):quit(1);return
+ advance(12)
+ if not result("pane_serve",session.workflow.act(pane_id,&"serve")):quit(1);return
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,config)
+ if not result("pane_current_save",restored):quit(1);return
+ restored.details.session.queue_free()
+ clear_fixture_hand()
+ var blocked := session.workflow.start(&"potato_fried",&"kiosk",PackedStringArray(["fixture_fryer"]))
+ print("OBSERVATION occupied_fryer ",JSON.stringify({"rejected":not blocked.ok,"reason":str(blocked.message_key)}))
+ if blocked.ok:quit(1);return
+ if not result("pane_last",session.workflow.act(pane_id,&"serve")):quit(1);return
+ clear_fixture_hand()
+ # Wrong heat and pause preserve elapsed; cancellation releases real resources.
+ at_device(&"fixture_fryer")
+ var fried := session.workflow.start(&"potato_fried",&"kiosk",PackedStringArray(["fixture_fryer"]))
+ if not result("fried_start",fried):quit(1);return
+ var fried_id := StringName(fried.details.job_id)
+ reaction(3)
+ if not result("fried_prepare",session.workflow.act(fried_id,&"prepare_batch")):quit(1);return
+ result("heat_off",session.workflow.act(fried_id,&"heat:off"));advance(20)
+ print("OBSERVATION paused_progress ",session.workflow.job(fried_id).elapsed)
+ result("heat_high",session.workflow.act(fried_id,&"heat:high"));advance(8)
+ print("OBSERVATION wrong_heat_quality ",session.workflow.job(fried_id).initial_quality)
+ result("fried_serve",session.workflow.act(fried_id,&"serve"));clear_fixture_hand()
+ result("cancel_remaining",session.workflow.act(fried_id,&"cancel"))
+ # Reject a resealed, structurally plausible extra portion in the canonical job.
+ var malformed := session.workflow.snapshot()
+ malformed.jobs[str(id)].portions_served=4
+ var rejected := session.workflow.restore(malformed)
+ print("OBSERVATION excessive_yield_rejected ",JSON.stringify({"rejected":not rejected.ok,"reason":str(rejected.message_key),"still_three":session.workflow.job(id).portions_served==3}))
+ if rejected.ok:quit(1);return
+ var oven_grants: Array[Dictionary]=[{"id":"fixture_oven","definition_id":"oven","quantity":1,"container_id":"kiosk_furniture","attributes":{}},{"definition_id":"potato","quantity":2,"container_id":"kiosk_dry","attributes":{}},{"definition_id":"oil","quantity":1,"container_id":"kiosk_dry","attributes":{}}]
+ prepared=session.items.prepare_grants(oven_grants)
+ if not result("oven_fixture",prepared):quit(1);return
+ result("oven_fixture_commit",session.items.commit(prepared.details.change))
+ placement=PlacementRequest.from_dict({"instance_id":"fixture_oven","location_id":"kiosk","cell":[12,-4],"rotation":0,"host_id":"","slot_id":""})
+ var found_cell := false
+ for y in range(-7,2):
+  for x in range(-8,15):
+   placement.cell=Vector2i(x,y)
+   if session.spaces.can_place(placement).ok:found_cell=true;break
+  if found_cell:break
+ print("OBSERVATION oven_cell ",placement.cell)
+ if not found_cell or not result("oven_place",session.spaces.place(placement)):quit(1);return
+ at_device(&"fixture_oven")
+ var baked := session.workflow.start(&"potato_baked",&"kiosk",PackedStringArray(["fixture_oven"]))
+ if not result("baked_start",baked):quit(1);return
+ var baked_id := StringName(baked.details.job_id);reaction(3)
+ if not result("baked_prepare",session.workflow.act(baked_id,&"prepare_batch")):quit(1);return
+ advance(12)
+ if not result("baked_serve",session.workflow.act(baked_id,&"serve")):quit(1);return
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,config)
+ if not result("cancelled_and_baked_current_save",restored):quit(1);return
+ restored.details.session.queue_free()
+ print("OBSERVATION active_projection ",JSON.stringify({"heating":session.workflow.heating_states(&"kiosk"),"active_job_count":session.workflow._active_jobs.size(),"total_history_jobs":session.workflow.snapshot().jobs.size()}))
+ session.queue_free();codec.queue_free();content.queue_free();await process_frame
+ quit(0 if not exhausted.ok else 1)

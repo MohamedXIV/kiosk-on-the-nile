@@ -1,0 +1,76 @@
+extends SceneTree
+var s:GameSession
+func _initialize():call_deferred("run")
+func result(label:String,r:ActionResult)->bool:
+ print(label," ",r.ok," ",r.message_key," ",r.details if not r.details.has("item") else r.details.item.snapshot());return r.ok
+func at_device(id:StringName):s.location_id=&"kiosk";s.player_ground=s.spaces.ground(id)+Vector2(0,1)
+func advance(minutes:float):s.workflow.tick(s.clock.elapse_minutes(minutes))
+func reaction(seconds:float):s.clock.advance(seconds);s.workflow.tick(s.clock.frame(seconds))
+func hear(id: String) -> bool:
+ s.personal.leave();s.narrative.cancel_all()
+ var visit: Variant=s.semantic._record("farid")
+ if visit==null:visit=s.visitors.spawn(&"farid")
+ visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground;visit.shopping_state=&"declined"
+ s.player_pose.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var started := await s.narrative.start(StringName(id),PackedStringArray([str(visit.id)]),{"manual_read":true})
+ if not result("hear_"+id,started):return false
+ var chapter: ConversationSession=s.narrative.sessions[started.details.session_id]
+ for index in range(12):
+  if chapter.current.ended:return true
+  if not chapter.current.choices.is_empty():
+   var options := s.narrative.choices(chapter)
+   if options.is_empty():return false
+   if not result("hear_choice",s.narrative.choose(chapter.id,StringName(options[0].id))):return false
+  elif not result("hear_next",s.narrative.advance_manual(chapter.id)):return false
+ return false
+func learn_shawarma() -> bool:
+ if not await hear("social_meet_farid"):return false
+ s.personal.leave();s.narrative.cancel_all();s.visitors.clear_visits()
+ advance(1440);s.accounts.tick(s.clock.frame(0))
+ if not await hear("social_company_farid"):return false
+ if not await hear("social_shawarma_hint"):return false
+ if not await hear("shawarma_learning"):return false
+ s.personal.leave();s.narrative.cancel_all();s.visitors.clear_visits()
+ return s.knowledge.has(&"KNOWN_SHAWARMA_BASICS")
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ if not content.load_directory("res://content").ok:quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);s=GameSession.new();root.add_child(s)
+ if not s.configure(cfg).ok:quit(1);return
+ var grants:Array[Dictionary]=[{"id":"review_spit","definition_id":"rotisserie","quantity":1,"container_id":"kiosk_furniture","attributes":{}}]
+ for id in ["chicken","marinade","garlic_sauce"]:grants.append({"definition_id":id,"quantity":3 if id=="chicken" else 1,"container_id":"kiosk_fridge:cold","attributes":{}})
+ for id in ["oil","bread"]:grants.append({"definition_id":id,"quantity":1,"container_id":"kiosk_dry","attributes":{}})
+ var prepared:=s.items.prepare_grants(grants)
+ if not result("RAW_FIXTURE",prepared):quit(1);return
+ s.items.commit(prepared.details.change)
+ if not result("PLACE",s.spaces.place(PlacementRequest.from_dict({"instance_id":"review_spit","location_id":"kiosk","cell":[8,3],"rotation":0,"host_id":"counter_5","slot_id":"top"}))):quit(1);return
+ if not await learn_shawarma():quit(1);return
+ at_device(&"counter_6")
+ var personal:bool="--personal" in OS.get_cmdline_user_args()
+ var started:=s.workflow.start(&"shawarma_batch",&"kiosk",PackedStringArray(["counter_6"]),personal)
+ if not result("LEARNED_START",started):quit(1);return
+ var id:=StringName(started.details.job_id);reaction(3)
+ if not result("PREP",s.workflow.act(id,&"refrigerate")):quit(1);return
+ var bowl:=s.inventory.held_id();at_device(&"kiosk_fridge")
+ if not result("COLD_STORE",s.inventory.store_held(&"kiosk_fridge:cold")):quit(1);return
+ advance(15)
+ if not result("COLD_TAKE",s.inventory.pick_up_storage(bowl)):quit(1);return
+ at_device(&"review_spit")
+ if not result("LOAD",s.workflow.act(id,&"load_spit")):quit(1);return
+ advance(20)
+ if not result("SLICE",s.workflow.act(id,&"slice")):quit(1);return
+ reaction(1);at_device(&"counter_6")
+ if personal:print("PERSONAL_PRECURSOR_NOT_ADVERTISED ",not "shawarma" in s.workflow.available_foods(&"kiosk"))
+ print("EXACTLY_ONE_BREAD_BEFORE_ASSEMBLY ",s.inventory.stock_count(&"kiosk",&"bread"))
+ started=s.workflow.start(&"shawarma_assemble",&"kiosk",PackedStringArray(["counter_6"]))
+ if not result("ASSEMBLE",started):quit(1);return
+ reaction(2)
+ var finish:=s.workflow.act(StringName(started.details.job_id),&"take")
+ if not result("ONE_BREAD_FINISH",finish):quit(1);return
+ if personal:print("PERSONAL_ASSEMBLY_NOT_ADVERTISED ",s.menu.offers(PackedStringArray(["shawarma"])).is_empty()," PRIVATE_TAG ",s.cooking.held_record().attributes.personal_use)
+ print("ONE_BREAD_CONSERVATION ",s.inventory.stock_count(&"kiosk",&"bread"))
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("ONE_BREAD_CURRENT ",restored.ok," ",restored.message_key)
+ quit(0 if restored.ok and s.inventory.stock_count(&"kiosk",&"bread")==0 else 1)

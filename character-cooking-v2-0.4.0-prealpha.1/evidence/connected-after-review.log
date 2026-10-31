@@ -1,0 +1,34 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONTENT true  {  }
+CONFIGURE true  {  }
+TRAVEL_market true  {  }
+MARKET_QUOTE true  { "quote": <RefCounted#-9223371682066987145> }
+ACTUAL_PURCHASE true  { "receipt": { "grants_known": true, "granted": [{ "item_id": "item_22", "definition_id": "fava_beans", "quantity": 2, "lot": { "origin": "item_22", "acquired_at": 940.0, "grade": "standard", "quality": 60, "cost_minor": 180, "cost_units": 1, "cost_known": true, "source_kind": "shop", "source_ref": "connected_market" } }, { "item_id": "item_23", "definition_id": "oil", "quantity": 1, "lot": { "origin": "item_23", "acquired_at": 940.0, "grade": "standard", "quality": 60, "cost_minor": 100, "cost_units": 1, "cost_known": true, "source_kind": "shop", "source_ref": "connected_market" } }, { "item_id": "item_24", "definition_id": "bread", "quantity": 1, "lot": { "origin": "item_24", "acquired_at": 940.0, "grade": "standard", "quality": 60, "cost_minor": 100, "cost_units": 1, "cost_known": true, "source_kind": "shop", "source_ref": "connected_market" } }, { "item_id": "item_25", "definition_id": "chili_sauce", "quantity": 1, "lot": { "origin": "item_25", "acquired_at": 940.0, "grade": "standard", "quality": 60, "cost_minor": 35, "cost_units": 1, "cost_known": true, "source_kind": "shop", "source_ref": "connected_market" } }, { "item_id": "item_26", "definition_id": "tea_portion_premium", "quantity": 1, "lot": { "origin": "item_26", "acquired_at": 940.0, "grade": "premium", "quality": 94, "cost_minor": 280, "cost_units": 1, "cost_known": true, "source_kind": "shop", "source_ref": "connected_market" } }], "id": "receipt_1", "request_id": "connected_market", "journey_id": "journey_1", "bag_id": "journey_1:bag", "quote": { "id": "quote_1", "shop_id": "market", "offer_revision": 1, "lines": [{ "offer_id": "fava_beans", "definition_id": "fava_beans", "quantity": 2, "unit_price_minor": 180 }, { "offer_id": "oil", "definition_id": "oil", "quantity": 1, "unit_price_minor": 100 }, { "offer_id": "bread", "definition_id": "bread", "quantity": 1, "unit_price_minor": 100 }, { "offer_id": "chili_sauce", "definition_id": "chili_sauce", "quantity": 1, "unit_price_minor": 35 }, { "offer_id": "tea_portion_premium", "definition_id": "tea_portion_premium", "quantity": 1, "unit_price_minor": 280 }], "total_minor": 875 }, "total_minor": 875, "at": 940.0 }, "cue": "coin" }
+RETURN true  {  }
+TRAVEL_to_kiosk true  {  }
+ACTUAL_UNPACK true  { "moved": [{ "definition_id": "fava_beans", "quantity": 2 }, { "definition_id": "oil", "quantity": 1 }, { "definition_id": "bread", "quantity": 1 }, { "definition_id": "chili_sauce", "quantity": 1 }, { "definition_id": "tea_portion_premium", "quantity": 1 }], "remaining": [] }
+HEAR_social_meet_farid true  { "session_id": "conversation_1" }
+INK أنا فريد، عندي ورشة قريبة من هنا. باجي أفرد ضهري ع النيل؛ مش كل يوم الواحد لازم يعمل حاجة.
+INK القعدة دي نعمة والله.. أهو نتعرف واحدة واحدة.
+FUL_REAL_LOTS true  { "job_id": "cook_1", "cue": "chime" }
+SOAK true  { "cue": "chime" }
+TAKE_POT true  { "cue": "chime" }
+LOAD_SLOW_HEAT true  { "cue": "chime" }
+TRAVEL_to_rooftop true  {  }
+ACTUAL_SLEEP true  { "requested_hours": 8, "extra_hours": 0, "actual_hours": 8, "wake_day": 2, "wake_minutes": 254.0, "rest_multiplier": 1.0, "rent_spent": 0, "cue": "chime" }
+TRAVEL_to_kiosk true  {  }
+OVERNIGHT_READY_BOUNDARY 1564.0 EXPECTED 1564.0
+SERVE_BATCH_SANDWICH true  { "freshness": { "at": 1704.0, "exposure": 70.0, "context": "ambient" }, "initial_quality": 90.0, "prepared_at": 1564.0, "batch_id": "item_27", "method": "simmer", "heat": "low", "serving_format": "sandwich", "consumption_mode": "here", "additions": ["chili"], "id": "food_28", "recipe_id": "ful", "variant_id": "ful/sandwich/here", "food_id": "ful", "sugar_id": "", "quality_score": 3, "quality_key": "excellent" }
+SETTLE_FROZEN_725 true  { "payment": 725, "settlement": "paid", "visit_id": "visit_2", "cue": "coin" }
+CONFIRMED_TASTE true  {  }
+OWN_EXPECTATION { "ful": { "score": 76.3279094827586, "count": 1, "source": "taste/order_1", "variant_id": "ful/sandwich/here" } } RETURN_WEIGHT 1.05601163793103
+HEAR_experience_taste true  { "session_id": "conversation_2" }
+INK عندي كلمة صغيرة عن المكان والأكل.. تحب تسمع؟
+INK فاكر الفول اللي جربته عندك.. جاي على مزاجي.
+CONNECTED_CURRENT_JSON true  { "session": @Node@11:<Node#529237285570>, "migration_report": {  } }
+SAME_FLOW_PROVENANCE {"input_lots":[{"acquired_at":940,"cost_known":true,"cost_minor":180,"cost_units":1,"grade":"standard","origin":"item_22","quality":60,"source_kind":"shop","source_ref":"connected_market"},{"acquired_at":940,"cost_known":true,"cost_minor":100,"cost_units":1,"grade":"standard","origin":"item_23","quality":60,"source_kind":"shop","source_ref":"connected_market"}],"now_menu":925,"paid":725,"ready_at":1564,"taste":"taste/order_1"}
+WARNING: 78 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

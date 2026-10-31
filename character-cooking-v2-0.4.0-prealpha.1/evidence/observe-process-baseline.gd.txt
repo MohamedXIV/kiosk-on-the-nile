@@ -1,0 +1,20 @@
+extends SceneTree
+func _initialize() -> void:
+ call_deferred("observe")
+func observe() -> void:
+ var content := ContentStore.new()
+ root.add_child(content)
+ content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded := content.load_directory("res://content")
+ if not loaded.ok:print("OBSERVATION ",loaded.message_key," ",JSON.stringify(loaded.details));quit(1);return
+ var session := GameSession.new()
+ root.add_child(session)
+ var configured := session.configure(SessionConfig.new(content.bundle(),content.fingerprint))
+ print("PROCESS_BASELINE ",JSON.stringify({"kebda":config_entry(session),"has_ful":session.workflow.recipes().has("ful")}))
+ var has_life := session.get_property_list().any(func(p):return p.name=="character_life")
+ print("OBSERVATION ",JSON.stringify({"configured":configured.ok,"temporary_character_state":has_life,"farid_existing_weights":session.visitors.character(&"farid").food_preferences,"new_state_expected":true,"raw_tea_attributes":session.items.instances(&"tea_portion")[0].attributes}))
+ session.queue_free();content.queue_free();quit()
+
+func config_entry(session: GameSession) -> Dictionary:
+ var recipe: Dictionary=session.workflow.recipes().kebda
+ return {"process_version":recipe.get("process_version",1),"portions":recipe.get("portions",0),"kinds":recipe.steps.map(func(step):return step.kind)}

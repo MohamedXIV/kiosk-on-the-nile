@@ -1,0 +1,42 @@
+extends SceneTree
+var s:GameSession
+func _initialize():call_deferred("run")
+func choose(visit:VisitState,social:float,tired:float)->Dictionary:
+ s.character_life._states[str(visit.character_id)].needs.social=social
+ s.character_life._states[str(visit.character_id)].needs.tiredness=tired
+ return s.character_life.consider(visit.character_id,visit.id,[])
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ if not content.load_directory("res://content").ok:quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);s=GameSession.new();root.add_child(s)
+ if not s.configure(cfg).ok:quit(1);return
+ s.location_id=&"kiosk";s.player_ground=Vector2(-1.5,-0.5)
+ var visit:=s.visitors.spawn(&"farid");visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground
+ var navigation:=s.customer_experience._nav(&"kiosk")
+ s.visitors.awareness.step(1,s.visitors.visits,{"player":s.player_pose,"farid":visit.pose},navigation.sight_clear)
+ var quiet:=choose(visit,0.2,0.05)
+ s.social_life.step_companionship(1)
+ var invitation:Dictionary=s.social_life._state.invitations[str(visit.id)]
+ var quiet_elapsed:=float(invitation.elapsed)
+ s.clock.elapse_minutes(21)
+ invitation.elapsed=0.0 # Explicit progress fixture isolates the rate, not an offered dialogue.
+ var company:=choose(visit,0.95,0.05)
+ s.social_life.step_companionship(1)
+ var company_elapsed:=float(invitation.elapsed)
+ print("COMPANY_BEHAVIOR ",StableJson.stringify({"quiet":quiet.intent,"company":company.intent,"quiet_elapsed":quiet_elapsed,"company_elapsed":company_elapsed,"stay_factor":s.character_life.stay_factor(visit.character_id,visit.id),"wait_unchanged":invitation.wait}))
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var saved:=s.character_life.snapshot();var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("COMPANY_CURRENT_IDENTITY ",restored.ok and restored.details.session.character_life.intent_for(visit.character_id,visit.id)==&"company" and restored.details.session.character_life.snapshot().rng_state==saved.rng_state," ",restored.message_key)
+ if not restored.ok:quit(1);return
+ s.clock.elapse_minutes(21);invitation.elapsed=0.0
+ var rest:=choose(visit,0.2,0.95)
+ s.social_life.step_companionship(1)
+ print("REST_NO_AUTO_INVITE ",rest.intent=="rest" and float(invitation.elapsed)==0," MEETING_DENIED ",not s.visitors._can_meet(visit))
+ visit.elapsed=visit.stay_seconds*0.9;visit.decision_remaining=1000
+ s.visitors.tick(0)
+ print("REST_EARLIER_DEPARTURE ",visit.phase==&"leaving"," CAP ",s.config.data.visitors.capacity)
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ restored=await codec.create_candidate(decoded.details.data,cfg)
+ print("REST_CURRENT ",restored.ok," ",restored.message_key," ",restored.details)
+ quit(0 if restored.ok and company_elapsed>quiet_elapsed and rest.intent=="rest" and visit.phase==&"leaving" else 1)

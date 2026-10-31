@@ -1,0 +1,8 @@
+Source650b1045917615a42c783a22203cdd22a17a84a4 clean release export. Ordinary entry, no QA bridge/qualification scene.
+TITLE_CAPTURED
+new-game pageErrors=[]
+hud-menu pageErrors=[]
+save-confirmed pageErrors=[]; screenshot visible انحفظت القعدة
+reload-title loading screenshot, then continue-title-ready enabled Continue
+continued-play pageErrors=[]; saved current day1/time15:48 resumed15:49,240EGP
+done pageErrors=[]

@@ -1,0 +1,96 @@
+extends SceneTree
+func _initialize() -> void:
+ call_deferred("observe")
+func show_result(label: String, result: ActionResult) -> void:
+ print("STEP ",label," ",JSON.stringify({"ok":result.ok,"reason":str(result.message_key)}))
+func observe() -> void:
+ var content := ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded := content.load_directory("res://content");show_result("content",loaded)
+ if not loaded.ok:quit(1);return
+ var config := SessionConfig.new(content.bundle(),content.fingerprint)
+ var locales := LocaleService.new();locales.configure(content.bundle())
+ var session := GameSession.new();root.add_child(session)
+ var configured := session.configure(config);show_result("configure",configured)
+ if not configured.ok:quit(1);return
+ var starter := session.items.instances(&"tea_portion")[0]
+ print("OBSERVATION starter ",JSON.stringify(starter.attributes))
+ var departure := session.travel.depart(&"market");show_result("travel_market",departure)
+ session.clock.elapse_minutes(10);session.travel.tick({})
+ var lines: Array[Dictionary]=[{"offer_id":"tea_portion_premium","quantity":2},{"offer_id":"potato_good","quantity":2}]
+ var quoted := session.shops.quote(&"market",lines);show_result("quote",quoted)
+ if not quoted.ok:quit(1);return
+ var balance := session.wallet.balance
+ var bought := session.shops.purchase(quoted.details.quote,&"lot_observation_buy");show_result("purchase",bought)
+ if not bought.ok:quit(1);return
+ var bag := StringName(session.travel.journey.data.purchase_container_id)
+ var bag_items := session.items.items_in(bag)
+ print("OBSERVATION purchase ",JSON.stringify({"debit":balance-session.wallet.balance,"quote":quoted.details.quote.total_minor,"lots":bag_items}))
+ show_result("return",session.travel.begin_return());session.clock.elapse_minutes(10);session.travel.tick({})
+ # Fixture padding leaves one real storage unit; actual unpack must split the purchased lot.
+ var dry := session.items.get_container(&"rooftop_dry")
+ var padding: Array[Dictionary]=[{"definition_id":"tea_portion","quantity":int(dry.capacity)-1,"container_id":"rooftop_dry","attributes":{}}]
+ var padded := session.items.prepare_grants(padding)
+ if padded.ok:show_result("padding",session.items.commit(padded.details.change))
+ var unpacked := session.inventory.unpack_purchase_bag(bag,&"rooftop");show_result("partial_unpack",unpacked)
+ print("OBSERVATION split ",JSON.stringify({"details":unpacked.details,"premium_instances":session.items.instances(&"tea_portion_premium")}))
+ var premium := session.items.instances(&"tea_portion_premium")[0]
+ var change := session.items.candidate();change.state.items[premium.id].attributes.lot.acquired_at-=1
+ var before := StableJson.stringify(session.items.snapshot())
+ var rejuvenated := session.items.commit(change)
+ print("OBSERVATION immutable ",JSON.stringify({"rejected":not rejuvenated.ok,"unchanged":before==StableJson.stringify(session.items.snapshot())}))
+ # Actual family reservation uses the older premium split before the new standard fixture lot.
+ var needs: Array[Dictionary]=[{"definition_id":"tea_portion","quantity":2,"required_storage":"dry"}]
+ var available := session.inventory.available(&"rooftop",needs);show_result("family_available",available)
+ print("OBSERVATION family_sources ",JSON.stringify(available.details))
+ show_result("reserve",session.inventory.reserve(&"lot_fixture",&"rooftop",needs))
+ var consume: Array[Dictionary]=[{"definition_id":"tea_portion","quantity":1}]
+ show_result("consume_one",session.inventory.consume_reservation(&"lot_fixture",consume))
+ show_result("release",session.inventory.release_reservation(&"lot_fixture"))
+ # Return other purchased lots to the actual kiosk stock and start a real tea workflow.
+ show_result("to_kiosk",session.travel.depart(&"to_kiosk"));session.clock.elapse_minutes(10);session.travel.tick({})
+ show_result("kiosk_unpack",session.inventory.unpack_purchase_bag(bag,&"kiosk"))
+ var devices := session.equipment.candidates(&"kiosk",&"heat_water")
+ var kettle := StringName(devices[0]);session.player_ground=session.spaces.ground(kettle)+Vector2(0,1.0)
+ var started := session.workflow.start(&"tea",&"kiosk",PackedStringArray([str(kettle)]));show_result("real_tea_start",started)
+ if started.ok:
+  var frame := session.clock.elapse_minutes(4);session.workflow.tick(frame)
+  show_result("real_tea_consume",session.workflow.act(StringName(started.details.job_id),&"add_tea"))
+  var job := session.workflow.job(StringName(started.details.job_id))
+  print("OBSERVATION actual_input_evidence ",JSON.stringify(job.input_evidence))
+ var codec := SaveCodec.new();root.add_child(codec)
+ var encoded := codec.encode(session)
+ var decoded := SaveCodec.decode_text(StableJson.stringify(encoded))
+ var current := await codec.create_candidate(decoded.details.data,config)
+ show_result("current_candidate",current)
+ if current.ok:current.details.session.queue_free()
+ var source_valid := IngredientLots.validate_session(session);show_result("lot_sources",source_valid)
+ locales.set_locale("en")
+ print("OBSERVATION english ",ItemText.item_details(session,session.items.instances(&"tea_portion_premium")[0]))
+ locales.set_locale("ar_EG")
+ var bad: Dictionary=JSON.parse_string(StableJson.stringify(encoded))
+ for item in bad.state.items.items.values():
+  if item.attributes.get("lot",{}).get("source_kind")=="shop":item.attributes.lot.cost_minor+=1;break
+ bad.erase("checksum");bad["checksum"]=StableJson.stringify(bad).sha256_text()
+ var rejected := await codec.create_candidate(bad,config)
+ show_result("tampered_cost_candidate",rejected)
+ if rejected.ok:rejected.details.session.queue_free()
+ var excess: Dictionary=JSON.parse_string(StableJson.stringify(encoded))
+ var original: Dictionary={}
+ for item in excess.state.items.items.values():
+  if item.attributes.get("lot",{}).get("source_kind")=="shop" and item.definition_id=="tea_portion_premium":original=item;break
+ var copied := original.duplicate(true)
+ copied.id="item_%d" % int(excess.state.items.next_id);excess.state.items.next_id=int(excess.state.items.next_id)+1
+ copied.quantity=3;copied.container_id="kiosk_dry";excess.state.items.items[copied.id]=copied
+ excess.erase("checksum");excess["checksum"]=StableJson.stringify(excess).sha256_text()
+ var duplicated := await codec.create_candidate(excess,config)
+ show_result("duplicated_origin_candidate",duplicated)
+ if duplicated.ok:duplicated.details.session.queue_free()
+ var invalid_recipe: Dictionary=JSON.parse_string(StableJson.stringify(encoded))
+ for job in invalid_recipe.state.workflow.jobs.values():job.definition.inputs="not an ingredient array";break
+ invalid_recipe.erase("checksum");invalid_recipe["checksum"]=StableJson.stringify(invalid_recipe).sha256_text()
+ var recipe_rejected := await codec.create_candidate(invalid_recipe,config)
+ show_result("malformed_recipe_candidate",recipe_rejected)
+ if recipe_rejected.ok:recipe_rejected.details.session.queue_free()
+ session.queue_free();content.queue_free();codec.queue_free()
+ await process_frame
+ quit(0 if current.ok and source_valid.ok and not rejected.ok and not duplicated.ok and not recipe_rejected.ok and not rejuvenated.ok else 1)

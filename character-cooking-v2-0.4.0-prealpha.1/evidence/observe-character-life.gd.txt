@@ -1,0 +1,55 @@
+extends SceneTree
+func _initialize() -> void:
+ call_deferred("observe")
+func observe() -> void:
+ var content := ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded := content.load_directory("res://content")
+ if not loaded.ok:print("OBSERVATION load ",loaded.message_key);quit(1);return
+ var config := SessionConfig.new(content.bundle(),content.fingerprint)
+ var session := GameSession.new();root.add_child(session)
+ var configured := session.configure(config)
+ if not configured.ok:print("OBSERVATION configure ",configured.message_key);quit(1);return
+ var visit := session.visitors.spawn(&"farid")
+ var life := session.character_life
+ var before := StableJson.stringify(life.snapshot())
+ var projection := life.state(&"farid")
+ var pure := before==StableJson.stringify(life.snapshot())
+ var offers: Array[Dictionary]=[{"food_id":"tea","price_minor":1200},{"food_id":"kebda","price_minor":2800}]
+ var decision := life.consider(&"farid",visit.id,offers)
+ var decided := StableJson.stringify(life.snapshot())
+ var repeated := life.consider(&"farid",visit.id,offers)
+ life.arrive(&"farid",visit.id)
+ var stable := decided==StableJson.stringify(life.snapshot()) and decision==repeated
+ var raw := JSON.stringify(life.snapshot(),"",true,true)
+ var clone := CharacterLife.new();clone.configure(config.section("character_life"),session.foods,session.clock)
+ var restored := clone.restore(JSON.parse_string(raw))
+ var rng_before := str(clone.snapshot().rng_state)
+ var restored_choice := clone.consider(&"farid",visit.id,offers)
+ var rng_unchanged := rng_before==str(clone.snapshot().rng_state)
+ var same_choice: bool= decision.food_id==restored_choice.food_id and decision.intent==restored_choice.intent and decision.visit==restored_choice.visit and int(decision.index)==int(restored_choice.index) and is_equal_approx(float(decision.at),float(restored_choice.at)) and is_equal_approx(float(decision.next_at),float(restored_choice.next_at)) and rng_unchanged
+ var malformed: Dictionary=JSON.parse_string(raw);malformed.actors.farid.needs.thirst=2
+ var bad := clone.restore(malformed)
+ var intact := clone.consider(&"farid",visit.id,offers)==restored_choice
+ print("OBSERVATION ",JSON.stringify({"configured":configured.ok,"pure_reads":pure,"state":projection,"decision":decision,"same_visit_no_reroll":stable,"json_restore":restored.ok,"same_choice_after_restore":same_choice,"rng_unchanged_after_restore":rng_unchanged,"bad_need_rejected":not bad.ok,"bad_restore_preserves_choice":intact}))
+ var counts := {}
+ for level in [0.05,0.95]:
+  var selections := {"eat":0,"drink":0,"quiet":0}
+  for seed_id in range(1,49):
+   var sample := CharacterLife.new();sample.configure(config.section("character_life"),session.foods,session.clock)
+   sample.restore(JSON.parse_string(raw));sample._rng.seed=seed_id
+   sample._states.farid.decision={};sample._states.farid.decisions=0
+   sample._states.farid.needs.hunger=level;sample._states.farid.needs.thirst=level
+   var picked := sample.consider(&"farid",visit.id,offers)
+   var key := str(picked.intent) if picked.intent in ["eat","drink"] else "quiet"
+   selections[key]+=1
+  counts[str(level)]=selections
+ print("OBSERVATION bounded48_seed_choices ",JSON.stringify(counts))
+ var codec := SaveCodec.new();root.add_child(codec)
+ var envelope := codec.encode(session)
+ var decoded := SaveCodec.decode_text(StableJson.stringify(envelope))
+ var candidate := await codec.create_candidate(decoded.details.data,config)
+ print("OBSERVATION current_save ",JSON.stringify({"decode":decoded.ok,"candidate":candidate.ok,"reason":str(candidate.message_key)}))
+ if candidate.ok:candidate.details.session.queue_free()
+ session.queue_free();content.queue_free();codec.queue_free()
+ await process_frame
+ quit(0 if candidate.ok and restored.ok and same_choice and pure and stable and not bad.ok and intact else 1)

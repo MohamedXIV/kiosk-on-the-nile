@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STEP contact {"ok":true,"reason":""}
+STEP quote {"ok":true,"reason":""}
+STEP accepted {"ok":true,"reason":""}
+STEP delivery {"occurrences":{"supply_contract_1:v1@932000000":{"cash_waiting":false,"emergency":false,"evaluated_at":961.0,"grants":[{"definition_id":"potato_good","id":"item_19","quantity":2},{"definition_id":"tea_portion_premium","id":"item_20","quantity":2}],"id":"supply_contract_1:v1@932000000","reason":"","receipt":"supply_receipt_1","scheduled_at":932.0,"status":"delivered","stock_units":{"potato_good":2,"tea_portion_premium":2},"version_id":"supply_contract_1:v1"}},"ok":true,"reason":"","tea":[{"attributes":{"lot":{"acquired_at":961.0,"cost_known":true,"cost_minor":280,"cost_units":1,"grade":"premium","origin":"item_20","quality":94,"source_kind":"supplier","source_ref":"supply_contract_1:v1@932000000"},"supply_grant_id":"item_20","supply_occurrence":"supply_contract_1:v1@932000000"},"container_id":"kiosk_dry","definition_id":"tea_portion_premium","id":"item_20","kind":"ingredient","quantity":2}]}
+STEP source {"ok":true,"reason":""}
+STEP current_candidate {"ok":true,"reason":""}
+WARNING: 73 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

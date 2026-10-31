@@ -1,0 +1,88 @@
+extends SceneTree
+var s:GameSession
+func _initialize():call_deferred("run")
+func ok(label:String,r:ActionResult)->bool:
+ print(label," ",r.ok," ",r.message_key," ",r.details if not r.details.has("item") else r.details.item.snapshot());return r.ok
+func at_device(id:StringName):s.location_id=&"kiosk";s.player_ground=s.spaces.ground(id)+Vector2(0,1)
+func reaction(seconds:float):s.clock.advance(seconds);s.workflow.tick(s.clock.frame(seconds))
+func elapse(minutes:float):s.workflow.tick(s.clock.elapse_minutes(minutes))
+func trip(route:StringName)->bool:
+ if not ok("TRAVEL_"+str(route),s.travel.depart(route)):return false
+ s.clock.elapse_minutes(10);s.travel.tick({});s.workflow.tick(s.clock.frame(0));return true
+func hear(encounter:String,visit:VisitState)->bool:
+ s.personal.leave();s.narrative.cancel_all();s.location_id=&"kiosk";s.player_ground=visit.pose.ground
+ var r:=await s.narrative.start(StringName(encounter),PackedStringArray([str(visit.id)]),{"manual_read":true})
+ if not ok("HEAR_"+encounter,r):return false
+ var chapter:ConversationSession=s.narrative.sessions[r.details.session_id]
+ for index in range(10):
+  print("INK ",chapter.current.text)
+  if chapter.current.ended:return true
+  if not chapter.current.choices.is_empty():
+   var choices:=s.narrative.choices(chapter)
+   if choices.is_empty():return false
+   r=s.narrative.choose(chapter.id,StringName(choices[0].id))
+  else:r=s.narrative.advance_manual(chapter.id)
+  if not r.ok:return false
+ return false
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ if not ok("CONTENT",content.load_directory("res://content")):quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);var locale:=LocaleService.new();locale.configure(cfg.data);locale.set_locale("ar_EG")
+ s=GameSession.new();root.add_child(s)
+ if not ok("CONFIGURE",s.configure(cfg)):quit(1);return
+ if not await trip(&"market"):quit(1);return
+ var basket:Array[Dictionary]=[]
+ for id in ["fava_beans","oil","bread","chili_sauce","tea_portion_premium"]:basket.append({"offer_id":id,"quantity":2 if id=="fava_beans" else 1})
+ var quoted:=s.shops.quote(&"market",basket)
+ if not ok("MARKET_QUOTE",quoted):quit(1);return
+ if not ok("ACTUAL_PURCHASE",s.shops.purchase(quoted.details.quote,&"connected_market")):quit(1);return
+ var bag:=StringName(s.travel.journey.data.purchase_container_id)
+ if not ok("RETURN",s.travel.begin_return()):quit(1);return
+ s.clock.elapse_minutes(10);s.travel.tick({})
+ if not await trip(&"to_kiosk"):quit(1);return
+ if not ok("ACTUAL_UNPACK",s.inventory.unpack_purchase_bag(bag,&"kiosk")):quit(1);return
+ var farid:=s.visitors.spawn(&"farid")
+ if farid==null:quit(1);return
+ farid.phase=&"staying";farid.pose.ground=Vector2(-1.5,-0.5);farid.destination=farid.pose.ground
+ if not await hear("social_meet_farid",farid):quit(1);return
+ s.personal.leave();s.narrative.cancel_all()
+ at_device(&"counter_6")
+ var started:=s.workflow.start(&"ful",&"kiosk",PackedStringArray(["counter_6"]),false,{"fava_beans":"standard"})
+ if not ok("FUL_REAL_LOTS",started):quit(1);return
+ var job:=StringName(started.details.job_id);reaction(4)
+ if not ok("SOAK",s.workflow.act(job,&"soak")):quit(1);return
+ elapse(240)
+ if not ok("TAKE_POT",s.workflow.act(job,&"take_pot")):quit(1);return
+ at_device(&"kebda")
+ if not ok("LOAD_SLOW_HEAT",s.workflow.act(job,&"load")):quit(1);return
+ var ready:=s.clock.world_minutes+360
+ if not await trip(&"to_rooftop"):quit(1);return
+ if not ok("ACTUAL_SLEEP",s.life.sleep(8)):quit(1);return
+ if not await trip(&"to_kiosk"):quit(1);return
+ print("OVERNIGHT_READY_BOUNDARY ",s.workflow.job(job).ready_at," EXPECTED ",ready)
+ s.menu.set_price(&"ful/sandwich/here",700);s.menu.set_addition_price(&"chili",25)
+ farid=s.visitors.spawn(&"farid")
+ if farid==null:print("NO_RETURN_VISIT");quit(1);return
+ farid.phase=&"staying";farid.pose.ground=Vector2(-1.5,-0.5);farid.destination=farid.pose.ground
+ # Explicit requested-variant fixture; the rest uses actual domain owners.
+ s.service.quote_provider=func(_v,_f):return s.menu.quote(&"ful/sandwich/here",PackedStringArray(["chili"]))
+ var order:=s.service.place_order(farid.id,&"ful")
+ if order==null:print("NO_ORDER");quit(1);return
+ farid.food_id=&"ful";farid.order_id=order.id;farid.shopping_state=&"pending"
+ s.menu.set_price(&"ful/sandwich/here",900)
+ at_device(&"kebda")
+ if not ok("SERVE_BATCH_SANDWICH",s.workflow.act(job,&"serve",{"variant_id":"ful/sandwich/here","additions":["chili"]})):quit(1);return
+ if not ok("SETTLE_FROZEN_725",s.service.complete(order.id,&"paid")):quit(1);return
+ s.player_ground=farid.pose.ground;s.clock.elapse_minutes(3)
+ if not ok("CONFIRMED_TASTE",s._step_experiences(s.clock.frame(0))):quit(1);return
+ print("OWN_EXPECTATION ",s.customer_experience.expected(&"farid")," RETURN_WEIGHT ",s.customer_experience.return_factor(&"farid"))
+ if not await hear("experience_taste",farid):quit(1);return
+ s.personal.leave()
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ if not ok("CONNECTED_CURRENT_JSON",restored):quit(1);return
+ var lots:Array=[]
+ for input in s.workflow.job(job).input_evidence:lots.append(input.attributes.get("lot",{}))
+ print("SAME_FLOW_PROVENANCE ",StableJson.stringify({"input_lots":lots,"paid":order.payment,"now_menu":s.menu.quote(&"ful/sandwich/here",PackedStringArray(["chili"])).details.quote.price_minor,"ready_at":s.workflow.job(job).ready_at,"taste":s.customer_experience.taste_sources(&"farid")[0].id}))
+ quit(0 if order.payment==725 and is_equal_approx(float(s.workflow.job(job).ready_at),ready) else 1)

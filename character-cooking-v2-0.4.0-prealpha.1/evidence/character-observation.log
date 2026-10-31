@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+OBSERVATION {"bad_need_rejected":true,"bad_restore_preserves_choice":true,"configured":true,"decision":{"at":930.0,"factors":{"quiet":1.96972322702408},"food_id":"","index":1,"intent":"quiet","next_at":950.0,"visit":"visit_1"},"json_restore":true,"pure_reads":true,"rng_unchanged_after_restore":true,"same_choice_after_restore":true,"same_visit_no_reroll":true,"state":{"at":930.0,"decision":{},"decisions":0,"needs":{"hunger":0.551398992538452,"social":0.396036803722382,"thirst":0.448575377464294,"tiredness":0.213394612073898},"visit":"visit_1"}}
+OBSERVATION bounded48_seed_choices {"0.05":{"drink":0,"eat":4,"quiet":44},"0.95":{"drink":6,"eat":29,"quiet":13}}
+OBSERVATION current_save {"candidate":true,"decode":true,"reason":""}
+WARNING: 73 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

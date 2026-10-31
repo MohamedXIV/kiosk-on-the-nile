@@ -1,0 +1,74 @@
+extends SceneTree
+func _initialize():call_deferred("run")
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ var loaded:=content.load_directory("res://content")
+ if not loaded.ok:print("CONTENT ",loaded.details);quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint)
+ var session:=GameSession.new();root.add_child(session)
+ var configured:=session.configure(cfg)
+ print("CONFIG ",configured.ok," ",configured.message_key)
+ if not configured.ok:quit(1);return
+ var q:=session.menu.quote(&"tea/cup/here")
+ print("QUOTE ",JSON.stringify(q.details))
+ session.menu.set_price(&"tea/cup/here",1200)
+ print("ZERO_PRICE ",session.menu.quote(&"tea/cup/here").details)
+ session.player_pose.location_id=&"kiosk";session.player_ground=session.spaces.ground(&"tea")+Vector2(0,1)
+ var started:=session.workflow.start(&"tea",&"kiosk",PackedStringArray(["tea"]))
+ if not started.ok:print("START ",started.message_key);quit(1);return
+ var id:=StringName(started.details.job_id)
+ session.clock.advance(3.2);session.workflow.tick(session.clock.frame(3.2))
+ var added:=session.workflow.act(id,&"add_tea")
+ if not added.ok:print("ADD ",added.message_key);quit(1);return
+ session.clock.advance(2.5);session.workflow.tick(session.clock.frame(2.5))
+ var served:=session.workflow.act(id,&"pour",{"variant_id":"tea/cup/here","additions":[]})
+ print("REAL_HERE ",served.ok," ",served.message_key," ",session.cooking.held_item().snapshot() if served.ok else {})
+ if not served.ok:quit(1);return
+ var visit:=session.visitors.spawn(&"amgad")
+ visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground
+ session.service.quote_provider=func(_visit,_food):return session.menu.quote(&"tea/cup/here")
+ var order:=session.service.place_order(visit.id,&"tea")
+ if order==null:print("NO_ORDER");quit(1);return
+ visit.food_id=&"tea";visit.order_id=order.id;visit.shopping_state=&"pending"
+ session.menu.set_price(&"tea/cup/here",900)
+ print("FROZEN_ACCEPTED_QUOTE ",order.base_price," NEW ",session.menu.quote(&"tea/cup/here").details.quote.price_minor)
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("CURRENT_CANDIDATE ",restored.ok," ",restored.message_key," ",restored.details)
+ if not restored.ok:quit(1);return
+ var paid:=session.service.complete(order.id,&"paid")
+ print("REAL_SETTLEMENT ",paid.ok," ",paid.message_key," ",paid.details)
+ var before_needs:Dictionary=session.character_life.state(&"amgad").needs
+ print("NO_TASTE_ON_HANDOVER ",session.customer_experience.expected(&"amgad").is_empty())
+ session.clock.elapse_minutes(3)
+ var stepped:=session._step_experiences(session.clock.frame(0))
+ print("ACTUAL_TASTE ",stepped.ok," ",stepped.message_key," ",session.customer_experience.taste_sources(&"amgad"))
+ var first_snapshot:=session.character_life.snapshot()
+ var twice:=session._step_experiences(session.clock.frame(0))
+ print("ONCE_ONLY ",twice.ok and StableJson.stringify(first_snapshot)==StableJson.stringify(session.character_life.snapshot()))
+ print("PERSONAL_NEEDS ",before_needs," -> ",session.character_life.state(&"amgad").needs," OTHER_MEMORY_EMPTY ",session.customer_experience.expected(&"farid").is_empty())
+ var imitated:=OrderState.new();imitated.id=order.id
+ var rejected:=session.customer_experience.confirm_taste(imitated,session.character_life,session.foods,session.menu)
+ print("NONCANONICAL_ORDER_REJECTED ",not rejected.ok)
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,cfg)
+ print("SETTLED_CURRENT_CANDIDATE ",restored.ok," ",restored.message_key," ",restored.details)
+ if not restored.ok:quit(1);return
+ print("REMEMBERED_AFTER_CONTINUE ",StableJson.stringify(restored.details.session.customer_experience.expected(&"amgad"))==StableJson.stringify(session.customer_experience.expected(&"amgad"))," RETURN_FACTOR ",session.customer_experience.return_factor(&"amgad"))
+ var bad:=codec.encode(session)
+ var key: String=bad.state.customer_experience.tastes.keys()[0]
+ bad.state.customer_experience.tastes[key].actor="farid"
+ bad.erase("checksum");bad["checksum"]=StableJson.stringify(bad).sha256_text()
+ var retargeted:=await codec.create_candidate(bad,cfg)
+ print("RETARGET_REJECTED ",not retargeted.ok," ",retargeted.message_key)
+ var future:=codec.encode(session)
+ future.state.customer_experience.tastes[key].at=session.clock.world_minutes+1
+ future.erase("checksum");future["checksum"]=StableJson.stringify(future).sha256_text()
+ var future_result:=await codec.create_candidate(future,cfg)
+ print("FUTURE_TASTE_REJECTED ",not future_result.ok," ",future_result.message_key)
+ session.visitors.clear_visits()
+ decoded=SaveCodec.decode_text(StableJson.stringify(codec.encode(session)))
+ restored=await codec.create_candidate(decoded.details.data,cfg)
+ print("CLOSED_TASTE_CURRENT ",restored.ok," ",restored.message_key)
+ quit(0 if restored.ok and paid.ok and order.payment==1200 and not retargeted.ok and not rejected.ok else 1)

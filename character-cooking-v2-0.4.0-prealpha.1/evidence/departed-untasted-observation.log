@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONFIG true 
+QUOTE {"quote":{"additions":[],"at":930.0,"base_minor":1200,"consumption_mode":"here","extra_prices":{},"food_id":"tea","price_minor":1200,"revision":1,"serving_format":"cup","variant_id":"tea/cup/here"}}
+ZERO_PRICE { "quote": { "variant_id": "tea/cup/here", "food_id": "tea", "serving_format": "cup", "consumption_mode": "here", "additions": [], "base_minor": 1200, "extra_prices": {  }, "price_minor": 1200, "revision": 1, "at": 930.0 } }
+REAL_TAKEAWAY true  { "freshness": { "at": 935.7, "exposure": 0.0, "context": "ambient" }, "initial_quality": 90.0, "prepared_at": 935.7, "batch_id": "", "method": "brew", "heat": "medium", "serving_format": "cup", "consumption_mode": "here", "additions": [], "id": "food_22", "recipe_id": "tea", "variant_id": "tea/cup/here", "food_id": "tea", "sugar_id": "regular", "quality_score": 3, "quality_key": "excellent" }
+FROZEN_ACCEPTED_QUOTE 1200 NEW 900
+CURRENT_CANDIDATE true  { "session": @Node@8:<Node#299976623899>, "migration_report": {  } }
+REAL_SETTLEMENT true  { "payment": 1200, "settlement": "paid", "visit_id": "visit_1", "cue": "coin" }
+DEPARTED_BEFORE_TASTE true true
+DEPARTED_NO_FOOD_MEMORY true
+SETTLED_CURRENT_CANDIDATE true  { "session": @Node@12:<Node#370826807210>, "migration_report": {  } }
+WARNING: 103 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

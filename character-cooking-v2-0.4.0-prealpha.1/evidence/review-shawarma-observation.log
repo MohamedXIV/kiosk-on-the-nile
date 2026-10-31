@@ -1,0 +1,25 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RAW_FIXTURE true  { "change": <RefCounted#-9223371737163364494> }
+PLACE true  {  }
+hear_social_meet_farid true  { "session_id": "conversation_1" }
+hear_next true  {  }
+hear_social_company_farid true  { "session_id": "conversation_2" }
+hear_social_shawarma_hint true  { "session_id": "conversation_3" }
+hear_shawarma_learning true  { "session_id": "conversation_4" }
+hear_choice true  { "cue": "chime" }
+LEARNED_START true  { "job_id": "cook_1", "cue": "chime" }
+PREP true  { "cue": "chime" }
+COLD_STORE true  {  }
+COLD_TAKE true  {  }
+LOAD true  { "cue": "chime" }
+SLICE true  {  }
+EXACTLY_ONE_BREAD_BEFORE_ASSEMBLY 1
+ASSEMBLE true  { "job_id": "cook_2", "cue": "chime" }
+ONE_BREAD_FINISH true  { "freshness": { "at": 2411.0, "exposure": 3.0, "context": "ambient" }, "initial_quality": 90.0, "prepared_at": 2408.0, "batch_id": "", "method": "roast", "heat": "medium", "serving_format": "sandwich", "consumption_mode": "here", "additions": [], "id": "food_30", "recipe_id": "shawarma_assemble", "variant_id": "shawarma/sandwich/here", "food_id": "shawarma", "sugar_id": "", "quality_score": 3, "quality_key": "excellent" }
+ONE_BREAD_CONSERVATION 0
+ONE_BREAD_CURRENT true 
+WARNING: 78 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

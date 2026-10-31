@@ -1,0 +1,67 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STEP content {"details":{},"ok":true,"reason":""}
+STEP configure {"details":{},"ok":true,"reason":""}
+STEP fixture_raws {"details":{"change":"<RefCounted#-9223371750316701843>"},"ok":true,"reason":""}
+STEP fixture_raw_commit {"details":{},"ok":true,"reason":""}
+STEP kebda_start {"details":{"cue":"chime","job_id":"cook_1"},"ok":true,"reason":""}
+STEP kebda_prepare {"details":{"cue":"chime"},"ok":true,"reason":""}
+OBSERVATION kebda_ready {"automatic_no_player_effort":true,"expected_ready_at":950.0,"initial_quality":92.6785714285714,"now":995.0,"offered":["tea","kebda"],"ready_at":950.0,"stage":"batch_hold"}
+STEP kebda_portion_0 {"details":{"item":{"additions":[],"batch_id":"item_30","consumption_mode":"here","food_id":"kebda","heat":"low","id":"food_31","initial_quality":92.6785714285714,"method":"saute","prepared_at":950.0,"quality_key":"excellent","quality_score":3,"recipe_id":"kebda","serving_format":"sandwich","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP kebda_portion_1 {"details":{"item":{"additions":[],"batch_id":"item_30","consumption_mode":"here","food_id":"kebda","heat":"low","id":"food_32","initial_quality":92.6785714285714,"method":"saute","prepared_at":950.0,"quality_key":"excellent","quality_score":3,"recipe_id":"kebda","serving_format":"sandwich","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP kebda_portion_2 {"details":{"item":{"additions":[],"batch_id":"item_30","consumption_mode":"here","food_id":"kebda","heat":"low","id":"food_33","initial_quality":92.6785714285714,"method":"saute","prepared_at":950.0,"quality_key":"excellent","quality_score":3,"recipe_id":"kebda","serving_format":"sandwich","sugar_id":""}},"ok":true,"reason":""}
+OBSERVATION kebda_yield {"equipment_free":true,"fourth_rejected":true,"job_status":"completed","produced":3}
+STEP multi_portion_current_save {"details":{"migration_report":{},"session":"@Node@8:<Node#296906393399>"},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP ful_start {"details":{"cue":"chime","job_id":"cook_2"},"ok":true,"reason":""}
+STEP ful_soak_begin {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP ful_take_pot {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP ful_load {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP actual_sleep {"details":{"actual_hours":8,"cue":"chime","extra_hours":0,"rent_spent":0,"requested_hours":8,"rest_multiplier":1.0,"wake_day":2,"wake_minutes":279.0},"ok":true,"reason":""}
+OBSERVATION overnight_ful {"expected_ready_at":1599.0,"initial_quality":90.0,"no_remote_food_in_hand":true,"now":1719.0,"ready_at":1599.0,"stage":"batch_hold"}
+STEP overnight_current_save {"details":{"migration_report":{},"session":"@Node@12:<Node#371816662941>"},"ok":true,"reason":""}
+STEP ful_portion_0 {"details":{"item":{"additions":[],"batch_id":"item_34","consumption_mode":"here","food_id":"ful","heat":"low","id":"food_35","initial_quality":90.0,"method":"simmer","prepared_at":1599.0,"quality_key":"excellent","quality_score":3,"recipe_id":"ful","serving_format":"plate","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP ful_portion_1 {"details":{"item":{"additions":[],"batch_id":"item_34","consumption_mode":"here","food_id":"ful","heat":"low","id":"food_36","initial_quality":90.0,"method":"simmer","prepared_at":1599.0,"quality_key":"excellent","quality_score":3,"recipe_id":"ful","serving_format":"plate","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP ful_portion_2 {"details":{"item":{"additions":[],"batch_id":"item_34","consumption_mode":"here","food_id":"ful","heat":"low","id":"food_37","initial_quality":90.0,"method":"simmer","prepared_at":1599.0,"quality_key":"excellent","quality_score":3,"recipe_id":"ful","serving_format":"plate","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP ful_portion_3 {"details":{"item":{"additions":[],"batch_id":"item_34","consumption_mode":"here","food_id":"ful","heat":"low","id":"food_38","initial_quality":90.0,"method":"simmer","prepared_at":1599.0,"quality_key":"excellent","quality_score":3,"recipe_id":"ful","serving_format":"plate","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP fixture_fryer_grant {"details":{"change":"<RefCounted#-9223371589741967361>"},"ok":true,"reason":""}
+STEP fixture_fryer_commit {"details":{},"ok":true,"reason":""}
+STEP fryer_place {"details":{},"ok":true,"reason":""}
+STEP pane_start {"details":{"cue":"chime","job_id":"cook_3"},"ok":true,"reason":""}
+STEP pane_coat {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP pane_load {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP pane_serve {"details":{"item":{"additions":[],"batch_id":"item_40","consumption_mode":"here","food_id":"kebda_pane","heat":"off","id":"food_41","initial_quality":90.0,"method":"fry","prepared_at":1736.0,"quality_key":"excellent","quality_score":3,"recipe_id":"kebda_pane","serving_format":"sandwich","sugar_id":""}},"ok":true,"reason":""}
+STEP pane_current_save {"details":{"migration_report":{},"session":"@Node@16:<Node#455551748092>"},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+OBSERVATION occupied_fryer {"reason":"missing_equipment","rejected":true}
+STEP pane_last {"details":{"item":{"additions":[],"batch_id":"item_40","consumption_mode":"here","food_id":"kebda_pane","heat":"off","id":"food_42","initial_quality":90.0,"method":"fry","prepared_at":1736.0,"quality_key":"excellent","quality_score":3,"recipe_id":"kebda_pane","serving_format":"sandwich","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP fried_start {"details":{"cue":"chime","job_id":"cook_4"},"ok":true,"reason":""}
+STEP fried_prepare {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP heat_off {"details":{"cue":"chime"},"ok":true,"reason":""}
+OBSERVATION paused_progress 0.0
+STEP heat_high {"details":{"cue":"chime"},"ok":true,"reason":""}
+OBSERVATION wrong_heat_quality 65.0
+STEP fried_serve {"details":{"item":{"additions":[],"batch_id":"item_43","consumption_mode":"here","food_id":"potato_fried","heat":"off","id":"food_44","initial_quality":65.0,"method":"fry","prepared_at":1765.15384615385,"quality_key":"good","quality_score":2,"recipe_id":"potato_fried","serving_format":"plate","sugar_id":""}},"ok":true,"reason":""}
+STEP fixture_clear_hand {"details":{},"ok":true,"reason":""}
+STEP cancel_remaining {"details":{},"ok":true,"reason":""}
+OBSERVATION excessive_yield_rejected {"reason":"invalid_content","rejected":true,"still_three":true}
+STEP oven_fixture {"details":{"change":"<RefCounted#-9223371501409924997>"},"ok":true,"reason":""}
+STEP oven_fixture_commit {"details":{},"ok":true,"reason":""}
+OBSERVATION oven_cell (-8, -7)
+STEP oven_place {"details":{},"ok":true,"reason":""}
+STEP baked_start {"details":{"cue":"chime","job_id":"cook_5"},"ok":true,"reason":""}
+STEP baked_prepare {"details":{"cue":"chime"},"ok":true,"reason":""}
+STEP baked_serve {"details":{"item":{"additions":[],"batch_id":"item_48","consumption_mode":"here","food_id":"potato_baked","heat":"off","id":"food_49","initial_quality":90.0,"method":"roast","prepared_at":1782.0,"quality_key":"excellent","quality_score":3,"recipe_id":"potato_baked","serving_format":"plate","sugar_id":""}},"ok":true,"reason":""}
+STEP cancelled_and_baked_current_save {"details":{"migration_report":{},"session":"@Node@20:<Node#542860379957>"},"ok":true,"reason":""}
+OBSERVATION active_projection {"active_job_count":1,"heating":[],"total_history_jobs":5}
+WARNING: 148 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

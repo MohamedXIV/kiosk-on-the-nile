@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+COMPANY_BEHAVIOR {"company":"company","company_elapsed":1.25,"quiet":"quiet","quiet_elapsed":1,"stay_factor":1.15,"wait_unchanged":10.362}
+COMPANY_CURRENT_IDENTITY true 
+REST_NO_AUTO_INVITE true MEETING_DENIED true
+REST_EARLIER_DEPARTURE true CAP 4.0
+REST_CURRENT true  { "session": @Node@12:<Node#376128407477>, "migration_report": {  } }
+WARNING: 103 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

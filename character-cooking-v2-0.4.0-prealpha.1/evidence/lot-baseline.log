@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+OBSERVATION {"configured":true,"farid_existing_weights":{"kebda":4.0,"potato_fried":1.0,"shawarma":2.0},"new_state_expected":true,"raw_tea_attributes":{},"temporary_character_state":true}
+WARNING: 48 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 22 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

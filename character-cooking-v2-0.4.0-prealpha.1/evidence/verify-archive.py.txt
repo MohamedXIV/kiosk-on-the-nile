@@ -1,0 +1,22 @@
+import hashlib,json,sys,urllib.request,zipfile,pathlib,subprocess
+repo=pathlib.Path('/workspace/kiosk-v2-artifacts');folder='character-cooking-v2-0.4.0-prealpha.1';commit,source=sys.argv[1:3]
+zips=list((repo/folder).glob('*.zip'));assert len(zips)==1
+local=zips[0];url=f'https://raw.githubusercontent.com/MohamedXIV/kiosk-on-the-nile/{commit}/{folder}/{local.name}'
+target=pathlib.Path('/tmp/kiosk-v2-independently-downloaded.zip')
+with urllib.request.urlopen(url,timeout=90) as r:target.write_bytes(r.read())
+raw=target.read_bytes();digest=hashlib.sha256(raw).hexdigest();assert raw==local.read_bytes()
+with zipfile.ZipFile(target) as z:
+ assert z.testzip() is None
+ b=json.loads(z.read('BUILD.json'));assert b['source']==source and b['source_dirty'] is False and b['version']=='0.4.0-prealpha.1'
+ assert b['build_mode']=='release' and b['publication_state']=='development' and b['save_format']=={'schema':4,'revision':22}
+ assert b['engine']['version']=='4.7.2'
+ for f,h in b['files'].items():assert hashlib.sha256(z.read(f)).hexdigest()==h,f
+ assert z.read('VERSION').decode().strip()=='0.4.0-prealpha.1'
+ assert 'revision22' in z.read('PLAYTEST_GUIDE_AR.md').decode()
+ assert '0.4.0-prealpha.1' in z.read('CHANGELOG.md').decode()
+ assert hashlib.sha256(z.read(b['engine_stem']+'.wasm')).hexdigest()==b['engine']['web_wasm_sha256']['release']
+old=json.loads(pathlib.Path('/tmp/kiosk-old-artifacts-manifest.json').read_text());now=json.loads((repo/'manifest.json').read_text());assert now[:42]==old and len(old)==42
+changes=subprocess.check_output(['git','diff','--name-status','930a1f879042e787fc7289c77c622d5be90d75af',commit],cwd=repo,text=True).splitlines()
+assert all(line.startswith('A\t'+folder+'/') for line in changes),changes
+report={'url':url,'archive_commit':commit,'source':source,'version':b['version'],'save_format':b['save_format'],'bytes':len(raw),'sha256':digest,'zip_crc':'passed','all_export_hashes':'passed','clean_source_release_template':'passed','guide_changelog':'passed','previous_manifest_entries_preserved':42,'existing_archive_paths_and_bytes':'unchanged git tree','new_files':len(changes)}
+pathlib.Path('/tmp/kiosk-v2-archive-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

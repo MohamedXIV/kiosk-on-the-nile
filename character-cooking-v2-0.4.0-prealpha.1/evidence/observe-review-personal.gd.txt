@@ -1,0 +1,45 @@
+extends SceneTree
+var s:GameSession
+func _initialize():call_deferred("run")
+func at_device(id:StringName):s.location_id=&"kiosk";s.player_ground=s.spaces.ground(id)+Vector2(0,1)
+func reaction(seconds:float):s.clock.advance(seconds);s.workflow.tick(s.clock.frame(seconds))
+func advance(minutes:float):s.workflow.tick(s.clock.elapse_minutes(minutes))
+func cook(personal:bool)->StringName:
+ var grants:Array[Dictionary]=[{"definition_id":"fava_beans","quantity":2,"container_id":"kiosk_dry","attributes":{}},{"definition_id":"oil","quantity":1,"container_id":"kiosk_dry","attributes":{}}]
+ var raw:=s.items.prepare_grants(grants)
+ if not raw.ok:print("RAW ",raw.message_key);return &""
+ s.items.commit(raw.details.change);at_device(&"counter_6")
+ var start:=s.workflow.start(&"ful",&"kiosk",PackedStringArray(["counter_6"]),personal)
+ if not start.ok:print("START ",start.message_key);return &""
+ var id:=StringName(start.details.job_id);reaction(4)
+ if not s.workflow.act(id,&"soak").ok:return &""
+ advance(240)
+ if not s.workflow.act(id,&"take_pot").ok:return &""
+ at_device(&"kebda")
+ if not s.workflow.act(id,&"load").ok:return &""
+ advance(360);return id
+func run():
+ var content:=ContentStore.new();root.add_child(content);content.required_sections=SessionConfig.REQUIRED_SECTIONS
+ if not content.load_directory("res://content").ok:quit(1);return
+ var cfg:=SessionConfig.new(content.bundle(),content.fingerprint);s=GameSession.new();root.add_child(s)
+ if not s.configure(cfg).ok:quit(1);return
+ var id:=cook(true)
+ if id.is_empty():quit(1);return
+ var advertised:bool="ful" in s.workflow.available_foods(&"kiosk")
+ print("PERSONAL_BATCH_NOT_ADVERTISED ",not advertised)
+ var visit:=s.visitors.spawn(&"farid");visit.phase=&"staying";visit.pose.ground=Vector2(-1.5,-0.5);visit.destination=visit.pose.ground
+ print("PERSONAL_ONLY_ORDER_REFUSED ",s.service.place_order(visit.id,&"ful")==null)
+ var served:=s.workflow.act(id,&"serve")
+ if not served.ok:print("SERVE ",served.message_key);quit(1);return
+ print("PERSONAL_PORTION_EXCLUDED ",s.menu.offers(PackedStringArray(["ful"])).is_empty()," PRIVATE_TAG ",s.cooking.held_record().attributes.personal_use)
+ var own:=s.life.consume_held();print("PERSONAL_EATING_PRESERVED ",own.ok)
+ if not own.ok:quit(1);return
+ if not s.workflow.act(id,&"cancel").ok:quit(1);return
+ id=cook(false)
+ if id.is_empty():quit(1);return
+ print("COMMERCIAL_BATCH_RESTORES_OFFERS ","ful" in s.workflow.available_foods(&"kiosk")," ",s.menu.offers(s.workflow.available_foods(&"kiosk"),s.workflow.available_foods(&"kiosk",false)).any(func(o):return o.food_id=="ful"))
+ var codec:=SaveCodec.new();root.add_child(codec)
+ var decoded:=SaveCodec.decode_text(StableJson.stringify(codec.encode(s)))
+ var restored:=await codec.create_candidate(decoded.details.data,cfg)
+ print("PERSONAL_COMMERCIAL_CURRENT ",restored.ok," ",restored.message_key," ",restored.details)
+ quit(0 if restored.ok and not advertised else 1)

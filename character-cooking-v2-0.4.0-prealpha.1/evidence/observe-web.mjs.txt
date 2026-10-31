@@ -1,0 +1,11 @@
+import {chromium} from '/workspace/kiosk-on-the-nile/tools/node_modules/playwright/index.mjs';
+import {spawn} from 'node:child_process';
+import readline from 'node:readline';
+const server=spawn('python3',['tools/web/serve.py',process.argv[2]||'/tmp/kiosk-v2-final-web'],{stdio:['ignore','pipe','inherit']});
+const port=await new Promise(r=>server.stdout.once('data',b=>r(Number(String(b).trim()))));
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const page=await browser.newPage({viewport:{width:1280,height:720}});const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')console.log('BROWSER_ERROR',m.text());});
+await page.goto(`http://127.0.0.1:${port}/index.html`);await page.waitForTimeout(20000);await page.screenshot({path:'/tmp/kiosk-v2-web-title.png'});console.log('TITLE_CAPTURED');
+const rl=readline.createInterface({input:process.stdin});
+for await(const line of rl){const c=JSON.parse(line);if(c.end)break;if(c.reload)await page.reload();else if(c.key)await page.keyboard.press(c.key);else await page.mouse.click(c.x,c.y);await page.waitForTimeout(c.wait||2500);await page.screenshot({path:`/tmp/kiosk-v2-web-${c.name}.png`});console.log(JSON.stringify({phase:c.name,pageErrors:errors}));}
+console.log(JSON.stringify({done:true,pageErrors:errors}));await browser.close();server.kill();
