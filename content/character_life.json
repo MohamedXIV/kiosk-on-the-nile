@@ -9,7 +9,10 @@
       "thirst": 0.1,
       "tiredness": 0.025,
       "social": 0.03
-    }
+    },
+    "company_stay_multiplier": 1.15,
+    "rest_stay_multiplier": 0.8,
+    "company_invite_rate": 1.25
   },
   "profiles": {
     "amgad": {

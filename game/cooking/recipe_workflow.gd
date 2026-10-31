@@ -416,7 +416,7 @@ func available_foods(location_id: StringName, include_prepared: bool=true) -> Pa
  var result := PackedStringArray()
  # Finished portions remain sellable after their last raw inputs were consumed.
  for item in _inventory.items.snapshot().items.values():
-  if not include_prepared or item.kind!="prepared":continue
+  if not include_prepared or item.kind!="prepared" or item.attributes.get("personal_use",false):continue
   var container := _inventory.items.get_container(StringName(item.container_id))
   var local: bool = container.location_id==str(location_id) and container.kind!="purchase_bag"
   var carried: bool = container.id=="player_hand" and _inventory.player_pose!=null and _inventory.player_pose.location_id==location_id
@@ -427,7 +427,7 @@ func available_foods(location_id: StringName, include_prepared: bool=true) -> Pa
   if RecipeProcesses.supports(definition):
    for id in _active_jobs:
     var job: Dictionary=_jobs[id]
-    if job.recipe_id!=recipe_id or job.location_id!=str(location_id) or job.definition.steps[int(job.step_index)].kind!="batch_hold":continue
+    if not _commercial_job(job) or job.recipe_id!=recipe_id or job.location_id!=str(location_id) or job.definition.steps[int(job.step_index)].kind!="batch_hold":continue
     var bowl := _inventory.items.get_item(StringName(str(job.get("bowl_id",""))))
     if not bowl.is_empty() and FoodFreshness.view(bowl.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
    continue
@@ -441,12 +441,14 @@ func available_foods(location_id: StringName, include_prepared: bool=true) -> Pa
   if not usable:continue
   var active := false
   for job in _jobs.values():
-   if job.status=="active" and job.location_id==str(location_id) and job.recipe_id==recipe_id:active=true
+   if _commercial_job(job) and job.status=="active" and job.location_id==str(location_id) and job.recipe_id==recipe_id:active=true
   var inputs: Array[Dictionary]=[]
   for input in definition.inputs:
    if input.get("required_storage")!="hand":inputs.append(input);continue
    var intermediate := false
    for item in _inventory.items.instances(StringName(input.definition_id)):
+    if item.attributes.get("personal_use",false):continue
+    if item.attributes.has("freshness") and not FoodFreshness.view(item.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable:continue
     var container := _inventory.items.get_container(StringName(item.container_id))
     if (container.location_id==str(location_id) and container.kind!="purchase_bag") or (container.id=="player_hand" and _inventory.player_pose.location_id==location_id):intermediate=true
    for precursor_id in _recipes:
@@ -457,11 +459,11 @@ func available_foods(location_id: StringName, include_prepared: bool=true) -> Pa
     var capable := true
     for step in precursor.steps:
      if _equipment.candidates(location_id,StringName(step.capability)).is_empty():capable=false
-    if capable and _inventory.available(location_id,precursor_inputs).ok:intermediate=true
+    if capable and _inventory.available(location_id,precursor_inputs,true).ok:intermediate=true
     for job in _jobs.values():
-     if job.status=="active" and job.location_id==str(location_id) and job.recipe_id==precursor_id:intermediate=true
+     if _commercial_job(job) and job.status=="active" and job.location_id==str(location_id) and job.recipe_id==precursor_id:intermediate=true
    if not intermediate:usable=false
-  if usable and (active or _inventory.available(location_id,inputs).ok) and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
+  if usable and (active or _inventory.available(location_id,inputs,true).ok) and not str(definition.output.food_id) in result:result.append(str(definition.output.food_id))
  return result
 
 func _publish_process(prepared: ActionResult) -> ActionResult:
@@ -520,3 +522,6 @@ func grade_options(required: StringName, location_id: StringName) -> PackedStrin
   var grade := str(item.attributes.get("lot",{}).get("grade",""))
   if not grade.is_empty() and not grade in result:result.append(grade)
  return result
+
+func _commercial_job(job: Dictionary) -> bool:
+ return not job.get("personal_use",false) and not job.get("input_evidence",[]).any(func(input):return input.get("attributes",{}).get("personal_use",false))

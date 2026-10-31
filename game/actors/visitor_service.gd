@@ -104,7 +104,7 @@ func tick(delta: float, calendar_delta: float = -1) -> void:
      _remarks(visit,delta)
     if not seating.reserved(visit.id) and not meetings.active(visit.id) and not peers.active(visit.id) and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius):
      leisure.step(visit,elapsed,_markers,str(_data.characters[str(visit.character_id)].leisure_marker),_position_available,route_reachable)
-   if (visit.elapsed >= visit.stay_seconds and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
+   if (visit.elapsed >= visit.stay_seconds*(character_life.stay_factor(visit.character_id,visit.id) if character_life!=null else 1.0) and (visit.served or visit.food_id==&"")) or visit.elapsed>=visit.maximum_wait:
     visit.phase = &"leaving"
     if peers.active(visit.id):finish_peer()
     meetings.finish(visit.id)
@@ -164,8 +164,10 @@ func _arrived(visit: VisitState) -> void:
 func busy_in_conversation(visit_id: StringName) -> bool:
  return purchase_blocked.is_valid() and purchase_blocked.call(visit_id)
 func _can_meet(visit: VisitState) -> bool:
+ if character_life!=null and character_life.intent_for(visit.character_id,visit.id)==&"rest":return false
  return not peers.active(visit.id) and visit.phase==&"staying" and visit.shopping_state in [&"undecided",&"declined"] and _orders.pending_for(visit.id)==null and not busy_in_conversation(visit.id) and meeting_available.is_valid() and bool(meeting_available.call(visit.id))
 func _peer_eligible(visit: VisitState, own_conversation: String) -> bool:
+ if own_conversation.is_empty() and character_life!=null and character_life.intent_for(visit.character_id,visit.id)==&"rest":return false
  return visit.phase==&"staying" and (not own_conversation.is_empty() or peers.active(visit.id) or visit.pose.ground.distance_to(visit.destination)<=float(_data.arrival_radius)) and visit.shopping_state in [&"undecided",&"declined",&"served"] and _orders.pending_for(visit.id)==null and not meetings.active(visit.id) and peer_available.is_valid() and bool(peer_available.call(visit.id,own_conversation))
 func _seat_busy(id: StringName) -> bool:
  return busy_in_conversation(id) or peers.active(id)
@@ -339,7 +341,7 @@ func restore(data: Dictionary) -> ActionResult:
 func _remarks(visit: VisitState, delta: float) -> void:
  var definition := character(visit.character_id)
  var waiting: bool = _orders.pending_for(visit.id)!=null
- if not waiting and not definition.ambient: return
+ if not waiting and (not definition.ambient or character_life!=null and character_life.intent_for(visit.character_id,visit.id)==&"rest"):return
  visit.remark_remaining -= delta
  if visit.remark_remaining>0: return
  visit.remark_remaining = float(_data.waiting_reminder_seconds) if waiting else _rng.randf_range(float(_data.ambient_remark_delay[0]),float(_data.ambient_remark_delay[1]))

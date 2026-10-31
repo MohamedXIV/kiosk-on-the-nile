@@ -295,6 +295,7 @@ func step_companionship(delta: float) -> void:
  var blocked := participation_blocked.is_valid() and bool(participation_blocked.call())
  for visit: VisitState in _session.visitors.visits.values():
   if not str(visit.character_id) in config.actors:continue
+  if _session.character_life.intent_for(visit.character_id,visit.id)==&"rest":continue
   var id := str(visit.id)
   if not _state.invitations.has(id):
    var sample := float(_session.visitors.random_index(1001))/1000.0
@@ -306,7 +307,7 @@ func step_companionship(delta: float) -> void:
   if invitation.offered or blocked or not _session.narrative.sessions.is_empty():continue
   var topics := topics_for(visit.id).filter(func(topic):return bool(_data.topics[topic.id].automatic))
   if topics.is_empty():continue
-  invitation.elapsed=minf(float(invitation.wait),float(invitation.elapsed)+delta)
+  invitation.elapsed=minf(float(invitation.wait),float(invitation.elapsed)+delta*_session.character_life.company_rate(visit.character_id,visit.id))
   if invitation.elapsed<float(invitation.wait):continue
   invitation.offered=true
   var entry: Dictionary=_session.config.data.encounters[topics[0].encounter]
@@ -314,6 +315,8 @@ func step_companionship(delta: float) -> void:
   else:_session.narrative.start(&"social_invitation",PackedStringArray([id]),{"topic_id":topics[0].id,"invitation":true})
 func can_invite(visit_id: StringName) -> bool:
  if _session.narrative==null or not _session.narrative.sessions.is_empty() or (_session.personal!=null and _session.personal.active()):return false
+ var visit: VisitState=_session.visitors.visits.get(str(visit_id))
+ if visit!=null and _session.character_life.intent_for(visit.character_id,visit.id)==&"rest":return false
  if participation_blocked.is_valid() and bool(participation_blocked.call()):return false
  if bool(_state.invitations.get(str(visit_id),{}).get("offered",false)):return false
  for topic in topics_for(visit_id):

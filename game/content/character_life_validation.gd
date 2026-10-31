@@ -4,8 +4,9 @@ const NEEDS := ["hunger","thirst","tiredness","social"]
 static func validate(data: Dictionary, actors: Array, foods: Dictionary) -> ActionResult:
  if not keys(data,["policy","profiles"]) or not data.policy is Dictionary or not data.profiles is Dictionary:return _fail("shape")
  var policy: Dictionary=data.policy
- if not keys(policy,["seed","reconsider_minutes","quiet_weight","elapsed_cap_minutes","rates"]):return _fail("policy")
+ if not keys(policy,["seed","reconsider_minutes","quiet_weight","elapsed_cap_minutes","rates","company_stay_multiplier","rest_stay_multiplier","company_invite_rate"]):return _fail("policy")
  if not ContentValidation.integer(policy.seed) or policy.seed<0 or not ContentValidation.bounded(policy.reconsider_minutes,5,180) or not ContentValidation.bounded(policy.quiet_weight,0.1,10) or not ContentValidation.bounded(policy.elapsed_cap_minutes,60,1440) or not policy.rates is Dictionary or not keys(policy.rates,NEEDS):return _fail("policy.values")
+ if not ContentValidation.bounded(policy.company_stay_multiplier,1,1.25) or not ContentValidation.bounded(policy.rest_stay_multiplier,0.7,1) or not ContentValidation.bounded(policy.company_invite_rate,1,1.5):return _fail("policy.intent_bias")
  for need in NEEDS:
   if not ContentValidation.bounded(policy.rates[need],0,1):return _fail("policy.rates."+need)
  if data.profiles.size()!=actors.size():return _fail("profiles.actors")

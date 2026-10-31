@@ -173,3 +173,13 @@ static func _visit_id(value: String) -> bool:
  return value.begins_with("visit_") and suffix.is_valid_int() and int(suffix)>0 and str(int(suffix))==suffix
 static func _invalid(reason: String) -> ActionResult:
  return ActionResult.failure(ActionResult.Code.INVALID_SAVE,StringName(reason))
+
+func intent_for(actor: StringName, visit: StringName) -> StringName:
+ # Narrow owned decision view: no projection copy and no RNG on a frame read.
+ var record: Dictionary=_states.get(str(actor),{})
+ return StringName(str(record.get("decision",{}).get("intent","quiet"))) if record.get("visit")==str(visit) else &"quiet"
+func stay_factor(actor: StringName, visit: StringName) -> float:
+ var intent := intent_for(actor,visit)
+ return float(_data.policy.company_stay_multiplier) if intent==&"company" else float(_data.policy.rest_stay_multiplier) if intent==&"rest" else 1.0
+func company_rate(actor: StringName, visit: StringName) -> float:
+ return float(_data.policy.company_invite_rate) if intent_for(actor,visit)==&"company" else 1.0

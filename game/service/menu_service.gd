@@ -112,13 +112,14 @@ func offers(available: PackedStringArray, preparable: PackedStringArray=[]) -> A
     var q: Dictionary=quoted.details.quote
     var feasible := false
     for item in _inventory.items.instances(&"prepared_food"):
+     if item.attributes.get("personal_use",false):continue
      var container := _inventory.items.get_container(StringName(item.container_id))
      var local: bool=container.get("location_id")=="kiosk" or container.get("id")=="player_hand" and _inventory.player_pose.location_id==&"kiosk"
      if local and matches(PreparedItem.from_dict(item.attributes),q) and FoodFreshness.view(item.attributes,_clock.world_minutes,_inventory.items.food_definitions).sellable:feasible=true;break
     if not feasible and food in preparable:
      var made := plan(StringName(food),{"variant_id":variant,"additions":additions})
      var inputs: Array[Dictionary]=[];inputs.assign(made.details.plan.inputs)
-     feasible=_inventory.available(&"kiosk",inputs).ok
+     feasible=_inventory.available(&"kiosk",inputs,true).ok
     if not feasible:continue
     var spice := float(_foods.definition(StringName(food)).spice)
     for id in q.additions:spice+=float(_data.additions[id].spice)

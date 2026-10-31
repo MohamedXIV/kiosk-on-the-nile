@@ -106,7 +106,7 @@ func _surface_reachable(id: StringName) -> ActionResult:
  return ActionResult.success()
 
 var equipment: EquipmentService
-func available(location_id: StringName, requirements: Array[Dictionary]) -> ActionResult:
+func available(location_id: StringName, requirements: Array[Dictionary], commercial: bool=false) -> ActionResult:
  var remaining: Dictionary={}
  var sources: Array[Dictionary]=[]
  var reserved := items.reserved_quantities()
@@ -116,6 +116,7 @@ func available(location_id: StringName, requirements: Array[Dictionary]) -> Acti
   if not ContentValidation.integer(requirement.get("quantity")) or requirement.quantity<1 or items.definition(StringName(definition_id)).is_empty():return ContentValidation.fail("inventory.requirement")
   var needed := int(requirement.quantity)
   for item in material_instances(StringName(definition_id)):
+   if commercial and item.attributes.get("personal_use",false):continue
    if requirement.has("item_id") and requirement.item_id!=item.id:continue
    if requirement.has("grade") and item.attributes.get("lot",{}).get("grade")!=requirement.grade:continue
    if item.attributes.has("freshness") and not FoodFreshness.view(item.attributes,items.world_clock.world_minutes,items.food_definitions).sellable:continue

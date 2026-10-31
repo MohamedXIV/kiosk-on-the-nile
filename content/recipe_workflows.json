@@ -229,11 +229,6 @@
         "required_storage": "hand"
       },
       {
-        "definition_id": "bread",
-        "quantity": 1,
-        "required_storage": "dry"
-      },
-      {
         "definition_id": "garlic_sauce",
         "quantity": 1,
         "required_storage": "cold"
