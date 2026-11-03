@@ -19,6 +19,7 @@ var _session: GameSession
 var _text: UiText
 var _strip: StatusStrip
 var _menu: PopupPanel
+var _menu_tabs: TabContainer
 var _prompt_panel: PanelContainer
 var _prompt: Label
 var _station: Label
@@ -42,32 +43,39 @@ func configure(text: UiText) -> void:
  _menu = PopupPanel.new()
  _menu.theme = theme
  add_child(_menu)
- var actions := VBoxContainer.new()
- var menu_scroll := ScrollContainer.new()
- menu_scroll.custom_minimum_size=Vector2(280,180)
- _menu.add_child(menu_scroll)
- actions.size_flags_horizontal=Control.SIZE_EXPAND_FILL
- menu_scroll.add_child(actions)
- for entry in [{"key":"menu_prices","action":func():menu_requested.emit()},{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"inventory","action":func():inventory_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"save","action":func():save_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"diagnostics","action":func():diagnostics_requested.emit()}]:
-  var callback: Callable = entry.action
-  actions.add_child(text.key_button(entry.key,func():_menu.hide();callback.call()))
- actions.add_child(text.key_button("supplier_phone",func():_menu.hide();supplier_requested.emit()))
- actions.add_child(text.key_button("consume",func():_menu.hide();consume_requested.emit()))
+ var tabs := TabContainer.new();_menu_tabs=tabs
+ tabs.custom_minimum_size=Vector2(300,200)
+ _menu.add_child(tabs)
+ var pages: Array[String]=["cozy.daily","cozy.outings","cozy.settings"]
+ var columns: Array[VBoxContainer]=[]
+ for page in pages:
+  var actions := VBoxContainer.new()
+  var scroll := SheetControls.scroll(actions)
+  tabs.add_child(scroll);tabs.set_tab_title(tabs.get_tab_count()-1,UiText.localized(page))
+  columns.append(actions)
+ var daily := columns[0]
+ for entry in [{"key":"inventory","action":func():inventory_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"menu_prices","action":func():menu_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"consume","action":func():consume_requested.emit()},{"key":"save","action":func():save_requested.emit()}]:
+  var callback: Callable=entry.action
+  daily.add_child(text.key_button(entry.key,func():_menu.hide();callback.call()))
+ var outings := columns[1]
+ outings.add_child(text.key_button("supplier_phone",func():_menu.hide();supplier_requested.emit()))
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
-  actions.add_child(text.key_button(entry.key,func():_menu.hide();travel_requested.emit(route_id)))
- actions.add_child(text.key_button("fatigue_accessibility",func():
+  outings.add_child(text.key_button(entry.key,func():_menu.hide();travel_requested.emit(route_id)))
+ var settings := columns[2]
+ var language := SheetControls.label(UiText.localized("cozy.language"));UiText.bind_control(language,"cozy.language");settings.add_child(language)
+ settings.add_child(LocaleService.current.picker())
+ settings.add_child(text.key_button("fatigue_accessibility",func():
   if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
   _menu.hide()))
- actions.add_child(LocaleService.current.picker())
- var tuning_button := text.key_button("tuning",func():_menu.hide();tuning_requested.emit())
- tuning_button.name="TuningButton"
- actions.add_child(tuning_button)
  var help := text.key_label("help",{"move_keys":" / ".join([text.data.input.move_up[0],text.data.input.move_left[0],text.data.input.move_down[0],text.data.input.move_right[0]]),"primary_key":text.data.input.interact_primary[0],"secondary_key":text.data.input.interact_secondary[0],"notebook_key":text.data.input.notebook[0]})
- help.custom_minimum_size.x = 280
- help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
- help.add_theme_font_size_override("font_size",15)
- actions.add_child(help)
+ help.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(help);settings.add_child(help)
+ var developer := VBoxContainer.new();developer.name="DeveloperTools";settings.add_child(developer)
+ var dev_heading := SheetControls.label(UiText.localized("cozy.developer"));UiText.bind_control(dev_heading,"cozy.developer");SheetControls.muted(dev_heading);developer.add_child(dev_heading)
+ developer.add_child(text.key_button("tuning",func():_menu.hide();tuning_requested.emit()))
+ developer.add_child(text.key_button("diagnostics",func():_menu.hide();diagnostics_requested.emit()))
+ LocaleService.current.changed.connect(_refresh_menu_titles)
+ _menu.popup_hide.connect(func():_strip.focus_menu())
  var prompt_panel := PanelContainer.new()
  _prompt_panel = prompt_panel
  prompt_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
@@ -116,11 +124,12 @@ func configure(text: UiText) -> void:
  toast.duration = float(text.data.toasts.duration)
  add_child(toast)
 func bind(session: GameSession) -> void:
- _menu.find_child("TuningButton",true,false).visible=session.config.section("tuning").dev_panel_enabled
+ _menu.find_child("DeveloperTools",true,false).visible=session.config.section("tuning").dev_panel_enabled
  _session = session
  notebook.bind_session(session)
  _thought=UiText.label("")
  _thought.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ _thought.add_theme_stylebox_override("normal",CozyTheme.box(CozyTheme.IVORY,CozyTheme.LINE,12,12))
  _thought.anchor_left=0.05;_thought.anchor_right=0.48;_thought.anchor_top=0.65;_thought.anchor_bottom=0.8
  _thought.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(_thought)
@@ -159,9 +168,13 @@ func present(target: InteractionTarget) -> void:
  _thought.visible=not thought.is_empty() and not _session.personal.active() and focused==null and not notebook.visible and not sleep_panel.visible
 
 func _open_menu() -> void:
- _menu.size=Vector2i(320,int(minf(560,get_viewport_rect().size.y-_strip.size.y-35)))
+ _menu.size=Vector2i(int(minf(460,get_viewport_rect().size.x-24)),int(minf(550,get_viewport_rect().size.y-_strip.size.y-35)))
  _menu.popup()
- _menu.position = Vector2i(int(_strip.position.x),int(_strip.position.y+_strip.size.y+8))
+ _menu.position = Vector2i(int(_strip.position.x if not LocaleService.current.rtl() else _strip.position.x+_strip.size.x-_menu.size.x),int(_strip.position.y+_strip.size.y+8))
+
+func _refresh_menu_titles() -> void:
+ var pages: Array[String]=["cozy.daily","cozy.outings","cozy.settings"]
+ for index in pages.size():_menu_tabs.set_tab_title(index,UiText.localized(pages[index]))
 
 func top_occupied_height() -> float:
  return _strip.position.y+_strip.size.y+float(_text.data.hud.margin)
