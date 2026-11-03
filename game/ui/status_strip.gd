@@ -13,6 +13,8 @@ var _period_textures: Array[Texture2D]=[]
 var _held: Label
 var _bars: Dictionary = {}
 var _save_feedback: Label
+var _menu_button: Button
+var _need_labels: Array[Label]=[]
 func configure(text: UiText) -> void:
  _text = text
  var settings: Dictionary = text.data.hud
@@ -43,8 +45,11 @@ func configure(text: UiText) -> void:
  heading.add_child(_money)
  _state = UiText.label()
  _state.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ _state.clip_text=true
+ _state.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
  heading.add_child(_state)
  var menu := text.key_button("menu",func():menu_requested.emit())
+ _menu_button=menu
  menu.focus_mode=Control.FOCUS_ALL
  menu.custom_minimum_size.x=80
  menu.size_flags_vertical=Control.SIZE_SHRINK_CENTER
@@ -62,16 +67,16 @@ func configure(text: UiText) -> void:
   var meter := HBoxContainer.new()
   meter.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
   if icons.get("needs",{}).has(key):meter.add_child(_icon(icons.needs[key],float(icons.get("size",22))))
-  meter.add_child(text.key_label(key))
+  var caption := text.key_label(key);_need_labels.append(caption);meter.add_child(caption)
   var bar := ProgressBar.new()
-  bar.custom_minimum_size = Vector2(float(settings.meter_width),8)
+  bar.custom_minimum_size = Vector2(60,8)
   bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
   bar.show_percentage = false
   var fill := StyleBoxFlat.new()
-  fill.bg_color = Color(settings.meter_colors[key])
+  fill.bg_color = Color("#87a279")
   fill.set_corner_radius_all(4)
   var background := fill.duplicate()
-  background.bg_color = Color("#463c32")
+  background.bg_color = Color("#dce3d5")
   bar.add_theme_stylebox_override("fill",fill)
   bar.add_theme_stylebox_override("background",background)
   meter.add_child(bar)
@@ -92,6 +97,8 @@ func show_save_status(key: String) -> void:
   _save_feedback.text=_text.text(key)
   UiText.bind_control(_save_feedback,"ui."+key)
 func present(session: GameSession) -> void:
+ var compact := get_viewport_rect().size.x<850
+ for caption in _need_labels:caption.visible=not compact
  var minute := int(session.clock.minutes)%1440
  _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
  if _day_icon!=null:
@@ -128,3 +135,6 @@ func _icon(path: String, extent: float) -> TextureRect:
  icon.size_flags_vertical=Control.SIZE_SHRINK_CENTER
  if not path.is_empty():icon.texture=load(path) as Texture2D
  return icon
+
+func focus_menu() -> void:
+ if is_instance_valid(_menu_button) and _menu_button.is_visible_in_tree():_menu_button.grab_focus()

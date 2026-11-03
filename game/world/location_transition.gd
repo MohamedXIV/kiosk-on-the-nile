@@ -9,14 +9,14 @@ func configure(timing: Dictionary, source_theme: Theme = null) -> void:
  _timing = timing.duplicate(true)
  layer = 20
  _veil = ColorRect.new()
- _veil.color = Color.BLACK
+ _veil.color = Color("#e4ebdf")
  _veil.modulate.a = 0
  _veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  _veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
  add_child(_veil)
  _message = Label.new()
  _message.theme = source_theme
- _message.text_direction = Control.TEXT_DIRECTION_RTL
+ _message.text_direction = Control.TEXT_DIRECTION_AUTO
  _message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
  _message.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
  _message.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

@@ -1321,6 +1321,15 @@
     "comment.food.ful": "الفول",
     "comment.food.shawarma": "الشاورما",
     "comment.food.potato_fried": "البطاطس المقلية",
-    "comment.food.potato_baked": "بطاطس الفرن"
+    "comment.food.potato_baked": "بطاطس الفرن",
+    "cozy.inspect": "التفاصيل",
+    "cozy.product_details": "اختيارك",
+    "cozy.title_eyebrow": "حياة صغيرة على النيل",
+    "cozy.title_hint": "خد وقتك… الكورنيش لسه فيه مكان لقعدة هادية.",
+    "cozy.language": "اللغة",
+    "cozy.daily": "يومك",
+    "cozy.outings": "مشاوير",
+    "cozy.settings": "إعدادات ومساعدة",
+    "cozy.developer": "أدوات التطوير"
   }
 }

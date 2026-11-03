@@ -24,8 +24,9 @@ func present(session: GameSession, room: LocationView, camera: Camera2D) -> void
      label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
      label.custom_minimum_size.x = 260
      label.add_theme_font_size_override("font_size",17)
-     label.add_theme_color_override("font_outline_color",Color("#17100b"))
-     label.add_theme_constant_override("outline_size",8)
+     label.add_theme_color_override("font_color",CozyTheme.IVORY)
+     label.add_theme_color_override("font_outline_color",Color("#293c35"))
+     label.add_theme_constant_override("outline_size",5)
      label.mouse_filter = Control.MOUSE_FILTER_IGNORE
      add_child(label)
      _labels[id] = label

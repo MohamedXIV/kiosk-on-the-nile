@@ -25,7 +25,7 @@ static func button(value: String, callback: Callable) -> Button:
  control.text = value
  control.text_direction = Control.TEXT_DIRECTION_AUTO
  control.focus_mode = Control.FOCUS_ALL
- control.custom_minimum_size.y = 44
+ control.custom_minimum_size = Vector2(96,44)
  control.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  control.pressed.connect(callback)
  return control

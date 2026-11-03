@@ -32,6 +32,7 @@ static func header(parent: VBoxContainer, heading: Label, text: UiText, close: C
  heading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  row.add_child(heading)
  var close_button := text.key_button("close",close)
+ close_button.custom_minimum_size.x=96
  close_button.theme_type_variation="QuietButton"
  close_button.focus_mode=Control.FOCUS_ALL
  row.add_child(close_button)
@@ -53,17 +54,27 @@ static func shell(panel: Control, width: float=1100, top: float=122, bottom: flo
  panel.theme_type_variation="Sheet"
  panel.set_meta("sheet_width",width)
  panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
- var fit := func():
-  if not panel.is_inside_tree():return
-  var extent := panel.get_viewport_rect().size
-  var margin := 16.0 if extent.x>=700 else 8.0
-  var available := minf(width,extent.x-margin*2)
-  var inset := minf(top,extent.y*0.22)
-  panel.position=Vector2((extent.x-available)*0.5,inset)
-  panel.size=Vector2(available,maxf(120,extent.y-inset-bottom))
- panel.get_viewport().size_changed.connect(fit)
- panel.visibility_changed.connect(func():if panel.visible:fit.call_deferred())
- fit.call_deferred()
+ var reference: WeakRef=weakref(panel)
+ var queue_fit := func():_queue_sheet_fit(reference,width,top,bottom)
+ panel.get_viewport().size_changed.connect(queue_fit)
+ panel.minimum_size_changed.connect(queue_fit)
+ panel.visibility_changed.connect(queue_fit)
+ queue_fit.call()
+static func _queue_sheet_fit(reference: WeakRef, width: float, top: float, bottom: float) -> void:
+ var panel: Control=reference.get_ref()
+ if not is_instance_valid(panel) or not panel.is_inside_tree() or panel.get_meta("sheet_fit_pending",false):return
+ panel.set_meta("sheet_fit_pending",true)
+ _fit_sheet.call_deferred(reference,width,top,bottom)
+static func _fit_sheet(reference: WeakRef, width: float, top: float, bottom: float) -> void:
+ var panel: Control=reference.get_ref()
+ if not is_instance_valid(panel) or not panel.is_inside_tree():return
+ panel.set_meta("sheet_fit_pending",false)
+ var extent := panel.get_viewport_rect().size
+ var margin := 16.0 if extent.x>=700 else 8.0
+ var available := minf(width,extent.x-margin*2)
+ var inset := minf(top,extent.y*0.22)
+ panel.position=Vector2((extent.x-available)*0.5,inset)
+ panel.size=Vector2(available,maxf(120,extent.y-inset-bottom))
 static func columns(parent: Control, collapse_width: float=760) -> BoxContainer:
  var row := BoxContainer.new()
  row.size_flags_horizontal=Control.SIZE_EXPAND_FILL
