@@ -49,7 +49,10 @@ func configure(page_size: int) -> void:
   field.fit_to_longest_item=false
   filters.add_child(field)
   field.item_selected.connect(func(_index):if not _changing:_apply_filters())
- _reset=_button("reset",clear_filters);filters.add_child(_reset)
+ _reset=_button("reset",clear_filters)
+ _reset.custom_minimum_size.x=140
+ _reset.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ filters.add_child(_reset)
  var reading := PanelContainer.new()
  reading.theme_type_variation="Inset"
  reading.size_flags_vertical=Control.SIZE_EXPAND_FILL
