@@ -20,33 +20,55 @@ var _page_size: int=40
 var _changing: bool=false
 func configure(page_size: int) -> void:
  _page_size=page_size
+ add_theme_constant_override("separation",10)
  _hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ SheetControls.muted(_hint)
  add_child(_hint)
  _search.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _search.clear_button_enabled=true
+ _search.custom_minimum_size.y=44
  _search.text_changed.connect(func(_value):_apply_filters())
  add_child(_search)
+ var filter_scroll := ScrollContainer.new()
+ filter_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+ filter_scroll.custom_minimum_size.y=58
+ add_child(filter_scroll)
  var filters := HFlowContainer.new()
+ filters.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  filters.add_theme_constant_override("h_separation",8)
  filters.add_theme_constant_override("v_separation",6)
- add_child(filters)
+ filter_scroll.add_child(filters)
+ resized.connect(func():
+  filter_scroll.custom_minimum_size.y=58 if size.x>=960 else 108
+  _hint.visible=size.x>=760
+  _search.tooltip_text=NotebookView.t("history_hint") if size.x<760 else NotebookView.t("search_label")
+ )
  for field in [_actor,_day,_chapter,_channel,_order]:
-  field.custom_minimum_size.x=150
+  field.custom_minimum_size=Vector2(140,44)
   field.size_flags_horizontal=Control.SIZE_EXPAND_FILL
   field.fit_to_longest_item=false
   filters.add_child(field)
   field.item_selected.connect(func(_index):if not _changing:_apply_filters())
  _reset=_button("reset",clear_filters);filters.add_child(_reset)
+ var reading := PanelContainer.new()
+ reading.theme_type_variation="Inset"
+ reading.size_flags_vertical=Control.SIZE_EXPAND_FILL
+ reading.custom_minimum_size.y=96
+ add_child(reading)
+ _body.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _body.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _body.text_direction=Control.TEXT_DIRECTION_AUTO
  _body.selection_enabled=true
- add_child(_body)
+ reading.add_child(_body)
  var paging := HBoxContainer.new()
  paging.add_theme_constant_override("separation",10)
  add_child(paging)
  _previous=_button("previous",func():_page-=1;_render(true));paging.add_child(_previous)
  _count.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _count.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ _count.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ _count.set_meta("centered",true)
+ SheetControls.muted(_count)
  paging.add_child(_count)
  _next=_button("next",func():_page+=1;_render(true));paging.add_child(_next)
  _rebuild_options()
@@ -54,6 +76,8 @@ func configure(page_size: int) -> void:
 func _button(key: String, action: Callable) -> Button:
  var button := UiText.button(NotebookView.t(key),action)
  button.focus_mode=Control.FOCUS_ALL
+ button.custom_minimum_size=Vector2(96,44)
+ button.theme_type_variation="QuietButton"
  button.set_meta("notebook_key",key)
  return button
 func _metadata(field: OptionButton, fallback: Variant) -> Variant:
@@ -97,7 +121,7 @@ func set_entries(entries: Array[Dictionary]) -> void:
 func refresh_language() -> void:
  _hint.text=NotebookView.t("history_hint")
  _search.placeholder_text=NotebookView.t("search")
- _search.tooltip_text=NotebookView.t("search_label")
+ _search.tooltip_text=NotebookView.t("history_hint") if size.x<760 else NotebookView.t("search_label")
  for pair in [[_actor,"actor_filter"],[_day,"day_filter"],[_chapter,"chapter_filter"],[_channel,"channel_filter"]]:pair[0].tooltip_text=NotebookView.t(str(pair[1]))
  for button in [_reset,_previous,_next]:button.text=NotebookView.t(str(button.get_meta("notebook_key")))
  _rebuild_options()

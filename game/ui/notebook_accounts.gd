@@ -16,18 +16,23 @@ var _display_text: String=""
 var _receipts: Array[Dictionary]=[]
 func configure(page_size: int) -> void:
  _page_size=page_size
+ add_theme_constant_override("separation",10)
  _mode.add_item("");_mode.add_item("")
+ _mode.custom_minimum_size.y=44
+ _mode.fit_to_longest_item=false
+ _mode.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _mode.item_selected.connect(func(_index):_page=0;refresh(true))
  add_child(_mode)
- _hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;add_child(_hint)
+ _hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(_hint);add_child(_hint)
+ var reading := PanelContainer.new();reading.theme_type_variation="Inset";reading.size_flags_vertical=Control.SIZE_EXPAND_FILL;add_child(reading)
  _body.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _body.selection_enabled=true
  _body.text_direction=Control.TEXT_DIRECTION_AUTO
- add_child(_body)
+ reading.add_child(_body)
  add_child(_paging)
- _previous=UiText.button("",func():_page-=1;refresh(true));_previous.focus_mode=Control.FOCUS_ALL;_paging.add_child(_previous)
- _count.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_count.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_paging.add_child(_count)
- _next=UiText.button("",func():_page+=1;refresh(true));_next.focus_mode=Control.FOCUS_ALL;_paging.add_child(_next)
+ _previous=UiText.button("",func():_page-=1;refresh(true));_previous.focus_mode=Control.FOCUS_ALL;_previous.custom_minimum_size=Vector2(96,44);_previous.theme_type_variation="QuietButton";_paging.add_child(_previous)
+ _count.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_count.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_count.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_count.set_meta("centered",true);SheetControls.muted(_count);_paging.add_child(_count)
+ _next=UiText.button("",func():_page+=1;refresh(true));_next.focus_mode=Control.FOCUS_ALL;_next.custom_minimum_size=Vector2(96,44);_next.theme_type_variation="QuietButton";_paging.add_child(_next)
  refresh_language()
 func bind_session(session: GameSession) -> void:_session=session
 func refresh_language() -> void:

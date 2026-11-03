@@ -61,7 +61,7 @@ static func paragraph(label: RichTextLabel, value: String, direction: int=-1) ->
    var code := value.unicode_at(i)
    if code>=0x0590 and code<=0x08ff:rtl=true;break
    if (code>=65 and code<=90) or (code>=97 and code<=122):rtl=false;break
- label.push_paragraph(HORIZONTAL_ALIGNMENT_LEFT,Control.TEXT_DIRECTION_RTL if rtl else Control.TEXT_DIRECTION_LTR)
+ label.push_paragraph(HORIZONTAL_ALIGNMENT_RIGHT if rtl else HORIZONTAL_ALIGNMENT_LEFT,Control.TEXT_DIRECTION_RTL if rtl else Control.TEXT_DIRECTION_LTR)
  label.add_text(value+"\n")
  label.pop()
 static func readable_text(label: RichTextLabel, value: String) -> void:
