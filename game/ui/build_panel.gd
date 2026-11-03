@@ -15,44 +15,44 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
  _text=text
  theme=text.make_theme()
  layout_direction=Control.LAYOUT_DIRECTION_INHERITED
- grow_vertical=Control.GROW_DIRECTION_BEGIN
- custom_minimum_size.x=330
- anchor_left=1
- anchor_right=1
- anchor_top=0.16
- anchor_bottom=0.96
- offset_left=-355
- offset_right=-18
- offset_top=0
- offset_bottom=0
+ # Arrangement remains a dock: the uncovered world still receives placement clicks.
+ theme_type_variation=&"Sheet"
+ get_viewport().size_changed.connect(_fit_dock)
+ _fit_dock()
  var box := VBoxContainer.new()
  var scroll := SheetControls.scroll(box)
  add_child(scroll)
- box.add_child(text.key_label("arrange_title"))
- box.add_child(_choices)
+ SheetControls.header(box,text.key_label("arrange_title"),text,func():_controller.cancel();hide();closed.emit())
+ var piece := SheetControls.card(box)
+ _choices.fit_to_longest_item=false;piece.add_child(_choices)
  _choices.item_selected.connect(func(index):_select(StringName(_choices.get_item_metadata(index))))
- var coordinates := HBoxContainer.new()
- box.add_child(coordinates)
+ var placement := SheetControls.card(box)
+ var coordinates := HFlowContainer.new()
+ coordinates.layout_direction=Control.LAYOUT_DIRECTION_LTR
+ placement.add_child(coordinates)
  for pair in [["X",_x],["Y",_y]]:
-  coordinates.add_child(UiText.label(pair[0]))
+  var coordinate := VBoxContainer.new();coordinates.add_child(coordinate)
+  coordinate.add_child(UiText.label(pair[0]))
   var field: SpinBox=pair[1]
   field.min_value=-256
   field.max_value=256
   field.step=1
-  field.custom_minimum_size.x=90
-  coordinates.add_child(field)
+  field.custom_minimum_size=Vector2(96,44)
+  field.get_line_edit().text_direction=Control.TEXT_DIRECTION_LTR
+  coordinate.add_child(field)
   field.value_changed.connect(func(_value):if not _updating:_preview())
- box.add_child(_host)
+ _host.fit_to_longest_item=false;placement.add_child(_host)
  _host.item_selected.connect(_select_host)
- var actions := HBoxContainer.new()
+ var actions := HFlowContainer.new()
+ actions.add_theme_constant_override("h_separation",8)
  box.add_child(actions)
  actions.add_child(SheetControls.key_button(text,"arrange_rotate",rotate_selection))
- actions.add_child(SheetControls.key_button(text,"arrange_confirm",func():_controller.confirm()))
+ var confirm := SheetControls.key_button(text,"arrange_confirm",func():_controller.confirm());SheetControls.primary(confirm);actions.add_child(confirm)
  actions.add_child(SheetControls.key_button(text,"arrange_store",func():_controller.store_selected();_refresh_choices()))
  for button in actions.get_children():
   button.custom_minimum_size=Vector2(90,44)
  _status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- box.add_child(_status)
+ var help := SheetControls.card(box);help.add_child(_status)
  box.add_child(SheetControls.key_button(text,"arrange_close",func():_controller.cancel();hide();closed.emit()))
  LocaleService.current.changed.connect(func():
   _refresh_choices(true)
@@ -149,3 +149,11 @@ func _select_host(index: int) -> void:
   _rotation=int(host.rotation)
   _updating=false
  _preview()
+
+func _fit_dock() -> void:
+ var viewport := get_viewport_rect().size
+ var width := minf(380,maxf(216,viewport.x*0.43))
+ width=minf(width,maxf(160,viewport.x-72))
+ anchor_left=1;anchor_right=1;anchor_top=0;anchor_bottom=1
+ offset_left=-width-12;offset_right=-12
+ offset_top=minf(122,maxf(18,viewport.y*0.17));offset_bottom=-18
