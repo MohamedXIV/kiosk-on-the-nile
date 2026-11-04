@@ -25,20 +25,25 @@ func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self)
  var column := VBoxContainer.new();add_child(column)
- SheetControls.title(_heading);column.add_child(_heading)
- SheetControls.muted(_wallet);column.add_child(_wallet)
+ var heading_row := HBoxContainer.new();column.add_child(heading_row)
+ SheetControls.title(_heading);heading_row.add_child(_heading)
+ SheetControls.muted(_wallet);heading_row.add_child(_wallet)
  _search.placeholder_text=OutingText.t("search")
  _search.clear_button_enabled=true
  _search.text_changed.connect(func(_value):_render_cards())
  column.add_child(_search)
- var body := SheetControls.columns(column,780)
- var scroll := SheetControls.scroll(_cards);scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.size_flags_stretch_ratio=1.1;scroll.custom_minimum_size.y=150;body.add_child(scroll)
+ var body := SheetControls.columns(column,0)
+ var scroll := SheetControls.scroll(_cards);scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.size_flags_stretch_ratio=1.1;scroll.custom_minimum_size.y=60;body.add_child(scroll)
  var detail_panel := PanelContainer.new();detail_panel.theme_type_variation="Card";detail_panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(detail_panel)
  var detail_column := VBoxContainer.new()
  var detail_scroll := SheetControls.scroll(detail_column);detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.add_child(detail_scroll)
  var detail_heading := SheetControls.label(UiText.localized("cozy.product_details",{},"Your selection"));UiText.bind_control(detail_heading,"cozy.product_details");SheetControls.title(detail_heading);detail_column.add_child(detail_heading)
  detail_column.add_child(_details)
- detail_column.add_child(text.key_label("shop_quantity"))
+ var checkout := PanelContainer.new();checkout.theme_type_variation="Inset";column.add_child(checkout)
+ var checkout_row := HFlowContainer.new();checkout.add_child(checkout_row)
+ var quantity_group := HBoxContainer.new();quantity_group.size_flags_vertical=Control.SIZE_SHRINK_CENTER;checkout_row.add_child(quantity_group)
+ var quantity_label := text.key_label("shop_quantity");quantity_group.add_child(quantity_label)
+ _quantity.tooltip_text=text.text("shop_quantity")
  _quantity.min_value=1;_quantity.max_value=1;_quantity.step=1;_quantity.value=1
  _quantity.value_changed.connect(func(_value):
   if not _updating:_invalidate();_update_details())
@@ -46,13 +51,19 @@ func configure(text: UiText, session: GameSession) -> void:
   if not _updating:_invalidate();_feedback.text="")
  _quantity.custom_minimum_size.y=44
  _quantity.get_line_edit().text_direction=Control.TEXT_DIRECTION_LTR
- detail_column.add_child(_quantity)
- detail_column.add_child(SheetControls.key_button(text,"shop_review",_review))
- _confirm=SheetControls.key_button(text,"shop_confirm",_purchase);_confirm.disabled=true;SheetControls.primary(_confirm);detail_column.add_child(_confirm)
- detail_column.add_child(_feedback)
+ _quantity.custom_minimum_size.x=100
+ quantity_group.add_child(_quantity)
+ var review := SheetControls.key_button(text,"shop_review",_review);review.custom_minimum_size.x=170;checkout_row.add_child(review)
+ _confirm=SheetControls.key_button(text,"shop_confirm",_purchase);_confirm.disabled=true;SheetControls.primary(_confirm);_confirm.custom_minimum_size.x=170;checkout_row.add_child(_confirm)
+ column.add_child(_feedback);_feedback.hide()
  var footer := HBoxContainer.new();column.add_child(footer)
  var time_hint := SheetControls.label(OutingText.t("world_continues"));SheetControls.muted(time_hint);footer.add_child(time_hint)
- var back := SheetControls.key_button(text,"journey_return",_return);back.theme_type_variation="QuietButton";footer.add_child(back)
+ var back := SheetControls.key_button(text,"journey_return",_return);back.custom_minimum_size.x=160;back.theme_type_variation="QuietButton";footer.add_child(back)
+ resized.connect(func():
+  quantity_label.visible=size.x>=800
+  time_hint.visible=size.y>=500
+  body.vertical=false
+ )
  hide()
 func present() -> void:
  var route := _session.travel.route()
@@ -99,6 +110,7 @@ func _invalidate() -> void:
  if _confirm!=null:_confirm.disabled=true
 func _update_details() -> void:
  _confirm.disabled=_quote==null
+ _feedback.visible=_quote!=null or _bought or _last_result!=null
  if _selected.is_empty():_details.text=OutingText.t("choose_offer");_quantity.editable=false;_feedback.text="";return
  var lines := PackedStringArray([OutingText.offer(_shop_id,_selected,"label"),OutingText.offer(_shop_id,_selected,"description"),_text.text("shop_price",{"price":"%.2f" % (int(_selected.price_minor)/100.0),"stock":_selected.available})])
  for part in _selected.contents:

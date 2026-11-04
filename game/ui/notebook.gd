@@ -38,6 +38,7 @@ func configure(text: UiText) -> void:
  hide()
 func _scroll(box: VBoxContainer) -> ScrollContainer:
  var scroll := ScrollContainer.new()
+ scroll.follow_focus=true
  scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
  box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  box.add_theme_constant_override("separation",12)

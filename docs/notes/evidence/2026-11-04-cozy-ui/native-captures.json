@@ -1,0 +1,1222 @@
+[
+  {
+    "area": "title",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "title",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "hud",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "hud",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "shop",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "shop",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "inventory",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "inventory",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "recipe",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "recipe",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "recipe_v2",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "recipe_v2",
+      "limitations": [
+        "V2 liver recipe shows genuine initial ingredient availability; no unearned stock or progress is injected."
+      ],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "dialogue",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "dialogue",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "notes",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "notes",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "people",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "people",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "history",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "history",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "accounts",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "accounts",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "visitor",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "visitor",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "payment",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "payment",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "supplier",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "supplier",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "district",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "district",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "sleep",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "sleep",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "journey",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "journey",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "build",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "build",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "menu",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "menu",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "tuning",
+    "locale": "ar_EG",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "tuning",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "title",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "title",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "hud",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "hud",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "shop",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "shop",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "inventory",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "inventory",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "recipe",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "recipe",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "recipe_v2",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "recipe_v2",
+      "limitations": [
+        "V2 liver recipe shows genuine initial ingredient availability; no unearned stock or progress is injected."
+      ],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "dialogue",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "dialogue",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "notes",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "notes",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "people",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "people",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "history",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "history",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "accounts",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "accounts",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "visitor",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "visitor",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "payment",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "payment",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "supplier",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "supplier",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "district",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "district",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "sleep",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "sleep",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "journey",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "journey",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "build",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "build",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "menu",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "menu",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "tuning",
+    "locale": "en",
+    "width": 1280,
+    "height": 720,
+    "exit": 0,
+    "status": {
+      "area": "tuning",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "title",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "title",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "hud",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "hud",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "shop",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "shop",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "inventory",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "inventory",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "recipe",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "recipe",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "dialogue",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "dialogue",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "notes",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "notes",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "people",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "people",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "history",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "history",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "accounts",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "accounts",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "visitor",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "visitor",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "payment",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "payment",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "supplier",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "supplier",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "district",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "district",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "sleep",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "sleep",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "journey",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "journey",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "build",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "build",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "menu",
+    "locale": "ar_EG",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "menu",
+      "limitations": [],
+      "locale": "ar_EG",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "title",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "title",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "hud",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "hud",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "shop",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "shop",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "inventory",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "inventory",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "recipe",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "recipe",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "dialogue",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "dialogue",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "notes",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "notes",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "people",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "people",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "history",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "history",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "accounts",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "accounts",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "visitor",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "visitor",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "payment",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "payment",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "supplier",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "supplier",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "district",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "district",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 950.04
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "sleep",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "sleep",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 930.0
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "journey",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "journey",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "build",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "build",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  },
+  {
+    "area": "menu",
+    "locale": "en",
+    "width": 640,
+    "height": 540,
+    "exit": 0,
+    "status": {
+      "area": "menu",
+      "limitations": [],
+      "locale": "en",
+      "ready": true,
+      "world_minutes": 940.02
+    },
+    "captured": true,
+    "script_error": false
+  }
+]

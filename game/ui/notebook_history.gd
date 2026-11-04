@@ -30,6 +30,7 @@ func configure(page_size: int) -> void:
  _search.text_changed.connect(func(_value):_apply_filters())
  add_child(_search)
  var filter_scroll := ScrollContainer.new()
+ filter_scroll.follow_focus=true
  filter_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
  filter_scroll.custom_minimum_size.y=58
  add_child(filter_scroll)

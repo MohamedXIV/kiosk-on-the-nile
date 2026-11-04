@@ -18,7 +18,7 @@ static func label(value: String = "") -> Label:
  var control := Label.new()
  control.text = value
  control.text_direction = Control.TEXT_DIRECTION_AUTO
- control.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT if LocaleService.current==null or LocaleService.current.rtl() else HORIZONTAL_ALIGNMENT_LEFT
+ control.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
  return control
 static func button(value: String, callback: Callable) -> Button:
  var control := Button.new()
@@ -47,7 +47,7 @@ static func refresh_tree(root: Node) -> void:
   root.layout_direction=Control.LAYOUT_DIRECTION_RTL if LocaleService.current.rtl() else Control.LAYOUT_DIRECTION_LTR
   if root is Label or root is Button or root is RichTextLabel:
    root.text_direction=Control.TEXT_DIRECTION_AUTO
-  if root is Label:root.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT if LocaleService.current.rtl() else HORIZONTAL_ALIGNMENT_LEFT
+  if root is Label:root.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT
   if root.has_meta("centered") and root is Label:root.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
   if root.has_meta("text_ref"):root.set("text",localized(str(root.get_meta("text_ref")),root.get_meta("text_args",{}),str(root.get_meta("source_fallback",""))))
   if root is OptionButton and root.has_meta("locale_picker"):root.select(0 if LocaleService.current.rtl() else 1)

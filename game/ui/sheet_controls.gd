@@ -21,6 +21,7 @@ static func card(parent: VBoxContainer) -> VBoxContainer:
  return column
 static func scroll(column: VBoxContainer) -> ScrollContainer:
  var control := ScrollContainer.new()
+ control.follow_focus=true
  control.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
  column.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  column.add_theme_constant_override("separation",12)

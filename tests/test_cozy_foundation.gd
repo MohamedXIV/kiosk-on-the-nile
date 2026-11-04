@@ -22,8 +22,30 @@ func run(check, tree) -> void:
  var label := SheetControls.label("أهلاً")
  tree.root.add_child(label)
  UiText.refresh_tree(label)
- check.equal(label.horizontal_alignment,HORIZONTAL_ALIGNMENT_RIGHT)
+ check.equal(label.horizontal_alignment,HORIZONTAL_ALIGNMENT_LEFT)
+ check.is_true(label.is_layout_rtl())
  locale.set_locale("en")
  UiText.refresh_tree(label)
  check.equal(label.horizontal_alignment,HORIZONTAL_ALIGNMENT_LEFT)
  button.free();label.free();store.free()
+ check.case("rtl_primary_action_keeps_readable_semantic_background")
+ var primary := UiText.button("Confirm",func():pass);primary.theme=first;SheetControls.primary(primary)
+ tree.root.add_child(primary)
+ for state in ["normal","hover","pressed"]:
+  var normal: StyleBoxFlat=primary.get_theme_stylebox(state)
+  var mirrored: StyleBoxFlat=primary.get_theme_stylebox(state+"_mirrored")
+  check.equal(mirrored.bg_color,normal.bg_color)
+ primary.free()
+ check.case("tabbing_to_last_action_reveals_it_in_scroll_region")
+ var viewport := SubViewport.new();viewport.size=Vector2i(320,180);tree.root.add_child(viewport)
+ var column := VBoxContainer.new();var scroll := SheetControls.scroll(column);viewport.add_child(scroll)
+ scroll.size=Vector2(300,150)
+ var last: Button
+ for index in range(12):
+  last=SheetControls.button("Action "+str(index),func():pass);column.add_child(last)
+ for frame in range(4):await tree.process_frame
+ last.grab_focus()
+ for frame in range(4):await tree.process_frame
+ check.is_true(last.get_global_rect().end.y<=scroll.get_global_rect().end.y+1)
+ viewport.queue_free()
+ for frame in range(2):await tree.process_frame

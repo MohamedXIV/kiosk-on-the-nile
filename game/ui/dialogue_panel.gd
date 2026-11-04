@@ -23,6 +23,7 @@ func _ready() -> void:
  SheetControls.title(_speaker)
  _layout.add_child(_speaker)
  _scroll=ScrollContainer.new()
+ _scroll.follow_focus=true
  _scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
  _scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _layout.add_child(_scroll)
