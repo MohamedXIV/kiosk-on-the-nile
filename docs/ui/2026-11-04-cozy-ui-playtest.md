@@ -47,3 +47,7 @@ Colors use ivory, sage and quiet warm neutrals with Cairo typography. Explicit m
 6. Open supplier terms and district quotes, arrange furniture, preview/cancel sleep and save/Continue. Confirm world time follows existing rules and every refused action explains itself.
 
 No merge, release, archive publication or version bump is authorized by completion of this playtest PR.
+
+## Follow-up Web check
+
+Actual normal Chromium startup entered gameplay using Enter, opened the notebook with N and dismissed it with Escape. Wallet and inventory snapshots remained unchanged. Screenshots and machine-readable results are retained under the evidence directory. This verifies that specific interaction, not all browser persistence or touch flows.
