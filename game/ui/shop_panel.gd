@@ -57,7 +57,7 @@ func configure(text: UiText, session: GameSession) -> void:
  _confirm=SheetControls.key_button(text,"shop_confirm",_purchase);_confirm.disabled=true;SheetControls.primary(_confirm);_confirm.custom_minimum_size.x=170;checkout_row.add_child(_confirm)
  column.add_child(_feedback);_feedback.hide()
  var footer := HBoxContainer.new();column.add_child(footer)
- var time_hint := SheetControls.label(OutingText.t("world_continues"));SheetControls.muted(time_hint);footer.add_child(time_hint)
+ var time_hint := SheetControls.label(OutingText.t("world_continues"));UiText.bind_control(time_hint,"outings.world_continues");SheetControls.muted(time_hint);footer.add_child(time_hint)
  var back := SheetControls.key_button(text,"journey_return",_return);back.custom_minimum_size.x=160;back.theme_type_variation="QuietButton";footer.add_child(back)
  resized.connect(func():
   quantity_label.visible=size.x>=800
@@ -78,6 +78,7 @@ func present() -> void:
  if revision!=_revision:
   _revision=revision;_offers=_session.shops.offers(_shop_id);_invalidate();_refresh_selection();_render_cards();_update_details()
  if locale_revision!=_locale_revision:
+  _quantity.tooltip_text=_text.text("shop_quantity")
   _locale_revision=locale_revision;_search.placeholder_text=OutingText.t("search");_render_cards();_update_details()
  _heading.text=OutingText.route(route,str(_session.travel.journey.data.get("route_id","")))
  _wallet.text=OutingText.t("wallet",{"amount":"%.2f" % (_session.wallet.balance/100.0)})
