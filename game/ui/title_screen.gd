@@ -69,6 +69,6 @@ static func boot(parent: Node) -> Label:
  status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  status.add_theme_font_size_override("font_size",24)
  status.add_theme_stylebox_override("normal",CozyTheme.box(Color("#e4ebdf"),Color.TRANSPARENT,0,20))
- status.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  parent.add_child(status)
+ status.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  return status
