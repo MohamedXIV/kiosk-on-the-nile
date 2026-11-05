@@ -63,3 +63,5 @@ Fixes rendering-batch fragmentation and premature/unheard conversation topics. S
 - [character-cooking-v2-0.4.0-prealpha.1](character-cooking-v2-0.4.0-prealpha.1/kiosk-on-the-nile-0.4.0-prealpha.1-dev-c7622bb5e2ff-web.zip) — new game required, save4/revision22; [guide](character-cooking-v2-0.4.0-prealpha.1/PLAYTEST_GUIDE_AR.md).
 
 - [Cozy UI development playtest](cozy-ui-dev-adb7721/kiosk-on-the-nile-0.4.0-prealpha.1-dev-adb7721a34f9-web.zip) — source adb7721, optimized development build, not a formal release.
+
+- [Cozy UI playtest with loading fix](cozy-ui-dev-e880408/kiosk-on-the-nile-0.4.0-prealpha.1-dev-e880408ed4b3-web.zip) — optimized development build, source e880408.

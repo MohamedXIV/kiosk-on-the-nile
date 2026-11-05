@@ -406,5 +406,14 @@
     "source_commit": "adb7721a34f984dc5ac0fa2d37cac57d43925c07",
     "publication_state": "development",
     "build_mode": "release"
+  },
+  {
+    "version": "cozy-ui-dev-e880408",
+    "path": "cozy-ui-dev-e880408/kiosk-on-the-nile-0.4.0-prealpha.1-dev-e880408ed4b3-web.zip",
+    "bytes": 12253988,
+    "sha256": "09f62e3bceb6bae259a92db46dff70db5e934f61a2ce7cf74b9b6687f38ee98e",
+    "source_commit": "e880408",
+    "publication_state": "development",
+    "build_mode": "release"
   }
 ]
