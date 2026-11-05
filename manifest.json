@@ -397,5 +397,14 @@
     },
     "save_impact": "New game required for all earlier unpublished revisions, including21; primary and backup bytes preserved.",
     "verification": "Independent immutable download: exact bytes/SHA256, ZIP CRC, all export hashes, pinned release WASM, clean merge source/version/save22 and Arabic guide/changelog passed. Main CI41174164354 and check runs success. Previous42 entries and archive paths/bytes unchanged. Bounded native/normal-Web/matched-render observations; human natural pacing/device acceptance remains open."
+  },
+  {
+    "version": "cozy-ui-dev-adb7721",
+    "path": "cozy-ui-dev-adb7721/kiosk-on-the-nile-0.4.0-prealpha.1-dev-adb7721a34f9-web.zip",
+    "bytes": 12253979,
+    "sha256": "aca7e2c4756c6223887cdc7da960feff5a53b5567dc2707908ed76a9eff022ea",
+    "source_commit": "adb7721a34f984dc5ac0fa2d37cac57d43925c07",
+    "publication_state": "development",
+    "build_mode": "release"
   }
 ]
