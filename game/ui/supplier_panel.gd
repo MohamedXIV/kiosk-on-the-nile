@@ -20,42 +20,49 @@ var _summary_tick: int=-1
 var _cash := VBoxContainer.new()
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
- anchor_left=0.1;anchor_right=0.9;anchor_top=0.15;anchor_bottom=0.94
- var root := VBoxContainer.new();add_child(root)
- root.add_child(text.key_label("supplier_title"))
- var scroll := ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;root.add_child(scroll)
- var box := VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
- _summary.custom_minimum_size.y=150;_summary.text_direction=Control.TEXT_DIRECTION_RTL;box.add_child(_summary)
- var funds := HFlowContainer.new();box.add_child(funds)
- _deposit.min_value=1;_deposit.max_value=1000;_deposit.value=10;_deposit.step=1;_deposit.suffix="ج.م";_deposit.update_on_text_changed=true;funds.add_child(_deposit)
+ SheetControls.shell(self)
+ var root := VBoxContainer.new();root.add_theme_constant_override("separation",12);add_child(root)
+ SheetControls.header(root,text.key_label("supplier_title"),text,func():session.contact.panel_requested=false;hide())
+ var box := VBoxContainer.new();var scroll := SheetControls.scroll(box);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;root.add_child(scroll)
+ var columns := SheetControls.columns(box,820)
+ var account := VBoxContainer.new();account.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_child(account)
+ var account_card := SheetControls.card(account)
+ _readable(_summary);account_card.add_child(_summary)
+ var funds := HFlowContainer.new();funds.add_theme_constant_override("h_separation",8);account_card.add_child(funds)
+ _number(_deposit,1,1000,10);_deposit.suffix="ج.م";funds.add_child(_deposit)
  funds.add_child(_button("deposit",func():_apply(session.supply_transactions.deposit("fathi",roundi(_deposit.value*100),"deposit:"+str(Time.get_ticks_usec())))))
  funds.add_child(_button("settle",func():_apply(session.supply_transactions.settle("settle:"+str(Time.get_ticks_usec())))))
- box.add_child(_cash)
- box.add_child(_label("basket"))
- var basket := HFlowContainer.new();box.add_child(basket)
- for id in session.config.section("suppliers").catalog:
-  var column := VBoxContainer.new();basket.add_child(column)
-  column.add_child(_item_label(str(id)))
-  var count := SpinBox.new();count.min_value=0;count.max_value=int(session.config.section("suppliers").catalog[id].daily_stock);count.step=1;count.update_on_text_changed=true;count.value=2 if id=="tea_portion" else 0
-  count.custom_minimum_size.x=120;column.add_child(count);_basket[id]=count
- var schedule := HFlowContainer.new();box.add_child(schedule)
- _hour.min_value=0;_hour.max_value=23;_hour.value=int(session.config.section("suppliers").delivery_minute)/60;_hour.suffix="ساعة";_hour.update_on_text_changed=true;schedule.add_child(_hour)
- _minute.min_value=0;_minute.max_value=59;_minute.value=int(session.config.section("suppliers").delivery_minute)%60;_minute.suffix="دقيقة";_minute.update_on_text_changed=true;schedule.add_child(_minute)
- var weekdays := HFlowContainer.new();box.add_child(weekdays)
- for label in ["اليوم ١","٢","٣","٤","٥","٦","٧"]:
-  var check := CheckBox.new();check.text=label;UiText.bind_control(check,"supply.day",{"day":_days.size()+1});check.button_pressed=true;weekdays.add_child(check);_days.append(check)
- box.add_child(_label("week_help"))
- box.add_child(_destination)
- for label in ["رصيد مقدم","آجل — وافق فتحي على سقف الحساب","نقدي — حضور وتأكيد عند الموعد"]:_mode.add_item(label)
- box.add_child(_mode)
- _leave.text="أسمح بترك الدفعة في التخزين المحدد أثناء غيابي";_leave.button_pressed=true;UiText.bind_control(_leave,"supply.leave");box.add_child(_leave)
- _once.text="طلب إضافي مرة واحدة — بعد %s دقيقة بدل الجدول الدوري" % str(float(session.config.section("suppliers").extra_delay_minutes));UiText.bind_control(_once,"supply.once",{"minutes":float(session.config.section("suppliers").extra_delay_minutes)});box.add_child(_once)
- box.add_child(_button("quote",_quote))
- _preview.custom_minimum_size.y=160;_preview.text_direction=Control.TEXT_DIRECTION_RTL;box.add_child(_preview)
- _accept=_button("accept",_sign);_accept.disabled=true;box.add_child(_accept)
- box.add_child(_button("decline",func():_quote_id="";_accept.disabled=true;_preview.text=_t("declined")))
- box.add_child(_button("pause",func():
+ account_card.add_child(_cash)
+ account_card.add_child(_button("pause",func():
   if session.contracts.state.active!="":_apply(session.contracts.pause(str(session.contracts.state.versions[session.contracts.state.active].contract_id),"pause:"+str(Time.get_ticks_usec())))))
+ var order := VBoxContainer.new();order.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_child(order)
+ var basket_card := SheetControls.card(order)
+ var basket_heading := _label("basket");SheetControls.title(basket_heading);basket_card.add_child(basket_heading)
+ var basket := HFlowContainer.new();basket.add_theme_constant_override("h_separation",16);basket_card.add_child(basket)
+ for id in session.config.section("suppliers").catalog:
+  var column := VBoxContainer.new();column.custom_minimum_size.x=128;basket.add_child(column)
+  column.add_child(_item_label(str(id)))
+  var count := SpinBox.new();_number(count,0,int(session.config.section("suppliers").catalog[id].daily_stock),2 if id=="tea_portion" else 0)
+  column.add_child(count);_basket[id]=count
+ var schedule_card := SheetControls.card(order)
+ var schedule := HFlowContainer.new();schedule.add_theme_constant_override("h_separation",12);schedule_card.add_child(schedule)
+ _number(_hour,0,23,int(session.config.section("suppliers").delivery_minute)/60);_hour.suffix="ساعة";schedule.add_child(_hour)
+ _number(_minute,0,59,int(session.config.section("suppliers").delivery_minute)%60);_minute.suffix="دقيقة";schedule.add_child(_minute)
+ var weekdays := HFlowContainer.new();weekdays.add_theme_constant_override("h_separation",8);schedule_card.add_child(weekdays)
+ for index in range(7):
+  var check := CheckBox.new();UiText.bind_control(check,"supply.day",{"day":index+1});check.button_pressed=true;check.custom_minimum_size=Vector2(84,44);weekdays.add_child(check);_days.append(check)
+ var week_help := _label("week_help");SheetControls.muted(week_help);schedule_card.add_child(week_help)
+ _destination.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_destination.fit_to_longest_item=false;schedule_card.add_child(_destination)
+ for label in ["رصيد مقدم","آجل — وافق فتحي على سقف الحساب","نقدي — حضور وتأكيد عند الموعد"]:_mode.add_item(label)
+ _mode.fit_to_longest_item=false;schedule_card.add_child(_mode)
+ _leave.button_pressed=true;UiText.bind_control(_leave,"supply.leave");_leave.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_leave.custom_minimum_size.y=44;schedule_card.add_child(_leave)
+ UiText.bind_control(_once,"supply.once",{"minutes":float(session.config.section("suppliers").extra_delay_minutes)});_once.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_once.custom_minimum_size.y=44;schedule_card.add_child(_once)
+ var quote_button := _button("quote",_quote);SheetControls.primary(quote_button);schedule_card.add_child(quote_button)
+ var review := SheetControls.card(box)
+ _readable(_preview);review.add_child(_preview)
+ var review_actions := HFlowContainer.new();review_actions.add_theme_constant_override("h_separation",8);review.add_child(review_actions)
+ _accept=_button("accept",_sign);SheetControls.primary(_accept);_accept.disabled=true;review_actions.add_child(_accept)
+ review_actions.add_child(_button("decline",func():_quote_id="";_accept.disabled=true;_preview.text=_t("declined")))
  _feedback.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;root.add_child(_feedback)
  root.add_child(_button("back",func():session.contact.panel_requested=false;hide()))
  LocaleService.current.changed.connect(_refresh_language)
@@ -110,13 +117,13 @@ func _message(result: ActionResult) -> String:
  return _t(str(key)) if key!="" else _text.outcome(result)
 func _t(key: String, args: Dictionary = {}) -> String:return UiText.localized("supply."+key,args,key)
 func _label(key: String) -> Label:
- var label := UiText.label(_t(key));UiText.bind_control(label,"supply."+key)
+ var label := SheetControls.label(_t(key));UiText.bind_control(label,"supply."+key)
  return label
 func _item_label(id: String) -> Label:
- var label := UiText.label(ItemText.definition(_session,id));label.set_meta("item_definition",id)
+ var label := SheetControls.label(ItemText.definition(_session,id));label.set_meta("item_definition",id)
  return label
 func _button(key: String, action: Callable) -> Button:
- var button := UiText.button(_t(key),action);UiText.bind_control(button,"supply."+key)
+ var button := SheetControls.button(_t(key),action);UiText.bind_control(button,"supply."+key)
  return button
 func _refresh_language() -> void:
  if _session==null:return
@@ -133,3 +140,15 @@ func _refresh_language() -> void:
  _summary.text=SupplierText.summary(_session)
  if _quote_id!="":_preview.text=SupplierText.terms(_session,_session.contracts.state.quotes[_quote_id])
  _cash_rows()
+
+func _readable(control: RichTextLabel) -> void:
+ control.fit_content=true
+ control.scroll_active=false
+ control.selection_enabled=true
+ control.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ control.text_direction=Control.TEXT_DIRECTION_AUTO
+func _number(control: SpinBox, minimum: float, maximum: float, initial: float) -> void:
+ control.min_value=minimum;control.max_value=maximum;control.value=initial;control.step=1
+ control.update_on_text_changed=true
+ control.custom_minimum_size=Vector2(112,44)
+ control.get_line_edit().text_direction=Control.TEXT_DIRECTION_LTR

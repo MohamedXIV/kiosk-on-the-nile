@@ -12,16 +12,18 @@ var _choices := VBoxContainer.new()
 var _elapsed: float=0
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
- anchor_left=0.18;anchor_right=0.82;anchor_top=0.2;anchor_bottom=0.8
- var box := VBoxContainer.new();add_child(box)
+ SheetControls.shell(self,720)
+ var box := VBoxContainer.new();box.add_theme_constant_override("separation",14);add_child(box)
  SheetControls.header(box,_heading,text,hide)
- box.add_child(_description);box.add_child(_choices);box.add_child(_feedback)
+ var summary := SheetControls.card(box);summary.add_child(_description)
+ var scroll := SheetControls.scroll(_choices);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
+ _feedback.visible=false;box.add_child(_feedback)
  visibility_changed.connect(func():if not visible:_session.service.end_decision(_order_id))
  LocaleService.current.changed.connect(func():if visible:_refresh())
  hide()
 func present(order_id: StringName) -> void:
  _session.service.end_decision(_order_id)
- _order_id=order_id;_feedback.text=""
+ _order_id=order_id;_feedback.text="";_feedback.visible=false
  var item := _session.cooking.held_item()
  _item_id=item.id if item!=null else &""
  if not _valid():hide();return
@@ -52,12 +54,15 @@ func _refresh() -> void:
  var item := _session.cooking.held_item()
  var quality: int=int(_session.cooking.freshness(item).grade) if order.status==&"pending" and item!=null else order.served_quality
  var amount: int=order.base_price+int(order.tips[clampi(quality,0,3)])
- if not order.gift_promised:_choices.add_child(SheetControls.button(_text.text("payment_paid_settle" if already_served else "payment_paid",{"amount":NotebookView.money(amount)}),_choose.bind(&"paid")))
+ if not order.gift_promised:
+  var paid := SheetControls.button(_text.text("payment_paid_settle" if already_served else "payment_paid",{"amount":NotebookView.money(amount)}),_choose.bind(&"paid"))
+  SheetControls.primary(paid);_choices.add_child(paid)
  if order.gift_promised or _session.can_offer_hospitality(order.visit_id):_choices.add_child(SheetControls.button(_text.text("payment_gift_settle" if already_served else "payment_gift"),_choose.bind(&"gift")))
- _choices.add_child(SheetControls.button(_text.text("payment_later"),hide))
+ var later := SheetControls.button(_text.text("payment_later"),hide);later.theme_type_variation="QuietButton";_choices.add_child(later)
+ for button in _choices.get_children():button.custom_minimum_size=Vector2(0,44)
  UiText.refresh_tree(self)
 func _choose(mode: StringName) -> void:
  if not _valid():hide();return
  var result := _session.complete_service(_order_id,mode,_item_id)
- if not result.ok:_feedback.text=_text.outcome(result);return
+ if not result.ok:_feedback.text=_text.outcome(result);_feedback.visible=true;return
  hide();completed.emit(result)

@@ -4,6 +4,7 @@ var _glyph := OrderGlyph.new()
 var _label := Label.new()
 func configure(text: UiText, food: Dictionary) -> void:
  theme=text.make_theme()
+ theme_type_variation="Inset"
  mouse_filter=Control.MOUSE_FILTER_IGNORE
  var row := HBoxContainer.new()
  row.mouse_filter=Control.MOUSE_FILTER_IGNORE

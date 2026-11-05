@@ -1,19 +1,18 @@
 class_name ProductCard
 extends PanelContainer
 signal selected(offer_id: StringName)
+var _button: Button
 func configure(offer: Dictionary, definition: Dictionary, text: UiText, shop_id: StringName) -> void:
- var row := HBoxContainer.new()
- add_child(row)
- var thumbnail := Control.new()
- thumbnail.custom_minimum_size=Vector2(64,64)
- thumbnail.draw.connect(func():
-  var color := Color(definition.get("color","#b69560"))
-  thumbnail.draw_rect(Rect2(8,18,48,30),color)
-  thumbnail.draw_rect(Rect2(8,10,48,8),color.lightened(0.3))
-  thumbnail.draw_rect(Rect2(8,10,48,38),Color(0.2,0.15,0.1),false,2))
- row.add_child(thumbnail)
- var button := SheetControls.button(OutingText.offer(shop_id,offer,"label")+"\n"+text.text("shop_price",{"price":"%.2f" % (int(offer.price_minor)/100.0),"stock":offer.available}),func():selected.emit(StringName(offer.id)))
- button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
- button.custom_minimum_size.x=180
- button.disabled=int(offer.available)<=0
- row.add_child(button)
+ theme_type_variation="Card"
+ var row := HBoxContainer.new();add_child(row)
+ var thumbnail := ItemGlyph.new();thumbnail.configure(definition);row.add_child(thumbnail)
+ var column := VBoxContainer.new();column.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(column)
+ var name_label := SheetControls.label(OutingText.offer(shop_id,offer,"label"));column.add_child(name_label)
+ var price := SheetControls.label(text.text("shop_price",{"price":"%.2f" % (int(offer.price_minor)/100.0),"stock":offer.available}))
+ SheetControls.muted(price);column.add_child(price)
+ _button=SheetControls.button(UiText.localized("cozy.inspect",{},"Details"),func():selected.emit(StringName(offer.id)))
+ _button.disabled=int(offer.available)<=0
+ column.add_child(_button)
+func set_selected(value: bool) -> void:
+ _button.theme_type_variation="PrimaryButton" if value else "QuietButton"
+ _button.button_pressed=value

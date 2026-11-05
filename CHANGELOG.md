@@ -5,6 +5,14 @@ Project versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Changed — integrated cozy UI playtest
+
+- Redesign all existing player interfaces with one native ivory/sage theme, consistent cards, headings, primary actions, visible keyboard focus and responsive scrolling. Includes title/Continue/loading, HUD/actions/settings, shops, inventory, cooking/serving, dialogue/visitors/payments, notebook/history/accounts, suppliers, district, travel, sleep and arrangement.
+- Keep real quantities, prices, quotes, ingredient provenance, authored narrative and every gameplay command. Arabic RTL and English LTR share the same layouts; narrow panels wrap actions and retain readable text.
+- Add deterministic production-control previews and bilingual wide/narrow interaction regressions. Refresh stale legacy test fixtures against current content and service APIs without changing game balance.
+
+**Save compatibility (UI batch):** no schema/revision, save semantics, gameplay timing or financial logic change. No new game requirement is introduced by this UI batch. VERSION remains 0.4.0-prealpha.1; this work is an unmerged development playtest, not a release. Future market/cart/material/cookware/retail features in #49–#54 remain separate.
+
 ### Character and cooking v2 preview target: 0.4.0-prealpha.1
 
 - Add authored preferences for all12 current characters and lightweight saved hunger, thirst, tiredness and company intentions. Contextual weighted choices preserve quiet visits; rest/company affect existing social behaviour without increasing the four-person cap. Weather remains a neutral interface.

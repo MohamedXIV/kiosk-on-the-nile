@@ -12,13 +12,16 @@ var _topic_key := ""
 var _elapsed: float=0
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
- anchor_left=0.16;anchor_right=0.84;anchor_top=0.16;anchor_bottom=0.94
- var box := VBoxContainer.new();add_child(box)
+ SheetControls.shell(self,780)
+ var box := VBoxContainer.new();box.add_theme_constant_override("separation",14);add_child(box)
  SheetControls.header(box,_heading,text,hide)
- box.add_child(_order)
+ var order_card := SheetControls.card(box)
+ order_card.add_child(_order)
  var scroll := SheetControls.scroll(_topics);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
- _recall=SheetControls.key_button(text,"recall_order",_recall_order);_recall.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_recall)
- _talk=SheetControls.key_button(text,"personal_talk",_personal_talk);_talk.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(_talk)
+ var actions := SheetControls.columns(box,640)
+ actions.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+ _talk=SheetControls.key_button(text,"personal_talk",_personal_talk);_talk.size_flags_horizontal=Control.SIZE_EXPAND_FILL;SheetControls.primary(_talk);actions.add_child(_talk)
+ _recall=SheetControls.key_button(text,"recall_order",_recall_order);_recall.size_flags_horizontal=Control.SIZE_EXPAND_FILL;actions.add_child(_recall)
  LocaleService.current.changed.connect(func():_topic_key="";if visible:_refresh())
  hide()
 func present(visit_id: StringName) -> void:
@@ -45,8 +48,9 @@ func _refresh() -> void:
  if key==_topic_key:return
  _topic_key=key;SheetControls.clear(_topics)
  for topic in topics:
-  var button := SheetControls.button(OutingText.topic(topic),_select.bind(str(topic.id)));button.disabled=busy;_topics.add_child(button)
- if topics.is_empty():_topics.add_child(SheetControls.label(OutingText.t("no_topics")))
+  var button := SheetControls.button(OutingText.topic(topic),_select.bind(str(topic.id)));button.disabled=busy;button.custom_minimum_size.x=0;_topics.add_child(button)
+ if topics.is_empty():
+  var empty := SheetControls.label(OutingText.t("no_topics"));SheetControls.muted(empty);_topics.add_child(empty)
 func _select(id: String) -> void:
  hide();await _session.social_life.start_topic(_visit_id,id)
 func _recall_order() -> void:

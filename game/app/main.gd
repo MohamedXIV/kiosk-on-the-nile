@@ -44,9 +44,13 @@ func _ready() -> void:
  RuntimePerformance.configure()
  if OS.is_debug_build() and OS.has_feature("web"):
   var qa: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('qa')")
+  if qa=="cozy":
+   add_child(load("res://tests/qualification/cozy_ui_boot.tscn").instantiate())
+   return
   if qa in ["ink","spatial","kiosk","rooftop"]:
    add_child(load("res://tests/qualification/ink_boot.tscn").instantiate())
    return
+ var loading := TitleScreen.boot(self)
  _content.required_sections = SessionConfig.REQUIRED_SECTIONS.duplicate()
  add_child(_content)
  add_child(_save)
@@ -61,13 +65,12 @@ func _ready() -> void:
   result = _content.load_directory(directory)
  if not result.ok:
   push_error("Content rejected: "+str(result.details))
-  var error := Label.new()
-  error.text = "Content could not be loaded: "+str(result.details)
-  add_child(error)
+  loading.text="تعذّر تجهيز القعدة. جرّب تفتح اللعبة تاني.\nCould not prepare the game. Please reopen it."
   return
  _config = SessionConfig.new(_content.bundle(),_content.fingerprint,_content.source_root)
  var localized := _locale.configure(_content.bundle())
  if not localized.ok:push_error("Invalid locale catalogs");return
+ loading.queue_free()
  _text = UiText.new(_content.section("ui"))
  _save.configure_feedback(_config.section("ui").get("save_feedback",{}))
  _locale.changed.connect(func():UiText.refresh_tree(self))
@@ -136,11 +139,7 @@ func continue_game() -> void:
    _hud.toast.show_message(_text.text("building_migration",{"moved":report.moved.size(),"stored":report.stored.size()}))
  else:
   push_warning("Save load rejected: %s (%s)" % [result.message_key,result.details])
-  var error := UiText.label(_text.outcome(result) if _text.data.get("errors",{}).has(str(result.message_key)) else _text.text("load_failed"))
-  error.position = Vector2(30,30)
-  error.custom_minimum_size.x=maxf(200,get_viewport_rect().size.x-60)
-  error.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-  _title.add_child(error)
+  _title.show_error(result)
  _busy = false
 func _install(candidate: GameSession) -> void:
  if _fatigue_layer:_fatigue_layer.free()
