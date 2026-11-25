@@ -1,4 +1,7 @@
 # Cozy UI system and object-first interaction — design contract v0.1
+
+> **2026-11-25 visual direction update:** The approved [Game UI Bible v0.1](2026-11-25-game-ui-bible.md) is now the visual and interaction design authority for #48. It supersedes conflicting web-like layout, typography, and restrained theme interpretations below. Preserve the existing functional, architectural, accessibility, and gameplay requirements; #48 still covers all existing player-facing screens. This is a design update, not implementation or release acceptance.
+
 Recorded 2026-11-03 (Africa/Cairo) for [Epic #47](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/47). Proposal for the next UI implementation, **not** a completed style migration. Follow [product direction](../roadmap/2026-11-03-cozy-gameplay-ux.md) and [GAME_VISION](../GAME_VISION.md).
 
 ## Visual direction and anti-goals
