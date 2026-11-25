@@ -1,3 +1,9 @@
+# Proposed next phase — Cozy gameplay UX / market / object-centric cooking (2026-11-03)
+
+**Design and GitHub planning only; not implemented, not a new version, release or save revision.** [Epic #47](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/47) tracks dependency-ready work [#48–#55](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/48). Read the [approved product direction](2026-11-03-cozy-gameplay-ux.md), [cozy menu UX contract](../ui/2026-11-03-cozy-menu-design.md) and [integration/owner audit](../architecture/2026-11-03-market-object-commerce.md) before implementation. Preserve current features and source-of-truth owners; a limited launch-facing menu is not deletion. Preserve the quieter game identity and human acceptance gates #6/#7. The previous checkpoint below remains historical and unaffected by this proposal.
+
+---
+
 ## Character/cooking v2 integration checkpoint — 2026-10-31 (Africa/Cairo)
 
 [Epic#35](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/35), tasks#36–#43 are implemented on PR#46: all-current-cast preferences/lightweight needs, real graded lots, generic recipe phases and overnight batches, comfortable freshness, actual serving variants/free prices/fixed quotes, confirmed personal taste memories and source-grounded comments. One fresh whole-branch review found three material issues; the single fix pass and actual-owner observations address all three. [Evidence and remaining delivery gates](../notes/2026-10-31-character-cooking-integration.md).
