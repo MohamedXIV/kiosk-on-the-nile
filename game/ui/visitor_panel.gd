@@ -13,9 +13,11 @@ var _elapsed: float=0
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self,780)
+ theme_type_variation="VisitorNote"
  var box := VBoxContainer.new();box.add_theme_constant_override("separation",14);add_child(box)
  SheetControls.header(box,_heading,text,hide)
  var order_card := SheetControls.card(box)
+ order_card.get_parent().theme_type_variation="OrderSlip"
  order_card.add_child(_order)
  var scroll := SheetControls.scroll(_topics);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
  var actions := SheetControls.columns(box,640)

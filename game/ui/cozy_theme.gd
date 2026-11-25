@@ -96,6 +96,7 @@ static func make() -> Theme:
  _apply_nile_assets(t)
  _apply_story_surfaces(t)
  _apply_work_surfaces(t)
+ _apply_daily_surfaces(t)
  _theme=t
  return _theme
 static func box(fill: Color, border: Color, radius: int, padding: int, elevated: bool=false) -> StyleBoxFlat:
@@ -216,3 +217,20 @@ static func _apply_work_surfaces(t: Theme) -> void:
  t.set_type_variation("PriceTag","Label")
  t.set_font_size("font_size","PriceTag",14)
  t.set_color("font_color","PriceTag",Color("#78562c"))
+
+const RECEIPT_ART=preload("res://assets/ui/nile/receipt.svg")
+static func _apply_daily_surfaces(t: Theme) -> void:
+ for kind in ["JourneyTicket","ArrangementDock","ReceiptSheet","SupplierLedger","MenuBoard","SleepCard","VisitorNote","SettingsPage"]:
+  t.set_type_variation(kind,"PanelContainer")
+ t.set_stylebox("panel","JourneyTicket",story_box(PAPER_ART,8,18,14))
+ t.set_stylebox("panel","ArrangementDock",texture_box(2,14,9))
+ t.set_stylebox("panel","ReceiptSheet",story_box(RECEIPT_ART,12,18,16))
+ t.set_stylebox("panel","SupplierLedger",story_box(NOTEBOOK_ART,18,18,12))
+ t.set_stylebox("panel","MenuBoard",story_box(NOTEBOOK_ART,18,18,12))
+ t.set_stylebox("panel","SleepCard",texture_box(3,14,10))
+ t.set_stylebox("panel","VisitorNote",story_box(PAPER_ART,8,14,10))
+ t.set_stylebox("panel","SettingsPage",story_box(PAPER_ART,8,12,10))
+ t.set_type_variation("Notice","Label")
+ t.set_stylebox("normal","Notice",texture_box(3,14,9))
+ t.set_color("font_color","Notice",INK)
+ t.set_font_size("font_size","Notice",15)

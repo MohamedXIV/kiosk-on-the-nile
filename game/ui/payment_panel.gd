@@ -13,9 +13,12 @@ var _elapsed: float=0
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self,720)
+ theme_type_variation="ReceiptSheet"
  var box := VBoxContainer.new();box.add_theme_constant_override("separation",14);add_child(box)
  SheetControls.header(box,_heading,text,hide)
- var summary := SheetControls.card(box);summary.add_child(_description)
+ var summary := VBoxContainer.new();box.add_child(summary)
+ var emblem := TextureRect.new();emblem.texture=CozyTheme.icon_texture("money");emblem.custom_minimum_size=Vector2(44,44);emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;emblem.size_flags_horizontal=Control.SIZE_SHRINK_CENTER;summary.add_child(emblem)
+ summary.add_child(_description)
  var scroll := SheetControls.scroll(_choices);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
  _feedback.visible=false;box.add_child(_feedback)
  visibility_changed.connect(func():if not visible:_session.service.end_decision(_order_id))

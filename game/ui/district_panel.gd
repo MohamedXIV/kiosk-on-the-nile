@@ -25,6 +25,7 @@ func configure(text: UiText, session: GameSession) -> void:
   choices.add_child(_button("district.offer",func():_quote(str(id)),{"periods":int(offer.periods),"discount":int(offer.discount_percent)}))
  var records := VBoxContainer.new();records.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_child(records)
  var record := SheetControls.card(records)
+ record.get_parent().theme_type_variation="ReceiptSheet"
  SheetControls.title(_heading);record.add_child(_heading)
  SheetControls.muted(_document);record.add_child(_document)
  _details.fit_content=true;_details.scroll_active=false;_details.selection_enabled=true;_details.text_direction=Control.TEXT_DIRECTION_AUTO

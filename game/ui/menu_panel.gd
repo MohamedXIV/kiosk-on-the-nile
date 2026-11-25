@@ -10,6 +10,7 @@ var _draft_prices: Dictionary={}
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self,960)
+ theme_type_variation="MenuBoard"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",14);add_child(column)
  SheetControls.header(column,_heading,text,hide)
  _scroll=SheetControls.scroll(_rows);_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;column.add_child(_scroll)
@@ -32,6 +33,7 @@ func _render() -> void:
   var food := str(variant).get_slice("/",0)
   if not foods.has(food):
    var card := SheetControls.card(_rows)
+   card.get_parent().theme_type_variation="RecipePaper"
    var title := SheetControls.label(UiText.localized("menu.food."+food,{},OutingText.order(_session,StringName(food))));SheetControls.title(title);card.add_child(title);foods[food]=card
   var label := UiText.localized("serving."+str(variant).get_slice("/",1),{},str(variant).get_slice("/",1))+" · "+UiText.localized("serving."+str(variant).get_slice("/",2),{},str(variant).get_slice("/",2))
   _price_row(foods[food],label,"food:"+str(id),int(state.prices[variant]),func(value):return _session.menu.set_price(id,value))

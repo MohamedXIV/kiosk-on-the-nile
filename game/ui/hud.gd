@@ -49,6 +49,7 @@ func configure(text: UiText) -> void:
  add_child(_menu)
  var tabs := TabContainer.new();_menu_tabs=tabs
  tabs.custom_minimum_size=Vector2(300,200)
+ tabs.get_tab_bar().theme_type_variation="NotebookTabs"
  _menu.add_child(tabs)
  var pages: Array[String]=["cozy.daily","cozy.outings","cozy.settings"]
  var columns: Array[VBoxContainer]=[]
@@ -64,22 +65,24 @@ func configure(text: UiText) -> void:
   button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
   button.custom_minimum_size.y=54
   daily.add_child(button)
- var outings := GridContainer.new();outings.columns=2;columns[1].add_child(outings)
- outings.add_child(text.key_button("supplier_phone",func():_menu.hide();supplier_requested.emit()))
+ var outings := GridContainer.new()
+ outings.columns=2
+ outings.add_theme_constant_override("h_separation",8)
+ outings.add_theme_constant_override("v_separation",8)
+ columns[1].add_child(outings)
+ _destination_tile(outings,"supplier","supplier_phone",func():supplier_requested.emit())
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
-  var button := text.key_button(entry.key,func():_menu.hide();travel_requested.emit(route_id))
-  button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-  button.custom_minimum_size.y=54
-  outings.add_child(button)
+  _destination_tile(outings,str(route_id),str(entry.key),func():travel_requested.emit(route_id))
  var settings := columns[2]
  var language := SheetControls.label(UiText.localized("cozy.language"));UiText.bind_control(language,"cozy.language");settings.add_child(language)
  settings.add_child(LocaleService.current.picker())
- settings.add_child(text.key_button("fatigue_accessibility",func():
+ preference_rows.add_child(text.key_button("fatigue_accessibility",func():
   if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
   _menu.hide()))
  var help := text.key_label("help",{"move_keys":" / ".join([text.data.input.move_up[0],text.data.input.move_left[0],text.data.input.move_down[0],text.data.input.move_right[0]]),"primary_key":text.data.input.interact_primary[0],"secondary_key":text.data.input.interact_secondary[0],"notebook_key":text.data.input.notebook[0]})
- help.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(help);settings.add_child(help)
+ help.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(help)
+ var help_page := PanelContainer.new();help_page.theme_type_variation="SettingsPage";settings.add_child(help_page);help_page.add_child(help)
  var developer := VBoxContainer.new();developer.name="DeveloperTools";settings.add_child(developer)
  var dev_heading := SheetControls.label(UiText.localized("cozy.developer"));UiText.bind_control(dev_heading,"cozy.developer");SheetControls.muted(dev_heading);developer.add_child(dev_heading)
  developer.add_child(text.key_button("tuning",func():_menu.hide();tuning_requested.emit()))
@@ -176,6 +179,18 @@ func present(target: InteractionTarget) -> void:
  var thought := _session.inner.view()
  _thought.text="" if thought.is_empty() else _text.text("thought_name")+": "+str(thought.text)
  _thought.visible=not thought.is_empty() and not _session.personal.active() and focused==null and not notebook.visible and not sleep_panel.visible
+
+func _destination_tile(parent: GridContainer,route: String,key: String,action: Callable) -> void:
+ var button := _text.key_button(key,func():_menu.hide();action.call())
+ button.icon=DestinationArt.texture(route)
+ button.icon_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ button.vertical_icon_alignment=VERTICAL_ALIGNMENT_TOP
+ button.expand_icon=true
+ button.add_theme_constant_override("icon_max_width",84)
+ button.theme_type_variation="QuietButton"
+ button.custom_minimum_size=Vector2(120,96)
+ button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ parent.add_child(button)
 
 func _open_menu(page: int=0) -> void:
  _menu_tabs.current_tab=page

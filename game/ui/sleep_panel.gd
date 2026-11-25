@@ -13,10 +13,12 @@ func configure(text: UiText) -> void:
  _text = text
  theme = text.make_theme()
  SheetControls.shell(self,680,132,66)
+ theme_type_variation="SleepCard"
  var root := VBoxContainer.new();root.add_theme_constant_override("separation",14);add_child(root)
  SheetControls.header(root,text.key_label("sleep_title"),text,hide)
  var box := VBoxContainer.new();var scroll := SheetControls.scroll(box);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;root.add_child(scroll)
  var duration := SheetControls.card(box)
+ var bed := TextureRect.new();bed.texture=CozyTheme.icon_texture("rest");bed.custom_minimum_size=Vector2(64,52);bed.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;bed.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;bed.size_flags_horizontal=Control.SIZE_SHRINK_CENTER;duration.add_child(bed)
  _hours = SpinBox.new()
  _hours.rounded = true
  _hours.update_on_text_changed = true

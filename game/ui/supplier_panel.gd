@@ -21,12 +21,14 @@ var _cash := VBoxContainer.new()
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self)
+ theme_type_variation="SupplierLedger"
  var root := VBoxContainer.new();root.add_theme_constant_override("separation",12);add_child(root)
  SheetControls.header(root,text.key_label("supplier_title"),text,func():session.contact.panel_requested=false;hide())
  var box := VBoxContainer.new();var scroll := SheetControls.scroll(box);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;root.add_child(scroll)
  var columns := SheetControls.columns(box,820)
  var account := VBoxContainer.new();account.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_child(account)
  var account_card := SheetControls.card(account)
+ account_card.get_parent().theme_type_variation="NotebookPage"
  _readable(_summary);account_card.add_child(_summary)
  var funds := HFlowContainer.new();funds.add_theme_constant_override("h_separation",8);account_card.add_child(funds)
  _number(_deposit,1,1000,10);_deposit.suffix="ج.م";funds.add_child(_deposit)
@@ -41,6 +43,7 @@ func configure(text: UiText, session: GameSession) -> void:
  var basket := HFlowContainer.new();basket.add_theme_constant_override("h_separation",16);basket_card.add_child(basket)
  for id in session.config.section("suppliers").catalog:
   var column := VBoxContainer.new();column.custom_minimum_size.x=128;basket.add_child(column)
+  var glyph := ItemGlyph.new();glyph.configure(session.items.definition(StringName(str(id))),str(id));glyph.size_flags_horizontal=Control.SIZE_SHRINK_CENTER;column.add_child(glyph)
   column.add_child(_item_label(str(id)))
   var count := SpinBox.new();_number(count,0,int(session.config.section("suppliers").catalog[id].daily_stock),2 if id=="tea_portion" else 0)
   column.add_child(count);_basket[id]=count
@@ -59,6 +62,7 @@ func configure(text: UiText, session: GameSession) -> void:
  UiText.bind_control(_once,"supply.once",{"minutes":float(session.config.section("suppliers").extra_delay_minutes)});_once.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_once.custom_minimum_size.y=44;schedule_card.add_child(_once)
  var quote_button := _button("quote",_quote);SheetControls.primary(quote_button);schedule_card.add_child(quote_button)
  var review := SheetControls.card(box)
+ review.get_parent().theme_type_variation="ReceiptSheet"
  _readable(_preview);review.add_child(_preview)
  var review_actions := HFlowContainer.new();review_actions.add_theme_constant_override("h_separation",8);review.add_child(review_actions)
  _accept=_button("accept",_sign);SheetControls.primary(_accept);_accept.disabled=true;review_actions.add_child(_accept)

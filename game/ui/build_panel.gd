@@ -10,23 +10,28 @@ var _y := SpinBox.new()
 var _host := OptionButton.new()
 var _rotation: int = 0
 var _updating: bool = false
+var _piece_art: ItemGlyph
 func configure(text: UiText, controller: BuildController, session: GameSession) -> void:
  _controller=controller
  _text=text
  theme=text.make_theme()
  layout_direction=Control.LAYOUT_DIRECTION_INHERITED
  # Arrangement remains a dock: the uncovered world still receives placement clicks.
- theme_type_variation=&"Sheet"
+ theme_type_variation=&"ArrangementDock"
  get_viewport().size_changed.connect(_fit_dock)
  _fit_dock()
  var box := VBoxContainer.new()
  var scroll := SheetControls.scroll(box)
  add_child(scroll)
  SheetControls.header(box,text.key_label("arrange_title"),text,func():_controller.cancel();hide();closed.emit())
- var piece := SheetControls.card(box)
- _choices.fit_to_longest_item=false;piece.add_child(_choices)
+ var tools := SheetControls.columns(box,600)
+ tools.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+ var piece := VBoxContainer.new();piece.size_flags_horizontal=Control.SIZE_EXPAND_FILL;tools.add_child(piece)
+ var selection := HBoxContainer.new();piece.add_child(selection)
+ _piece_art=ItemGlyph.new();_piece_art.custom_minimum_size=Vector2(52,52);_piece_art.hide();selection.add_child(_piece_art)
+ _choices.fit_to_longest_item=false;_choices.size_flags_horizontal=Control.SIZE_EXPAND_FILL;selection.add_child(_choices)
  _choices.item_selected.connect(func(index):_select(StringName(_choices.get_item_metadata(index))))
- var placement := SheetControls.card(box)
+ var placement := VBoxContainer.new();placement.size_flags_horizontal=Control.SIZE_EXPAND_FILL;tools.add_child(placement)
  var coordinates := HFlowContainer.new()
  coordinates.layout_direction=Control.LAYOUT_DIRECTION_LTR
  placement.add_child(coordinates)
@@ -52,7 +57,7 @@ func configure(text: UiText, controller: BuildController, session: GameSession) 
  for button in actions.get_children():
   button.custom_minimum_size=Vector2(90,44)
  _status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- var help := SheetControls.card(box);help.add_child(_status)
+ _status.theme_type_variation="Muted";box.add_child(_status)
  box.add_child(SheetControls.key_button(text,"arrange_close",func():_controller.cancel();hide();closed.emit()))
  LocaleService.current.changed.connect(func():
   _refresh_choices(true)
@@ -83,12 +88,15 @@ func _refresh_choices(preserve_preview: bool = false) -> void:
  elif selected!="" and preserve_preview:
   for index in range(_host.item_count):
    if str(_host.get_item_metadata(index))==str(_controller.request.host_id):_host.select(index);break
- else:_choices.select(-1)
+ else:_choices.select(-1);_piece_art.hide()
 func _controller_items_definition(item: Dictionary) -> Dictionary:
  return _controller.definition(StringName(item.definition_id))
 func _select(id: StringName) -> void:
  _controller.select(id)
  if _controller.request==null: return
+ var definition_id := _controller_items_definition_for_request()
+ _piece_art.configure(_controller.definition(StringName(definition_id)),definition_id)
+ _piece_art.show()
  _updating=true
  _x.value=_controller.request.cell.x
  _y.value=_controller.request.cell.y
@@ -152,8 +160,8 @@ func _select_host(index: int) -> void:
 
 func _fit_dock() -> void:
  var viewport := get_viewport_rect().size
- var width := minf(380,maxf(216,viewport.x*0.43))
- width=minf(width,maxf(160,viewport.x-72))
- anchor_left=1;anchor_right=1;anchor_top=0;anchor_bottom=1
- offset_left=-width-12;offset_right=-12
- offset_top=minf(122,maxf(18,viewport.y*0.17));offset_bottom=-18
+ var width := minf(840,maxf(160,viewport.x-80))
+ var height := minf(268,viewport.y*0.38)
+ set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+ position=Vector2((viewport.x-width)*0.5,viewport.y-height-12)
+ size=Vector2(width,height)
