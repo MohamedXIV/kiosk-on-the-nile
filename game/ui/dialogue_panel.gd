@@ -15,12 +15,13 @@ var _signature: String=""
 var _maximum_height_ratio: float=0.42
 var _text: UiText
 func _ready() -> void:
- theme_type_variation="Sheet"
+ theme_type_variation="DialogueFrame"
  _layout=VBoxContainer.new()
  _layout.add_theme_constant_override("separation",10)
  add_child(_layout)
  _speaker=SheetControls.label()
- SheetControls.title(_speaker)
+ _speaker.theme_type_variation="SpeakerTag"
+ _speaker.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
  _layout.add_child(_speaker)
  _scroll=ScrollContainer.new()
  _scroll.follow_focus=true
@@ -75,12 +76,14 @@ func _begin(signature: String, speaker_name: String="") -> bool:
 func _line(value: String) -> Label:
  var label := SheetControls.label(value)
  label.text_direction=Control.TEXT_DIRECTION_AUTO
+ label.theme_type_variation="DialogueLine"
  _box.add_child(label)
  return label
 func _button(value: String, action: Callable, primary: bool=false) -> void:
  var button := SheetControls.button(value,action)
  button.custom_minimum_size=Vector2(0,44)
  if primary:SheetControls.primary(button)
+ else:button.theme_type_variation="QuietButton"
  _box.add_child(button)
 func _leave_button(action: Callable) -> void:
  _leave=SheetControls.button(_text.text("dialogue_leave"),action)
@@ -93,13 +96,13 @@ func _choices(conversation: ConversationSession, choices: Array[Dictionary]) -> 
 func _fit() -> void:
  var viewport := get_viewport_rect().size
  # Keep conversation beside the world at wide sizes and readable on narrow views.
- var width := minf(580,viewport.x-32)
+ var width := minf(460,viewport.x-32)
  anchor_left=0;anchor_right=0;anchor_top=0;anchor_bottom=0
  offset_left=viewport.x-width-16
  offset_right=viewport.x-16
  offset_top=122
  var style := get_theme_stylebox("panel")
- var fixed_height := style.get_minimum_size().y+_speaker.get_combined_minimum_size().y+20
+ var fixed_height := style.get_minimum_size().y+(_speaker.get_combined_minimum_size().y if _speaker.visible else 0)+20
  if is_instance_valid(_leave):fixed_height+=_leave.get_combined_minimum_size().y+10
  var desired := _box.get_combined_minimum_size().y+fixed_height
  offset_bottom=offset_top+minf(desired,minf(viewport.y*_maximum_height_ratio,maxf(120,viewport.y-offset_top-18)))

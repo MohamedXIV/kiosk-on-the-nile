@@ -97,7 +97,7 @@ func _ready() -> void:
    if result.message_key!=&"web_save_unconfirmed":_hud.toast.show_message(_save_message(result)))
  _title = TitleScreen.new()
  _ui_layer.add_child(_title)
- _title.configure(_text,_save.store.has_save())
+ _title.configure(_text,_save.store.has_save(),_config)
  UiText.refresh_tree(_title)
  _title.new_requested.connect(begin_new_game)
  _title.continue_requested.connect(continue_game)
@@ -250,6 +250,8 @@ func _install(candidate: GameSession) -> void:
  _hud.add_child(_captions)
  _hud.move_child(_captions,0)
  _title.hide()
+ _title.queue_free()
+ _title=null
  _session.start_new()
  _sound.set_muted(false)
  if _probe: _probe.session = _session

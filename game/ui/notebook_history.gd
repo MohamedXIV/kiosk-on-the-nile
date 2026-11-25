@@ -55,7 +55,7 @@ func configure(page_size: int) -> void:
  _reset.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  filters.add_child(_reset)
  var reading := PanelContainer.new()
- reading.theme_type_variation="Inset"
+ reading.theme_type_variation="NotebookPage"
  reading.size_flags_vertical=Control.SIZE_EXPAND_FILL
  reading.custom_minimum_size.y=96
  add_child(reading)

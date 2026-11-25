@@ -17,13 +17,16 @@ func configure(text: UiText) -> void:
  _text=text
  SheetControls.shell(self,1120)
  theme=text.make_theme()
+ theme_type_variation="NotebookCover"
  var box := VBoxContainer.new()
  box.add_theme_constant_override("separation",10)
  add_child(box)
  var heading := text.key_label("notebook")
  SheetControls.header(box,heading,text,func():hide();closed.emit())
+ heading.theme_type_variation="NotebookSection"
  _subtitle.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(_subtitle);box.add_child(_subtitle)
  _tabs.size_flags_vertical=Control.SIZE_EXPAND_FILL
+ _tabs.get_tab_bar().theme_type_variation="NotebookTabs"
  _tabs.get_tab_bar().scrolling_enabled=true
  _tabs.get_tab_bar().clip_tabs=true
  box.add_child(_tabs)
@@ -72,24 +75,35 @@ func _label(value: String) -> Label:
  label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  return label
-func _card(parent: VBoxContainer) -> VBoxContainer:
- return SheetControls.card(parent)
+func _page(parent: Container,kind: String="NotebookPage") -> VBoxContainer:
+ var panel := PanelContainer.new()
+ panel.theme_type_variation=kind
+ panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ parent.add_child(panel)
+ var page := VBoxContainer.new()
+ page.add_theme_constant_override("separation",8)
+ panel.add_child(page)
+ return page
 func _render_notes() -> void:
  var notes := NotebookView.notes(_session)
  var reputation := NotebookView.reputation(_session)
  var key := str(LocaleService.current.revision)+JSON.stringify(notes)+reputation
  if key==_notes_key:return
  _notes_key=key;_clear(_notes)
- var reputation_card := _card(_notes)
+ var reputation_card := _page(_notes)
  var reputation_label := _label(reputation);SheetControls.muted(reputation_label);reputation_card.add_child(reputation_label)
- if notes.is_empty():_notes.add_child(_label(NotebookView.t("notes_empty")))
+ var page := _page(_notes)
+ if notes.is_empty():page.add_child(_label(NotebookView.t("notes_empty")))
  for note in notes:
-  var box := _card(_notes)
+  var box := VBoxContainer.new()
+  box.add_theme_constant_override("separation",5)
+  page.add_child(box)
   box.add_child(_label(str(note.text)))
   var chapter := str(note.chapter)
   if chapter!="" and _history.has_chapter(chapter):
    var button := UiText.button(NotebookView.t("source"),func():_history.show_chapter(chapter);_tabs.current_tab=2)
    button.focus_mode=Control.FOCUS_ALL;button.theme_type_variation="QuietButton";button.custom_minimum_size.y=44;button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(button)
+  page.add_child(HSeparator.new())
 func _render_people() -> void:
  var people := NotebookView.people(_session)
  var key := str(LocaleService.current.revision)+JSON.stringify(people)
@@ -97,9 +111,15 @@ func _render_people() -> void:
  _people_key=key;_clear(_people)
  var hint := _label(NotebookView.t("people_hint"));SheetControls.muted(hint);_people.add_child(hint)
  if people.is_empty():_people.add_child(_label(NotebookView.t("people_empty")))
+ var grid := GridContainer.new()
+ grid.columns=2 if size.x>=780 else 1
+ grid.add_theme_constant_override("h_separation",12)
+ grid.add_theme_constant_override("v_separation",10)
+ _people.add_child(grid)
+ grid.resized.connect(func():grid.columns=2 if _people.size.x>=740 else 1)
  for person in people:
-  var box := _card(_people)
-  var name_label := _label(str(person.name));SheetControls.title(name_label);box.add_child(name_label)
+  var box := _page(grid,"PersonPage")
+  var name_label := _label(str(person.name));name_label.theme_type_variation="NotebookSection";box.add_child(name_label)
   box.add_child(_label(str(person.stage)))
   var bar := ProgressBar.new();bar.value=float(person.score);bar.show_percentage=false;bar.custom_minimum_size.y=12;box.add_child(bar)
   if str(person.connection)!="":

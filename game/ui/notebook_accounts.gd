@@ -24,7 +24,7 @@ func configure(page_size: int) -> void:
  _mode.item_selected.connect(func(_index):_page=0;refresh(true))
  add_child(_mode)
  _hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(_hint);add_child(_hint)
- var reading := PanelContainer.new();reading.theme_type_variation="Inset";reading.size_flags_vertical=Control.SIZE_EXPAND_FILL;add_child(reading)
+ var reading := PanelContainer.new();reading.theme_type_variation="NotebookPage";reading.size_flags_vertical=Control.SIZE_EXPAND_FILL;add_child(reading)
  _body.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _body.selection_enabled=true
  _body.text_direction=Control.TEXT_DIRECTION_AUTO

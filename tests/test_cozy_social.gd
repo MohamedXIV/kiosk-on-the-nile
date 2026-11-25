@@ -44,6 +44,8 @@ func run(check, tree) -> void:
  var first_child := dialogue._box.get_child(0)
  dialogue.present(conversation,[],"Amgad")
  check.is_true(first_child==dialogue._box.get_child(0))
+ check.equal(dialogue._speaker.theme_type_variation,&"SpeakerTag")
+ check.equal(first_child.theme_type_variation,&"DialogueLine")
  check.is_true(dialogue._leave.get_parent()==dialogue._layout)
  check.is_true(dialogue._leave.get_global_rect().end.x<=640)
  var left: Array[StringName]=[]
@@ -78,6 +80,7 @@ func run(check, tree) -> void:
   check.equal(order.settlement,&"pending")
  check.case("notebook_history_sheet_fits_both_locales_and_viewports")
  var notebook := Notebook.new();host.add_child(notebook);notebook.configure(text)
+ check.equal(notebook.theme_type_variation,&"NotebookCover")
  notebook._tabs.current_tab=2;notebook._history.set_entries(entries);notebook.open()
  for locale_id in ["ar_EG","en"]:
   locale.set_locale(locale_id);UiText.refresh_tree(notebook)

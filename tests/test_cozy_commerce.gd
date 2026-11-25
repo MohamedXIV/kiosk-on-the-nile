@@ -128,10 +128,12 @@ func run(check, tree) -> void:
   for width in [1280,640]:
    viewport.size=Vector2i(width,720)
    for can_continue in [false,true]:
-    var title := TitleScreen.new();host.add_child(title);title.configure(text,can_continue)
+    var title := TitleScreen.new();host.add_child(title);title.configure(text,can_continue,session.config)
     title.new_requested.connect(func():emitted.append("new"));title.continue_requested.connect(func():emitted.append("continue"))
     UiText.refresh_tree(title);await _settle(tree)
     check.is_true(_root_bounds(title,viewport.size))
+    check.is_true(title.find_child("*",false,false)!=null)
+    check.is_true(title._masthead!=null and title._actions!=null)
     check.is_true(_horizontal_bounds(title,title.get_global_rect()))
     var continue_button := _key_button(title,"continue")
     var primary := continue_button if can_continue else _key_button(title,"new_game")

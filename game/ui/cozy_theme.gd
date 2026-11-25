@@ -94,6 +94,7 @@ static func make() -> Theme:
   for state in ["grabber","grabber_highlight","grabber_pressed"]:
    t.set_stylebox(state,kind,box(Color("#93aa87"),Color.TRANSPARENT,5,5))
  _apply_nile_assets(t)
+ _apply_story_surfaces(t)
  _theme=t
  return _theme
 static func box(fill: Color, border: Color, radius: int, padding: int, elevated: bool=false) -> StyleBoxFlat:
@@ -156,3 +157,40 @@ static func _apply_nile_assets(t: Theme) -> void:
   t.set_color("font_disabled_color",kind,Color("#756b60"))
   t.set_stylebox("focus",kind,focus_box())
   t.set_stylebox("focus_mirrored",kind,t.get_stylebox("focus",kind))
+
+# Distinct tactile surfaces; the same accessibility and localization primitives.
+const NOTEBOOK_ART = preload("res://assets/ui/nile/notebook.svg")
+const PAPER_ART = preload("res://assets/ui/nile/paper.svg")
+const SPEECH_ART = preload("res://assets/ui/nile/speech.svg")
+static func story_box(art: Texture2D,margin: int,padding: int,vertical: int) -> StyleBoxTexture:
+ var style := StyleBoxTexture.new()
+ style.texture=art
+ for side in [SIDE_LEFT,SIDE_RIGHT,SIDE_TOP,SIDE_BOTTOM]:
+  style.set_texture_margin(side,margin)
+  style.set_content_margin(side,padding if side==SIDE_LEFT or side==SIDE_RIGHT else vertical)
+ return style
+static func _apply_story_surfaces(t: Theme) -> void:
+ for kind in ["NotebookCover","NotebookPage","TitleTray","DialogueFrame","PersonPage"]:
+  t.set_type_variation(kind,"PanelContainer")
+ t.set_stylebox("panel","NotebookCover",story_box(NOTEBOOK_ART,18,22,16))
+ t.set_stylebox("panel","NotebookPage",story_box(PAPER_ART,8,14,12))
+ t.set_stylebox("panel","PersonPage",story_box(PAPER_ART,8,14,12))
+ t.set_stylebox("panel","TitleTray",texture_box(3,16,12))
+ t.set_stylebox("panel","DialogueFrame",box(Color.TRANSPARENT,Color.TRANSPARENT,0,0))
+ t.set_type_variation("SpeakerTag","Label")
+ t.set_stylebox("normal","SpeakerTag",texture_box(12,14,5))
+ t.set_color("font_color","SpeakerTag",IVORY)
+ t.set_font_size("font_size","SpeakerTag",18)
+ t.set_type_variation("DialogueLine","Label")
+ t.set_stylebox("normal","DialogueLine",story_box(SPEECH_ART,18,16,12))
+ t.set_font_size("font_size","DialogueLine",17)
+ t.set_type_variation("NotebookTabs","TabBar")
+ t.set_stylebox("tab_selected","NotebookTabs",texture_box(12,14,6))
+ t.set_stylebox("tab_hovered","NotebookTabs",texture_box(5,14,6))
+ t.set_stylebox("tab_unselected","NotebookTabs",texture_box(4,14,6))
+ t.set_color("font_selected_color","NotebookTabs",IVORY)
+ t.set_color("font_unselected_color","NotebookTabs",INK)
+ t.set_color("font_hovered_color","NotebookTabs",INK)
+ t.set_type_variation("NotebookSection","Label")
+ t.set_color("font_color","NotebookSection",Color("#24616b"))
+ t.set_font_size("font_size","NotebookSection",20)
