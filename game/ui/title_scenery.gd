@@ -23,6 +23,7 @@ func configure(config: SessionConfig) -> void:
  _surface.add_child(_viewport)
  var backdrop := ColorRect.new()
  backdrop.color=Color(data.background)
+ backdrop.z_index=-1000
  backdrop.mouse_filter=Control.MOUSE_FILTER_IGNORE
  _viewport.add_child(backdrop)
  backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
