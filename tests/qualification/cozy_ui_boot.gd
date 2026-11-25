@@ -131,7 +131,7 @@ func _open_area(layer: CanvasLayer) -> void:
  match _area:
   "title":
    hud.hide()
-   var title := TitleScreen.new();layer.add_child(title);title.configure(_text,false);UiText.refresh_tree(title)
+   var title := TitleScreen.new();layer.add_child(title);title.configure(_text,false,session.config);UiText.refresh_tree(title)
   "hud":pass
   "shop":
    var panel := ShopPanel.new();hud.add_child(panel);panel.configure(_text,session);panel.present()

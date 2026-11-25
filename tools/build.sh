@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build-only gate. Gameplay acceptance is deliberately a separate invocation.
+# Build + native startup smoke. Full gameplay acceptance is separate.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
@@ -15,6 +15,7 @@ fi
 if rg -n 'SCRIPT ERROR:|Parse Error:|Compile Error:' .cache/build-logs/import.log; then
  exit 1
 fi
+bash tools/check-ui-startup.sh
 if ! bash tools/export-web.sh "$@" > .cache/build-logs/export.log 2>&1; then
  cat .cache/build-logs/export.log
  exit 1
@@ -22,4 +23,4 @@ fi
 if rg -n 'SCRIPT ERROR:|Parse Error:|Compile Error:' .cache/build-logs/export.log; then
  exit 1
 fi
-echo 'Ink compilation, Godot import and Web export completed. Logs: .cache/build-logs/'
+echo 'Ink compilation, Godot import, native startup smoke and Web export completed. Logs: .cache/build-logs/'
