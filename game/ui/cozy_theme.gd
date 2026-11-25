@@ -1,17 +1,17 @@
 class_name CozyTheme
 extends RefCounted
 ## Presentation tokens shared by every native game surface. No domain state.
-const INK := Color("#293c35")
-const MUTED := Color("#617168")
-const IVORY := Color("#faf7ef")
-const SAGE := Color("#466b57")
-const LINE := Color("#d6ded1")
+const INK := Color("#543c2b")
+const MUTED := Color("#79634e")
+const IVORY := Color("#f5e8ce")
+const SAGE := Color("#496133")
+const LINE := Color("#ac8d66")
 static var _theme: Theme
 static func make() -> Theme:
  if _theme!=null:return _theme
  var t := Theme.new()
  t.default_font=load("res://assets/fonts/Cairo.ttf")
- t.default_font_size=18
+ t.default_font_size=16
  for kind in ["Label","RichTextLabel","Button","OptionButton","CheckBox","LineEdit","TextEdit","SpinBox","TabBar","PopupMenu"]:
   t.set_color("font_color",kind,INK)
   t.set_color("font_hover_color",kind,INK)
@@ -28,10 +28,10 @@ static func make() -> Theme:
  t.set_type_variation("Inset","PanelContainer")
  t.set_stylebox("panel","Inset",box(Color("#e8eee2"),Color.TRANSPARENT,12,12))
  t.set_type_variation("Heading","Label")
- t.set_font_size("font_size","Heading",26)
+ t.set_font_size("font_size","Heading",23)
  t.set_type_variation("Muted","Label")
  t.set_color("font_color","Muted",MUTED)
- t.set_font_size("font_size","Muted",16)
+ t.set_font_size("font_size","Muted",14)
  for kind in ["Button","OptionButton"]:
   t.set_stylebox("normal",kind,box(Color("#e8eee2"),LINE,10,12))
   t.set_stylebox("hover",kind,box(Color("#dce7d6"),Color("#a6bca5"),10,12))
@@ -83,7 +83,7 @@ static func make() -> Theme:
   t.set_color("font_selected_color",kind,INK)
   t.set_color("font_unselected_color",kind,MUTED)
   t.set_color("font_hovered_color",kind,INK)
-  t.set_font_size("font_size",kind,17)
+  t.set_font_size("font_size",kind,16)
  t.set_constant("separation","VBoxContainer",12)
  t.set_constant("separation","HBoxContainer",12)
  for kind in ["HFlowContainer","VFlowContainer"]:
@@ -93,6 +93,7 @@ static func make() -> Theme:
   t.set_stylebox("scroll",kind,box(Color("#e4e9df"),Color.TRANSPARENT,5,3))
   for state in ["grabber","grabber_highlight","grabber_pressed"]:
    t.set_stylebox(state,kind,box(Color("#93aa87"),Color.TRANSPARENT,5,5))
+ _apply_nile_assets(t)
  _theme=t
  return _theme
 static func box(fill: Color, border: Color, radius: int, padding: int, elevated: bool=false) -> StyleBoxFlat:
@@ -111,3 +112,47 @@ static func focus_box() -> StyleBoxFlat:
  style.expand_margin_left=2;style.expand_margin_right=2
  style.expand_margin_top=2;style.expand_margin_bottom=2
  return style
+
+# Original scalable game artwork; texture cells protect the corner pixels.
+const FRAME_ATLAS = preload("res://assets/ui/nile/frames.svg")
+const ICON_ATLAS = preload("res://assets/ui/nile/icons.svg")
+const FRAME_CELL := Vector2(80,48)
+const FRAME_COLUMNS := 5
+const ICON_CELL := 48
+const ICON_INDEX := {"bag":0,"notebook":1,"outings":2,"settings":3,"actions":4,"money":5,"hunger":6,"rest":7,"mood":8}
+static func texture_box(index: int, padding: int = 12, vertical_padding: int = 8) -> StyleBoxTexture:
+ var style := StyleBoxTexture.new()
+ style.texture=FRAME_ATLAS
+ style.region_rect=Rect2(Vector2(index%FRAME_COLUMNS, floori(float(index)/FRAME_COLUMNS))*FRAME_CELL,FRAME_CELL)
+ for side in [SIDE_LEFT,SIDE_RIGHT,SIDE_TOP,SIDE_BOTTOM]:
+  style.set_texture_margin(side,12)
+  style.set_content_margin(side,padding if side==SIDE_LEFT or side==SIDE_RIGHT else vertical_padding)
+ return style
+static func icon_texture(key: String) -> Texture2D:
+ var result := AtlasTexture.new()
+ result.atlas=ICON_ATLAS
+ result.region=Rect2(int(ICON_INDEX[key])*ICON_CELL,0,ICON_CELL,ICON_CELL)
+ result.filter_clip=true
+ return result
+static func _apply_nile_assets(t: Theme) -> void:
+ t.set_stylebox("panel","PanelContainer",texture_box(0,16,12))
+ t.set_stylebox("panel","Sheet",texture_box(0,22,16))
+ t.set_stylebox("panel","Card",texture_box(1,14,10))
+ t.set_stylebox("panel","Inset",texture_box(2,12,8))
+ t.set_stylebox("panel","PopupPanel",texture_box(0,16,12))
+ t.set_stylebox("panel","PopupMenu",texture_box(3,12,9))
+ t.set_type_variation("HudBadge","PanelContainer")
+ t.set_stylebox("panel","HudBadge",texture_box(3,10,6))
+ t.set_type_variation("NileButton","Button")
+ for kind in ["Button","OptionButton","PrimaryButton","QuietButton","DangerButton","NileButton"]:
+  var start: int={"Button":4,"OptionButton":4,"PrimaryButton":8,"QuietButton":4,"DangerButton":16,"NileButton":12}[kind]
+  for index in range(4):
+   var state: String=["normal","hover","pressed","disabled"][index]
+   var style := texture_box(start+index,12,7)
+   t.set_stylebox(state,kind,style)
+   t.set_stylebox(state+"_mirrored",kind,style)
+  var ink := IVORY if kind in ["PrimaryButton","DangerButton","NileButton"] else INK
+  for property in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:t.set_color(property,kind,ink)
+  t.set_color("font_disabled_color",kind,Color("#756b60"))
+  t.set_stylebox("focus",kind,focus_box())
+  t.set_stylebox("focus_mirrored",kind,t.get_stylebox("focus",kind))

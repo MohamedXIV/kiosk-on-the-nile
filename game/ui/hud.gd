@@ -40,6 +40,10 @@ func configure(text: UiText) -> void:
  add_child(_strip)
  _strip.configure(text)
  _strip.menu_requested.connect(_open_menu)
+ _strip.inventory_requested.connect(func():inventory_requested.emit())
+ _strip.notebook_requested.connect(func():notebook_requested.emit())
+ _strip.outings_requested.connect(func():_open_menu(1))
+ _strip.settings_requested.connect(func():_open_menu(2))
  _menu = PopupPanel.new()
  _menu.theme = theme
  add_child(_menu)
@@ -53,15 +57,21 @@ func configure(text: UiText) -> void:
   var scroll := SheetControls.scroll(actions)
   tabs.add_child(scroll);tabs.set_tab_title(tabs.get_tab_count()-1,UiText.localized(page))
   columns.append(actions)
- var daily := columns[0]
+ var daily := GridContainer.new();daily.columns=2;columns[0].add_child(daily)
  for entry in [{"key":"inventory","action":func():inventory_requested.emit()},{"key":"notebook","action":func():notebook_requested.emit()},{"key":"menu_prices","action":func():menu_requested.emit()},{"key":"arrange","action":func():arrange_requested.emit()},{"key":"clean_floor","action":func():clean_floor_requested.emit()},{"key":"consume","action":func():consume_requested.emit()},{"key":"save","action":func():save_requested.emit()}]:
   var callback: Callable=entry.action
-  daily.add_child(text.key_button(entry.key,func():_menu.hide();callback.call()))
- var outings := columns[1]
+  var button := text.key_button(entry.key,func():_menu.hide();callback.call())
+  button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+  button.custom_minimum_size.y=54
+  daily.add_child(button)
+ var outings := GridContainer.new();outings.columns=2;columns[1].add_child(outings)
  outings.add_child(text.key_button("supplier_phone",func():_menu.hide();supplier_requested.emit()))
  for entry in [{"id":"district","key":"district_trip"},{"id":"market","key":"shop_market"},{"id":"appliances","key":"shop_appliances"},{"id":"homewares","key":"shop_homewares"}]:
   var route_id := StringName(entry.id)
-  outings.add_child(text.key_button(entry.key,func():_menu.hide();travel_requested.emit(route_id)))
+  var button := text.key_button(entry.key,func():_menu.hide();travel_requested.emit(route_id))
+  button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+  button.custom_minimum_size.y=54
+  outings.add_child(button)
  var settings := columns[2]
  var language := SheetControls.label(UiText.localized("cozy.language"));UiText.bind_control(language,"cozy.language");settings.add_child(language)
  settings.add_child(LocaleService.current.picker())
@@ -167,10 +177,13 @@ func present(target: InteractionTarget) -> void:
  _thought.text="" if thought.is_empty() else _text.text("thought_name")+": "+str(thought.text)
  _thought.visible=not thought.is_empty() and not _session.personal.active() and focused==null and not notebook.visible and not sleep_panel.visible
 
-func _open_menu() -> void:
- _menu.size=Vector2i(int(minf(460,get_viewport_rect().size.x-24)),int(minf(550,get_viewport_rect().size.y-_strip.size.y-35)))
- _menu.popup()
- _menu.position = Vector2i(int(_strip.position.x if not LocaleService.current.rtl() else _strip.position.x+_strip.size.x-_menu.size.x),int(_strip.position.y+_strip.size.y+8))
+func _open_menu(page: int=0) -> void:
+ _menu_tabs.current_tab=page
+ var extent := get_viewport_rect().size
+ var anchor := _strip.menu_anchor()
+ var popup_size := Vector2i(int(minf(460,extent.x-24)),int(minf(460,maxf(220,extent.y-anchor.end.y-20))))
+ var pos := Vector2i(int(clampf(anchor.get_center().x-popup_size.x*0.5,12,extent.x-popup_size.x-12)),int(clampf(anchor.end.y+6,8,extent.y-popup_size.y-8)))
+ _menu.popup(Rect2i(pos,popup_size))
 
 func _refresh_menu_titles() -> void:
  var pages: Array[String]=["cozy.daily","cozy.outings","cozy.settings"]
