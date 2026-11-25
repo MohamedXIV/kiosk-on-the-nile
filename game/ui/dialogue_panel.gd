@@ -102,8 +102,8 @@ func _fit() -> void:
  offset_right=viewport.x-16
  offset_top=122
  var style := get_theme_stylebox("panel")
- var fixed_height := style.get_minimum_size().y+(_speaker.get_combined_minimum_size().y if _speaker.visible else 0)+20
+ var fixed_height: float = style.get_minimum_size().y+(_speaker.get_combined_minimum_size().y if _speaker.visible else 0)+20
  if is_instance_valid(_leave):fixed_height+=_leave.get_combined_minimum_size().y+10
- var desired := _box.get_combined_minimum_size().y+fixed_height
+ var desired: float = _box.get_combined_minimum_size().y+fixed_height
  offset_bottom=offset_top+minf(desired,minf(viewport.y*_maximum_height_ratio,maxf(120,viewport.y-offset_top-18)))
  show()

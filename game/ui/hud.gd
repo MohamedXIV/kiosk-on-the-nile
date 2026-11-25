@@ -75,8 +75,13 @@ func configure(text: UiText) -> void:
   var route_id := StringName(entry.id)
   _destination_tile(outings,str(route_id),str(entry.key),func():travel_requested.emit(route_id))
  var settings := columns[2]
- var language := SheetControls.label(UiText.localized("cozy.language"));UiText.bind_control(language,"cozy.language");settings.add_child(language)
- settings.add_child(LocaleService.current.picker())
+ var preferences := PanelContainer.new()
+ preferences.theme_type_variation="SettingsPage"
+ settings.add_child(preferences)
+ var preference_rows := VBoxContainer.new()
+ preferences.add_child(preference_rows)
+ var language := SheetControls.label(UiText.localized("cozy.language"));UiText.bind_control(language,"cozy.language");preference_rows.add_child(language)
+ preference_rows.add_child(LocaleService.current.picker())
  preference_rows.add_child(text.key_button("fatigue_accessibility",func():
   if _session!=null:_session.fatigue.visual_scale=0.35 if _session.fatigue.visual_scale>0.5 else 0.0 if _session.fatigue.visual_scale>0 else 1.0
   _menu.hide()))
