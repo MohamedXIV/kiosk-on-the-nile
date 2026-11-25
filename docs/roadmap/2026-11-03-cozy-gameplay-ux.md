@@ -1,4 +1,7 @@
 # Cozy gameplay UX, market and launch-facing scope — design direction
+
+> **2026-11-25 visual direction update:** The approved [Game UI Bible v0.1](../ui/2026-11-25-game-ui-bible.md) is now the visual and interaction design authority for #48. It supersedes conflicting web-like layout, typography, and restrained theme interpretations below. Preserve the existing functional, architectural, accessibility, and gameplay requirements; #48 still covers all existing player-facing screens. This is a design update, not implementation or release acceptance.
+
 Recorded 2026-11-03 (Africa/Cairo). Parent tracking issue: [#47](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/47). This document records **approved conversation direction and proposed implementation boundaries**, not finished gameplay or a release. The authoritative experience remains [GAME_VISION](../GAME_VISION.md); [RELEASING](../RELEASING.md) controls version, changelog and saves.
 
 ## Why this phase exists
