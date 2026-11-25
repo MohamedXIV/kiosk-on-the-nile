@@ -38,6 +38,8 @@ func run(check, tree) -> void:
    check.is_true(_reachable(_key_button(shop,"shop_review"),shop))
    check.is_true(_reachable(_key_button(shop,"journey_return"),shop))
    check.is_true(shop._cards.get_child_count()>0)
+   check.is_true(shop._cards is HFlowContainer)
+   check.equal(shop.theme_type_variation,&"ShopBoard")
    for card in shop._cards.get_children():
     if card is ProductCard:
      check.equal(card._button.focus_mode,Control.FOCUS_ALL)

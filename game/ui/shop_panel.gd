@@ -3,7 +3,8 @@ extends PanelContainer
 var _session: GameSession
 var _text: UiText
 var _shop_id: StringName
-var _cards := VBoxContainer.new()
+var _cards := HFlowContainer.new()
+var _selection_art: ItemGlyph
 var _details := SheetControls.label()
 var _heading := SheetControls.label()
 var _feedback := SheetControls.label()
@@ -24,22 +25,32 @@ var _updating: bool=false
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self)
+ theme_type_variation="ShopBoard"
  var column := VBoxContainer.new();add_child(column)
  var heading_row := HBoxContainer.new();column.add_child(heading_row)
- SheetControls.title(_heading);heading_row.add_child(_heading)
- SheetControls.muted(_wallet);heading_row.add_child(_wallet)
+ SheetControls.title(_heading);_heading.theme_type_variation="ShopHeading";heading_row.add_child(_heading)
+ _wallet.theme_type_variation="PriceTag";heading_row.add_child(_wallet)
  _search.placeholder_text=OutingText.t("search")
  _search.clear_button_enabled=true
  _search.text_changed.connect(func(_value):_render_cards())
  column.add_child(_search)
  var body := SheetControls.columns(column,0)
- var scroll := SheetControls.scroll(_cards);scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.size_flags_stretch_ratio=1.1;scroll.custom_minimum_size.y=60;body.add_child(scroll)
- var detail_panel := PanelContainer.new();detail_panel.theme_type_variation="Card";detail_panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(detail_panel)
+ var scroll := ScrollContainer.new()
+ scroll.follow_focus=true;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+ scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;scroll.size_flags_stretch_ratio=1.35;scroll.custom_minimum_size.y=60
+ _cards.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ _cards.add_theme_constant_override("h_separation",8);_cards.add_theme_constant_override("v_separation",8)
+ scroll.add_child(_cards);body.add_child(scroll)
+ var detail_panel := PanelContainer.new();detail_panel.theme_type_variation="ItemDetail";detail_panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(detail_panel)
  var detail_column := VBoxContainer.new()
  var detail_scroll := SheetControls.scroll(detail_column);detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.add_child(detail_scroll)
  var detail_heading := SheetControls.label(UiText.localized("cozy.product_details",{},"Your selection"));UiText.bind_control(detail_heading,"cozy.product_details");SheetControls.title(detail_heading);detail_column.add_child(detail_heading)
+ _selection_art=ItemGlyph.new()
+ _selection_art.custom_minimum_size=Vector2(88,88)
+ _selection_art.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+ detail_column.add_child(_selection_art)
  detail_column.add_child(_details)
- var checkout := PanelContainer.new();checkout.theme_type_variation="Inset";column.add_child(checkout)
+ var checkout := PanelContainer.new();checkout.theme_type_variation="OrderSlip";column.add_child(checkout)
  var checkout_row := HFlowContainer.new();checkout.add_child(checkout_row)
  var quantity_group := HBoxContainer.new();quantity_group.size_flags_vertical=Control.SIZE_SHRINK_CENTER;checkout_row.add_child(quantity_group)
  var quantity_label := text.key_label("shop_quantity");quantity_group.add_child(quantity_label)
@@ -112,7 +123,10 @@ func _invalidate() -> void:
 func _update_details() -> void:
  _confirm.disabled=_quote==null
  _feedback.visible=_quote!=null or _bought or _last_result!=null
+ _selection_art.visible=not _selected.is_empty()
  if _selected.is_empty():_details.text=OutingText.t("choose_offer");_quantity.editable=false;_feedback.text="";return
+ var selected_definition := str(_selected.contents[0].definition_id)
+ _selection_art.configure(_session.items.definition(StringName(selected_definition)),selected_definition)
  var lines := PackedStringArray([OutingText.offer(_shop_id,_selected,"label"),OutingText.offer(_shop_id,_selected,"description"),_text.text("shop_price",{"price":"%.2f" % (int(_selected.price_minor)/100.0),"stock":_selected.available})])
  for part in _selected.contents:
   var definition := _session.items.definition(StringName(part.definition_id))

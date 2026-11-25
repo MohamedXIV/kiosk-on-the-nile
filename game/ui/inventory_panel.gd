@@ -17,10 +17,12 @@ var _reset_scroll: bool=false
 var _location: String=""
 var _age_labels: Array[Dictionary]=[]
 var _age_elapsed: float=0
+var _selected_items: Dictionary={}
 const KINDS := ["","purchase_bag","dry","cold","storage"]
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme()
  SheetControls.shell(self)
+ theme_type_variation="InventoryBag"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
  SheetControls.header(column,_heading,text,hide)
  SheetControls.muted(_hint);column.add_child(_hint)
@@ -101,6 +103,7 @@ func _render() -> void:
   entries.sort_custom(func(a,b):return str(a.id)<str(b.id))
   if entries.is_empty() and query!="":continue
   var card := SheetControls.card(_rows);shown+=1
+  card.get_parent().theme_type_variation="StorageTray"
   var title := _kind_label(str(container.kind))
   if int(totals[container.kind])>1:title+=" · "+str(ordinals[container.kind])
   var container_title := SheetControls.label(ItemText.t("capacity",{"name":title,"used":used,"capacity":int(container.capacity)}));SheetControls.title(container_title);card.add_child(container_title)
@@ -113,35 +116,77 @@ func _render() -> void:
    var unpack := _action(_text.text("inventory_unpack"),"unpack:"+str(container_id),func():_apply(_session.inventory.unpack_purchase_bag(container_id,_session.location_id)))
    SheetControls.primary(unpack);card.add_child(unpack)
   if entries.is_empty():card.add_child(SheetControls.label(ItemText.t("empty_container")))
-  for item in entries:
-   var item_card := PanelContainer.new();item_card.theme_type_variation="Inset";card.add_child(item_card)
-   var row := SheetControls.columns(item_card,680);row.add_theme_constant_override("separation",12)
-   var content := HBoxContainer.new();content.size_flags_horizontal=Control.SIZE_EXPAND_FILL;content.add_theme_constant_override("separation",12);row.add_child(content)
-   var glyph := preload("res://game/ui/item_glyph.gd").new();glyph.configure(_session.items.definition(StringName(str(item.definition_id))));glyph.size_flags_vertical=Control.SIZE_SHRINK_BEGIN;content.add_child(glyph)
-   var detail := VBoxContainer.new();detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL;content.add_child(detail)
-   var item_label := SheetControls.label(ItemText.t("quantity",{"name":ItemText.instance(_session,item),"quantity":int(item.quantity)}))
-   item_label.custom_minimum_size.y=float(_text.data.theme.font_size)*1.4
-   detail.add_child(item_label)
-   var description := ItemText.item_details(_session,item)
-   if description!="":
-    var age_label := SheetControls.label(description);SheetControls.muted(age_label);detail.add_child(age_label)
-    if item.attributes.has("freshness"):_age_labels.append({"label":age_label,"item":item})
-   var count := int(reserved.get(item.id,0))
-   if count>0:detail.add_child(SheetControls.label(ItemText.t("reserved",{"count":count})))
-   var item_id := StringName(str(item.id))
-   if item.kind in ["batch","prepared"] and container.kind=="cold":
-    var take := _action(_text.text("recipe_take_bowl"),"take:"+str(item_id),func():_apply(_session.inventory.pick_up_storage(item_id)))
-    SheetControls.primary(take)
-    take.disabled=not held.is_empty();row.add_child(take)
-   elif container.kind!="purchase_bag":
-    var pack := _action(_text.text("inventory_pack"),"pack:"+str(item_id),func():_apply(_session.inventory.pack(item_id)))
-    pack.disabled=count>0;row.add_child(pack)
+  if not entries.is_empty():
+   var selected_id := str(_selected_items.get(str(container_id),""))
+   var chosen: Dictionary={}
+   for item in entries:
+    if str(item.id)==selected_id:chosen=item;break
+   if chosen.is_empty():chosen=entries[0];selected_id=str(chosen.id)
+   _selected_items[str(container_id)]=selected_id
+   var slots := HFlowContainer.new()
+   slots.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+   slots.add_theme_constant_override("h_separation",8)
+   slots.add_theme_constant_override("v_separation",8)
+   card.add_child(slots)
+   for item in entries:
+    var item_id := str(item.id)
+    var tile := PanelContainer.new()
+    tile.theme_type_variation="SelectedItemSlot" if item_id==selected_id else "ItemSlot"
+    tile.custom_minimum_size.x=148
+    slots.add_child(tile)
+    var tile_content := VBoxContainer.new()
+    tile_content.add_theme_constant_override("separation",3)
+    tile.add_child(tile_content)
+    var glyph := ItemGlyph.new()
+    glyph.configure(_session.items.definition(StringName(str(item.definition_id))),str(item.definition_id))
+    glyph.custom_minimum_size=Vector2(64,64)
+    glyph.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+    tile_content.add_child(glyph)
+    var name := SheetControls.label(ItemText.t("quantity",{"name":ItemText.instance(_session,item),"quantity":int(item.quantity)}))
+    name.custom_minimum_size.x=120
+    name.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+    name.set_meta("centered",true)
+    tile_content.add_child(name)
+    var inspect := _action(UiText.localized("cozy.inspect",{},"Details"),"inspect:"+item_id,func():
+     _selected_items[str(container_id)]=item_id
+     _dirty=true)
+    inspect.theme_type_variation="PrimaryButton" if item_id==selected_id else "QuietButton"
+    tile_content.add_child(inspect)
+   _render_item_details(card,chosen,container,held,reserved)
+
  if shown==0:_rows.add_child(SheetControls.label(ItemText.t("no_items")))
  if _last_result:
   _feedback.text=_text.text("inventory_partial") if _last_result.ok and not _last_result.details.get("remaining",[]).is_empty() else ItemText.missing(_session,_text,_last_result)
  _feedback.visible=not _feedback.text.is_empty()
  _scroll.get_v_scroll_bar().set_deferred("value",scroll)
  _restore_focus(focus_key)
+func _render_item_details(parent: VBoxContainer,item: Dictionary,container: Dictionary,held: Dictionary,reserved: Dictionary) -> void:
+ var panel := PanelContainer.new()
+ panel.theme_type_variation="ItemDetail"
+ parent.add_child(panel)
+ var row := SheetControls.columns(panel,460)
+ var detail := VBoxContainer.new()
+ detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ row.add_child(detail)
+ var title := SheetControls.label(ItemText.instance(_session,item))
+ title.theme_type_variation="NotebookSection"
+ detail.add_child(title)
+ var description := ItemText.item_details(_session,item)
+ if not description.is_empty():
+  var age_label := SheetControls.label(description)
+  SheetControls.muted(age_label);detail.add_child(age_label)
+  if item.attributes.has("freshness"):_age_labels.append({"label":age_label,"item":item})
+ var count := int(reserved.get(item.id,0))
+ if count>0:detail.add_child(SheetControls.label(ItemText.t("reserved",{"count":count})))
+ var item_id := StringName(str(item.id))
+ if item.kind in ["batch","prepared"] and container.kind=="cold":
+  var take := _action(_text.text("recipe_take_bowl"),"take:"+str(item_id),func():_apply(_session.inventory.pick_up_storage(item_id)))
+  SheetControls.primary(take)
+  take.disabled=not held.is_empty();row.add_child(take)
+ elif container.kind!="purchase_bag":
+  var pack := _action(_text.text("inventory_pack"),"pack:"+str(item_id),func():_apply(_session.inventory.pack(item_id)))
+  pack.disabled=count>0;row.add_child(pack)
+
 func _apply(result: ActionResult) -> void:
  _last_result=result;_dirty=true
 func _action(value: String, key: String, action: Callable) -> Button:

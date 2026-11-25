@@ -36,6 +36,8 @@ func run(check, tree) -> void:
  check.case("inventory_refresh_keeps_search_and_focus_and_exact_quantity")
  locale.set_locale("en")
  inventory.open();inventory._search.text="tea";inventory._render()
+ check.equal(inventory.theme_type_variation,&"InventoryBag")
+ check.is_true(not inventory._rows.find_children("*","ItemGlyph",true,false).is_empty())
  inventory._search.grab_focus()
  var search_id := inventory._search.get_instance_id()
  inventory.refresh();inventory._process(0)
@@ -76,6 +78,8 @@ func run(check, tree) -> void:
  check.is_true(started.ok)
  if started.ok:
   recipes.present(&"tea")
+  check.equal(recipes.theme_type_variation,&"CookingBoard")
+  check.is_true(recipes._station_art.visible)
   check.equal(recipes._progress.size(),1)
   var entry: Dictionary=recipes._progress[0]
   var original_label_id: int=entry.label.get_instance_id()

@@ -5,6 +5,7 @@ var _text: UiText
 var _instance_id: StringName
 var _heading := SheetControls.label()
 var _held := SheetControls.label()
+var _station_art: ItemGlyph
 var _tabs := TabContainer.new()
 var _care := VBoxContainer.new()
 var _active := VBoxContainer.new()
@@ -25,10 +26,15 @@ var _elapsed: float=0
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme();_hygiene_data=session.config.section("hygiene")
  SheetControls.shell(self)
+ theme_type_variation="CookingBoard"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
  SheetControls.header(column,_heading,text,hide)
- var hands := PanelContainer.new();hands.theme_type_variation="Inset";column.add_child(hands);hands.add_child(_held)
+ var hands := PanelContainer.new();hands.theme_type_variation="StationTray";column.add_child(hands)
+ var station_row := HBoxContainer.new();hands.add_child(station_row)
+ _station_art=ItemGlyph.new();_station_art.custom_minimum_size=Vector2(70,70);station_row.add_child(_station_art)
+ station_row.add_child(_held)
  _tabs.size_flags_vertical=Control.SIZE_EXPAND_FILL;column.add_child(_tabs)
+ _tabs.get_tab_bar().theme_type_variation="NotebookTabs"
  for rows in [_care,_active,_recipes]:
   var scroll := SheetControls.scroll(rows);_scrolls.append(scroll);_tabs.add_child(scroll)
  column.add_child(_feedback)
@@ -62,6 +68,9 @@ func _refresh() -> void:
  _cleanliness=null;_clean_progress=null;_clean_button=null;_stop_button=null
  var instance := _session.items.get_item(_instance_id)
  var placement := _session.spaces.placement(_instance_id)
+ var definition_id := str(instance.get("definition_id",""))
+ _station_art.visible=not instance.is_empty()
+ _station_art.configure(_session.items.definition(StringName(definition_id)),definition_id)
  _heading.text=_text.text("item_actions_title",{"item":ItemText.definition(_session,str(instance.get("definition_id","")))})
  var held := _session.items.get_item(_session.inventory.held_id())
  _held.text=ItemText.t("held",{"item":ItemText.instance(_session,held)}) if not held.is_empty() else ItemText.t("hands_empty")
@@ -103,8 +112,10 @@ func _render_jobs() -> void:
  for job in _session.workflow.jobs_at(_instance_id):
   var step: Dictionary=job.definition.steps[int(job.step_index)]
   var card := SheetControls.card(_active)
+  card.get_parent().theme_type_variation="StationTray"
   var heading := SheetControls.label(ItemText.recipe(str(job.recipe_id),str(job.definition.label)));SheetControls.title(heading);card.add_child(heading)
-  card.add_child(SheetControls.label(ItemText.step(str(job.recipe_id),step)))
+  var stage := SheetControls.label("%s / %s  ·  %s" % [int(job.step_index)+1,job.definition.steps.size(),ItemText.step(str(job.recipe_id),step)])
+  stage.theme_type_variation="ShopHeading";card.add_child(stage)
   var meter := ProgressBar.new();meter.show_percentage=false;meter.custom_minimum_size.y=12;meter.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(meter)
   var progress := SheetControls.label();card.add_child(progress)
   _progress.append({"job_id":str(job.id),"step_id":str(step.id),"label":progress,"meter":meter})
@@ -134,8 +145,9 @@ func _render_recipes() -> void:
  for recipe in available:
   var definition: Dictionary=recipe.definition
   var card := SheetControls.card(_recipes)
+  card.get_parent().theme_type_variation="RecipePaper"
   var heading := SheetControls.label(ItemText.recipe(str(recipe.id),str(definition.label)));SheetControls.title(heading);card.add_child(heading)
-  card.add_child(SheetControls.label(ItemText.requirements(_session,definition)))
+  _ingredient_strip(card,definition)
   var equipment := SheetControls.label(ItemText.equipment(definition));SheetControls.muted(equipment);card.add_child(equipment)
   if not recipe.available:
    var reason := ActionResult.failure(ActionResult.Code.NOT_AVAILABLE,recipe.missing,recipe.details)
@@ -169,6 +181,32 @@ func _render_recipes() -> void:
   var personal := _action(_text.text("self_cooking"),str(id)+":personal",func():_apply(_session.workflow.start(id,_session.location_id,PackedStringArray([str(_instance_id)]),true,_selected_ingredients.get(str(id),{}))))
   personal.disabled=not recipe.available;actions.add_child(personal)
  if available.is_empty():_recipes.add_child(SheetControls.label(ItemText.t("recipes_empty")))
+func _ingredient_strip(parent: VBoxContainer,definition: Dictionary) -> void:
+ var strip := HFlowContainer.new()
+ strip.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ strip.add_theme_constant_override("h_separation",8)
+ strip.add_theme_constant_override("v_separation",6)
+ parent.add_child(strip)
+ for input in definition.inputs:
+  var input_id := str(input.definition_id)
+  var slot := PanelContainer.new()
+  slot.theme_type_variation="ItemSlot"
+  slot.custom_minimum_size.x=126
+  strip.add_child(slot)
+  var column := VBoxContainer.new()
+  column.add_theme_constant_override("separation",2)
+  slot.add_child(column)
+  var glyph := ItemGlyph.new()
+  glyph.configure(_session.items.definition(StringName(input_id)),input_id)
+  glyph.custom_minimum_size=Vector2(56,56)
+  glyph.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+  column.add_child(glyph)
+  var quantity := SheetControls.label(ItemText.t("quantity",{"name":ItemText.definition(_session,input_id),"quantity":int(input.quantity)}))
+  quantity.custom_minimum_size.x=100
+  quantity.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  quantity.set_meta("centered",true)
+  column.add_child(quantity)
+
 func _apply(result: ActionResult) -> void:
  _last_result=result;_dirty=true
  if result.ok and result.details.has("job_id"):_tabs.current_tab=1

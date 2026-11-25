@@ -95,6 +95,7 @@ static func make() -> Theme:
    t.set_stylebox(state,kind,box(Color("#93aa87"),Color.TRANSPARENT,5,5))
  _apply_nile_assets(t)
  _apply_story_surfaces(t)
+ _apply_work_surfaces(t)
  _theme=t
  return _theme
 static func box(fill: Color, border: Color, radius: int, padding: int, elevated: bool=false) -> StyleBoxFlat:
@@ -194,3 +195,24 @@ static func _apply_story_surfaces(t: Theme) -> void:
  t.set_type_variation("NotebookSection","Label")
  t.set_color("font_color","NotebookSection",Color("#24616b"))
  t.set_font_size("font_size","NotebookSection",20)
+
+# Distinct work surfaces: a storage tray, a seller's board, and recipe paper.
+static func _apply_work_surfaces(t: Theme) -> void:
+ for kind in ["InventoryBag","ShopBoard","CookingBoard","StorageTray","ItemSlot","SelectedItemSlot","ItemDetail","StationTray","RecipePaper","OrderSlip"]:
+  t.set_type_variation(kind,"PanelContainer")
+ t.set_stylebox("panel","InventoryBag",story_box(NOTEBOOK_ART,18,20,14))
+ t.set_stylebox("panel","ShopBoard",texture_box(0,20,14))
+ t.set_stylebox("panel","CookingBoard",story_box(NOTEBOOK_ART,18,20,14))
+ t.set_stylebox("panel","StorageTray",texture_box(2,12,9))
+ t.set_stylebox("panel","ItemSlot",texture_box(1,8,6))
+ t.set_stylebox("panel","SelectedItemSlot",texture_box(5,8,6))
+ t.set_stylebox("panel","ItemDetail",story_box(PAPER_ART,8,12,9))
+ t.set_stylebox("panel","RecipePaper",story_box(PAPER_ART,8,14,10))
+ t.set_stylebox("panel","StationTray",texture_box(2,12,8))
+ t.set_stylebox("panel","OrderSlip",story_box(PAPER_ART,8,12,8))
+ t.set_type_variation("ShopHeading","Label")
+ t.set_font_size("font_size","ShopHeading",20)
+ t.set_color("font_color","ShopHeading",Color("#24616b"))
+ t.set_type_variation("PriceTag","Label")
+ t.set_font_size("font_size","PriceTag",14)
+ t.set_color("font_color","PriceTag",Color("#78562c"))

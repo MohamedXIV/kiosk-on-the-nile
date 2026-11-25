@@ -3,16 +3,31 @@ extends PanelContainer
 signal selected(offer_id: StringName)
 var _button: Button
 func configure(offer: Dictionary, definition: Dictionary, text: UiText, shop_id: StringName) -> void:
- theme_type_variation="Card"
- var row := HBoxContainer.new();add_child(row)
- var thumbnail := ItemGlyph.new();thumbnail.configure(definition);row.add_child(thumbnail)
- var column := VBoxContainer.new();column.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(column)
- var name_label := SheetControls.label(OutingText.offer(shop_id,offer,"label"));column.add_child(name_label)
+ theme_type_variation="ItemSlot"
+ custom_minimum_size.x=142
+ var column := VBoxContainer.new()
+ column.add_theme_constant_override("separation",4)
+ add_child(column)
+ var thumbnail := ItemGlyph.new()
+ thumbnail.configure(definition,str(offer.contents[0].definition_id))
+ thumbnail.custom_minimum_size=Vector2(68,68)
+ thumbnail.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+ column.add_child(thumbnail)
+ var name_label := SheetControls.label(OutingText.offer(shop_id,offer,"label"))
+ name_label.custom_minimum_size.x=114
+ name_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ name_label.set_meta("centered",true)
+ column.add_child(name_label)
  var price := SheetControls.label(text.text("shop_price",{"price":"%.2f" % (int(offer.price_minor)/100.0),"stock":offer.available}))
- SheetControls.muted(price);column.add_child(price)
+ price.theme_type_variation="PriceTag"
+ price.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ price.set_meta("centered",true)
+ column.add_child(price)
  _button=SheetControls.button(UiText.localized("cozy.inspect",{},"Details"),func():selected.emit(StringName(offer.id)))
+ _button.custom_minimum_size.x=0
  _button.disabled=int(offer.available)<=0
  column.add_child(_button)
 func set_selected(value: bool) -> void:
+ theme_type_variation="SelectedItemSlot" if value else "ItemSlot"
  _button.theme_type_variation="PrimaryButton" if value else "QuietButton"
  _button.button_pressed=value
