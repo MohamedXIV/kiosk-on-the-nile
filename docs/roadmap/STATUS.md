@@ -1,5 +1,8 @@
 # Proposed next phase — Cozy gameplay UX / market / object-centric cooking (2026-11-03)
 
+> **2026-11-25 visual direction update:** The approved [Game UI Bible v0.1](../ui/2026-11-25-game-ui-bible.md) is now the visual and interaction design authority for #48. It supersedes conflicting web-like layout, typography, and restrained theme interpretations below. Preserve the existing functional, architectural, accessibility, and gameplay requirements; #48 still covers all existing player-facing screens. This is a design update, not implementation or release acceptance.
+
+
 **Design and GitHub planning only; not implemented, not a new version, release or save revision.** [Epic #47](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/47) tracks dependency-ready work [#48–#55](https://github.com/MohamedXIV/kiosk-on-the-nile/issues/48). Read the [approved product direction](2026-11-03-cozy-gameplay-ux.md), [cozy menu UX contract](../ui/2026-11-03-cozy-menu-design.md) and [integration/owner audit](../architecture/2026-11-03-market-object-commerce.md) before implementation. Preserve current features and source-of-truth owners; a limited launch-facing menu is not deletion. Preserve the quieter game identity and human acceptance gates #6/#7. The previous checkpoint below remains historical and unaffected by this proposal.
 
 ---
