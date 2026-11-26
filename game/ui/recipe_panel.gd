@@ -12,6 +12,8 @@ var _header: HBoxContainer
 var _manage: Button
 var _active_feedback: Label
 var _gameplay_mode: bool=false
+var _action_pages: Dictionary={}
+var _action_pagers: Array[OverlayActionPager]=[]
 var _tabs := TabContainer.new()
 var _care := VBoxContainer.new()
 var _active := VBoxContainer.new()
@@ -51,6 +53,7 @@ func configure(text: UiText, session: GameSession) -> void:
  _station_row=station_row
  _station_art=ItemGlyph.new();_station_art.custom_minimum_size=Vector2.ONE*REGULAR_STATION_SIZE;station_row.add_child(_station_art)
  resized.connect(_fit_station_art)
+ resized.connect(_fit_action_pages)
  station_row.add_child(_held)
  _tabs.size_flags_vertical=Control.SIZE_EXPAND_FILL;column.add_child(_tabs)
  _tabs.get_tab_bar().theme_type_variation="NotebookTabs"
@@ -69,6 +72,11 @@ func _fit_station_art() -> void:
  if not is_instance_valid(_station_art):return
  _station_art.custom_minimum_size=Vector2.ONE*(32.0 if _gameplay_mode else COMPACT_STATION_SIZE if CozyTheme.compact_for(get_viewport_rect().size) else REGULAR_STATION_SIZE)
 
+func _fit_action_pages() -> void:
+ var paged := _gameplay_mode and CozyTheme.compact_for(get_viewport_rect().size)
+ for pager in _action_pagers:
+  if is_instance_valid(pager) and pager._paged!=paged:pager.set_paged(paged)
+
 func _refresh_language() -> void:
  for i in range(3):_tabs.set_tab_title(i,ItemText.t(["care","active","recipes"][i]))
  _manage.text=UiText.localized("cozy.station_management_short")
@@ -77,6 +85,7 @@ func present(instance_id: StringName, _unused_recipes: Array[Dictionary] = []) -
  var changed_target := _instance_id!=instance_id
  _instance_id=instance_id
  if changed_target:
+  _action_pages.clear()
   _last_result=null
   for scroll in _scrolls:scroll.get_v_scroll_bar().value=0
  _refresh()
@@ -106,6 +115,7 @@ func _sync_surface() -> void:
  _feedback.visible=not _gameplay_mode and not _feedback.text.is_empty()
  if is_instance_valid(_active_feedback):_active_feedback.visible=_gameplay_mode and not _active_feedback.text.is_empty()
  _fit_station_art()
+ _fit_action_pages()
  SheetControls._queue_sheet_fit(weakref(self),1100,122,18)
 
 func _refresh() -> void:
@@ -114,6 +124,7 @@ func _refresh() -> void:
  var offsets: Array=[]
  for scroll in _scrolls:offsets.append(scroll.get_v_scroll_bar().value)
  _progress.clear()
+ _action_pagers.clear()
  _recipes.set_meta("has_recipes",false)
  for rows in [_care,_active,_recipes]:SheetControls.clear(rows)
  _cleanliness=null;_clean_progress=null;_clean_button=null;_stop_button=null;_active_feedback=null
@@ -189,15 +200,27 @@ func _render_jobs() -> void:
   if RecipeProcesses.supports(job.definition):
    summary.add_child(SheetControls.label(ItemText.t("method",{"method":UiText.localized("cooking.method."+str(job.definition.method),{},str(job.definition.method))})))
    if step.kind in ["passive_heat","batch_hold"]:
-    var heat_row := VBoxContainer.new();heat_row.add_theme_constant_override("separation",4);commands.add_child(heat_row)
     for heat in RecipeProcesses.HEATS:
      var heat_id: String=heat
      var heat_button := _action(UiText.localized("cooking.heat."+heat_id,{},heat_id),str(id)+":heat:"+heat_id,func():_apply(_session.workflow.act(id,StringName("heat:"+heat_id))))
-     heat_button.disabled=job.heat==heat_id;heat_row.add_child(heat_button)
+     heat_button.disabled=job.heat==heat_id;commands.add_child(heat_button)
   if step.kind=="batch_heat":commands.add_child(_action(_text.text("recipe_stop_heat"),str(id)+":stop_heat",func():_apply(_session.workflow.act(id,&"stop_heat"))))
   var cancel_hint := SheetControls.label(ItemText.t("cancel_hint"));SheetControls.muted(cancel_hint);summary.add_child(cancel_hint)
   var cancel := _action(_text.text("recipe_cancel"),str(id)+":cancel",func():_apply(_session.workflow.act(id,&"cancel")))
   cancel.theme_type_variation="DangerButton";commands.add_child(cancel)
+  # Preserve all real serving/heat/advance/cancel controls, with a stable
+  # selected control key across workflow refreshes instead of a second job state.
+  var actions: Array[Control]=[]
+  for child in commands.get_children():
+   if child is Control:actions.append(child)
+  var pager := OverlayActionPager.new();commands.add_child(pager)
+  pager.configure(actions)
+  _action_pagers.append(pager)
+  var page_key := str(job.id)
+  var saved := str(_action_pages.get(page_key,""))
+  for index in range(actions.size()):
+   if str(actions[index].get_meta("recipe_focus",""))==saved:pager.select(index);break
+  pager.page_changed.connect(func(index):_action_pages[page_key]=str(actions[index].get_meta("recipe_focus","")))
  if _progress.is_empty():_active.add_child(SheetControls.label(ItemText.t("active_empty")))
 func _step_track(parent: VBoxContainer,job: Dictionary) -> void:
  # Steps come directly from the current job definition; no parallel progress state.
@@ -288,7 +311,9 @@ func _ingredient_strip(parent: VBoxContainer,definition: Dictionary) -> void:
 
 func _apply(result: ActionResult) -> void:
  _last_result=result;_dirty=true
- if result.ok and result.details.has("job_id"):_tabs.current_tab=1
+ if result.ok:
+  _action_pages.clear()
+  if result.details.has("job_id"):_tabs.current_tab=1
 func _process(delta: float) -> void:
  if not visible:return
  if _dirty:_refresh()

@@ -17,6 +17,7 @@ var _reading_box: VBoxContainer
 var _history: VBoxContainer
 var _history_toggle: Button
 var _current_line: Label
+var _choice_pager: OverlayActionPager
 var _compact: bool=false
 var _layout_configured: bool=false
 var _scroll: ScrollContainer
@@ -121,7 +122,7 @@ func _begin(signature: String, speaker_name: String="") -> bool:
  for child in _box.get_children():child.free()
  for child in _reading_box.get_children():child.free()
  if is_instance_valid(_leave):_leave.free()
- _history=null;_history_toggle=null;_current_line=null
+ _history=null;_history_toggle=null;_current_line=null;_choice_pager=null
  _layout_configured=false
  _speaker.text=speaker_name
  _speaker.visible=not speaker_name.is_empty()
@@ -167,9 +168,17 @@ func _fit() -> void:
  _speaker.tooltip_text=_speaker.text
  if not _layout_configured:
   _layout_configured=true
+  var actions: Array[Control]=[]
+  for child in _box.get_children():
+   if child is Button:actions.append(child)
+  if not actions.is_empty():
+   _choice_pager=OverlayActionPager.new()
+   _box.add_child(_choice_pager)
+   _choice_pager.configure(actions)
   if is_instance_valid(_history):_reading_box.move_child(_history,_reading_box.get_child_count()-1)
   _reading.set_deferred("scroll_vertical",0)
   _scroll.set_deferred("scroll_vertical",0)
+ if is_instance_valid(_choice_pager) and _choice_pager._paged!=_compact:_choice_pager.set_paged(_compact)
  set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
  position=envelope.position
  size=envelope.size

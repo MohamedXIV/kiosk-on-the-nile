@@ -266,6 +266,9 @@ func _review_layout() -> bool:
    if SheetControls.gameplay_area_ratio(surface.get_global_rect(),bounds.size)>SheetControls.GAMEPLAY_AREA_LIMIT:return false
    if surface._scrolls[1].size.y<44:return false
    if not surface.get_global_rect().grow(1).encloses(surface._manage.get_global_rect()):return false
+   if CozyTheme.compact_for(bounds.size):
+    for pager in surface._action_pagers:
+     if not pager._paged or not _check_action_pages(pager):return false
   var tracks: Array[Node] = surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
   if not surface._progress.is_empty() and tracks.size()!=surface._progress.size():return false
   for track in tracks:
@@ -310,10 +313,9 @@ func _review_layout() -> bool:
   if is_instance_valid(panel._current_line):
    if not panel._current_line.is_visible_in_tree() or panel._current_line.get_theme_font_size("font_size")<15:return false
    if panel._current_line.size.y<=panel._reading.size.y and not panel._reading.get_global_rect().grow(1).encloses(panel._current_line.get_global_rect()):return false
-  for child in panel._box.get_children():
-   if child is Button and child!=panel._history_toggle:
-    if child.size.y<=panel._scroll.size.y and not panel._scroll.get_global_rect().grow(1).encloses(child.get_global_rect()):return false
-    break
+  if not is_instance_valid(panel._choice_pager):return false
+  if CozyTheme.compact_for(bounds.size):
+   if not panel._choice_pager._paged or not _check_action_pages(panel._choice_pager):return false
   if is_instance_valid(panel._history) and panel._history.visible:return false
  if _area=="build":
   for child in hud.get_children():
@@ -331,6 +333,20 @@ func _review_layout() -> bool:
    if child is InventoryPanel:return child._search.size.y<=64 and child._filter.size.y<=64 and child._scroll.size.y>=100
   return false
  return true
+func _check_action_pages(pager: OverlayActionPager) -> bool:
+ # Exercise paging through every existing action without invoking its callback.
+ # Geometry is qualified separately after containers have settled.
+ var original := pager._index
+ for index in range(pager._controls.size()):
+  pager.select(index)
+  if pager.selected_control()!=pager._controls[index]:return false
+  for j in range(pager._controls.size()):
+   if pager._controls[j].visible!=(j==index):return false
+  if pager._next.disabled!=(index==pager._controls.size()-1):return false
+  if pager._previous.disabled!=(index==0):return false
+ pager.select(original)
+ return true
+
 func _capture(exit_code: int=0) -> void:
  if DisplayServer.get_name()=="headless":
   print("COZY_UI_CAPTURE skipped: headless display has no rendered image")
