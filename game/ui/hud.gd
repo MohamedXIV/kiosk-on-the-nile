@@ -154,7 +154,7 @@ func bind(session: GameSession) -> void:
 func present(target: InteractionTarget) -> void:
  if _session==null: return
  _strip.present(_session)
- dialogue.position.y = _strip.position.y+_strip.size.y+float(_text.data.hud.margin)
+ dialogue.top_inset = _strip.position.y+_strip.size.y+float(_text.data.hud.margin)
  _prompt.text = _text.text("interaction",{"primary":target.primary}) if target else ""
  var secondary: String = target.secondary if target else ""
  if secondary.is_empty() and _session.cooking.held_item(): secondary = _text.text("consume")

@@ -24,10 +24,14 @@ func configure(text: UiText, session: GameSession) -> void:
  SheetControls.shell(self)
  theme_type_variation="InventoryBag"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
- SheetControls.header(column,_heading,text,hide)
+ SheetControls.header(column,_heading,text,hide,"bag","SectionNile")
  SheetControls.muted(_hint);column.add_child(_hint)
  var hands := PanelContainer.new();hands.theme_type_variation="Inset";column.add_child(hands);hands.add_child(_held)
  var controls := SheetControls.columns(column,640);controls.add_theme_constant_override("separation",8)
+ # Search/filter are a toolbar, not a competing vertically expanding pane.
+ controls.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+ _search.custom_minimum_size.y=44
+ _filter.custom_minimum_size.y=44
  _search.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_search.clear_button_enabled=true;controls.add_child(_search)
  _search.text_changed.connect(func(_value):_dirty=true;_reset_scroll=true)
  _filter.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_filter.fit_to_longest_item=false;_filter.clip_text=true;controls.add_child(_filter)

@@ -27,9 +27,30 @@ static func scroll(column: VBoxContainer) -> ScrollContainer:
  column.add_theme_constant_override("separation",12)
  control.add_child(column)
  return control
-static func header(parent: VBoxContainer, heading: Label, text: UiText, close: Callable) -> void:
- var row := HBoxContainer.new();parent.add_child(row)
+static func banner(parent: VBoxContainer, icon_key: String, kind: String) -> HBoxContainer:
+ var panel := PanelContainer.new()
+ panel.theme_type_variation=kind
+ parent.add_child(panel)
+ var row := HBoxContainer.new()
+ row.add_theme_constant_override("separation",10)
+ panel.add_child(row)
+ var art := TextureRect.new()
+ art.texture=CozyTheme.icon_texture(icon_key)
+ art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ art.custom_minimum_size=Vector2(32,32)
+ art.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+ art.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ row.add_child(art)
+ return row
+static func header(parent: VBoxContainer, heading: Label, text: UiText, close: Callable, icon_key: String="", banner_kind: String="") -> void:
+ var row: HBoxContainer
+ if not banner_kind.is_empty() and not icon_key.is_empty():
+  row=banner(parent,icon_key,banner_kind)
+ else:
+  row=HBoxContainer.new();parent.add_child(row)
  title(heading)
+ if not banner_kind.is_empty():heading.add_theme_color_override("font_color",CozyTheme.IVORY)
  heading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  row.add_child(heading)
  var close_button := text.key_button("close",close)

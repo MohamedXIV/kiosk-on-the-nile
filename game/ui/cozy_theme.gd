@@ -97,6 +97,7 @@ static func make() -> Theme:
  _apply_story_surfaces(t)
  _apply_work_surfaces(t)
  _apply_daily_surfaces(t)
+ _apply_review_surfaces(t)
  _theme=t
  return _theme
 static func box(fill: Color, border: Color, radius: int, padding: int, elevated: bool=false) -> StyleBoxFlat:
@@ -234,3 +235,22 @@ static func _apply_daily_surfaces(t: Theme) -> void:
  t.set_stylebox("normal","Notice",texture_box(3,14,9))
  t.set_color("font_color","Notice",INK)
  t.set_font_size("font_size","Notice",15)
+
+# The first rendered review exposed a nearly monochrome card treatment.
+# Semantic headings give the work surfaces their own identity without new state.
+static func _apply_review_surfaces(t: Theme) -> void:
+ for entry in [["SectionOlive",8],["SectionNile",12],["SectionClay",16]]:
+  var kind: String=entry[0]
+  t.set_type_variation(kind,"PanelContainer")
+  t.set_stylebox("panel",kind,texture_box(int(entry[1]),12,7))
+ t.set_type_variation("NotebookBook","TabContainer")
+ t.set_stylebox("panel","NotebookBook",story_box(PAPER_ART,8,14,12))
+ for kind in ["TabContainer","NotebookBook"]:
+  t.set_stylebox("tab_selected",kind,texture_box(12,14,6))
+  t.set_stylebox("tab_hovered",kind,texture_box(5,14,6))
+  t.set_stylebox("tab_unselected",kind,texture_box(4,14,6))
+  t.set_color("font_selected_color",kind,IVORY)
+  t.set_color("font_unselected_color",kind,INK)
+  t.set_color("font_hovered_color",kind,INK)
+ for kind in ["LineEdit","TextEdit"]:
+  t.set_stylebox("normal",kind,box(Color("#fff4df"),LINE,8,9))

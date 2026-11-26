@@ -13,6 +13,11 @@ var _leave: Button
 var _scroll: ScrollContainer
 var _signature: String=""
 var _maximum_height_ratio: float=0.42
+var top_inset: float=122.0
+const PANEL_WIDTH := 460.0
+const EDGE := 16.0
+const MIN_SCROLL_HEIGHT := 96.0
+const MIN_PANEL_HEIGHT := 220.0
 var _text: UiText
 func _ready() -> void:
  theme_type_variation="DialogueFrame"
@@ -21,12 +26,17 @@ func _ready() -> void:
  add_child(_layout)
  _speaker=SheetControls.label()
  _speaker.theme_type_variation="SpeakerTag"
- _speaker.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
+ # The speaker must retain a real horizontal line before the scroll area is measured.
+ _speaker.autowrap_mode=TextServer.AUTOWRAP_OFF
+ _speaker.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+ _speaker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ _speaker.custom_minimum_size.y=36
  _layout.add_child(_speaker)
  _scroll=ScrollContainer.new()
  _scroll.follow_focus=true
  _scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
  _scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+ _scroll.custom_minimum_size.y=MIN_SCROLL_HEIGHT
  _layout.add_child(_scroll)
  _box=VBoxContainer.new()
  _box.add_theme_constant_override("separation",10)
@@ -95,15 +105,15 @@ func _choices(conversation: ConversationSession, choices: Array[Dictionary]) -> 
   _button(LocalizedNarrative.choice(choice,conversation.current),func():choice_selected.emit(conversation.id,StringName(choice.id)))
 func _fit() -> void:
  var viewport := get_viewport_rect().size
- # Keep conversation beside the world at wide sizes and readable on narrow views.
- var width := minf(460,viewport.x-32)
+ var width := minf(PANEL_WIDTH,viewport.x-EDGE*2)
+ var top := maxf(EDGE,top_inset)
+ # Reserve an explicit reading area. Auto-wrapped labels report misleading
+ # minimum heights before their container has received its width.
+ var available := maxf(MIN_SCROLL_HEIGHT,viewport.y-top-EDGE)
+ var height := minf(available,maxf(MIN_PANEL_HEIGHT,viewport.y*_maximum_height_ratio))
  anchor_left=0;anchor_right=0;anchor_top=0;anchor_bottom=0
- offset_left=viewport.x-width-16
- offset_right=viewport.x-16
- offset_top=122
- var style := get_theme_stylebox("panel")
- var fixed_height: float = style.get_minimum_size().y+(_speaker.get_combined_minimum_size().y if _speaker.visible else 0)+20
- if is_instance_valid(_leave):fixed_height+=_leave.get_combined_minimum_size().y+10
- var desired: float = _box.get_combined_minimum_size().y+fixed_height
- offset_bottom=offset_top+minf(desired,minf(viewport.y*_maximum_height_ratio,maxf(120,viewport.y-offset_top-18)))
+ offset_left=viewport.x-width-EDGE
+ offset_right=viewport.x-EDGE
+ offset_top=top
+ offset_bottom=top+height
  show()

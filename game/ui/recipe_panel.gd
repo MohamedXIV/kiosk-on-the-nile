@@ -28,7 +28,7 @@ func configure(text: UiText, session: GameSession) -> void:
  SheetControls.shell(self)
  theme_type_variation="CookingBoard"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
- SheetControls.header(column,_heading,text,hide)
+ SheetControls.header(column,_heading,text,hide,"hunger","SectionClay")
  var hands := PanelContainer.new();hands.theme_type_variation="StationTray";column.add_child(hands)
  var station_row := HBoxContainer.new();hands.add_child(station_row)
  _station_art=ItemGlyph.new();_station_art.custom_minimum_size=Vector2(70,70);station_row.add_child(_station_art)

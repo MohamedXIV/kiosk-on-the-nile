@@ -27,11 +27,12 @@ func configure(text: UiText, session: GameSession) -> void:
  SheetControls.shell(self)
  theme_type_variation="ShopBoard"
  var column := VBoxContainer.new();add_child(column)
- var heading_row := HBoxContainer.new();column.add_child(heading_row)
- SheetControls.title(_heading);_heading.theme_type_variation="ShopHeading";heading_row.add_child(_heading)
- _wallet.theme_type_variation="PriceTag";heading_row.add_child(_wallet)
+ var heading_row := SheetControls.banner(column,"bag","SectionOlive")
+ SheetControls.title(_heading);_heading.add_theme_color_override("font_color",CozyTheme.IVORY);heading_row.add_child(_heading)
+ _wallet.theme_type_variation="PriceTag";_wallet.add_theme_color_override("font_color",CozyTheme.IVORY);heading_row.add_child(_wallet)
  _search.placeholder_text=OutingText.t("search")
  _search.clear_button_enabled=true
+ _search.custom_minimum_size.y=44
  _search.text_changed.connect(func(_value):_render_cards())
  column.add_child(_search)
  var body := SheetControls.columns(column,0)

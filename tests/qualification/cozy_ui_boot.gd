@@ -67,6 +67,12 @@ func _ready() -> void:
  _prepared=true
  # Reapply compact dialogue sizing after fonts and wrapping have settled.
  if _area=="dialogue":hud.present(null)
+ # Catch the actual geometry regressions found in the first rendered review.
+ for index in range(4):await get_tree().process_frame
+ if not _review_layout():
+  push_error("Cozy UI preview rejected: visible layout regression in "+_area)
+  get_tree().quit(1)
+  return
  var status := {"ready":true,"area":_area,"locale":_locale.locale,"limitations":_limitations,"world_minutes":session.clock.world_minutes}
  print("COZY_UI_STATUS ",JSON.stringify(status))
  if OS.has_feature("web"):JavaScriptBridge.eval("window.cozyStatus="+JSON.stringify(status))
@@ -197,6 +203,17 @@ func _open_area(layer: CanvasLayer) -> void:
   _:_limitations.append("Unknown area; showing the real HUD.")
  if session.locations.is_physical(session.location_id):_physical.set_active_location(session.location_id)
  _physical.character.present(session.player_pose,Color(session.config.section("spatial").character.player_color),true)
+func _review_layout() -> bool:
+ if _area=="dialogue":
+  var panel := hud.dialogue
+  if not panel.visible or panel._box.get_child_count()==0:return false
+  if panel._speaker.visible and (panel._speaker.size.x<100 or panel._speaker.size.y>80):return false
+  if panel._scroll.size.y<80:return false
+ if _area=="inventory":
+  for child in hud.get_children():
+   if child is InventoryPanel:return child._search.size.y<=64 and child._filter.size.y<=64 and child._scroll.size.y>=100
+  return false
+ return true
 func _capture() -> void:
  if DisplayServer.get_name()=="headless":
   print("COZY_UI_CAPTURE skipped: headless display has no rendered image")

@@ -22,9 +22,10 @@ func configure(text: UiText) -> void:
  box.add_theme_constant_override("separation",10)
  add_child(box)
  var heading := text.key_label("notebook")
- SheetControls.header(box,heading,text,func():hide();closed.emit())
+ SheetControls.header(box,heading,text,func():hide();closed.emit(),"notebook","SectionNile")
  heading.theme_type_variation="NotebookSection"
  _subtitle.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;SheetControls.muted(_subtitle);box.add_child(_subtitle)
+ _tabs.theme_type_variation="NotebookBook"
  _tabs.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _tabs.get_tab_bar().theme_type_variation="NotebookTabs"
  _tabs.get_tab_bar().scrolling_enabled=true
@@ -90,15 +91,22 @@ func _render_notes() -> void:
  var key := str(LocaleService.current.revision)+JSON.stringify(notes)+reputation
  if key==_notes_key:return
  _notes_key=key;_clear(_notes)
- var reputation_card := _page(_notes)
- var reputation_label := _label(reputation);SheetControls.muted(reputation_label);reputation_card.add_child(reputation_label)
- var page := _page(_notes)
+ var page := VBoxContainer.new()
+ page.add_theme_constant_override("separation",14)
+ _notes.add_child(page)
+ var reputation_label := _label(reputation)
+ reputation_label.theme_type_variation="NotebookSection"
+ page.add_child(reputation_label)
+ page.add_child(HSeparator.new())
  if notes.is_empty():page.add_child(_label(NotebookView.t("notes_empty")))
  for note in notes:
   var box := VBoxContainer.new()
   box.add_theme_constant_override("separation",5)
   page.add_child(box)
-  box.add_child(_label(str(note.text)))
+  var passage := _label(str(note.text))
+  passage.add_theme_font_size_override("font_size",17)
+  passage.add_theme_constant_override("line_spacing",5)
+  box.add_child(passage)
   var chapter := str(note.chapter)
   if chapter!="" and _history.has_chapter(chapter):
    var button := UiText.button(NotebookView.t("source"),func():_history.show_chapter(chapter);_tabs.current_tab=2)
