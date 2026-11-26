@@ -243,7 +243,17 @@ func _review_layout() -> bool:
   return false
  if surface is TitleScreen:
   if not bounds.grow(1).encloses(surface._actions.get_global_rect()):return false
+ if surface is RecipePanel:
+  var tracks := surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
+  if not surface._progress.is_empty() and tracks.size()!=surface._progress.size():return false
+  for track in tracks:
+   var current_count := 0
+   for marker in track.get_children():
+    if marker.theme_type_variation=="RecipeStepNow":current_count+=1
+   if current_count!=1:return false
+  if bounds.size.x<=640 and surface._station_art.custom_minimum_size.y>44:return false
  if surface is ShopPanel:
+  if bounds.size.x<=640 and surface._selection_art.custom_minimum_size.y>44:return false
   for button in surface.find_children("*","Button",true,false):
    if button.get_meta("text_ref","") in ["ui.shop_review","ui.shop_confirm","ui.journey_return"] and not bounds.grow(1).encloses(button.get_global_rect()):return false
  # All production shortcuts must center the artwork on the face, not on

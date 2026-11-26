@@ -45,7 +45,8 @@ func configure(text: UiText, session: GameSession) -> void:
  var detail_panel := PanelContainer.new();detail_panel.theme_type_variation="ItemDetail";detail_panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(detail_panel)
  var detail_column := VBoxContainer.new()
  var detail_scroll := SheetControls.scroll(detail_column);detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL;detail_panel.add_child(detail_scroll)
- var detail_heading := SheetControls.label(UiText.localized("cozy.product_details",{},"Your selection"));UiText.bind_control(detail_heading,"cozy.product_details");SheetControls.title(detail_heading);detail_column.add_child(detail_heading)
+ var detail_heading := SheetControls.label(UiText.localized("cozy.product_details",{},"Your selection"));UiText.bind_control(detail_heading,"cozy.product_details");detail_heading.theme_type_variation="ShopHeading";detail_column.add_child(detail_heading)
+ detail_column.add_theme_constant_override("separation",6)
  _selection_art=ItemGlyph.new()
  _selection_art.custom_minimum_size=Vector2(88,88)
  _selection_art.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
@@ -72,9 +73,13 @@ func configure(text: UiText, session: GameSession) -> void:
  var time_hint := SheetControls.label(OutingText.t("world_continues"));UiText.bind_control(time_hint,"outings.world_continues");SheetControls.muted(time_hint);footer.add_child(time_hint)
  var back := SheetControls.key_button(text,"journey_return",_return);back.custom_minimum_size.x=160;back.theme_type_variation="QuietButton";footer.add_child(back)
  resized.connect(func():
+  var compact := size.x<740
   quantity_label.visible=size.x>=800
   time_hint.visible=size.y>=500
   body.vertical=false
+  _selection_art.custom_minimum_size=Vector2.ONE*(44.0 if compact else 88.0)
+  detail_heading.visible=not compact
+  _quantity.get_line_edit().alignment=HORIZONTAL_ALIGNMENT_CENTER
  )
  hide()
 func present() -> void:

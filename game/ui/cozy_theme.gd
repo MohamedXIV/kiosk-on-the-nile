@@ -98,6 +98,7 @@ static func make() -> Theme:
  _apply_work_surfaces(t)
  _apply_daily_surfaces(t)
  _apply_review_surfaces(t)
+ _apply_reading_workbench(t)
  _theme=t
  return _theme
 static func box(fill: Color, border: Color, radius: int, padding: int, elevated: bool=false) -> StyleBoxFlat:
@@ -258,3 +259,23 @@ static func _apply_review_surfaces(t: Theme) -> void:
   t.set_color("font_hovered_color",kind,INK)
  for kind in ["LineEdit","TextEdit"]:
   t.set_stylebox("normal",kind,box(Color("#fff4df"),LINE,8,9))
+
+# Workbench and notebook details are intentionally different presentation roles.
+static func _apply_reading_workbench(t: Theme) -> void:
+ t.set_type_variation("StationStatus","PanelContainer")
+ t.set_stylebox("panel","StationStatus",texture_box(2,10,5))
+ t.set_type_variation("NotebookBookmark","PanelContainer")
+ t.set_stylebox("panel","NotebookBookmark",texture_box(3,8,5))
+ t.set_type_variation("NotebookPassage","Label")
+ t.set_stylebox("normal","NotebookPassage",story_box(PAPER_ART,8,12,8))
+ for entry in [["RecipeStepDone",8,IVORY],["RecipeStepNow",16,IVORY],["RecipeStepLater",4,MUTED],["ContactMonogram",12,IVORY]]:
+  var kind: String=entry[0]
+  t.set_type_variation(kind,"Label")
+  t.set_stylebox("normal",kind,texture_box(int(entry[1]),6,3))
+  t.set_color("font_color",kind,entry[2])
+  t.set_font_size("font_size",kind,24 if kind=="ContactMonogram" else 14)
+ for entry in [["CookingProgress",Color("#b55e37")],["ContactProgress",Color("#66834a")]]:
+  var kind: String=entry[0]
+  t.set_type_variation(kind,"ProgressBar")
+  t.set_stylebox("background",kind,box(Color("#e1c9a3"),Color.TRANSPARENT,4,0))
+  t.set_stylebox("fill",kind,box(entry[1],Color.TRANSPARENT,4,0))

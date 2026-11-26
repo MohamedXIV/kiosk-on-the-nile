@@ -23,15 +23,19 @@ var _last_result: ActionResult
 var _hygiene_data: Dictionary
 var _dirty: bool=true
 var _elapsed: float=0
+const COMPACT_WIDTH := 740.0
+const COMPACT_STATION_SIZE := 40.0
+const REGULAR_STATION_SIZE := 64.0
 func configure(text: UiText, session: GameSession) -> void:
  _session=session;_text=text;theme=text.make_theme();_hygiene_data=session.config.section("hygiene")
  SheetControls.shell(self)
  theme_type_variation="CookingBoard"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
  SheetControls.header(column,_heading,text,hide,"hunger","SectionClay")
- var hands := PanelContainer.new();hands.theme_type_variation="StationTray";column.add_child(hands)
+ var hands := PanelContainer.new();hands.theme_type_variation="StationStatus";column.add_child(hands)
  var station_row := HBoxContainer.new();hands.add_child(station_row)
- _station_art=ItemGlyph.new();_station_art.custom_minimum_size=Vector2(70,70);station_row.add_child(_station_art)
+ _station_art=ItemGlyph.new();_station_art.custom_minimum_size=Vector2.ONE*REGULAR_STATION_SIZE;station_row.add_child(_station_art)
+ resized.connect(_fit_station_art)
  station_row.add_child(_held)
  _tabs.size_flags_vertical=Control.SIZE_EXPAND_FILL;column.add_child(_tabs)
  _tabs.get_tab_bar().theme_type_variation="NotebookTabs"
@@ -44,6 +48,10 @@ func configure(text: UiText, session: GameSession) -> void:
  LocaleService.current.changed.connect(_refresh_language)
  _refresh_language()
  hide()
+func _fit_station_art() -> void:
+ if not is_instance_valid(_station_art):return
+ _station_art.custom_minimum_size=Vector2.ONE*(COMPACT_STATION_SIZE if size.x<COMPACT_WIDTH else REGULAR_STATION_SIZE)
+
 func _refresh_language() -> void:
  for i in range(3):_tabs.set_tab_title(i,ItemText.t(["care","active","recipes"][i]))
  _dirty=true
@@ -114,9 +122,10 @@ func _render_jobs() -> void:
   var card := SheetControls.card(_active)
   card.get_parent().theme_type_variation="StationTray"
   var heading := SheetControls.label(ItemText.recipe(str(job.recipe_id),str(job.definition.label)));SheetControls.title(heading);card.add_child(heading)
+  _step_track(card,job)
   var stage := SheetControls.label("%s / %s  ·  %s" % [int(job.step_index)+1,job.definition.steps.size(),ItemText.step(str(job.recipe_id),step)])
   stage.theme_type_variation="ShopHeading";card.add_child(stage)
-  var meter := ProgressBar.new();meter.show_percentage=false;meter.custom_minimum_size.y=12;meter.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(meter)
+  var meter := ProgressBar.new();meter.theme_type_variation="CookingProgress";meter.show_percentage=false;meter.custom_minimum_size.y=12;meter.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(meter)
   var progress := SheetControls.label();card.add_child(progress)
   _progress.append({"job_id":str(job.id),"step_id":str(step.id),"label":progress,"meter":meter})
   if step.kind=="cold_wait":card.add_child(SheetControls.label(ItemText.t("cold_wait")))
@@ -139,6 +148,25 @@ func _render_jobs() -> void:
   var cancel := _action(_text.text("recipe_cancel"),str(id)+":cancel",func():_apply(_session.workflow.act(id,&"cancel")))
   cancel.theme_type_variation="DangerButton";card.add_child(cancel)
  if _progress.is_empty():_active.add_child(SheetControls.label(ItemText.t("active_empty")))
+func _step_track(parent: VBoxContainer,job: Dictionary) -> void:
+ # Steps come directly from the current job definition; no parallel progress state.
+ var track := HFlowContainer.new()
+ track.name="RecipeStepTrack"
+ track.add_theme_constant_override("h_separation",4)
+ track.add_theme_constant_override("v_separation",4)
+ parent.add_child(track)
+ var current := int(job.step_index)
+ for index in range(job.definition.steps.size()):
+  var step: Dictionary=job.definition.steps[index]
+  var marker := UiText.label(str(index+1))
+  marker.theme_type_variation="RecipeStepDone" if index<current else "RecipeStepNow" if index==current else "RecipeStepLater"
+  marker.custom_minimum_size=Vector2(42,28)
+  marker.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  marker.set_meta("centered",true)
+  marker.tooltip_text=ItemText.step(str(job.recipe_id),step)
+  marker.mouse_filter=Control.MOUSE_FILTER_STOP
+  track.add_child(marker)
+
 func _render_recipes() -> void:
  var available := _session.workflow.available_recipes(_session.location_id,_instance_id,_selected_ingredients)
  _recipes.set_meta("has_recipes",not available.is_empty())
