@@ -55,6 +55,7 @@ static func header(parent: VBoxContainer, heading: Label, text: UiText, close: C
  row.add_child(heading)
  var close_button := text.key_button("close",close)
  close_button.custom_minimum_size.x=96
+ close_button.size_flags_vertical=Control.SIZE_SHRINK_CENTER
  close_button.theme_type_variation="QuietButton"
  close_button.focus_mode=Control.FOCUS_ALL
  row.add_child(close_button)

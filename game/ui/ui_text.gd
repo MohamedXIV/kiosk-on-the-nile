@@ -19,6 +19,7 @@ static func label(value: String = "") -> Label:
  control.text = value
  control.text_direction = Control.TEXT_DIRECTION_AUTO
  control.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+ control.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
  return control
 static func button(value: String, callback: Callable) -> Button:
  var control := Button.new()
@@ -26,6 +27,7 @@ static func button(value: String, callback: Callable) -> Button:
  control.text_direction = Control.TEXT_DIRECTION_AUTO
  control.focus_mode = Control.FOCUS_ALL
  control.custom_minimum_size = Vector2(96,44)
+ control.alignment = HORIZONTAL_ALIGNMENT_CENTER
  control.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  control.pressed.connect(callback)
  return control

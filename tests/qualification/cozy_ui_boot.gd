@@ -196,6 +196,10 @@ func _open_area(layer: CanvasLayer) -> void:
   "build":
    if _require(session.build.begin(session.location_id),"arrangement"):
     var panel := BuildPanel.new();hud.add_child(panel);panel.configure(_text,session.build,session);panel.open()
+    # Select a real existing fixture item, without moving or placing it.
+    if panel._choices.item_count>0:
+     panel._choices.select(0)
+     panel._select(StringName(panel._choices.get_item_metadata(0)))
   "menu":
    var panel := MenuPanel.new();hud.add_child(panel);panel.configure(_text,session);panel.open()
   "tuning":
@@ -209,6 +213,17 @@ func _review_layout() -> bool:
   if not panel.visible or panel._box.get_child_count()==0:return false
   if panel._speaker.visible and (panel._speaker.size.x<100 or panel._speaker.size.y>80):return false
   if panel._scroll.size.y<80:return false
+ if _area=="build":
+  for child in hud.get_children():
+   if child is BuildPanel:
+    var dock: BuildPanel=child
+    if not dock.visible or dock._actions.size.y<44:return false
+    var bounds := dock.get_global_rect()
+    for button in [dock._rotate,dock._confirm,dock._store]:
+     if not bounds.grow(1).encloses(button.get_global_rect()):return false
+    if dock._choices.item_count>0 and (dock._choices.selected<0 or not dock._piece_art.visible):return false
+    return dock._tools_scroll.size.y>=64
+  return false
  if _area=="inventory":
   for child in hud.get_children():
    if child is InventoryPanel:return child._search.size.y<=64 and child._filter.size.y<=64 and child._scroll.size.y>=100

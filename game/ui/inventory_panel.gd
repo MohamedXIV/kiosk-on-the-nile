@@ -147,7 +147,8 @@ func _render() -> void:
     glyph.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
     tile_content.add_child(glyph)
     var name := SheetControls.label(ItemText.t("quantity",{"name":ItemText.instance(_session,item),"quantity":int(item.quantity)}))
-    name.custom_minimum_size.x=120
+    name.custom_minimum_size=Vector2(120,68)
+    name.size_flags_vertical=Control.SIZE_EXPAND_FILL
     name.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
     name.set_meta("centered",true)
     tile_content.add_child(name)
@@ -156,6 +157,7 @@ func _render() -> void:
      _dirty=true)
     inspect.theme_type_variation="PrimaryButton" if item_id==selected_id else "QuietButton"
     tile_content.add_child(inspect)
+    inspect.size_flags_vertical=Control.SIZE_SHRINK_END
    _render_item_details(card,chosen,container,held,reserved)
 
  if shown==0:_rows.add_child(SheetControls.label(ItemText.t("no_items")))

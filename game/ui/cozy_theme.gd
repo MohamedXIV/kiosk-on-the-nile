@@ -153,6 +153,10 @@ static func _apply_nile_assets(t: Theme) -> void:
   for index in range(4):
    var state: String=["normal","hover","pressed","disabled"][index]
    var style := texture_box(start+index,12,7)
+   # The painted face ends above the atlas shadow. Center text in the face,
+   # not in the full cell including its lower shadow (2 px optical correction).
+   style.set_content_margin(SIDE_TOP,5)
+   style.set_content_margin(SIDE_BOTTOM,9)
    t.set_stylebox(state,kind,style)
    t.set_stylebox(state+"_mirrored",kind,style)
   var ink := IVORY if kind in ["PrimaryButton","DangerButton","NileButton"] else INK
@@ -224,7 +228,7 @@ static func _apply_daily_surfaces(t: Theme) -> void:
  for kind in ["JourneyTicket","ArrangementDock","ReceiptSheet","SupplierLedger","MenuBoard","SleepCard","VisitorNote","SettingsPage"]:
   t.set_type_variation(kind,"PanelContainer")
  t.set_stylebox("panel","JourneyTicket",story_box(PAPER_ART,8,18,14))
- t.set_stylebox("panel","ArrangementDock",texture_box(2,14,9))
+ t.set_stylebox("panel","ArrangementDock",texture_box(2,12,7))
  t.set_stylebox("panel","ReceiptSheet",story_box(RECEIPT_ART,12,18,16))
  t.set_stylebox("panel","SupplierLedger",story_box(NOTEBOOK_ART,18,18,12))
  t.set_stylebox("panel","MenuBoard",story_box(NOTEBOOK_ART,18,18,12))
