@@ -41,13 +41,15 @@ func run(check, tree) -> void:
  await tree.process_frame
  await tree.process_frame
  check.case("dialogue_keeps_cached_controls_and_leave_outside_scroll")
- var first_child := dialogue._box.get_child(0)
+ var first_child := dialogue._reading_box.get_child(0)
  dialogue.present(conversation,[],"Amgad")
- check.is_true(first_child==dialogue._box.get_child(0))
+ check.is_true(first_child==dialogue._reading_box.get_child(0))
  check.equal(dialogue._speaker.theme_type_variation,&"SpeakerTag")
  check.equal(first_child.theme_type_variation,&"DialogueLine")
- check.is_true(dialogue._leave.get_parent()==dialogue._layout)
+ check.is_true(dialogue._leave.get_parent()==dialogue._header)
  check.is_true(dialogue._leave.get_global_rect().end.x<=640)
+ check.is_true(SheetControls.gameplay_area_ratio(dialogue.get_global_rect(),Vector2(viewport.size))<=SheetControls.GAMEPLAY_AREA_LIMIT)
+ check.is_true(dialogue._reading.size.y>=44 and dialogue._scroll.size.y>=44)
  var left: Array[StringName]=[]
  dialogue.group_leave_requested.connect(func(id):left.append(id))
  dialogue._leave.pressed.emit()

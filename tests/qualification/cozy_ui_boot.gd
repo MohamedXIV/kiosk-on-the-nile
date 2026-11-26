@@ -75,16 +75,14 @@ func _ready() -> void:
   else:get_tree().quit(1)
   return
  var status := {"ready":true,"area":_area,"locale":_locale.locale,"limitations":_limitations,"world_minutes":session.clock.world_minutes}
- # Baseline diagnostic for the new gameplay overlay budget. Not yet an
- # acceptance assertion: the existing dialogue and active station layouts
- # precede that requirement. Report outer control bounds, not alpha pixels.
+ # Report the actual bounded gameplay surface, including its frame.
  var surface: Control=_visible_area_panel()
  if is_instance_valid(surface):
-  var extent: Vector2=get_viewport_rect().size
+  var measured_extent: Vector2=get_viewport_rect().size
   var footprint: Rect2=surface.get_global_rect()
   status["surface_width"]=footprint.size.x
   status["surface_height"]=footprint.size.y
-  status["surface_area_ratio"]=footprint.size.x*footprint.size.y/maxf(1.0,extent.x*extent.y)
+  status["surface_area_ratio"]=SheetControls.gameplay_area_ratio(footprint,measured_extent)
   if surface is DialoguePanel:
    status["surface_class"]="gameplay_dialogue"
   elif surface is RecipePanel:
@@ -263,6 +261,11 @@ func _review_layout() -> bool:
   if not bounds.grow(1).encloses(surface._masthead.get_global_rect()):return false
   if CozyTheme.short_landscape_for(bounds.size) and surface._actions.get_global_rect().intersects(surface._masthead.get_global_rect()):return false
  if surface is RecipePanel:
+  if surface._tabs.current_tab==1:
+   if not surface._gameplay_mode or surface._tabs.tabs_visible:return false
+   if SheetControls.gameplay_area_ratio(surface.get_global_rect(),bounds.size)>SheetControls.GAMEPLAY_AREA_LIMIT:return false
+   if surface._scrolls[1].size.y<44:return false
+   if not surface.get_global_rect().grow(1).encloses(surface._manage.get_global_rect()):return false
   var tracks: Array[Node] = surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
   if not surface._progress.is_empty() and tracks.size()!=surface._progress.size():return false
   for track in tracks:
@@ -297,23 +300,21 @@ func _review_layout() -> bool:
  if _area=="dialogue":
   var panel := hud.dialogue
   if not panel.visible or panel._box.get_child_count()==0:return false
-  if panel._speaker.visible and (panel._speaker.size.x<100 or panel._speaker.size.y>80):return false
-  if panel._scroll.size.y<80:return false
-  if CozyTheme.compact_for(bounds.size):
-   if panel._scroll.size.y<144 or panel.size.x<bounds.size.x-20:return false
-   if absf(panel.get_global_rect().end.y-(bounds.end.y-8))>2:return false
-   if is_instance_valid(panel._current_line) and not panel._scroll.get_global_rect().grow(1).encloses(panel._current_line.get_global_rect()):return false
-   if not panel._compact:return false
-   if panel._speaker.visible and panel._speaker.size.x>302:return false
-   if is_instance_valid(panel._leave) and (panel._leave.size.y<44 or panel._leave.size.y>56 or panel._leave.get_parent()!=panel._header):return false
-   if panel.get_global_rect().position.y<hud._strip.get_global_rect().end.y:return false
-   if is_instance_valid(panel._current_line):
-    # At least the first selectable response must be visible, not only the speech.
-    for child in panel._box.get_children():
-     if child is Button and child!=panel._history_toggle:
-      if not panel._scroll.get_global_rect().grow(1).encloses(child.get_global_rect()):return false
-      break
-   if is_instance_valid(panel._history) and panel._history.visible:return false
+  if SheetControls.gameplay_area_ratio(panel.get_global_rect(),bounds.size)>SheetControls.GAMEPLAY_AREA_LIMIT:return false
+  if panel._speaker.visible and (panel._speaker.size.x<96 or panel._speaker.size.y>80):return false
+  if panel._scroll.size.y<44 or panel._reading.size.y<44:return false
+  if panel.get_global_rect().position.y<hud._strip.get_global_rect().end.y:return false
+  if is_instance_valid(panel._leave):
+   if panel._leave.size.y<44 or panel._leave.get_parent()!=panel._header:return false
+   if not panel.get_global_rect().grow(1).encloses(panel._leave.get_global_rect()):return false
+  if is_instance_valid(panel._current_line):
+   if not panel._current_line.is_visible_in_tree() or panel._current_line.get_theme_font_size("font_size")<15:return false
+   if panel._current_line.size.y<=panel._reading.size.y and not panel._reading.get_global_rect().grow(1).encloses(panel._current_line.get_global_rect()):return false
+  for child in panel._box.get_children():
+   if child is Button and child!=panel._history_toggle:
+    if child.size.y<=panel._scroll.size.y and not panel._scroll.get_global_rect().grow(1).encloses(child.get_global_rect()):return false
+    break
+  if is_instance_valid(panel._history) and panel._history.visible:return false
  if _area=="build":
   for child in hud.get_children():
    if child is BuildPanel:

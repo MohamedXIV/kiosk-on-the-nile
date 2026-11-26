@@ -6,6 +6,12 @@ var _instance_id: StringName
 var _heading := SheetControls.label()
 var _held := SheetControls.label()
 var _station_art: ItemGlyph
+var _station_summary: PanelContainer
+var _station_row: HBoxContainer
+var _header: HBoxContainer
+var _manage: Button
+var _active_feedback: Label
+var _gameplay_mode: bool=false
 var _tabs := TabContainer.new()
 var _care := VBoxContainer.new()
 var _active := VBoxContainer.new()
@@ -33,8 +39,16 @@ func configure(text: UiText, session: GameSession) -> void:
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
  resized.connect(func():column.add_theme_constant_override("separation",5 if CozyTheme.compact_for(get_viewport_rect().size) else 10))
  SheetControls.header(column,_heading,text,hide,"hunger","SectionClay")
+ _header=_heading.get_parent() as HBoxContainer
+ _manage=SheetControls.button(UiText.localized("cozy.station_management_short"),func():_tabs.current_tab=2 if _recipes.get_meta("has_recipes",false) else 0)
+ _manage.custom_minimum_size=Vector2(96,44)
+ _header.add_child(_manage)
+ _header.move_child(_manage,_header.get_child_count()-2)
+ _manage.hide()
  var hands := PanelContainer.new();hands.theme_type_variation="StationStatus";column.add_child(hands)
+ _station_summary=hands
  var station_row := HBoxContainer.new();hands.add_child(station_row)
+ _station_row=station_row
  _station_art=ItemGlyph.new();_station_art.custom_minimum_size=Vector2.ONE*REGULAR_STATION_SIZE;station_row.add_child(_station_art)
  resized.connect(_fit_station_art)
  station_row.add_child(_held)
@@ -43,6 +57,8 @@ func configure(text: UiText, session: GameSession) -> void:
  for rows in [_care,_active,_recipes]:
   var scroll := SheetControls.scroll(rows);_scrolls.append(scroll);_tabs.add_child(scroll)
  column.add_child(_feedback)
+ _tabs.tab_changed.connect(func(_tab):_sync_surface())
+ clip_contents=true
  session.workflow.changed.connect(func():_dirty=true)
  session.items.changed.connect(func(_revision):_dirty=true)
  session.cooking.changed.connect(func(_id):_dirty=true)
@@ -51,10 +67,11 @@ func configure(text: UiText, session: GameSession) -> void:
  hide()
 func _fit_station_art() -> void:
  if not is_instance_valid(_station_art):return
- _station_art.custom_minimum_size=Vector2.ONE*(COMPACT_STATION_SIZE if CozyTheme.compact_for(get_viewport_rect().size) else REGULAR_STATION_SIZE)
+ _station_art.custom_minimum_size=Vector2.ONE*(32.0 if _gameplay_mode else COMPACT_STATION_SIZE if CozyTheme.compact_for(get_viewport_rect().size) else REGULAR_STATION_SIZE)
 
 func _refresh_language() -> void:
  for i in range(3):_tabs.set_tab_title(i,ItemText.t(["care","active","recipes"][i]))
+ _manage.text=UiText.localized("cozy.station_management_short")
  _dirty=true
 func present(instance_id: StringName, _unused_recipes: Array[Dictionary] = []) -> void:
  var changed_target := _instance_id!=instance_id
@@ -65,7 +82,32 @@ func present(instance_id: StringName, _unused_recipes: Array[Dictionary] = []) -
  _refresh()
  if not _progress.is_empty():_tabs.current_tab=1
  elif changed_target:_tabs.current_tab=2 if _recipes.has_meta("has_recipes") and _recipes.get_meta("has_recipes") else 0
+ _sync_surface()
  show()
+func _sync_surface() -> void:
+ # Explicit management tabs may be large. The active-job tab never is.
+ _gameplay_mode=_tabs.current_tab==1
+ set_meta("gameplay_overlay",_gameplay_mode)
+ _tabs.tabs_visible=not _gameplay_mode
+ _station_summary.visible=not _gameplay_mode
+ _manage.visible=_gameplay_mode
+ var art_parent: Control=_header if _gameplay_mode else _station_row
+ if _station_art.get_parent()!=art_parent:
+  _station_art.reparent(art_parent,false)
+  art_parent.move_child(_station_art,0)
+ for child in _header.get_children():
+  if child is TextureRect:child.visible=not _gameplay_mode
+ if _gameplay_mode:
+  _heading.add_theme_font_size_override("font_size",16)
+  _heading.text=ItemText.definition(_session,str(_session.items.get_item(_instance_id).get("definition_id","")))
+ else:
+  _heading.remove_theme_font_size_override("font_size")
+  _heading.text=_text.text("item_actions_title",{"item":ItemText.definition(_session,str(_session.items.get_item(_instance_id).get("definition_id","")))})
+ _feedback.visible=not _gameplay_mode and not _feedback.text.is_empty()
+ if is_instance_valid(_active_feedback):_active_feedback.visible=_gameplay_mode and not _active_feedback.text.is_empty()
+ _fit_station_art()
+ SheetControls._queue_sheet_fit(weakref(self),1100,122,18)
+
 func _refresh() -> void:
  _dirty=false
  var focus_key := _focused_key()
@@ -74,7 +116,7 @@ func _refresh() -> void:
  _progress.clear()
  _recipes.set_meta("has_recipes",false)
  for rows in [_care,_active,_recipes]:SheetControls.clear(rows)
- _cleanliness=null;_clean_progress=null;_clean_button=null;_stop_button=null
+ _cleanliness=null;_clean_progress=null;_clean_button=null;_stop_button=null;_active_feedback=null
  var instance := _session.items.get_item(_instance_id)
  var placement := _session.spaces.placement(_instance_id)
  var definition_id := str(instance.get("definition_id",""))
@@ -91,7 +133,10 @@ func _refresh() -> void:
   _render_jobs()
   _render_recipes()
  _feedback.text=ItemText.missing(_session,_text,_last_result) if _last_result else ""
- _feedback.visible=not _feedback.text.is_empty()
+ _active_feedback=SheetControls.label(_feedback.text)
+ _active.add_child(_active_feedback)
+ _active.move_child(_active_feedback,0)
+ _sync_surface()
  for i in range(_scrolls.size()):_scrolls[i].get_v_scroll_bar().set_deferred("value",offsets[i])
  _update_progress()
  _restore_focus(focus_key)
@@ -122,32 +167,37 @@ func _render_jobs() -> void:
   var step: Dictionary=job.definition.steps[int(job.step_index)]
   var card := SheetControls.card(_active)
   card.get_parent().theme_type_variation="StationTray"
-  var heading := SheetControls.label(ItemText.recipe(str(job.recipe_id),str(job.definition.label)));SheetControls.title(heading);card.add_child(heading)
-  _step_track(card,job)
+  var split := HBoxContainer.new()
+  split.add_theme_constant_override("separation",8)
+  card.add_child(split)
+  var summary := VBoxContainer.new();summary.size_flags_horizontal=Control.SIZE_EXPAND_FILL;summary.add_theme_constant_override("separation",4);split.add_child(summary)
+  var commands := VBoxContainer.new();commands.size_flags_horizontal=Control.SIZE_EXPAND_FILL;commands.add_theme_constant_override("separation",4);split.add_child(commands)
+  var heading := SheetControls.label(ItemText.recipe(str(job.recipe_id),str(job.definition.label)));SheetControls.muted(heading);summary.add_child(heading)
   var stage := SheetControls.label("%s / %s  ·  %s" % [int(job.step_index)+1,job.definition.steps.size(),ItemText.step(str(job.recipe_id),step)])
-  stage.theme_type_variation="ShopHeading";card.add_child(stage)
-  var meter := ProgressBar.new();meter.theme_type_variation="CookingProgress";meter.show_percentage=false;meter.custom_minimum_size.y=12;meter.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(meter)
-  var progress := SheetControls.label();card.add_child(progress)
+  stage.add_theme_color_override("font_color",Color("#24616b"));summary.add_child(stage)
+  var meter := ProgressBar.new();meter.theme_type_variation="CookingProgress";meter.show_percentage=false;meter.custom_minimum_size.y=12;meter.mouse_filter=Control.MOUSE_FILTER_IGNORE;summary.add_child(meter)
+  var progress := SheetControls.label();summary.add_child(progress)
   _progress.append({"job_id":str(job.id),"step_id":str(step.id),"label":progress,"meter":meter})
-  if step.kind=="cold_wait":card.add_child(SheetControls.label(ItemText.t("cold_wait")))
+  _step_track(summary,job)
+  if step.kind=="cold_wait":summary.add_child(SheetControls.label(ItemText.t("cold_wait")))
   var id := StringName(str(job.id));var action := StringName(str(step.action))
-  if step.kind=="batch_hold" or not job.definition.has("vessel_definition") and int(job.step_index)==job.definition.steps.size()-1:_serving_controls(card,job)
+  if step.kind=="batch_hold" or not job.definition.has("vessel_definition") and int(job.step_index)==job.definition.steps.size()-1:_serving_controls(commands,job)
   if step.kind!="passive_heat":
    var advance := _action(ItemText.step(str(job.recipe_id),step),str(id)+":advance",func():_apply(_session.workflow.act(id,action,_serving_options.get(str(id),{}))))
-   SheetControls.primary(advance);card.add_child(advance)
-  if step.kind=="soak":card.add_child(SheetControls.label(ItemText.t("soak_hint")))
+   SheetControls.primary(advance);commands.add_child(advance)
+  if step.kind=="soak":summary.add_child(SheetControls.label(ItemText.t("soak_hint")))
   if RecipeProcesses.supports(job.definition):
-   card.add_child(SheetControls.label(ItemText.t("method",{"method":UiText.localized("cooking.method."+str(job.definition.method),{},str(job.definition.method))})))
+   summary.add_child(SheetControls.label(ItemText.t("method",{"method":UiText.localized("cooking.method."+str(job.definition.method),{},str(job.definition.method))})))
    if step.kind in ["passive_heat","batch_hold"]:
-    var heat_row := SheetControls.columns(card,620)
+    var heat_row := VBoxContainer.new();heat_row.add_theme_constant_override("separation",4);commands.add_child(heat_row)
     for heat in RecipeProcesses.HEATS:
      var heat_id: String=heat
      var heat_button := _action(UiText.localized("cooking.heat."+heat_id,{},heat_id),str(id)+":heat:"+heat_id,func():_apply(_session.workflow.act(id,StringName("heat:"+heat_id))))
      heat_button.disabled=job.heat==heat_id;heat_row.add_child(heat_button)
-  if step.kind=="batch_heat":card.add_child(_action(_text.text("recipe_stop_heat"),str(id)+":stop_heat",func():_apply(_session.workflow.act(id,&"stop_heat"))))
-  var cancel_hint := SheetControls.label(ItemText.t("cancel_hint"));SheetControls.muted(cancel_hint);card.add_child(cancel_hint)
+  if step.kind=="batch_heat":commands.add_child(_action(_text.text("recipe_stop_heat"),str(id)+":stop_heat",func():_apply(_session.workflow.act(id,&"stop_heat"))))
+  var cancel_hint := SheetControls.label(ItemText.t("cancel_hint"));SheetControls.muted(cancel_hint);summary.add_child(cancel_hint)
   var cancel := _action(_text.text("recipe_cancel"),str(id)+":cancel",func():_apply(_session.workflow.act(id,&"cancel")))
-  cancel.theme_type_variation="DangerButton";card.add_child(cancel)
+  cancel.theme_type_variation="DangerButton";commands.add_child(cancel)
  if _progress.is_empty():_active.add_child(SheetControls.label(ItemText.t("active_empty")))
 func _step_track(parent: VBoxContainer,job: Dictionary) -> void:
  # Steps come directly from the current job definition; no parallel progress state.

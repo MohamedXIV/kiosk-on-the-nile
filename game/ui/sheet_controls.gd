@@ -93,6 +93,12 @@ static func _fit_sheet(reference: WeakRef, width: float, top: float, bottom: flo
  if not is_instance_valid(panel) or not panel.is_inside_tree():return
  panel.set_meta("sheet_fit_pending",false)
  var extent := panel.get_viewport_rect().size
+ if panel.get_meta("gameplay_overlay",false):
+  panel.theme=CozyTheme.make_compact()
+  var envelope := gameplay_rect(extent)
+  panel.position=envelope.position
+  panel.size=envelope.size
+  return
  var compact := CozyTheme.compact_for(extent)
  var desired_theme := CozyTheme.for_viewport(extent)
  if panel.theme!=desired_theme:panel.theme=desired_theme
@@ -118,3 +124,19 @@ static func focus_first(root: Control) -> void:
    focus_first(child)
    var owner := root.get_viewport().gui_get_focus_owner()
    if owner!=null and root.is_ancestor_of(owner):return
+
+# Both core interactions use this area budget, including their frame and header.
+# Leave a small rounding/layout allowance; 25% is the acceptance ceiling.
+const GAMEPLAY_AREA_LIMIT := 0.25
+const GAMEPLAY_AREA_TARGET := 0.24
+const GAMEPLAY_EDGE := 8.0
+const GAMEPLAY_MAX_WIDTH := 760.0
+const GAMEPLAY_MAX_HEIGHT := 280.0
+static func gameplay_rect(extent: Vector2, top_clearance: float=0.0) -> Rect2:
+ var width_ratio := 0.68 if CozyTheme.short_landscape_for(extent) else 0.80
+ var width := floorf(maxf(1.0,minf(GAMEPLAY_MAX_WIDTH,minf(extent.x-GAMEPLAY_EDGE*2,extent.x*width_ratio))))
+ var available_height := maxf(1.0,extent.y-top_clearance-GAMEPLAY_EDGE)
+ var height := floorf(minf(GAMEPLAY_MAX_HEIGHT,minf(available_height,extent.x*extent.y*GAMEPLAY_AREA_TARGET/width)))
+ return Rect2(Vector2(floorf((extent.x-width)*0.5),extent.y-height-GAMEPLAY_EDGE),Vector2(width,height))
+static func gameplay_area_ratio(rect: Rect2, extent: Vector2) -> float:
+ return rect.size.x*rect.size.y/maxf(1.0,extent.x*extent.y)

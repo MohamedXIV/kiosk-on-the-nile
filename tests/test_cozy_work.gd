@@ -81,6 +81,13 @@ func run(check, tree) -> void:
   check.equal(recipes.theme_type_variation,&"CookingBoard")
   check.is_true(recipes._station_art.visible)
   check.equal(recipes._progress.size(),1)
+  for frame in range(4):await tree.process_frame
+  check.is_true(recipes._gameplay_mode and not recipes._tabs.tabs_visible)
+  check.is_true(SheetControls.gameplay_area_ratio(recipes.get_global_rect(),Vector2(viewport.size))<=SheetControls.GAMEPLAY_AREA_LIMIT)
+  recipes._manage.pressed.emit()
+  check.is_true(not recipes._gameplay_mode and recipes._tabs.tabs_visible)
+  recipes._tabs.current_tab=1
+  check.is_true(recipes._gameplay_mode)
   var entry: Dictionary=recipes._progress[0]
   var original_label_id: int=entry.label.get_instance_id()
   recipes._update_progress()

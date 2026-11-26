@@ -181,7 +181,7 @@ func present(target: InteractionTarget) -> void:
    var actor := str(focused.current.speaker_id)
    speaker_name=LocalizedNarrative.speaker(actor,_session.tuning.display_name(actor,str(_session.presence.profile(StringName(actor)).get("name",actor))))
   dialogue.present(focused,_session.narrative.choices(focused),speaker_name)
- if dialogue.visible and CozyTheme.compact_for(get_viewport_rect().size):_prompt_panel.hide()
+ if dialogue.visible:_prompt_panel.hide()
  var thought := _session.inner.view()
  _thought.text="" if thought.is_empty() else _text.text("thought_name")+": "+str(thought.text)
  _thought.visible=not thought.is_empty() and not _session.personal.active() and focused==null and not notebook.visible and not sleep_panel.visible
