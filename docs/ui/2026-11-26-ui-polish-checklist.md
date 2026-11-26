@@ -15,3 +15,7 @@ Scope: #48 / PR #57, existing UI only. The user's three screenshots and four obs
 - Run existing real-main startup smoke and rendered capture matrix in Arabic and English.
 - Review all 16 shots, then test 640×540 and other remaining screens. Verify selection, placement/rotation/store, keyboard and controller focus as appropriate, and live Web behavior. Existing teardown diagnostics (48 ObjectDB instances / 22 resources on 77718d2) remain tracked, not waived.
 - No merge or version change until actual acceptance; these corrections do not imply the final game art is complete.
+
+## Review checkpoint: 19f4792
+
+Workflow 45746471688 succeeded. All sixteen native 1280×720 captures were downloaded and reviewed as bilingual contact sheets; the startup completion marker was present. The compact search row, horizontal speaker, selected chair preview, fixed arrangement actions and icon placement are visible in actual captures. These are meaningful improvements, not final visual acceptance. Main title/world art, recipe presentation, notebook character and content density need further polish. Resource diagnostics remain 48 ObjectDB instances and 22 resources at shutdown. This checkpoint expands qualification to 40 wide and 16 narrow captures (56 cases), retains each result in matrix.tsv, checks actual requested panel visibility and viewport bounds, and continues after individual failures. The new matrix has not yet run at this head. Empty receipts or other explicit fixture limitations remain labeled and do not establish transaction acceptance.

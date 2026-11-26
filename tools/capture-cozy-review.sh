@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Render representative production UI fixtures in both locales using the pinned engine.
-# This is a visual-review artifact, not a claim of acceptance or full interaction coverage.
+# Render production UI fixtures, in isolated native Godot sessions.
+# Preserve every case result even when one screen fails.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
@@ -14,19 +14,49 @@ export XDG_DATA_HOME="$TMP/data"
 export XDG_CONFIG_HOME="$TMP/config"
 export XDG_CACHE_HOME="$TMP/cache"
 mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
-# Start with the primary visual surfaces; expand the matrix after reviewing them.
+MANIFEST="$OUT/matrix.tsv"
+printf 'viewport\tlocale\tarea\tresult\texit_code\n' > "$MANIFEST"
+primary=(title hud inventory shop recipe notes dialogue build)
+secondary=(recipe_v2 people history accounts receipts visitor payment supplier district sleep journey menu)
+failed=0
+capture_case() {
+ local area="$1" lang="$2" width="$3" height="$4"
+ local dir="$OUT/${width}x${height}"
+ mkdir -p "$dir"
+ local log="$dir/$area-$lang.log" shot="$dir/$area-$lang.png" status=0 result=pass
+ rm -f "$shot"
+ timeout 60s xvfb-run -a -s "-screen 0 ${width}x${height}x24" "$ROOT/.cache/bin/godot-$VERSION" --path "$ROOT" --rendering-method gl_compatibility --audio-driver Dummy res://tests/qualification/cozy_ui_boot.tscn -- --area "$area" --lang "$lang" --width "$width" --height "$height" --capture-dir "$dir" > "$log" 2>&1 || status=$?
+ if [[ "$status" != 0 ]]; then
+  result=engine_exit
+ elif rg -q 'SCRIPT ERROR:|Parse Error:|Compile Error:|Cozy UI preview rejected' "$log"; then
+  result=script_or_layout_error
+ elif ! grep -q 'COZY_UI_STATUS .*"ready":true' "$log" || [[ ! -s "$shot" ]]; then
+  result=missing_capture
+ else
+  # A screenshot of the wrong size cannot qualify a responsive case.
+  if ! python3 - "$shot" "$width" "$height" <<'PY'
+import struct, sys
+with open(sys.argv[1], "rb") as f:
+    header = f.read(24)
+assert header[:8] == b"\x89PNG\r\n\x1a\n"
+assert struct.unpack(">II", header[16:24]) == (int(sys.argv[2]), int(sys.argv[3]))
+PY
+  then result=wrong_size; fi
+ fi
+ printf '%sx%s\t%s\t%s\t%s\t%s\n' "$width" "$height" "$lang" "$area" "$result" "$status" >> "$MANIFEST"
+ echo "COZY_REVIEW $width x $height $area $lang: $result"
+ if [[ "$result" != pass ]]; then
+  cat "$log"
+  failed=$((failed+1))
+ fi
+}
 for lang in ar_EG en; do
- for area in title hud inventory shop recipe notes dialogue build; do
-  log="$OUT/$area-$lang.log"
-  shot="$OUT/$area-$lang.png"
-  rm -f "$shot"
-  if ! timeout 60s xvfb-run -a -s "-screen 0 1280x720x24" "$ROOT/.cache/bin/godot-$VERSION" --path "$ROOT" --rendering-method gl_compatibility --audio-driver Dummy res://tests/qualification/cozy_ui_boot.tscn -- --area "$area" --lang "$lang" --width 1280 --height 720 --capture-dir "$OUT" > "$log" 2>&1; then
-   cat "$log"; exit 1
-  fi
-  if rg -n 'SCRIPT ERROR:|Parse Error:|Compile Error:|Cozy UI preview rejected' "$log"; then exit 1; fi
-  if ! grep -q 'COZY_UI_STATUS .*"ready":true' "$log" || [[ ! -s "$shot" ]]; then
-   cat "$log"; echo "Missing ready status or screenshot: $area $lang" >&2; exit 1
-  fi
-  echo "COZY_REVIEW_CAPTURED $area $lang"
+ for area in "${primary[@]}" "${secondary[@]}"; do
+  capture_case "$area" "$lang" 1280 720
+ done
+ for area in "${primary[@]}"; do
+  capture_case "$area" "$lang" 640 540
  done
 done
+echo "COZY_REVIEW_MATRIX_FAILED=$failed"
+test "$failed" -eq 0

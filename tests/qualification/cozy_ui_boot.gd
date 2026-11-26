@@ -207,7 +207,44 @@ func _open_area(layer: CanvasLayer) -> void:
   _:_limitations.append("Unknown area; showing the real HUD.")
  if session.locations.is_physical(session.location_id):_physical.set_active_location(session.location_id)
  _physical.character.present(session.player_pose,Color(session.config.section("spatial").character.player_color),true)
+func _visible_area_panel() -> Control:
+ # A successful capture must show the requested real panel, not only the HUD.
+ if _area in ["notebook","notes","people","history","accounts","receipts"]:return hud.notebook
+ if _area=="dialogue":return hud.dialogue
+ if _area=="sleep":return hud.sleep_panel
+ if _area=="hud":return hud._strip
+ if _area=="title":
+  for child in hud.get_parent().get_children():
+   if child is TitleScreen:return child
+  return null
+ for child in hud.get_children():
+  if _area=="inventory" and child is InventoryPanel:return child
+  if _area=="shop" and child is ShopPanel:return child
+  if _area in ["recipe","recipe_v2"] and child is RecipePanel:return child
+  if _area=="visitor" and child is VisitorPanel:return child
+  if _area=="payment" and child is PaymentPanel:return child
+  if _area=="supplier" and child is SupplierPanel:return child
+  if _area=="district" and child is DistrictPanel:return child
+  if _area=="journey" and child is JourneyPanel:return child
+  if _area=="build" and child is BuildPanel:return child
+  if _area=="menu" and child is MenuPanel:return child
+  if _area=="tuning" and child is TuningPanel:return child
+ return null
+
 func _review_layout() -> bool:
+ var surface := _visible_area_panel()
+ if not is_instance_valid(surface) or not surface.is_visible_in_tree():
+  print("COZY_REVIEW_MISSING_SURFACE ",_area," ",_limitations)
+  return false
+ var bounds := get_viewport_rect()
+ if not bounds.grow(1).encloses(surface.get_global_rect()):
+  print("COZY_REVIEW_OVERFLOW ",_area," ",surface.get_global_rect()," viewport=",bounds)
+  return false
+ if surface is TitleScreen:
+  if not bounds.grow(1).encloses(surface._actions.get_global_rect()):return false
+ if surface is ShopPanel:
+  for button in surface.find_children("*","Button",true,false):
+   if button.get_meta("text_ref","") in ["ui.shop_review","ui.shop_confirm","ui.journey_return"] and not bounds.grow(1).encloses(button.get_global_rect()):return false
  # All production shortcuts must center the artwork on the face, not on
  # the bottom shadow or text baseline. Check both captured locales.
  if _area=="hud":
