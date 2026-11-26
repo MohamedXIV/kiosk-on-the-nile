@@ -5,7 +5,7 @@ func _init() -> void:
  custom_minimum_size=Vector2(28,26)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _draw() -> void:
- var ink := Color("e6d6b8")
+ var ink := CozyTheme.SAGE
  match kind:
   "cup":
    draw_style_box(_cup_style(),Rect2(3,6,16,16))
@@ -22,7 +22,7 @@ func _draw() -> void:
 func _cup_style() -> StyleBoxFlat:
  var style := StyleBoxFlat.new()
  style.bg_color=Color("b78e52")
- style.border_color=Color("e6d6b8")
+ style.border_color=CozyTheme.SAGE
  style.set_border_width_all(2)
  style.corner_radius_bottom_left=4
  style.corner_radius_bottom_right=4

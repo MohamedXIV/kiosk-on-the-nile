@@ -4,6 +4,7 @@ var _glyph := OrderGlyph.new()
 var _label := Label.new()
 func configure(text: UiText, food: Dictionary) -> void:
  theme=text.make_theme()
+ theme_type_variation="OrderSlip"
  mouse_filter=Control.MOUSE_FILTER_IGNORE
  var row := HBoxContainer.new()
  row.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -14,7 +15,7 @@ func configure(text: UiText, food: Dictionary) -> void:
  _glyph.queue_redraw()
  _label.text=str(food.get("menu_label",""))
  _label.mouse_filter=Control.MOUSE_FILTER_IGNORE
- _label.add_theme_font_size_override("font_size",16)
+ _label.add_theme_font_size_override("font_size",14)
  row.add_child(_label)
 
 func present(session: GameSession, food_id: StringName) -> void:

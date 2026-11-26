@@ -8,30 +8,34 @@ var _feedback_key: String=""
 func configure(session: GameSession) -> void:
  _session=session
  session.tuning.rejected.connect(func():_set_feedback("tuning.rejected"))
- anchor_left=0.08;anchor_right=0.92;anchor_top=0.13;anchor_bottom=0.9
+ theme=CozyTheme.make()
+ SheetControls.shell(self,960)
  var column := VBoxContainer.new()
- add_child(SheetControls.scroll(column))
- column.add_child(_label("tuning.title"))
+ var root := VBoxContainer.new();root.add_theme_constant_override("separation",12);add_child(root)
+ var title := _label("tuning.title");SheetControls.title(title);root.add_child(title)
+ var scroll := SheetControls.scroll(column);scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;root.add_child(scroll)
  var units := PackedStringArray()
  for key in session.config.section("tuning").fields:
   var field: Dictionary=session.config.section("tuning").fields[key]
   units.append("%s: %s [%s..%s]" % [key,field.unit,field.minimum,field.maximum])
  var help := _label("tuning.help")
  help.tooltip_text="\n".join(units)
- column.add_child(help)
+ SheetControls.muted(help);column.add_child(help)
  _editor.size_flags_vertical=Control.SIZE_EXPAND_FILL
- _editor.custom_minimum_size.y=140
+ _editor.custom_minimum_size.y=220
+ _editor.wrap_mode=TextEdit.LINE_WRAPPING_BOUNDARY
+ _editor.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _editor.text_direction=Control.TEXT_DIRECTION_LTR
  column.add_child(_editor)
  var buttons := HFlowContainer.new()
  column.add_child(buttons)
- buttons.add_child(_button("tuning.apply",func():_apply_text()))
+ var apply := _button("tuning.apply",func():_apply_text());SheetControls.primary(apply);buttons.add_child(apply)
  buttons.add_child(_button("tuning.default",func():_editor.text="{}";_apply_text()))
  buttons.add_child(_button("tuning.export",_export))
  buttons.add_child(_button("tuning.import",_import))
  _feedback.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- column.add_child(_feedback)
- column.add_child(_button("tuning.close",hide))
+ root.add_child(_feedback)
+ root.add_child(_button("tuning.close",hide))
  if LocaleService.current:LocaleService.current.changed.connect(_refresh_language)
  hide()
 func open() -> void:

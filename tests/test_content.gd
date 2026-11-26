@@ -6,7 +6,8 @@ func run(check, _tree) -> void:
  if not FileAccess.file_exists(path): return
  var store = load(path).new()
  check.is_true(store.load_directory("res://content").ok)
- check.equal(store.section("time").minutes_per_second, 2.5)
+ var authored_time: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://content/time.json"))
+ check.equal(store.section("time"),authored_time)
  check.case("typed_data_rejects_bad_tuning_before_activation")
  var invalid: Dictionary = store.bundle()
  invalid.needs.hunger_decay = -1

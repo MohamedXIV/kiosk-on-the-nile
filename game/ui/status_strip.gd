@@ -1,6 +1,10 @@
 class_name StatusStrip
-extends PanelContainer
+extends HBoxContainer
 signal menu_requested
+signal inventory_requested
+signal notebook_requested
+signal outings_requested
+signal settings_requested
 var _text: UiText
 var _clock: Label
 var _money: Label
@@ -11,89 +15,189 @@ var _day_locale_revision: int=-1
 var _periods: Array=[]
 var _period_textures: Array[Texture2D]=[]
 var _held: Label
-var _bars: Dictionary = {}
+var _bars: Dictionary={}
 var _save_feedback: Label
+var _menu_button: Button
+var _need_labels: Array[Label]=[]
+var _shortcut_buttons: Dictionary={}
+var _popup_anchor: Button
+var _day: Label
+var _dial: TextureRect
+var _left: VBoxContainer
+var _info: VBoxContainer
+var _density_initialized: bool=false
+var _compact: bool=false
+const CLOCK_ART = preload("res://assets/ui/nile/clock.svg")
 func configure(text: UiText) -> void:
- _text = text
- var settings: Dictionary = text.data.hud
- add_theme_font_size_override("font_size",int(settings.font_size))
- var style: StyleBoxFlat = get_theme_stylebox("panel").duplicate()
- style.content_margin_top = 6
- style.content_margin_bottom = 6
- add_theme_stylebox_override("panel",style)
- var box := VBoxContainer.new()
- box.add_theme_constant_override("separation",2)
- add_child(box)
- var heading := HBoxContainer.new()
- heading.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
- heading.add_theme_constant_override("separation",18)
- box.add_child(heading)
- var clock_group := HBoxContainer.new()
- clock_group.layout_direction=Control.LAYOUT_DIRECTION_INHERITED
- heading.add_child(clock_group)
+ _text=text
+ mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_theme_constant_override("separation",8)
+ var left := VBoxContainer.new()
+ _left=left
+ left.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ left.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+ left.add_theme_constant_override("separation",4)
+ left.custom_minimum_size.x=246
+ add_child(left)
+ var time_row := HBoxContainer.new()
+ time_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ time_row.add_theme_constant_override("separation",6)
+ left.add_child(time_row)
+ var dial := TextureRect.new()
+ _dial=dial
+ dial.texture=CLOCK_ART
+ dial.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ dial.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ dial.custom_minimum_size=Vector2(104,104)
+ dial.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ time_row.add_child(dial)
+ var face := VBoxContainer.new()
+ face.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ face.offset_left=10;face.offset_right=-10;face.offset_top=9;face.offset_bottom=-11
+ face.alignment=BoxContainer.ALIGNMENT_CENTER
+ face.add_theme_constant_override("separation",0)
+ dial.add_child(face)
+ var settings: Dictionary=text.data.hud
  var icons: Dictionary=settings.get("icons",{})
  _periods=icons.get("day_periods",[])
  if not _periods.is_empty():
-  _day_icon=_icon("",float(icons.get("size",22)))
-  clock_group.add_child(_day_icon)
+  _day_icon=_icon("",26)
+  _day_icon.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+  face.add_child(_day_icon)
   for period: Dictionary in _periods:_period_textures.append(load(period.path) as Texture2D)
- _clock = UiText.label()
- clock_group.add_child(_clock)
- _money = UiText.label()
- heading.add_child(_money)
- _state = UiText.label()
- _state.size_flags_horizontal = Control.SIZE_EXPAND_FILL
- heading.add_child(_state)
- var menu := text.key_button("menu",func():menu_requested.emit())
- menu.focus_mode=Control.FOCUS_ALL
- menu.custom_minimum_size.x=80
- menu.size_flags_vertical=Control.SIZE_SHRINK_CENTER
- for state in ["normal","hover","pressed"]:
-  var button_style: StyleBoxFlat = get_theme_stylebox(state,"Button").duplicate()
-  button_style.content_margin_top = 2
-  button_style.content_margin_bottom = 2
-  menu.add_theme_stylebox_override(state,button_style)
- heading.add_child(menu)
- var details := HBoxContainer.new()
- details.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
- details.add_theme_constant_override("separation",18)
- box.add_child(details)
- for key in ["hunger","rest","mood"]:
-  var meter := HBoxContainer.new()
-  meter.layout_direction = Control.LAYOUT_DIRECTION_INHERITED
-  if icons.get("needs",{}).has(key):meter.add_child(_icon(icons.needs[key],float(icons.get("size",22))))
-  meter.add_child(text.key_label(key))
-  var bar := ProgressBar.new()
-  bar.custom_minimum_size = Vector2(float(settings.meter_width),8)
-  bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-  bar.show_percentage = false
-  var fill := StyleBoxFlat.new()
-  fill.bg_color = Color(settings.meter_colors[key])
-  fill.set_corner_radius_all(4)
-  var background := fill.duplicate()
-  background.bg_color = Color("#463c32")
-  bar.add_theme_stylebox_override("fill",fill)
-  bar.add_theme_stylebox_override("background",background)
-  meter.add_child(bar)
-  details.add_child(meter)
-  _bars[key] = bar
- _held = UiText.label()
- _held.size_flags_horizontal = Control.SIZE_EXPAND_FILL
- _held.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
- _held.clip_text = true
- details.add_child(_held)
+ _clock=UiText.label()
+ _clock.add_theme_font_size_override("font_size",18)
+ _clock.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ _clock.set_meta("centered",true)
+ face.add_child(_clock)
+ _day=UiText.label()
+ _day.add_theme_font_size_override("font_size",12)
+ _day.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ _day.set_meta("centered",true)
+ face.add_child(_day)
+ var info := VBoxContainer.new()
+ _info=info
+ info.custom_minimum_size.x=126
+ info.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ info.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ info.add_theme_constant_override("separation",4)
+ time_row.add_child(info)
+ var wallet := _badge(info)
+ wallet.add_child(_kit_icon("money",22))
+ _money=UiText.label()
+ _money.add_theme_font_size_override("font_size",15)
+ wallet.add_child(_money)
+ var state_badge := _badge(info)
+ _state=UiText.label()
+ _state.add_theme_font_size_override("font_size",12)
+ _state.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ _state.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ state_badge.add_child(_state)
+ _held=UiText.label()
+ _held.add_theme_font_size_override("font_size",13)
+ _held.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ left.add_child(_held)
+ _held.hide()
  _save_feedback=UiText.label()
+ _save_feedback.add_theme_font_size_override("font_size",13)
  _save_feedback.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- box.add_child(_save_feedback)
+ left.add_child(_save_feedback)
  _save_feedback.hide()
+ var spacer := Control.new()
+ spacer.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ spacer.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ add_child(spacer)
+ var right := VBoxContainer.new()
+ right.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ right.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+ right.add_theme_constant_override("separation",5)
+ add_child(right)
+ var needs := _badge(right)
+ for key in ["hunger","rest","mood"]:
+  var meter := VBoxContainer.new()
+  meter.add_theme_constant_override("separation",1)
+  meter.custom_minimum_size.x=55
+  needs.add_child(meter)
+  var icon := _kit_icon(key,24)
+  icon.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+  meter.add_child(icon)
+  var caption := text.key_label(key)
+  caption.add_theme_font_size_override("font_size",12)
+  caption.set_meta("centered",true)
+  caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  _need_labels.append(caption)
+  meter.add_child(caption)
+  var bar := ProgressBar.new()
+  bar.custom_minimum_size=Vector2(52,7)
+  bar.show_percentage=false
+  var colors: Dictionary={"hunger":"#b88340","rest":"#37818a","mood":"#78964b"}
+  bar.add_theme_stylebox_override("fill",CozyTheme.box(Color(colors[key]),Color.TRANSPARENT,3,0))
+  bar.add_theme_stylebox_override("background",CozyTheme.box(Color("#ddc6a2"),Color.TRANSPARENT,3,0))
+  meter.add_child(bar)
+  _bars[key]=bar
+ var shortcuts := HBoxContainer.new()
+ shortcuts.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ shortcuts.add_theme_constant_override("separation",4)
+ right.add_child(shortcuts)
+ _shortcut(shortcuts,"bag",func():inventory_requested.emit())
+ _shortcut(shortcuts,"notebook",func():notebook_requested.emit())
+ _shortcut(shortcuts,"outings",func():outings_requested.emit())
+ _shortcut(shortcuts,"settings",func():settings_requested.emit())
+ _menu_button=_shortcut(shortcuts,"actions",func():menu_requested.emit())
+ _refresh_shortcuts()
+ LocaleService.current.changed.connect(_refresh_shortcuts)
+
+func _badge(parent: VBoxContainer) -> HBoxContainer:
+ var panel := PanelContainer.new()
+ panel.theme_type_variation="HudBadge"
+ panel.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+ parent.add_child(panel)
+ var row := HBoxContainer.new()
+ row.add_theme_constant_override("separation",5)
+ panel.add_child(row)
+ return row
+
+func _kit_icon(key: String, extent: float) -> TextureRect:
+ var icon := _icon("",extent)
+ icon.texture=CozyTheme.icon_texture(key)
+ return icon
+
+func _shortcut(parent: HBoxContainer, key: String, action: Callable) -> Button:
+ var button := UiText.button("",func():pass)
+ button.custom_minimum_size=Vector2(44,44)
+ button.theme_type_variation="QuietButton"
+ UiText.center_button_icon(button,CozyTheme.icon_texture(key))
+ button.pressed.connect(func():
+  _popup_anchor=button
+  action.call())
+ parent.add_child(button)
+ _shortcut_buttons[key]=button
+ return button
+
+func _refresh_shortcuts() -> void:
+ _shortcut_buttons.bag.tooltip_text=_text.text("inventory")
+ _shortcut_buttons.notebook.tooltip_text=_text.text("notebook")
+ _shortcut_buttons.outings.tooltip_text=UiText.localized("cozy.outings")
+ _shortcut_buttons.settings.tooltip_text=UiText.localized("cozy.settings")
+ _shortcut_buttons.actions.tooltip_text=_text.text("menu")
+
+func menu_anchor() -> Rect2:
+ return (_popup_anchor if is_instance_valid(_popup_anchor) else _menu_button).get_global_rect()
+
 func show_save_status(key: String) -> void:
  _save_feedback.visible=not key.is_empty()
  if not key.is_empty():
   _save_feedback.text=_text.text(key)
   UiText.bind_control(_save_feedback,"ui."+key)
 func present(session: GameSession) -> void:
+ var compact := CozyTheme.compact_for(get_viewport_rect().size)
+ _fit_density(compact)
+ for caption in _need_labels:caption.visible=not compact
  var minute := int(session.clock.minutes)%1440
- _clock.text = _text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
+ _clock.text="%02d:%02d" % [minute/60,minute%60]
+ _day.text=("اليوم %s" if LocaleService.current.rtl() else "Day %s") % session.clock.day
+ _clock.tooltip_text=_text.text("day_time",{"day":session.clock.day,"hour":"%02d" % (minute/60),"minute":"%02d" % (minute%60)})
  if _day_icon!=null:
   var period_index: int=0
   for index in _periods.size():
@@ -104,7 +208,7 @@ func present(session: GameSession) -> void:
    _day_period=period_index
    _day_icon.texture=_period_textures[period_index]
    _day_icon.tooltip_text=_text.text(_periods[period_index].label)
-   _clock.tooltip_text=_day_icon.tooltip_text
+   _day.tooltip_text=_day_icon.tooltip_text
  _money.text = _text.text("money",{"amount":"%.2f" % (session.wallet.balance/100.0)})
  _state.text = _text.text("open") if session.kiosk_open else _text.text("closed")
  if not session.accounts.business_allowed():_state.text+=" · "+_text.text("hud_business_suspended")
@@ -115,9 +219,22 @@ func present(session: GameSession) -> void:
  var held := session.items.get_item(session.inventory.held_id())
  _held.text = _text.text("held",{"item":ItemText.instance(session,held)}) if not held.is_empty() else _text.text("empty_hands")
  _held.tooltip_text = _held.text
+ _held.visible=not held.is_empty()
  for key in _bars:
   _bars[key].value = session.needs.get(key)
   _bars[key].tooltip_text = _text.text(key)
+
+func _fit_density(compact: bool) -> void:
+ if _density_initialized and _compact==compact:return
+ _density_initialized=true;_compact=compact
+ theme=CozyTheme.make_compact() if compact else CozyTheme.make()
+ _dial.custom_minimum_size=Vector2.ONE*(86.0 if compact else 104.0)
+ _left.custom_minimum_size.x=216 if compact else 246
+ _info.custom_minimum_size.x=110 if compact else 126
+ _clock.add_theme_font_size_override("font_size",16 if compact else 18)
+ _day.add_theme_font_size_override("font_size",12)
+ _money.add_theme_font_size_override("font_size",14 if compact else 15)
+ if is_instance_valid(_day_icon):_day_icon.custom_minimum_size=Vector2.ONE*(20.0 if compact else 26.0)
 
 func _icon(path: String, extent: float) -> TextureRect:
  var icon := TextureRect.new()
@@ -128,3 +245,7 @@ func _icon(path: String, extent: float) -> TextureRect:
  icon.size_flags_vertical=Control.SIZE_SHRINK_CENTER
  if not path.is_empty():icon.texture=load(path) as Texture2D
  return icon
+
+func focus_menu() -> void:
+ var origin := _popup_anchor if is_instance_valid(_popup_anchor) else _menu_button
+ if is_instance_valid(origin) and origin.is_visible_in_tree():origin.grab_focus()

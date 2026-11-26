@@ -18,6 +18,7 @@
     "ui.close": "اقفل",
     "ui.dialogue_continue": "كمّل",
     "ui.dialogue_leave": "أستأذنك دلوقتي",
+    "ui.dialogue_leave_short": "استئذان",
     "ui.dialogue_topics": "تحب نحكي في إيه؟",
     "ui.supplier_title": "اتفاق التوريد — عم فتحي",
     "ui.success": "تمام",
@@ -1321,6 +1322,18 @@
     "comment.food.ful": "الفول",
     "comment.food.shawarma": "الشاورما",
     "comment.food.potato_fried": "البطاطس المقلية",
-    "comment.food.potato_baked": "بطاطس الفرن"
+    "comment.food.potato_baked": "بطاطس الفرن",
+    "cozy.inspect": "التفاصيل",
+    "cozy.station_management_short": "الجهاز",
+    "cozy.overlay_previous": "الاختيار السابق",
+    "cozy.overlay_next": "الاختيار التالي",
+    "cozy.product_details": "اختيارك",
+    "cozy.title_eyebrow": "حياة صغيرة على النيل",
+    "cozy.title_hint": "خد وقتك… الكورنيش لسه فيه مكان لقعدة هادية.",
+    "cozy.language": "اللغة",
+    "cozy.daily": "يومك",
+    "cozy.outings": "مشاوير",
+    "cozy.settings": "إعدادات ومساعدة",
+    "cozy.developer": "أدوات التطوير"
   }
 }

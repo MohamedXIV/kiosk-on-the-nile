@@ -18,6 +18,7 @@
     "ui.close": "Close",
     "ui.dialogue_continue": "Continue",
     "ui.dialogue_leave": "I should get going.",
+    "ui.dialogue_leave_short": "Leave",
     "ui.dialogue_topics": "What shall we talk about?",
     "ui.supplier_title": "Supplies — Uncle Fathi",
     "ui.success": "Done",
@@ -1321,6 +1322,18 @@
     "comment.food.ful": "ful",
     "comment.food.shawarma": "shawarma",
     "comment.food.potato_fried": "fried potatoes",
-    "comment.food.potato_baked": "baked potatoes"
+    "comment.food.potato_baked": "baked potatoes",
+    "cozy.inspect": "Details",
+    "cozy.station_management_short": "Station",
+    "cozy.overlay_previous": "Previous action",
+    "cozy.overlay_next": "Next action",
+    "cozy.product_details": "Your selection",
+    "cozy.title_eyebrow": "A little life by the river",
+    "cozy.title_hint": "Take your time. The corniche has room for a quiet day.",
+    "cozy.language": "Language",
+    "cozy.daily": "Your day",
+    "cozy.outings": "Outings",
+    "cozy.settings": "Settings & help",
+    "cozy.developer": "Development tools"
   }
 }

@@ -30,26 +30,49 @@ func run(check, tree) -> void:
  var view = load("res://game/world/location_view.gd").new()
  tree.root.add_child(view)
  view.configure(roof,session)
- check.case("owned_fan_and_knowledge_gate_actual_targets")
- var fan_visible := false
- for target in view.interaction_targets():
-  if target.id == &"fan": fan_visible = true
- check.is_true(not fan_visible)
- session.home.install_fan()
- for target in view.interaction_targets():
-  if target.id == &"fan": fan_visible = true
- check.is_true(fan_visible)
+ check.case("knowledge_gate_exposes_used_fan_offer")
+ var phone_rule: Dictionary={}
+ for interaction in definitions.kiosk.interactions:
+  if interaction.get("secondary_action")=="buy_fan":phone_rule=interaction.secondary_requires
+ check.is_true(not phone_rule.is_empty())
+ check.is_true(not session.conditions.permits(phone_rule))
+ check.is_true(session.knowledge.learn(&"KNOWN_CHEAP_FAN","مصلحة مروحة","amgad"))
+ check.is_true(session.conditions.permits(phone_rule))
+ check.case("stored_fan_requires_placement_before_generated_equipment_interaction")
+ check.is_true(not _has_fan_target(view,session))
+ check.is_true(session.home.install_fan().ok)
+ check.is_true(session.home.has_fan)
+ view.refresh_layout()
+ check.is_true(not _has_fan_target(view,session))
+ var fan: Dictionary=session.items.instances(&"fan")[0]
+ var request := PlacementRequest.from_dict({"instance_id":fan.id,"location_id":"rooftop","cell":[2,-3],"rotation":0,"host_id":"","slot_id":""})
+ check.is_true(session.spaces.place(request).ok)
+ view.refresh_layout()
+ check.is_true(_has_fan_target(view,session))
+ check.is_true(session.spaces.store(StringName(fan.id)).ok)
+ view.refresh_layout()
+ check.is_true(not _has_fan_target(view,session))
+ # Ownership in storage still prevents buying a second used fan.
+ check.is_true(not session.conditions.permits(phone_rule))
+ check.case("actor_motion_respects_current_generated_solids_and_player_bounds")
  var motor := ActorMotor.new()
  view.add_child(motor)
  motor.configure(mapping,4.5)
  motor.teleport(&"rooftop",Vector2(0,-0.2))
  await tree.physics_frame
  motor.step_input(Vector2(-1,-1),1.0)
- check.is_true(not load("res://game/world/footprint_geometry.gd").blocked(motor.pose.ground,roof.data.solids,0.0))
- check.is_true(motor.pose.ground.x>=-2.55 and motor.pose.ground.y>=-1.85)
+ check.is_true(not FootprintGeometry.blocked(motor.pose.ground,session.spaces.solids(&"rooftop"),0.0))
+ var bounds: Array=view.definition.data.player_bounds
+ check.is_true(motor.pose.ground.x>=float(bounds[0]) and motor.pose.ground.y>=float(bounds[1]))
  check.is_true(view.get_node("Solids").get_child_count()>0)
  check.is_true(view.y_sort_enabled)
  view.queue_free()
  session.queue_free()
  store.free()
  await tree.process_frame
+
+func _has_fan_target(view: LocationView, session: GameSession) -> bool:
+ for target in view.interaction_targets():
+  for fan in session.items.instances(&"fan"):
+   if str(target.id)=="equipment:"+str(fan.id):return true
+ return false

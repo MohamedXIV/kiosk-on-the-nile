@@ -24,7 +24,7 @@ func activate(id: String) -> void:
  if previous!="" and _entries.has(previous):_close(previous)
  for key in _entries:
   if key!=id and _entries[key].panel.visible:_close(str(key))
- entry.panel.call_deferred("grab_focus")
+ SheetControls.focus_first.call_deferred(entry.panel)
 func _close(id: String) -> void:
  var entry: Dictionary=_entries[id]
  if entry.close.is_valid():entry.close.call()
