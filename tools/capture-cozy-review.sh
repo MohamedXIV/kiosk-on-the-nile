@@ -14,6 +14,17 @@ export XDG_DATA_HOME="$TMP/data"
 export XDG_CONFIG_HOME="$TMP/config"
 export XDG_CACHE_HOME="$TMP/cache"
 mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+# Compile the shared fixture once before starting any rendered case.
+ENGINE="$ROOT/.cache/bin/godot-$VERSION"
+PREFLIGHT="$OUT/preflight.log"
+if ! timeout 30s "$ENGINE" --headless --path "$ROOT" --check-only --script res://tests/qualification/cozy_ui_boot.gd > "$PREFLIGHT" 2>&1; then
+ cat "$PREFLIGHT"
+ exit 1
+fi
+if rg -q 'SCRIPT ERROR:|Parse Error:|Compile Error:' "$PREFLIGHT"; then
+ cat "$PREFLIGHT"
+ exit 1
+fi
 MANIFEST="$OUT/matrix.tsv"
 printf 'viewport\tlocale\tarea\tresult\texit_code\n' > "$MANIFEST"
 primary=(title hud inventory shop recipe notes dialogue build)
@@ -25,11 +36,11 @@ capture_case() {
  mkdir -p "$dir"
  local log="$dir/$area-$lang.log" shot="$dir/$area-$lang.png" status=0 result=pass
  rm -f "$shot"
- timeout 60s xvfb-run -a -s "-screen 0 ${width}x${height}x24" "$ROOT/.cache/bin/godot-$VERSION" --path "$ROOT" --rendering-method gl_compatibility --audio-driver Dummy res://tests/qualification/cozy_ui_boot.tscn -- --area "$area" --lang "$lang" --width "$width" --height "$height" --capture-dir "$dir" > "$log" 2>&1 || status=$?
- if [[ "$status" != 0 ]]; then
-  result=engine_exit
- elif rg -q 'SCRIPT ERROR:|Parse Error:|Compile Error:|Cozy UI preview rejected' "$log"; then
+ timeout 25s xvfb-run -a -s "-screen 0 ${width}x${height}x24" "$ROOT/.cache/bin/godot-$VERSION" --path "$ROOT" --rendering-method gl_compatibility --audio-driver Dummy res://tests/qualification/cozy_ui_boot.tscn -- --area "$area" --lang "$lang" --width "$width" --height "$height" --capture-dir "$dir" > "$log" 2>&1 || status=$?
+ if rg -q 'SCRIPT ERROR:|Parse Error:|Compile Error:|Cozy UI preview rejected' "$log"; then
   result=script_or_layout_error
+ elif [[ "$status" != 0 ]]; then
+  result=engine_exit
  elif ! grep -q 'COZY_UI_STATUS .*"ready":true' "$log" || [[ ! -s "$shot" ]]; then
   result=missing_capture
  else
@@ -48,6 +59,11 @@ PY
  if [[ "$result" != pass ]]; then
   cat "$log"
   failed=$((failed+1))
+  # Shared compilation failures invalidate the matrix, not just one fixture.
+  if rg -q 'Parse Error:|Compile Error:' "$log"; then
+   echo "Shared fixture compilation failed; aborting invalid matrix" >&2
+   exit 1
+  fi
  fi
 }
 for lang in ar_EG en; do

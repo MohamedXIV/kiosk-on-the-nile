@@ -71,7 +71,8 @@ func _ready() -> void:
  for index in range(4):await get_tree().process_frame
  if not _review_layout():
   push_error("Cozy UI preview rejected: visible layout regression in "+_area)
-  get_tree().quit(1)
+  if not _capture_dir.is_empty():await _capture(1)
+  else:get_tree().quit(1)
   return
  var status := {"ready":true,"area":_area,"locale":_locale.locale,"limitations":_limitations,"world_minutes":session.clock.world_minutes}
  print("COZY_UI_STATUS ",JSON.stringify(status))
@@ -272,9 +273,9 @@ func _review_layout() -> bool:
    if child is BuildPanel:
     var dock: BuildPanel=child
     if not dock.visible or dock._actions.size.y<44:return false
-    var bounds := dock.get_global_rect()
+    var dock_bounds := dock.get_global_rect()
     for button in [dock._rotate,dock._confirm,dock._store]:
-     if not bounds.grow(1).encloses(button.get_global_rect()):return false
+     if not dock_bounds.grow(1).encloses(button.get_global_rect()):return false
     if dock._choices.item_count>0 and (dock._choices.selected<0 or not dock._piece_art.visible):return false
     return dock._tools_scroll.size.y>=64
   return false
@@ -283,7 +284,7 @@ func _review_layout() -> bool:
    if child is InventoryPanel:return child._search.size.y<=64 and child._filter.size.y<=64 and child._scroll.size.y>=100
   return false
  return true
-func _capture() -> void:
+func _capture(exit_code: int=0) -> void:
  if DisplayServer.get_name()=="headless":
   print("COZY_UI_CAPTURE skipped: headless display has no rendered image")
  else:
@@ -300,4 +301,4 @@ func _capture() -> void:
   player.destroy()
   player.queue_free()
  for index in range(3):await get_tree().process_frame
- get_tree().quit()
+ get_tree().quit(exit_code)
