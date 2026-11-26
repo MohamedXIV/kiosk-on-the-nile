@@ -93,11 +93,15 @@ static func _fit_sheet(reference: WeakRef, width: float, top: float, bottom: flo
  if not is_instance_valid(panel) or not panel.is_inside_tree():return
  panel.set_meta("sheet_fit_pending",false)
  var extent := panel.get_viewport_rect().size
- var margin := 16.0 if extent.x>=700 else 8.0
+ var compact := CozyTheme.compact_for(extent)
+ var desired_theme := CozyTheme.for_viewport(extent)
+ if panel.theme!=desired_theme:panel.theme=desired_theme
+ var margin := 8.0 if compact else 16.0
  var available := minf(width,extent.x-margin*2)
- var inset := minf(top,extent.y*0.22)
+ var inset := minf(top,extent.y*(0.17 if compact else 0.22))
+ var lower_margin := minf(bottom,10.0) if compact else bottom
  panel.position=Vector2((extent.x-available)*0.5,inset)
- panel.size=Vector2(available,maxf(120,extent.y-inset-bottom))
+ panel.size=Vector2(available,maxf(120,extent.y-inset-lower_margin))
 static func columns(parent: Control, collapse_width: float=760) -> BoxContainer:
  var row := BoxContainer.new()
  row.size_flags_horizontal=Control.SIZE_EXPAND_FILL

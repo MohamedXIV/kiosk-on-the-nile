@@ -73,7 +73,8 @@ func configure(text: UiText, session: GameSession) -> void:
  var time_hint := SheetControls.label(OutingText.t("world_continues"));UiText.bind_control(time_hint,"outings.world_continues");SheetControls.muted(time_hint);footer.add_child(time_hint)
  var back := SheetControls.key_button(text,"journey_return",_return);back.custom_minimum_size.x=160;back.theme_type_variation="QuietButton";footer.add_child(back)
  resized.connect(func():
-  var compact := size.x<740
+  var compact := CozyTheme.compact_for(get_viewport_rect().size)
+  column.add_theme_constant_override("separation",5 if compact else 12)
   quantity_label.visible=size.x>=800
   time_hint.visible=size.y>=500
   body.vertical=false

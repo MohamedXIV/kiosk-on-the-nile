@@ -10,6 +10,15 @@ var _box: VBoxContainer
 var _layout: VBoxContainer
 var _speaker: Label
 var _leave: Button
+var _header: HBoxContainer
+var _history: VBoxContainer
+var _history_toggle: Button
+var _current_line: Label
+var _compact: bool=false
+var _layout_configured: bool=false
+const COMPACT_EDGE := 8.0
+const COMPACT_READING_HEIGHT := 144.0
+const COMPACT_HEIGHT_RATIO := 0.58
 var _scroll: ScrollContainer
 var _signature: String=""
 var _maximum_height_ratio: float=0.42
@@ -24,6 +33,9 @@ func _ready() -> void:
  _layout=VBoxContainer.new()
  _layout.add_theme_constant_override("separation",10)
  add_child(_layout)
+ _header=HBoxContainer.new()
+ _header.add_theme_constant_override("separation",6)
+ _layout.add_child(_header)
  _speaker=SheetControls.label()
  _speaker.theme_type_variation="SpeakerTag"
  # The speaker must retain a real horizontal line before the scroll area is measured.
@@ -31,7 +43,7 @@ func _ready() -> void:
  _speaker.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
  _speaker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _speaker.custom_minimum_size.y=36
- _layout.add_child(_speaker)
+ _header.add_child(_speaker)
  _scroll=ScrollContainer.new()
  _scroll.follow_focus=true
  _scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
@@ -52,7 +64,7 @@ func present(conversation: ConversationSession, choices: Array[Dictionary], spea
  if conversation==null or (choices.is_empty() and not joined):hide();_signature="";return
  var signature := str(LocaleService.current.revision if LocaleService.current else 0)+str(conversation.id)+":"+str(conversation.beat)+JSON.stringify(choices)
  if _begin(signature,speaker_name):
-  _line(LocalizedNarrative.line(conversation.current))
+  _current_line=_line(LocalizedNarrative.line(conversation.current))
   if choices.is_empty():_button(_text.text("dialogue_continue"),func():group_advance_requested.emit(conversation.id),true)
   else:_choices(conversation,choices)
   if joined:_leave_button(func():group_leave_requested.emit(conversation.id))
@@ -62,13 +74,25 @@ func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
  var signature := str(LocaleService.current.revision if LocaleService.current else 0)+JSON.stringify([view.get("actor_id"),str(conversation.id) if conversation else "",conversation.beat if conversation else 0,view.topics,view.opening])
  if _begin(signature,NotebookView.name(str(view.actor_id),str(view.name))):
   if conversation:
-   for event in view.get("recent",[]):
-    var preceding := _line(str(event.name)+": "+str(event.text))
-    SheetControls.muted(preceding)
-   _line(LocalizedNarrative.line(conversation.current))
+   # Current speech and choices remain first in compact mode; the preceding
+   # lines remain available through a history disclosure, not deleted.
+   var recent: Array=view.get("recent",[])
+   if not recent.is_empty():
+    _history=VBoxContainer.new()
+    _box.add_child(_history)
+    for event in recent:
+     var preceding := SheetControls.label(str(event.name)+": "+str(event.text))
+     SheetControls.muted(preceding)
+     _history.add_child(preceding)
+   _current_line=_line(LocalizedNarrative.line(conversation.current))
    var choices := director.choices(conversation)
    if choices.is_empty():_button(_text.text("dialogue_continue"),func():advance_requested.emit(),true)
    else:_choices(conversation,choices)
+   if is_instance_valid(_history):
+    _history_toggle=SheetControls.button(_text.text("journal_title"),func():_history.visible=_history_toggle.button_pressed)
+    _history_toggle.toggle_mode=true
+    _history_toggle.custom_minimum_size=Vector2(0,44)
+    _box.add_child(_history_toggle)
   else:
    SheetControls.muted(_line(_text.text("dialogue_topics")))
    for topic in view.topics:_button(OutingText.manual_topic(topic),func():topic_selected.emit(str(topic.key)))
@@ -79,6 +103,8 @@ func _begin(signature: String, speaker_name: String="") -> bool:
  _signature=signature
  for child in _box.get_children():child.free()
  if is_instance_valid(_leave):_leave.free()
+ _history=null;_history_toggle=null;_current_line=null
+ _layout_configured=false
  _speaker.text=speaker_name
  _speaker.visible=not speaker_name.is_empty()
  _scroll.scroll_vertical=0
@@ -103,17 +129,49 @@ func _leave_button(action: Callable) -> void:
 func _choices(conversation: ConversationSession, choices: Array[Dictionary]) -> void:
  for choice in choices:
   _button(LocalizedNarrative.choice(choice,conversation.current),func():choice_selected.emit(conversation.id,StringName(choice.id)))
+func _apply_density(compact: bool) -> void:
+ if _layout_configured and _compact==compact:return
+ _layout_configured=true
+ _compact=compact
+ theme=CozyTheme.make_compact() if compact else CozyTheme.make()
+ theme_type_variation="CompactDialogueFrame" if compact else "DialogueFrame"
+ _layout.add_theme_constant_override("separation",5 if compact else 10)
+ _box.add_theme_constant_override("separation",6 if compact else 10)
+ _scroll.custom_minimum_size.y=COMPACT_READING_HEIGHT if compact else MIN_SCROLL_HEIGHT
+ if is_instance_valid(_leave):
+  var parent: Control=_header if compact else _layout
+  if _leave.get_parent()!=parent:_leave.reparent(parent,false)
+  _leave.custom_minimum_size=Vector2(96,44) if compact else Vector2(0,44)
+ if is_instance_valid(_history):
+  if compact:
+   _box.move_child(_history,_box.get_child_count()-1)
+   _history.visible=false
+   _history_toggle.set_pressed_no_signal(false)
+  else:
+   _box.move_child(_history,0)
+   _history.visible=true
+  _history_toggle.visible=compact
+ _scroll.set_deferred("scroll_vertical",0)
+
 func _fit() -> void:
  var viewport := get_viewport_rect().size
- var width := minf(PANEL_WIDTH,viewport.x-EDGE*2)
- var top := maxf(EDGE,top_inset)
- # Reserve an explicit reading area. Auto-wrapped labels report misleading
- # minimum heights before their container has received its width.
- var available := maxf(MIN_SCROLL_HEIGHT,viewport.y-top-EDGE)
- var height := minf(available,maxf(MIN_PANEL_HEIGHT,viewport.y*_maximum_height_ratio))
+ var compact := CozyTheme.compact_for(viewport)
+ _apply_density(compact)
  anchor_left=0;anchor_right=0;anchor_top=0;anchor_bottom=0
- offset_left=viewport.x-width-EDGE
- offset_right=viewport.x-EDGE
- offset_top=top
- offset_bottom=top+height
+ if compact:
+  var available := maxf(COMPACT_READING_HEIGHT,viewport.y-top_inset-COMPACT_EDGE)
+  var height := minf(available,maxf(220.0,viewport.y*COMPACT_HEIGHT_RATIO))
+  offset_left=COMPACT_EDGE
+  offset_right=viewport.x-COMPACT_EDGE
+  offset_top=viewport.y-height-COMPACT_EDGE
+  offset_bottom=viewport.y-COMPACT_EDGE
+ else:
+  var width := minf(PANEL_WIDTH,viewport.x-EDGE*2)
+  var top := maxf(EDGE,top_inset)
+  var available := maxf(MIN_SCROLL_HEIGHT,viewport.y-top-EDGE)
+  var height := minf(available,maxf(MIN_PANEL_HEIGHT,viewport.y*_maximum_height_ratio))
+  offset_left=viewport.x-width-EDGE
+  offset_right=viewport.x-EDGE
+  offset_top=top
+  offset_bottom=top+height
  show()

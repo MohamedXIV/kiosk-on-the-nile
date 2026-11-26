@@ -244,7 +244,7 @@ func _review_layout() -> bool:
  if surface is TitleScreen:
   if not bounds.grow(1).encloses(surface._actions.get_global_rect()):return false
  if surface is RecipePanel:
-  var tracks := surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
+  var tracks: Array[Node] = surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
   if not surface._progress.is_empty() and tracks.size()!=surface._progress.size():return false
   for track in tracks:
    var current_count := 0
@@ -267,8 +267,10 @@ func _review_layout() -> bool:
    if used.size==Vector2i.ZERO:return false
    var center := Vector2(used.position)+Vector2(used.size)*0.5
    if center.distance_to(Vector2.ONE*CozyTheme.ICON_CELL*0.5)>1.6:return false
+  if CozyTheme.compact_for(bounds.size) and hud._strip._dial.custom_minimum_size.x>86:return false
   for key in hud._strip._shortcut_buttons:
    var button: Button=hud._strip._shortcut_buttons[key]
+   if button.size.x<44 or button.size.y<44:return false
    var art := button.get_node_or_null("CenteredIcon") as TextureRect
    if art==null or art.texture==null or art.mouse_filter!=Control.MOUSE_FILTER_IGNORE:return false
    var target := button.get_global_rect().get_center()+Vector2(0,UiText.BUTTON_FACE_CENTER_Y)
@@ -278,6 +280,12 @@ func _review_layout() -> bool:
   if not panel.visible or panel._box.get_child_count()==0:return false
   if panel._speaker.visible and (panel._speaker.size.x<100 or panel._speaker.size.y>80):return false
   if panel._scroll.size.y<80:return false
+  if CozyTheme.compact_for(bounds.size):
+   if panel._scroll.size.y<144 or panel.size.x<bounds.size.x-20:return false
+   if absf(panel.get_global_rect().end.y-(bounds.end.y-8))>2:return false
+   if is_instance_valid(panel._current_line) and not panel._scroll.get_global_rect().grow(1).encloses(panel._current_line.get_global_rect()):return false
+   if not panel._compact:return false
+   if is_instance_valid(panel._history) and panel._history.visible:return false
  if _area=="build":
   for child in hud.get_children():
    if child is BuildPanel:

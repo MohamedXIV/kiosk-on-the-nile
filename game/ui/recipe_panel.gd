@@ -31,6 +31,7 @@ func configure(text: UiText, session: GameSession) -> void:
  SheetControls.shell(self)
  theme_type_variation="CookingBoard"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
+ resized.connect(func():column.add_theme_constant_override("separation",5 if CozyTheme.compact_for(get_viewport_rect().size) else 10))
  SheetControls.header(column,_heading,text,hide,"hunger","SectionClay")
  var hands := PanelContainer.new();hands.theme_type_variation="StationStatus";column.add_child(hands)
  var station_row := HBoxContainer.new();hands.add_child(station_row)
@@ -50,7 +51,7 @@ func configure(text: UiText, session: GameSession) -> void:
  hide()
 func _fit_station_art() -> void:
  if not is_instance_valid(_station_art):return
- _station_art.custom_minimum_size=Vector2.ONE*(COMPACT_STATION_SIZE if size.x<COMPACT_WIDTH else REGULAR_STATION_SIZE)
+ _station_art.custom_minimum_size=Vector2.ONE*(COMPACT_STATION_SIZE if CozyTheme.compact_for(get_viewport_rect().size) else REGULAR_STATION_SIZE)
 
 func _refresh_language() -> void:
  for i in range(3):_tabs.set_tab_title(i,ItemText.t(["care","active","recipes"][i]))

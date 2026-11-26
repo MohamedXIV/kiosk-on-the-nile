@@ -279,3 +279,41 @@ static func _apply_reading_workbench(t: Theme) -> void:
   t.set_type_variation(kind,"ProgressBar")
   t.set_stylebox("background",kind,box(Color("#e1c9a3"),Color.TRANSPARENT,4,0))
   t.set_stylebox("fill",kind,box(entry[1],Color.TRANSPARENT,4,0))
+
+# Separate density profile; never mutate the shared desktop Theme or shrink
+# interactive targets below 44 logical pixels just to fit more chrome.
+const COMPACT_WIDTH := 740.0
+const COMPACT_HEIGHT := 580.0
+static var _compact_theme: Theme
+static func compact_for(extent: Vector2) -> bool:
+ return extent.x<COMPACT_WIDTH or extent.y<COMPACT_HEIGHT
+static func for_viewport(extent: Vector2) -> Theme:
+ return make_compact() if compact_for(extent) else make()
+static func make_compact() -> Theme:
+ if _compact_theme!=null:return _compact_theme
+ var t := make().duplicate() as Theme
+ t.default_font_size=15
+ for entry in [["Heading",20],["NotebookSection",18],["ShopHeading",18],["Muted",13],["DialogueLine",16],["SpeakerTag",16],["PriceTag",14]]:
+  t.set_font_size("font_size",str(entry[0]),int(entry[1]))
+ for kind in ["TabBar","TabContainer","NotebookTabs","NotebookBook"]:
+  t.set_font_size("font_size",kind,14)
+  for state in ["tab_selected","tab_hovered","tab_unselected","tab_disabled"]:
+   if not t.has_stylebox(state,kind):continue
+   var tab := t.get_stylebox(state,kind).duplicate() as StyleBox
+   for side in [SIDE_LEFT,SIDE_RIGHT,SIDE_TOP,SIDE_BOTTOM]:tab.set_content_margin(side,5 if side==SIDE_LEFT or side==SIDE_RIGHT else 3)
+   t.set_stylebox(state,kind,tab)
+ for kind in ["Sheet","PanelContainer","Card","Inset","NotebookCover","NotebookPage","PersonPage","InventoryBag","StorageTray","ItemSlot","SelectedItemSlot","ItemDetail","ShopBoard","CookingBoard","StationTray","RecipePaper","OrderSlip","NotebookBookmark","StationStatus","ArrangementDock","HudBadge","SectionOlive","SectionNile","SectionClay","ReceiptSheet","SupplierLedger","JourneyTicket","SleepCard","VisitorNote","SettingsPage","MenuBoard","TitleTray"]:
+  if not t.has_stylebox("panel",kind):continue
+  var frame := t.get_stylebox("panel",kind).duplicate() as StyleBox
+  for side in [SIDE_LEFT,SIDE_RIGHT,SIDE_TOP,SIDE_BOTTOM]:
+   var cap := 9.0 if side==SIDE_LEFT or side==SIDE_RIGHT else 5.0
+   frame.set_content_margin(side,minf(frame.get_margin(side),cap))
+  t.set_stylebox("panel",kind,frame)
+ for kind in ["VBoxContainer","HBoxContainer"]:t.set_constant("separation",kind,6)
+ for kind in ["HFlowContainer","VFlowContainer"]:
+  t.set_constant("h_separation",kind,6)
+  t.set_constant("v_separation",kind,6)
+ t.set_type_variation("CompactDialogueFrame","PanelContainer")
+ t.set_stylebox("panel","CompactDialogueFrame",texture_box(0,10,8))
+ _compact_theme=t
+ return _compact_theme

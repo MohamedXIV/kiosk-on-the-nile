@@ -21,6 +21,7 @@ func configure(text: UiText) -> void:
  var box := VBoxContainer.new()
  box.add_theme_constant_override("separation",10)
  add_child(box)
+ resized.connect(func():box.add_theme_constant_override("separation",5 if CozyTheme.compact_for(get_viewport_rect().size) else 10))
  var heading := text.key_label("notebook")
  SheetControls.header(box,heading,text,func():hide();closed.emit(),"notebook","SectionNile")
  heading.theme_type_variation="NotebookSection"
@@ -92,7 +93,7 @@ func _render_notes() -> void:
  if key==_notes_key:return
  _notes_key=key;_clear(_notes)
  var page := VBoxContainer.new()
- page.add_theme_constant_override("separation",14)
+ page.add_theme_constant_override("separation",8 if CozyTheme.compact_for(get_viewport_rect().size) else 14)
  _notes.add_child(page)
  var reputation_row := SheetControls.banner(page,"notebook","NotebookBookmark")
  var reputation_label := _label(reputation)

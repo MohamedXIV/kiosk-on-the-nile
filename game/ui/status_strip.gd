@@ -22,12 +22,18 @@ var _need_labels: Array[Label]=[]
 var _shortcut_buttons: Dictionary={}
 var _popup_anchor: Button
 var _day: Label
+var _dial: TextureRect
+var _left: VBoxContainer
+var _info: VBoxContainer
+var _density_initialized: bool=false
+var _compact: bool=false
 const CLOCK_ART = preload("res://assets/ui/nile/clock.svg")
 func configure(text: UiText) -> void:
  _text=text
  mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_theme_constant_override("separation",8)
  var left := VBoxContainer.new()
+ _left=left
  left.mouse_filter=Control.MOUSE_FILTER_IGNORE
  left.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
  left.add_theme_constant_override("separation",4)
@@ -38,6 +44,7 @@ func configure(text: UiText) -> void:
  time_row.add_theme_constant_override("separation",6)
  left.add_child(time_row)
  var dial := TextureRect.new()
+ _dial=dial
  dial.texture=CLOCK_ART
  dial.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
  dial.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -70,6 +77,7 @@ func configure(text: UiText) -> void:
  _day.set_meta("centered",true)
  face.add_child(_day)
  var info := VBoxContainer.new()
+ _info=info
  info.custom_minimum_size.x=126
  info.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  info.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -183,7 +191,8 @@ func show_save_status(key: String) -> void:
   _save_feedback.text=_text.text(key)
   UiText.bind_control(_save_feedback,"ui."+key)
 func present(session: GameSession) -> void:
- var compact := get_viewport_rect().size.x<700
+ var compact := CozyTheme.compact_for(get_viewport_rect().size)
+ _fit_density(compact)
  for caption in _need_labels:caption.visible=not compact
  var minute := int(session.clock.minutes)%1440
  _clock.text="%02d:%02d" % [minute/60,minute%60]
@@ -214,6 +223,18 @@ func present(session: GameSession) -> void:
  for key in _bars:
   _bars[key].value = session.needs.get(key)
   _bars[key].tooltip_text = _text.text(key)
+
+func _fit_density(compact: bool) -> void:
+ if _density_initialized and _compact==compact:return
+ _density_initialized=true;_compact=compact
+ theme=CozyTheme.make_compact() if compact else CozyTheme.make()
+ _dial.custom_minimum_size=Vector2.ONE*(86.0 if compact else 104.0)
+ _left.custom_minimum_size.x=216 if compact else 246
+ _info.custom_minimum_size.x=110 if compact else 126
+ _clock.add_theme_font_size_override("font_size",16 if compact else 18)
+ _day.add_theme_font_size_override("font_size",12)
+ _money.add_theme_font_size_override("font_size",14 if compact else 15)
+ if is_instance_valid(_day_icon):_day_icon.custom_minimum_size=Vector2.ONE*(20.0 if compact else 26.0)
 
 func _icon(path: String, extent: float) -> TextureRect:
  var icon := TextureRect.new()

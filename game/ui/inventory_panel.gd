@@ -24,10 +24,11 @@ func configure(text: UiText, session: GameSession) -> void:
  SheetControls.shell(self)
  theme_type_variation="InventoryBag"
  var column := VBoxContainer.new();column.add_theme_constant_override("separation",10);add_child(column)
+ resized.connect(func():column.add_theme_constant_override("separation",5 if CozyTheme.compact_for(get_viewport_rect().size) else 10))
  SheetControls.header(column,_heading,text,hide,"bag","SectionNile")
  SheetControls.muted(_hint);column.add_child(_hint)
  var hands := PanelContainer.new();hands.theme_type_variation="Inset";column.add_child(hands);hands.add_child(_held)
- var controls := SheetControls.columns(column,640);controls.add_theme_constant_override("separation",8)
+ var controls := SheetControls.columns(column,500);controls.add_theme_constant_override("separation",8)
  # Search/filter are a toolbar, not a competing vertically expanding pane.
  controls.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
  _search.custom_minimum_size.y=44
@@ -41,6 +42,7 @@ func configure(text: UiText, session: GameSession) -> void:
  session.items.changed.connect(func(_revision):_dirty=true)
  LocaleService.current.changed.connect(_refresh_language)
  _refresh_language()
+ get_viewport().size_changed.connect(func():_dirty=true)
  hide()
 func _kind_label(kind: String) -> String:
  if kind=="":return ItemText.t("all_storage")
@@ -69,6 +71,7 @@ func _process(delta: float) -> void:
    if is_instance_valid(entry.label):entry.label.text=ItemText.item_details(_session,entry.item)
 func _render() -> void:
  _dirty=false;_location=str(_session.location_id)
+ var compact := CozyTheme.compact_for(get_viewport_rect().size)
  var focus_key := _focused_key()
  var scroll := 0.0 if _reset_scroll else _scroll.get_v_scroll_bar().value
  _reset_scroll=false
@@ -136,18 +139,18 @@ func _render() -> void:
     var item_id := str(item.id)
     var tile := PanelContainer.new()
     tile.theme_type_variation="SelectedItemSlot" if item_id==selected_id else "ItemSlot"
-    tile.custom_minimum_size.x=148
+    tile.custom_minimum_size.x=124 if compact else 148
     slots.add_child(tile)
     var tile_content := VBoxContainer.new()
     tile_content.add_theme_constant_override("separation",3)
     tile.add_child(tile_content)
     var glyph := ItemGlyph.new()
     glyph.configure(_session.items.definition(StringName(str(item.definition_id))),str(item.definition_id))
-    glyph.custom_minimum_size=Vector2(64,64)
+    glyph.custom_minimum_size=Vector2.ONE*(48.0 if compact else 64.0)
     glyph.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
     tile_content.add_child(glyph)
     var name := SheetControls.label(ItemText.t("quantity",{"name":ItemText.instance(_session,item),"quantity":int(item.quantity)}))
-    name.custom_minimum_size=Vector2(120,68)
+    name.custom_minimum_size=Vector2(106,48) if compact else Vector2(120,68)
     name.size_flags_vertical=Control.SIZE_EXPAND_FILL
     name.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
     name.set_meta("centered",true)
