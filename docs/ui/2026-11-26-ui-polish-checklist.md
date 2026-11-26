@@ -27,3 +27,7 @@ Workflow 45748157480 (d84ed85) was cancelled at its 20-minute limit. Startup pas
 ## Expanded matrix result and art pass
 
 Workflow 45756465872 at 42fd818 completed successfully: matrix.tsv has 56 passing rows, 40 wide and 16 compact, with actual PNGs. Reviewed wide English and compact Arabic contact sheets. The bounds checks passed but visual review shows restricted reading space at compact size, especially recipe and shop; notebook people remains sparse. Receipt fixture explicitly has no signed records, and v2 liver fixture uses initial availability, not injected progress. Startup still reports 48 ObjectDB instances and 22 resources at exit. This pass introduces a compact station summary and recipe-step markers derived from the real active job, reduces redundant compact shop preview chrome, and uses notebook index cards and localized-name initials rather than invented portraits. It adds assertions for active recipe markers and compact illustration sizes. The exact new head still requires captures and interaction testing; no visual acceptance, merge or release.
+
+## Core gameplay surface acceptance (new user direction)
+
+[Gameplay-first overlay budget](2026-11-26-gameplay-overlay-budget.md) is the current acceptance requirement for dialogue and active cooking. Both must occupy at most 25% of viewport area, preserving readable speech and all existing actions. Management sheets are exempt. Diagnostic baseline first; implementation and hard acceptance tests remain open.

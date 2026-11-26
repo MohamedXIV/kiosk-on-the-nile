@@ -75,6 +75,23 @@ func _ready() -> void:
   else:get_tree().quit(1)
   return
  var status := {"ready":true,"area":_area,"locale":_locale.locale,"limitations":_limitations,"world_minutes":session.clock.world_minutes}
+ # Baseline diagnostic for the new gameplay overlay budget. Not yet an
+ # acceptance assertion: the existing dialogue and active station layouts
+ # precede that requirement. Report outer control bounds, not alpha pixels.
+ var surface: Control=_visible_area_panel()
+ if is_instance_valid(surface):
+  var extent: Vector2=get_viewport_rect().size
+  var footprint: Rect2=surface.get_global_rect()
+  status["surface_width"]=footprint.size.x
+  status["surface_height"]=footprint.size.y
+  status["surface_area_ratio"]=footprint.size.x*footprint.size.y/maxf(1.0,extent.x*extent.y)
+  if surface is DialoguePanel:
+   status["surface_class"]="gameplay_dialogue"
+  elif surface is RecipePanel:
+   status["surface_class"]="gameplay_cooking" if surface._tabs.current_tab==1 and not surface._progress.is_empty() else "station_management"
+  else:
+   status["surface_class"]="other"
+
  print("COZY_UI_STATUS ",JSON.stringify(status))
  if OS.has_feature("web"):JavaScriptBridge.eval("window.cozyStatus="+JSON.stringify(status))
  if not _capture_dir.is_empty():await _capture()
