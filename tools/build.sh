@@ -23,4 +23,9 @@ fi
 if rg -n 'SCRIPT ERROR:|Parse Error:|Compile Error:' .cache/build-logs/export.log; then
  exit 1
 fi
+# Reuse the existing pull-request build and retained diagnostic artifact.
+# No new workflow or release-time screenshot dependency.
+if [[ "${GITHUB_ACTIONS:-}" == "true" && "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+ bash tools/capture-cozy-review.sh
+fi
 echo 'Ink compilation, Godot import, native startup smoke and Web export completed. Logs: .cache/build-logs/'

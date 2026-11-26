@@ -6,6 +6,7 @@ var _summary := RichTextLabel.new()
 var _preview := RichTextLabel.new()
 var _feedback := Label.new()
 var _basket: Dictionary={}
+var _basket_labels: Dictionary={}
 var _days: Array[CheckBox]=[]
 var _hour := SpinBox.new()
 var _minute := SpinBox.new()
@@ -44,7 +45,9 @@ func configure(text: UiText, session: GameSession) -> void:
  for id in session.config.section("suppliers").catalog:
   var column := VBoxContainer.new();column.custom_minimum_size.x=128;basket.add_child(column)
   var glyph := ItemGlyph.new();glyph.configure(session.items.definition(StringName(str(id))),str(id));glyph.size_flags_horizontal=Control.SIZE_SHRINK_CENTER;column.add_child(glyph)
-  column.add_child(_item_label(str(id)))
+  var item_label := _item_label(str(id))
+  column.add_child(item_label)
+  _basket_labels[id]=item_label
   var count := SpinBox.new();_number(count,0,int(session.config.section("suppliers").catalog[id].daily_stock),2 if id=="tea_portion" else 0)
   column.add_child(count);_basket[id]=count
  var schedule_card := SheetControls.card(order)
@@ -133,7 +136,7 @@ func _refresh_language() -> void:
  if _session==null:return
  UiText.refresh_tree(self)
  for id in _basket:
-  var label: Label=_basket[id].get_parent().get_child(0)
+  var label: Label=_basket_labels[id]
   label.text=ItemText.definition(_session,str(id))
  _hour.suffix=_t("hour");_minute.suffix=_t("minute");_deposit.suffix=_t("currency")
  var selected := _mode.selected

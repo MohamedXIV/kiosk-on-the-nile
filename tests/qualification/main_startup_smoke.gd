@@ -29,6 +29,9 @@ func _run() -> void:
  for language in ["en","ar_EG"]:
   if not _require(main._locale.set_locale(language).ok,"locale "+language):return
   await process_frame
+  for id in main._supplier_panel._basket_labels:
+   var label: Label=main._supplier_panel._basket_labels[id]
+   if not _require(label.text==ItemText.definition(main._session,str(id)),"supplier label "+str(id)+" "+language):return
   main._hud._strip._shortcut_buttons["bag"].pressed.emit()
   await process_frame
   if not _require(main._inventory_panel.visible and main._modals.active_id()=="inventory","inventory shortcut "+language):return
@@ -40,8 +43,10 @@ func _run() -> void:
   main._modals.close_active()
   await process_frame
  if not _require(not main._modals.blocking(),"modal close"):return
- # Mark only after all assertions; shell checks script errors even if Godot exits 0.
- print("STARTUP_SMOKE_PASS")
+ # Stop simulation and presentation before explicitly draining session resources.
+ # Keep the completion marker after cleanup; the shell also requires exit zero.
+ main.set_process(false)
+ main.set_physics_process(false)
  main._session.running=false
  main._session.personal.leave()
  for id in main._session.narrative.sessions.keys():main._session.narrative.cancel(StringName(id))
@@ -50,4 +55,7 @@ func _run() -> void:
   player.destroy()
   player.queue_free()
  for frame in range(3):await process_frame
+ main.queue_free()
+ for frame in range(4):await process_frame
+ print("STARTUP_SMOKE_PASS")
  quit(0)

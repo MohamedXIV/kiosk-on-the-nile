@@ -76,5 +76,5 @@ func _add_prop(data: Dictionary,parent: Node2D,mapping: SpatialMapping,parent_gr
  visual.configure(data,mapping)
  if visual is SignView:
   visual.present(false)
-  if LocaleService.current:LocaleService.current.changed.connect(func():visual.present(false))
+  if LocaleService.current:LocaleService.current.changed.connect(visual.present.bind(false))
  for child in data.get("children",[]):_add_prop(child,visual,mapping,ground)
