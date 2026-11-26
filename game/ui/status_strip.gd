@@ -159,10 +159,7 @@ func _shortcut(parent: HBoxContainer, key: String, action: Callable) -> Button:
  var button := UiText.button("",func():pass)
  button.custom_minimum_size=Vector2(44,44)
  button.theme_type_variation="QuietButton"
- button.icon=CozyTheme.icon_texture(key)
- button.expand_icon=true
- button.icon_alignment=HORIZONTAL_ALIGNMENT_CENTER
- button.add_theme_constant_override("icon_max_width",26)
+ UiText.center_button_icon(button,CozyTheme.icon_texture(key))
  button.pressed.connect(func():
   _popup_anchor=button
   action.call())

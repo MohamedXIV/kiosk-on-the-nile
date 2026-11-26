@@ -208,6 +208,23 @@ func _open_area(layer: CanvasLayer) -> void:
  if session.locations.is_physical(session.location_id):_physical.set_active_location(session.location_id)
  _physical.character.present(session.player_pose,Color(session.config.section("spatial").character.player_color),true)
 func _review_layout() -> bool:
+ # All production shortcuts must center the artwork on the face, not on
+ # the bottom shadow or text baseline. Check both captured locales.
+ if _area=="hud":
+  var atlas: Image=CozyTheme.ICON_ATLAS.get_image()
+  for key in CozyTheme.ICON_INDEX:
+   var index: int=CozyTheme.ICON_INDEX[key]
+   var cell := atlas.get_region(Rect2i(index*CozyTheme.ICON_CELL,0,CozyTheme.ICON_CELL,CozyTheme.ICON_CELL))
+   var used := cell.get_used_rect()
+   if used.size==Vector2i.ZERO:return false
+   var center := Vector2(used.position)+Vector2(used.size)*0.5
+   if center.distance_to(Vector2.ONE*CozyTheme.ICON_CELL*0.5)>1.6:return false
+  for key in hud._strip._shortcut_buttons:
+   var button: Button=hud._strip._shortcut_buttons[key]
+   var art := button.get_node_or_null("CenteredIcon") as TextureRect
+   if art==null or art.texture==null or art.mouse_filter!=Control.MOUSE_FILTER_IGNORE:return false
+   var target := button.get_global_rect().get_center()+Vector2(0,UiText.BUTTON_FACE_CENTER_Y)
+   if art.get_global_rect().get_center().distance_to(target)>0.5:return false
  if _area=="dialogue":
   var panel := hud.dialogue
   if not panel.visible or panel._box.get_child_count()==0:return false

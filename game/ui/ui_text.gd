@@ -28,9 +28,29 @@ static func button(value: String, callback: Callable) -> Button:
  control.focus_mode = Control.FOCUS_ALL
  control.custom_minimum_size = Vector2(96,44)
  control.alignment = HORIZONTAL_ALIGNMENT_CENTER
+ control.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
  control.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  control.pressed.connect(callback)
  return control
+
+## Icon-only buttons need to align with the painted face, independently of
+## the font baseline and the outer shadow. A passive child preserves the
+## real native Button, keyboard focus, tooltip and pressed signal.
+const BUTTON_FACE_CENTER_Y := -2.5
+static func center_button_icon(button: Button, texture: Texture2D, extent: float = 26.0) -> TextureRect:
+ var image := TextureRect.new()
+ image.name="CenteredIcon"
+ image.texture=texture
+ image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ image.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ button.add_child(image)
+ image.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+ image.offset_left=-extent*0.5
+ image.offset_right=extent*0.5
+ image.offset_top=-extent*0.5+BUTTON_FACE_CENTER_Y
+ image.offset_bottom=extent*0.5+BUTTON_FACE_CENTER_Y
+ return image
 
 static func localized(id: String, args: Dictionary = {}, fallback: String = "") -> String:
  return LocaleService.current.text(id,args,fallback) if LocaleService.current!=null else fallback
