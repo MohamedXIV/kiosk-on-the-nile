@@ -11,6 +11,7 @@ var _layout: VBoxContainer
 var _speaker: Label
 var _leave: Button
 var _header: HBoxContainer
+var _header_spacer: Control
 var _history: VBoxContainer
 var _history_toggle: Button
 var _current_line: Label
@@ -44,6 +45,11 @@ func _ready() -> void:
  _speaker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _speaker.custom_minimum_size.y=36
  _header.add_child(_speaker)
+ _header_spacer=Control.new()
+ _header_spacer.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ _header_spacer.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ _header_spacer.hide()
+ _header.add_child(_header_spacer)
  _scroll=ScrollContainer.new()
  _scroll.follow_focus=true
  _scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
@@ -138,10 +144,16 @@ func _apply_density(compact: bool) -> void:
  _layout.add_theme_constant_override("separation",5 if compact else 10)
  _box.add_theme_constant_override("separation",6 if compact else 10)
  _scroll.custom_minimum_size.y=COMPACT_READING_HEIGHT if compact else MIN_SCROLL_HEIGHT
+ _speaker.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
+ _speaker.size_flags_vertical=Control.SIZE_SHRINK_CENTER if compact else Control.SIZE_FILL
+ _header_spacer.visible=compact
  if is_instance_valid(_leave):
   var parent: Control=_header if compact else _layout
   if _leave.get_parent()!=parent:_leave.reparent(parent,false)
-  _leave.custom_minimum_size=Vector2(96,44) if compact else Vector2(0,44)
+  _leave.custom_minimum_size=Vector2(92,44) if compact else Vector2(0,44)
+  _leave.text=UiText.localized("ui.dialogue_leave_short") if compact else _text.text("dialogue_leave")
+  _leave.tooltip_text=_text.text("dialogue_leave")
+  _leave.autowrap_mode=TextServer.AUTOWRAP_OFF if compact else TextServer.AUTOWRAP_WORD_SMART
  if is_instance_valid(_history):
   if compact:
    _box.move_child(_history,_box.get_child_count()-1)
@@ -159,13 +171,18 @@ func _fit() -> void:
  _apply_density(compact)
  anchor_left=0;anchor_right=0;anchor_top=0;anchor_bottom=0
  if compact:
-  var available := maxf(COMPACT_READING_HEIGHT,viewport.y-top_inset-COMPACT_EDGE)
-  var height := minf(available,maxf(220.0,viewport.y*COMPACT_HEIGHT_RATIO))
+  var font := _speaker.get_theme_font("font")
+  var name_width := font.get_string_size(_speaker.text,HORIZONTAL_ALIGNMENT_LEFT,-1,_speaker.get_theme_font_size("font_size")).x+30.0
+  _speaker.custom_minimum_size.x=clampf(name_width,100.0,minf(300.0,viewport.x-130.0))
+  var available := maxf(220.0,viewport.y-top_inset-COMPACT_EDGE)
+  var ratio := 0.68 if CozyTheme.short_landscape_for(viewport) else COMPACT_HEIGHT_RATIO
+  var height := minf(available,maxf(220.0,viewport.y*ratio))
   offset_left=COMPACT_EDGE
   offset_right=viewport.x-COMPACT_EDGE
   offset_top=viewport.y-height-COMPACT_EDGE
   offset_bottom=viewport.y-COMPACT_EDGE
  else:
+  _speaker.custom_minimum_size.x=0
   var width := minf(PANEL_WIDTH,viewport.x-EDGE*2)
   var top := maxf(EDGE,top_inset)
   var available := maxf(MIN_SCROLL_HEIGHT,viewport.y-top-EDGE)

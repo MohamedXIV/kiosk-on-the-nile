@@ -86,7 +86,12 @@ func _fit() -> void:
  if not is_instance_valid(_actions):return
  var extent := size
  if extent.x<100 or extent.y<100:return
- var compact := extent.x<760
+ var compact := CozyTheme.compact_for(extent)
+ var desired_theme := CozyTheme.for_viewport(extent)
+ if theme!=desired_theme:theme=desired_theme
+ if CozyTheme.short_landscape_for(extent):
+  _fit_short_landscape(extent)
+  return
  var title_width := minf(extent.x-40,720)
  _heading.add_theme_font_size_override("font_size",34 if compact else 42)
  _masthead.position=Vector2((extent.x-title_width)*0.5,20 if compact else 30)
@@ -95,6 +100,19 @@ func _fit() -> void:
  _actions.size=Vector2(width,_actions.get_combined_minimum_size().y)
  var x := (extent.x-width)*0.5 if compact else (24.0 if LocaleService.current.rtl() else extent.x-width-24)
  _actions.position=Vector2(x,maxf(_masthead.position.y+_masthead.size.y+12,extent.y-_actions.size.y-24))
+
+func _fit_short_landscape(extent: Vector2) -> void:
+ # The title and action tray occupy separate columns on low landscape windows.
+ var margin := 16.0
+ var gap := 18.0
+ var action_width := minf(300.0,extent.x*0.42)
+ var title_width := extent.x-margin*2-gap-action_width
+ var rtl := LocaleService.current.rtl()
+ _heading.add_theme_font_size_override("font_size",32)
+ _masthead.size=Vector2(title_width,0)
+ _actions.size=Vector2(action_width,_actions.get_combined_minimum_size().y)
+ _masthead.position=Vector2(margin+action_width+gap if rtl else margin,maxf(margin,(extent.y-_masthead.size.y)*0.5))
+ _actions.position=Vector2(margin if rtl else extent.x-margin-action_width,maxf(margin,(extent.y-_actions.size.y)*0.5))
 
 func show_error(result: ActionResult) -> void:
  _error=result

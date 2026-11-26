@@ -243,6 +243,8 @@ func _review_layout() -> bool:
   return false
  if surface is TitleScreen:
   if not bounds.grow(1).encloses(surface._actions.get_global_rect()):return false
+  if not bounds.grow(1).encloses(surface._masthead.get_global_rect()):return false
+  if CozyTheme.short_landscape_for(bounds.size) and surface._actions.get_global_rect().intersects(surface._masthead.get_global_rect()):return false
  if surface is RecipePanel:
   var tracks: Array[Node] = surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
   if not surface._progress.is_empty() and tracks.size()!=surface._progress.size():return false
@@ -251,9 +253,9 @@ func _review_layout() -> bool:
    for marker in track.get_children():
     if marker.theme_type_variation=="RecipeStepNow":current_count+=1
    if current_count!=1:return false
-  if bounds.size.x<=640 and surface._station_art.custom_minimum_size.y>44:return false
+  if CozyTheme.compact_for(bounds.size) and surface._station_art.custom_minimum_size.y>44:return false
  if surface is ShopPanel:
-  if bounds.size.x<=640 and surface._selection_art.custom_minimum_size.y>44:return false
+  if CozyTheme.compact_for(bounds.size) and surface._selection_art.custom_minimum_size.y>44:return false
   for button in surface.find_children("*","Button",true,false):
    if button.get_meta("text_ref","") in ["ui.shop_review","ui.shop_confirm","ui.journey_return"] and not bounds.grow(1).encloses(button.get_global_rect()):return false
  # All production shortcuts must center the artwork on the face, not on
@@ -285,6 +287,15 @@ func _review_layout() -> bool:
    if absf(panel.get_global_rect().end.y-(bounds.end.y-8))>2:return false
    if is_instance_valid(panel._current_line) and not panel._scroll.get_global_rect().grow(1).encloses(panel._current_line.get_global_rect()):return false
    if not panel._compact:return false
+   if panel._speaker.visible and panel._speaker.size.x>302:return false
+   if is_instance_valid(panel._leave) and (panel._leave.size.y<44 or panel._leave.size.y>56 or panel._leave.get_parent()!=panel._header):return false
+   if panel.get_global_rect().position.y<hud._strip.get_global_rect().end.y:return false
+   if is_instance_valid(panel._current_line):
+    # At least the first selectable response must be visible, not only the speech.
+    for child in panel._box.get_children():
+     if child is Button and child!=panel._history_toggle:
+      if not panel._scroll.get_global_rect().grow(1).encloses(child.get_global_rect()):return false
+      break
    if is_instance_valid(panel._history) and panel._history.visible:return false
  if _area=="build":
   for child in hud.get_children():

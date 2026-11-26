@@ -284,9 +284,13 @@ static func _apply_reading_workbench(t: Theme) -> void:
 # interactive targets below 44 logical pixels just to fit more chrome.
 const COMPACT_WIDTH := 740.0
 const COMPACT_HEIGHT := 580.0
+const SHORT_LANDSCAPE_HEIGHT := 480.0
+const COMPACT_HUD_CLEARANCE := 104.0
 static var _compact_theme: Theme
 static func compact_for(extent: Vector2) -> bool:
  return extent.x<COMPACT_WIDTH or extent.y<COMPACT_HEIGHT
+static func short_landscape_for(extent: Vector2) -> bool:
+ return extent.x>extent.y and extent.y<SHORT_LANDSCAPE_HEIGHT
 static func for_viewport(extent: Vector2) -> Theme:
  return make_compact() if compact_for(extent) else make()
 static func make_compact() -> Theme:

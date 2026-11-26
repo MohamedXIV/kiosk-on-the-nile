@@ -230,6 +230,7 @@ func _fit_dock() -> void:
  theme=CozyTheme.for_viewport(viewport)
  var width := minf(DOCK_WIDTH,maxf(160,viewport.x-(16 if compact else 80)))
  var height := minf(DOCK_HEIGHT,viewport.y*(0.46 if compact else 0.44))
+ if CozyTheme.short_landscape_for(viewport):height=maxf(212.0,height)
  set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
  position=Vector2((viewport.x-width)*0.5,viewport.y-height-DOCK_EDGE)
  size=Vector2(width,height)

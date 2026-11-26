@@ -18,6 +18,7 @@
     "ui.close": "Close",
     "ui.dialogue_continue": "Continue",
     "ui.dialogue_leave": "I should get going.",
+    "ui.dialogue_leave_short": "Leave",
     "ui.dialogue_topics": "What shall we talk about?",
     "ui.supplier_title": "Supplies — Uncle Fathi",
     "ui.success": "Done",

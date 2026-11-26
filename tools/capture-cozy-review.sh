@@ -72,6 +72,7 @@ for lang in ar_EG en; do
  done
  for area in "${primary[@]}"; do
   capture_case "$area" "$lang" 640 540
+  capture_case "$area" "$lang" 844 390
  done
 done
 echo "COZY_REVIEW_MATRIX_FAILED=$failed"

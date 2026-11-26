@@ -27,6 +27,7 @@ func configure(text: UiText, session: GameSession) -> void:
  resized.connect(func():column.add_theme_constant_override("separation",5 if CozyTheme.compact_for(get_viewport_rect().size) else 10))
  SheetControls.header(column,_heading,text,hide,"bag","SectionNile")
  SheetControls.muted(_hint);column.add_child(_hint)
+ resized.connect(func():_hint.visible=not CozyTheme.short_landscape_for(get_viewport_rect().size))
  var hands := PanelContainer.new();hands.theme_type_variation="Inset";column.add_child(hands);hands.add_child(_held)
  var controls := SheetControls.columns(column,500);controls.add_theme_constant_override("separation",8)
  # Search/filter are a toolbar, not a competing vertically expanding pane.
@@ -77,6 +78,10 @@ func _render() -> void:
  _reset_scroll=false
  _age_labels.clear()
  SheetControls.clear(_rows)
+ if CozyTheme.short_landscape_for(get_viewport_rect().size):
+  var reading_hint := SheetControls.label(_hint.text)
+  SheetControls.muted(reading_hint)
+  _rows.add_child(reading_hint)
  var state := _session.items.storage_view()
  var held := _session.items.get_item(_session.inventory.held_id())
  _held.text=ItemText.t("held",{"item":ItemText.instance(_session,held)}) if not held.is_empty() else ItemText.t("hands_empty")

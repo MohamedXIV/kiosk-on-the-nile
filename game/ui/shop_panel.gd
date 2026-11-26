@@ -75,8 +75,13 @@ func configure(text: UiText, session: GameSession) -> void:
  resized.connect(func():
   var compact := CozyTheme.compact_for(get_viewport_rect().size)
   column.add_theme_constant_override("separation",5 if compact else 12)
-  quantity_label.visible=size.x>=800
+  var short_landscape := CozyTheme.short_landscape_for(get_viewport_rect().size)
+  quantity_label.visible=size.x>=800 and not short_landscape
   time_hint.visible=size.y>=500
+  # Keep the same return command but remove a full fixed footer in short landscape.
+  var return_parent: Control=checkout_row if short_landscape else footer
+  if back.get_parent()!=return_parent:back.reparent(return_parent,false)
+  footer.visible=not short_landscape
   body.vertical=false
   _selection_art.custom_minimum_size=Vector2.ONE*(44.0 if compact else 88.0)
   detail_heading.visible=not compact
