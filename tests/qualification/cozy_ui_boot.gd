@@ -268,7 +268,9 @@ func _review_layout() -> bool:
    if not surface.get_global_rect().grow(1).encloses(surface._manage.get_global_rect()):return false
    if CozyTheme.compact_for(bounds.size):
     for pager in surface._action_pagers:
-     if not pager._paged or not _check_action_pages(pager):return false
+     if not pager._paged or not _first_action_fits(pager,surface._scrolls[1]):return false
+     if surface._action_pagers.size()==1 and pager._row.get_parent()!=surface._header:return false
+     if not _check_action_pages(pager):return false
   var tracks: Array[Node] = surface._active.find_children("RecipeStepTrack","HFlowContainer",true,false)
   if not surface._progress.is_empty() and tracks.size()!=surface._progress.size():return false
   for track in tracks:
@@ -315,7 +317,9 @@ func _review_layout() -> bool:
    if panel._current_line.size.y<=panel._reading.size.y and not panel._reading.get_global_rect().grow(1).encloses(panel._current_line.get_global_rect()):return false
   if not is_instance_valid(panel._choice_pager):return false
   if CozyTheme.compact_for(bounds.size):
-   if not panel._choice_pager._paged or not _check_action_pages(panel._choice_pager):return false
+   if not panel._choice_pager._paged or not _first_action_fits(panel._choice_pager,panel._scroll):return false
+   if panel._choice_pager._row.get_parent()!=panel._header:return false
+   if not _check_action_pages(panel._choice_pager):return false
   if is_instance_valid(panel._history) and panel._history.visible:return false
  if _area=="build":
   for child in hud.get_children():
@@ -333,6 +337,15 @@ func _review_layout() -> bool:
    if child is InventoryPanel:return child._search.size.y<=64 and child._filter.size.y<=64 and child._scroll.size.y>=100
   return false
  return true
+func _first_action_fits(pager: OverlayActionPager, scroll: ScrollContainer) -> bool:
+ var action := pager.selected_control()
+ if not is_instance_valid(action):return false
+ var view := scroll.get_global_rect()
+ if not view.grow(1).encloses(action.get_global_rect()):
+  print("COZY_REVIEW_CLIPPED_ACTION ",_area," ",action.get_global_rect()," visible=",view)
+  return false
+ return true
+
 func _check_action_pages(pager: OverlayActionPager) -> bool:
  # Exercise paging through every existing action without invoking its callback.
  # Geometry is qualified separately after containers have settled.

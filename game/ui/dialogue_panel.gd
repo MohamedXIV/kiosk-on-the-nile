@@ -52,7 +52,7 @@ func _ready() -> void:
  _reading=ScrollContainer.new()
  _reading.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
  _reading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
- _reading.size_flags_stretch_ratio=1.2
+ _reading.size_flags_stretch_ratio=1.0
  _reading.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _reading.custom_minimum_size=Vector2(96,44)
  body.add_child(_reading)
@@ -119,6 +119,7 @@ func present_personal(view: Dictionary, director: NarrativeDirector) -> void:
 func _begin(signature: String, speaker_name: String="") -> bool:
  if signature==_signature:return false
  _signature=signature
+ if is_instance_valid(_choice_pager):_choice_pager.set_navigation_host(null)
  for child in _box.get_children():child.free()
  for child in _reading_box.get_children():child.free()
  if is_instance_valid(_leave):_leave.free()
@@ -178,7 +179,14 @@ func _fit() -> void:
   if is_instance_valid(_history):_reading_box.move_child(_history,_reading_box.get_child_count()-1)
   _reading.set_deferred("scroll_vertical",0)
   _scroll.set_deferred("scroll_vertical",0)
- if is_instance_valid(_choice_pager) and _choice_pager._paged!=_compact:_choice_pager.set_paged(_compact)
+ if is_instance_valid(_choice_pager):
+  if _choice_pager._paged!=_compact:_choice_pager.set_paged(_compact)
+  _choice_pager.set_navigation_host(_header if _compact else null)
+  if _compact:
+   _header.move_child(_choice_pager._row,1)
+   _speaker.custom_minimum_size.x=minf(_speaker.custom_minimum_size.x,132.0)
+   _header_spacer.hide()
+  else:_header_spacer.show()
  set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
  position=envelope.position
  size=envelope.size

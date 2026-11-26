@@ -318,6 +318,11 @@ static func make_compact() -> Theme:
   t.set_constant("h_separation",kind,6)
   t.set_constant("v_separation",kind,6)
  t.set_type_variation("CompactDialogueFrame","PanelContainer")
- t.set_stylebox("panel","CompactDialogueFrame",texture_box(0,10,8))
+ t.set_stylebox("panel","CompactDialogueFrame",texture_box(0,8,5))
+ t.set_type_variation("ActiveJobTray","PanelContainer")
+ t.set_stylebox("panel","ActiveJobTray",box(Color.TRANSPARENT,Color.TRANSPARENT,0,0))
+ var speech := t.get_stylebox("normal","DialogueLine").duplicate() as StyleBox
+ for side in [SIDE_TOP,SIDE_BOTTOM]:speech.set_content_margin(side,4)
+ t.set_stylebox("normal","DialogueLine",speech)
  _compact_theme=t
  return _compact_theme

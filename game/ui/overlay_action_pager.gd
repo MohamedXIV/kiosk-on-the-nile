@@ -26,13 +26,27 @@ func configure(actions: Array[Control]) -> void:
  _counter=UiText.label()
  _counter.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  _counter.set_meta("centered",true)
+ _counter.layout_direction=Control.LAYOUT_DIRECTION_LTR
+ _counter.text_direction=Control.TEXT_DIRECTION_LTR
+ _counter.custom_minimum_size.x=36
  _counter.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _row.add_child(_previous);_row.add_child(_counter);_row.add_child(_next)
  for control in _controls:
   control.reparent(self,false)
   control.custom_minimum_size.y=maxf(44,control.custom_minimum_size.y)
   control.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ move_child(_row,get_child_count()-1)
  set_paged(false)
+
+# An optional persistent header host keeps navigation out of the reading area.
+# Return the row before clearing the owning pager or rebuilding its controls.
+func set_navigation_host(host: Control) -> void:
+ var target: Control=host if is_instance_valid(host) else self
+ if _row.get_parent()!=target:_row.reparent(target,false)
+ if target==self:move_child(_row,get_child_count()-1)
+ _row.size_flags_horizontal=Control.SIZE_SHRINK_CENTER if target!=self else Control.SIZE_EXPAND_FILL
+ _row.visible=_paged and _controls.size()>1
+
 func set_paged(value: bool) -> void:
  _paged=value
  _row.visible=value and _controls.size()>1

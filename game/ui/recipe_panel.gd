@@ -10,6 +10,7 @@ var _station_summary: PanelContainer
 var _station_row: HBoxContainer
 var _header: HBoxContainer
 var _manage: Button
+var _close: Button
 var _active_feedback: Label
 var _gameplay_mode: bool=false
 var _action_pages: Dictionary={}
@@ -42,6 +43,7 @@ func configure(text: UiText, session: GameSession) -> void:
  resized.connect(func():column.add_theme_constant_override("separation",5 if CozyTheme.compact_for(get_viewport_rect().size) else 10))
  SheetControls.header(column,_heading,text,hide,"hunger","SectionClay")
  _header=_heading.get_parent() as HBoxContainer
+ _close=_header.get_child(_header.get_child_count()-1) as Button
  _manage=SheetControls.button(UiText.localized("cozy.station_management_short"),func():_tabs.current_tab=2 if _recipes.get_meta("has_recipes",false) else 0)
  _manage.custom_minimum_size=Vector2(96,44)
  _header.add_child(_manage)
@@ -74,8 +76,18 @@ func _fit_station_art() -> void:
 
 func _fit_action_pages() -> void:
  var paged := _gameplay_mode and CozyTheme.compact_for(get_viewport_rect().size)
+ var header_navigation := paged and _action_pagers.size()==1
+ if is_instance_valid(_close):
+  _close.custom_minimum_size.x=64 if header_navigation else 96
+  _manage.custom_minimum_size.x=64 if header_navigation else 96
+  _heading.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS if header_navigation else TextServer.OVERRUN_NO_TRIMMING
+  _heading.autowrap_mode=TextServer.AUTOWRAP_OFF if header_navigation else TextServer.AUTOWRAP_WORD_SMART
+  _heading.tooltip_text=_heading.text
  for pager in _action_pagers:
-  if is_instance_valid(pager) and pager._paged!=paged:pager.set_paged(paged)
+  if not is_instance_valid(pager):continue
+  if pager._paged!=paged:pager.set_paged(paged)
+  pager.set_navigation_host(_header if header_navigation else null)
+  if header_navigation:_header.move_child(pager._row,maxi(0,_header.get_child_count()-3))
 
 func _refresh_language() -> void:
  for i in range(3):_tabs.set_tab_title(i,ItemText.t(["care","active","recipes"][i]))
@@ -124,6 +136,8 @@ func _refresh() -> void:
  var offsets: Array=[]
  for scroll in _scrolls:offsets.append(scroll.get_v_scroll_bar().value)
  _progress.clear()
+ for pager in _action_pagers:
+  if is_instance_valid(pager):pager.set_navigation_host(null)
  _action_pagers.clear()
  _recipes.set_meta("has_recipes",false)
  for rows in [_care,_active,_recipes]:SheetControls.clear(rows)
@@ -177,7 +191,7 @@ func _render_jobs() -> void:
  for job in _session.workflow.jobs_at(_instance_id):
   var step: Dictionary=job.definition.steps[int(job.step_index)]
   var card := SheetControls.card(_active)
-  card.get_parent().theme_type_variation="StationTray"
+  card.get_parent().theme_type_variation="ActiveJobTray"
   var split := HBoxContainer.new()
   split.add_theme_constant_override("separation",8)
   card.add_child(split)
@@ -185,6 +199,7 @@ func _render_jobs() -> void:
   var commands := VBoxContainer.new();commands.size_flags_horizontal=Control.SIZE_EXPAND_FILL;commands.add_theme_constant_override("separation",4);split.add_child(commands)
   var heading := SheetControls.label(ItemText.recipe(str(job.recipe_id),str(job.definition.label)));SheetControls.muted(heading);summary.add_child(heading)
   var stage := SheetControls.label("%s / %s  ·  %s" % [int(job.step_index)+1,job.definition.steps.size(),ItemText.step(str(job.recipe_id),step)])
+  stage.text_direction=Control.TEXT_DIRECTION_AUTO
   stage.add_theme_color_override("font_color",Color("#24616b"));summary.add_child(stage)
   var meter := ProgressBar.new();meter.theme_type_variation="CookingProgress";meter.show_percentage=false;meter.custom_minimum_size.y=12;meter.mouse_filter=Control.MOUSE_FILTER_IGNORE;summary.add_child(meter)
   var progress := SheetControls.label();summary.add_child(progress)
